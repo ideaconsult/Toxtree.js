@@ -41,13 +41,17 @@ window.ToxMan = {
 			prefix = this.prefix;
 			
 		var featureList = document.getElementsByClassName(prefix + '-features')[0];
-		this.elements.featureRow = featureList.getElementsByClassName('row')[0];
-		this.elements.featureList = featureList.getElementsByClassName('body')[0];
+		if (featureList){
+			this.elements.featureRow = featureList.getElementsByClassName('row')[0];
+			this.elements.featureList = featureList.getElementsByClassName('body')[0];
+			this.elements.featureImage = document.getElementsByClassName(prefix + '-diagram')[0];
+		}
 		
-		this.elements.featureImage = document.getElementsByClassName(prefix + '-diagram')[0];
 		var algoList = document.getElementsByClassName(prefix + '-algorithms')[0];
-		this.elements.algoRow = algoList.getElementsByClassName('row')[0];
-		this.elements.algoList = algoList.getElementsByClassName('body')[0];
+		if (algoList){
+			this.elements.algoRow = algoList.getElementsByClassName('row')[0];
+			this.elements.algoList = algoList.getElementsByClassName('body')[0];
+		}
 	},
 	
 	/* Makes a query for dataset based on a needle - the starting point of all actions.
@@ -80,15 +84,25 @@ window.ToxMan = {
 			var infoRow = ToxTree.elements.algoInfo;
 			
 			clearChildren(root);
-			var list = document.createDocumentFragment();
 			for (var i = 0;i < algos.length; ++i) {
 				var row = tempRow.cloneNode(true);
 				fillTree(row, algos[i], prefix + '-algo');
-/* 				row.getElementsByClassName('info')[0].onclick = algoInfoClicked; */
-/* 				row.getElementsByClassName('run')[0].onclick = algoRunClicked; */
-				list.appendChild(row);
+				root.appendChild(row);
+				var info = row.querySelector('button.info');
+				if (info){
+					info.onclick = function(e){
+						// TODO: toggle visible
+					}
+				}
+				
+				var run = row.querySelector('button.run');
+				if (run){
+					run.onclick = function(e){
+						// TODO: runs a prediction	
+					}
+				}
 			}
-			root.appendChild(list);
+			
 		});
 	},
 	
@@ -112,13 +126,3 @@ window.ToxMan = {
 		
 	},
 };
-
-/* Called from the button that shows / hides detailed information for an algorithm
-*/
-function algoInfoClicked(e){
-}
-
-/* Called from the button that runs a prdiction with given alforithm
-*/
-function algoRunClicked(e){
-}
