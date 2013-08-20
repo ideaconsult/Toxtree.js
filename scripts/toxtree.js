@@ -7,17 +7,17 @@ window.ToxMan = {
 	currentQuery: null,
 	prefix: 'toxtree',
 	
-	/* A single place to hold all necessary queries. Parameters are marked with [XX] and formatString() (common.js) is used
+	/* A single place to hold all necessary queries. Parameters are marked with <XX> and formatString() (common.js) is used
 	to prepare the actual URLs
 	*/
 	queries: {
-		query: "",
-		listAlgo: "",
-		getImage: "",
-		taskPoll: "",
-		getModel: "",
+		query: "/query/compound/search/all?search=<1>&page=0&pagesize=1",
+		listAlgo: "/algorithm?search=ToxTree",
+		getImage: "/compound/<1>?media=image/png",
+		taskPoll: "/task/<1>",
+		getModel: "/model?algorithm=<1>",
 		postModel: "",
-		getPrediction: "",
+		getPrediction: "/compound/DATASET_URI?feature_uris[]=<1>",
 		postPrediction: ""
 	},
 	
@@ -53,7 +53,7 @@ window.ToxMan = {
 	/* Makes a query for dataset based on a needle - the starting point of all actions.
 	*/
 	query : function(needle) {
-		var q = formatString(this.queries.query, encodeURI(needle));
+		var q = formatString(this.queries.query, encodeURIComponent(needle)); // TODO: encode it?
 		ConnMan.call(q, function(dataset){
 			var features = ToxTree.parseFeatures(dataset);
 			var root = ToxTree.elements.featureList;

@@ -59,7 +59,7 @@ window.ConnMan = {
 			function() {
 				if(finished) return;
 				finished = true;
-				connectionError(0, "Timeout");
+				connectionError(0, localMessage.timeout);
 			},
 			this.timeoutSecs * 1000);
 

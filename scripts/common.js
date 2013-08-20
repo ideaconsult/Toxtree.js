@@ -296,7 +296,7 @@ function clearChildren(obj, last) {
 */
 function formatString(format) {
   for (var i = 1;i < arguments.length; ++i) {
-    format = format.replace('[' + i + ']', arguments[i]);
+    format = format.replace('<' + i + '>', arguments[i]);
   }
   return format;
 }
