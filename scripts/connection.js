@@ -42,7 +42,8 @@ window.ConnMan = {
 	},
 	
 	/* Make the actual HTTPRequest to the server. Creates s new object, fills in the passed data, callback, etc.
-		setups all necessary handlers and voilah - go to the server. The callback will be called on success only.
+		setups all necessary handlers and voilah - go to the server. The callback will be called in either way - 
+		success or error, with the later case passing 'null'.
 	*/
 	makeXHR: function(method, url, callback, data){
 	  var xhr = new XMLHttpRequest();
@@ -79,6 +80,7 @@ window.ConnMan = {
 	    if(finished)return;
 	    finished = true;
 	    clearTimeout(requestTimeout);
+	    callback(null);
 			connectionError(xhr.errorCode, xhr.errorMessage);
 		};
 

@@ -47,6 +47,26 @@
 	padding-left: 1px !important;
 	padding-right: 0px !important;
 }
+
+button.imaged {
+  border: 0px;
+  margin: 0px;
+  padding: 0px;
+  opacity: 0.8;
+  line-height: 0px;
+}
+
+button.imaged:hover {
+	opacity: 1.0;
+}
+
+.inlined {
+	display: inline-block;
+}
+
+.floated-right {
+	float: right;
+}
 /* And now some visual styling
 */
 #query-needle {
@@ -70,9 +90,9 @@
   border: 1px solid #ccc;
   border-top: 1px solid #eee;
   border-left: 1px solid #eee;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
+  -moz-border-radius: 7px;
+  -webkit-border-radius: 7px;
+  border-radius: 7px;
   color: #444;
   margin: 0px;
   
@@ -119,4 +139,8 @@
 */
 .toxtree-algorithms {
 	overflow-y: scroll;
+}
+
+.toxtree-algorithms li > *:nth-child(1) {
+	width: 90%;
 }

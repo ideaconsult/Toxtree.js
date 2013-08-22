@@ -41,6 +41,9 @@
 							<td class="separator"/></td>
 							<td class="three columns nomargin data-field" data-field="value"> _value_ </td>
 						</tr>
+						<tr class="header-blank">
+							<td colspan="3"><strong class="data-field" data-field="header"> _header_ </strong></td>
+						</tr>
 					</tfoot>
 				</table>
 			</div>
@@ -51,7 +54,8 @@
 			<h4>Algorithms</h4>
 			<ul class="toxtree-algorithms body">
 				<li class="row-blank template panel-hovering">
-					<h5 class="data-field" data-field="name"> _name_ <img class='run' src="images/run.png"/></h5>
+					<h5 class="data-field inlined" data-field="name"> _name_ </h5>
+					<button class="imaged run"><img src="images/run.png"/></button>
 					<div class="info">
 						<h6>Description: <strong class="data-field" data-field="description"> _description_ </strong></h6>
 						<div class="results"> _results_ </div>
@@ -60,7 +64,7 @@
 			</ul>
 		</div>
 		<div class="sixteen columns bordered">
-			<h6><span id="connection-baseuri"></span> : <img src="images/idle.png" id="connection-status"/> <span id="connection-error"></span></h6>
+			<h6><span id="connection-baseuri"></span> : <img src="images/ok.png" id="connection-status"/> <span id="connection-error"></span></h6>
 		</div>
 	</div>
 </body>

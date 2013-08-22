@@ -15,17 +15,12 @@ domready(function(){
 	var needle = document.getElementById('query-needle');
 	var query = document.getElementById('query-button');
 	if (query && needle){
-		query.onclick = function(e){
-			ToxMan.query(needle.value);
-		}
-		
-		needle.onchange = function (e) {
-			if (this.value.length > 0)
+		needle.onchange = query.onclick = function(e){
+			if (needle.value.length > 0){
 				ToxMan.query(needle.value);
-		}
-		
-		needle.onkeypress = function (e) {
-			query.disabled = this.value.length == 0;
+				needle.setAttribute('placeholder', needle.value + "_");
+				needle.value = '';
+			}
 		}
 	}
 });

@@ -5,6 +5,7 @@
 
 window.ToxMan = {
 	currentQuery: null,
+	currentDataset: null,
 	prefix: 'ToxMan',
 	algorithms: null, // it gets filled from the listAlgos() query.
 	featurePrefix: 'http://www.opentox.org/api/1.1#',
@@ -18,7 +19,7 @@ window.ToxMan = {
 		taskPoll: "/task/<1>",
 		getModel: "/model?algorithm=<1>",
 		postModel: "",
-		getPrediction: "/compound/DATASET_URI?feature_uris[]=<1>",
+		getPrediction: "/compound/<1>?feature_uris[]=<2>",
 		postPrediction: ""
 	},
 	
@@ -27,6 +28,7 @@ window.ToxMan = {
 	elements: {
 		featureList: null, 		// the whole container (table) for feature list
 		featureRow: null,			// a single, template, row for filling the above
+		featureHeader: null,  // a single row, as above, with textual header information
 		featureImage: null,		// the placeholder for the compund image
 		algoList: null,				// the container (table) for algorithms list
 		algoRow: null,				// a single, template, row for filling the above
@@ -44,6 +46,7 @@ window.ToxMan = {
 		var featureList = document.getElementsByClassName(prefix + '-features')[0];
 		if (featureList){
 			this.elements.featureRow = featureList.getElementsByClassName('row-blank')[0];
+			this.elements.featureHeader = featureList.getElementsByClassName('header-blank')[0];
 			this.elements.featureList = featureList.classList.contains('body') ? featureList : featureList.getElementsByClassName('body')[0];
 		}
 		this.elements.featureImage = document.getElementsByClassName(prefix + '-diagram')[0];
@@ -73,31 +76,22 @@ window.ToxMan = {
 	query : function(needle) {
 		if (needle.length < 1)
 			return false;
-		var q = formatString(this.queries.query, encodeURIComponent(needle)); // TODO: encode it?
-		ConnMan.call(q, function(dataset){
+		this.currentQuery = formatString(this.queries.query, encodeURIComponent(needle)); // TODO: encode it?
+		ConnMan.call(this.currentQuery, function(dataset){
 			// start with some clearing
 			ToxMan.clearResults();
-			if (dataset.dataEntry.length < 1){
+			if (!dataset || dataset.dataEntry.length < 1){
 				ConnMan.setResult('notfound', localMessage.nothingFound);
 				return false;
 			}
-
-			var root = ToxMan.elements.featureList;
-			var tempRow = ToxMan.elements.featureRow;
-
-			// ok - we have something to proceed on.
-			var features = ToxMan.buildFeatures(dataset, 0);
+			// now parse to see the compund ID
+			dataset.dataEntry[0].compound.id = parseInt(dataset.dataEntry[0].compound.URI.replace(/.*compound\/(\d+)\/.*/, '$1'));
+			ToxMan.currentDataset = dataset;
 			
-			var list = document.createDocumentFragment();
-			for (var i = 0;i < features.length; ++i) {
-				var row = tempRow.cloneNode(true);
-				fillTree(row, features[i], ToxMan.prefix + '-feature');
-				row.classList.remove('template');
-				list.appendChild(row);
-			}
-			root.appendChild(list);
-			
-			// now setup the diagram image
+			// fills the feature list...
+			ToxMan.addFeatures(ToxMan.buildFeatures(dataset, 0));
+	
+			// ... and setup the diagram image
 			var image = ToxMan.elements.featureImage;
 			if (image){
 				image.style.visibility = 'visible';
@@ -111,6 +105,8 @@ window.ToxMan = {
 	*/
 	listAlgos : function() {
 		ConnMan.call(this.queries.listAlgos, function(algos){
+			if (!algos) // i.e. error
+				return false;
 			var root = ToxMan.elements.algoList;
 			var tempRow = ToxMan.elements.algoRow;
 			
@@ -150,23 +146,41 @@ window.ToxMan = {
 					}
 				}
 				
-				// finally - attach the handler for running the prediction
+				// finally - attach the handler for running the prediction - create a new function each time so the proper index to be passed
 				var run = row.querySelector('.run');
 				if (run){
-					run.onclick = function(e){
-						// TODO: runs a prediction	
-					}
+					run.onclick = (function(algoIdx){
+						return function(e){
+							ToxMan.runPrediction(algoIdx);
+							e.stopPropagation();
+						}
+					})(i);
 				}
 			}
-			
 		});
 	},
 	
-	/* Runs a prediction (algorithm) with givel algoId on a given compoundId. 'algoId' is used to determine
-	which element in the UI should be filled, so that results can be shown later.
+	/* Runs a prediction (algorithm) with given 'algo' (as reported upon listAlgos()) on the compound form the current dataset. 'algoId' is used to determine
+		which element in the UI should be filled, so that results can be shown later.
 	*/
-	runPrediction : function (compoundId, algoId) {
+	runPrediction : function (algoIndex) {
+		var algo = this.algorithms[algoIndex];
+		var q = formatString(this.queries.getModel, encodeURIComponent(algo.uri));
+		var predictParser = function(prediction){
+			var features = ToxMan.buildFeatures(prediction, 0);
+			ToxMan.addFeatures(features, algo.name);
+		};
 		
+		ConnMan.call(q, function(model){
+			if (!model || model.model.length < 1){
+				// TODO: we need to make a POST call to create a model first.
+				
+			}
+			else { // OK, we have the model - attempt to get a prediction for our compound...
+				var q = formatString(ToxMan.queries.getPrediction, encodeURIComponent(ToxMan.currentDataset.dataEntry[0].compound.id), encodeURIComponent(model.model[0].predicted));
+				ConnMan.call(q, predictParser);	
+			}
+		});
 	},
 	
 	/* Build a new array of features from 'values' and 'feature' arrays in the dataset. 
@@ -175,18 +189,46 @@ window.ToxMan = {
 	buildFeatures : function(dataset, index) {
 		var features = [];
 		for (var i in dataset.dataEntry[index].values){
-			var name = dataset.feature[i].title;
-			if (name.indexOf(this.featurePrefix) == -1) // not from the accepted feature namespace
-				continue;
-			
 			var entry = new Object();
 			entry.id = i;
 			entry.value = dataset.dataEntry[index].values[i];
-			entry.name = name.replace(this.featurePrefix, "");
+			entry.name = dataset.feature[i].title.replace(this.featurePrefix, "");
 			features.push(entry);
 		}
 		
 		return features;
+	},
+	
+	/* Adds given features (the result of buildFeatures call) to the feature list. If header is passed
+	 one single header row is added with the given string
+	*/
+	addFeatures : function (features, header) {
+		// proceed on filling the feature windows
+		var root = ToxMan.elements.featureList;
+		var tempRow = ToxMan.elements.featureRow;
+
+		if (!root || !tempRow)
+			return false;
+		
+		var list = document.createDocumentFragment();
+		
+		// add a header row, if asked to do so.
+		if (header){
+			var hdr = ToxMan.elements.featureHeader.cloneNode(true);
+			fillTree(hdr, {"header": header});
+			list.appendChild(hdr);
+		}
+		
+		// now fill the features' key:value pairs.
+		for (var i = 0;i < features.length; ++i) {
+			var row = tempRow.cloneNode(true);
+			fillTree(row, features[i], ToxMan.prefix + '-feature');
+			row.classList.remove('template');
+			list.appendChild(row);
+		}
+		
+		// finalize by adding this to the root.
+		root.appendChild(list);
 	},
 	
 	/* Poll a given taskId and calls the callback when a result from the server comes - 
