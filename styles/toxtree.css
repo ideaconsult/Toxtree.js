@@ -64,8 +64,9 @@ button.imaged:hover {
 	display: inline-block;
 }
 
-.floated-right {
-	float: right;
+.fly-bottom {
+	position: absolute;
+	bottom: 0px;
 }
 /* And now some visual styling
 */
@@ -143,4 +144,8 @@ button.imaged:hover {
 
 .toxtree-algorithms li > *:nth-child(1) {
 	width: 90%;
+}
+
+.toxtree-algorithm .results {
+	height: auto;
 }

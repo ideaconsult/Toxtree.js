@@ -169,6 +169,9 @@ window.ToxMan = {
 		var predictParser = function(prediction){
 			var features = ToxMan.buildFeatures(prediction, 0);
 			ToxMan.addFeatures(features, algo.name);
+			var results = document.getElementById(ToxMan.prefix + '-algo-' + algo.id).getElementsByClassName('results')[0];
+			results.classList.remove('invisible');
+			results.innerHTML = features[1].value;
 		};
 		
 		ConnMan.call(q, function(model){

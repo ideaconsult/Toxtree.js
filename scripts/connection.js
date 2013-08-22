@@ -84,6 +84,10 @@ window.ConnMan = {
 			connectionError(xhr.errorCode, xhr.errorMessage);
 		};
 
+		// some nices...
+		this.elements.status.src = "images/waiting_small.gif";
+		this.elements.status.title = localMessage.waiting;
+
 		try
 		{
 			xhr.open(method, this.baseURI + url, true);
@@ -116,8 +120,10 @@ window.ConnMan = {
 	/* Set the result from the request - be it success or error
 	*/
 	setResult: function(status, error){
-		if (this.elements.status)
+		if (this.elements.status){
 			this.elements.status.src = "images/" + status + ".png";
+			this.elements.status.title = localMessage[status];
+		}
 		if (!error)
 			error = '';
 		if (this.elements.error){
