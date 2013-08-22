@@ -62,6 +62,9 @@ button.imaged:hover {
 
 .inlined {
 	display: inline-block;
+	margin-left: 10px;
+	margin-top: 5px;
+	vertical-align: text-top;
 }
 
 .fly-bottom {
@@ -128,6 +131,14 @@ button.imaged:hover {
 	padding-left: 10px;
 	padding-right: 2px;
 	white-space: nowrap;
+
+  -moz-user-select: auto;
+  -khtml-user-select: auto;
+  -webkit-user-select: auto;
+  user-select: auto;
+  
+  vertical-align: top;
+	
 }
 
 .toxtree-features td:nth-child(1) {
@@ -148,9 +159,22 @@ button.imaged:hover {
 }
 
 .toxtree-algorithms li > *:nth-child(1) {
-	width: 90%;
+	width: 87%;
+	text-overflow: ellipsis;
 }
 
-.toxtree-algorithm .results {
+.toxtree-algorithms li > *:nth-child(2) {
+	text-align: center;
+}
+
+.toxtree-algorithms .results {
 	height: auto;
+  -moz-user-select: auto;
+  -khtml-user-select: auto;
+  -webkit-user-select: auto;
+  user-select: auto;
+  
+  margin-right: 10px;
+  margin-bottom: 10px;
+  background: #f0f0f0;
 }

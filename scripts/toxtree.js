@@ -97,6 +97,8 @@ window.ToxMan = {
 				image.style.visibility = 'visible';
 				image.src = dataset.dataEntry[0].compound.URI + '?media=image/png';
 			}
+			
+			ToxMan.runAutos();
 		});
 	},
 	
@@ -131,30 +133,36 @@ window.ToxMan = {
 				root.appendChild(row);
 
 				// now attach the handler for clicking on the line which opens / hides it.
-				row.onclick = function(e){
-					var info = this.getElementsByClassName('info')[0];
-					var res = this.getElementsByClassName('results')[0];
-					if (this.classList.contains('visible')){
-						this.classList.remove('visible');
+				var showhideInfo = function(row){
+					var info = row.getElementsByClassName('info')[0];
+					var res = row.getElementsByClassName('results')[0];
+					if (row.classList.contains('visible')){
+						row.classList.remove('visible');
 						if (info)
 							info.classList.add('invisible');
 					}
 					else {
-						this.classList.add('visible')
+						row.classList.add('visible')
 						if (info)
 							info.classList.remove('invisible');
 					}
 				}
 				
+				row.getElementsByClassName('title')[0].onclick = function(e) { showhideInfo(this.parentNode); }
+				
+				// then put good id to auto checkboxes so that runAutos() can recognizes
+				var auto = row.getElementsByClassName('auto')[0].id = ToxMan.prefix + "-algoauto-" + i;
+
 				// finally - attach the handler for running the prediction - create a new function each time so the proper index to be passed
 				var run = row.querySelector('.run');
 				if (run){
-					run.onclick = (function(algoIdx){
+					run.onclick = (function(algoIdx, row){
 						return function(e){
 							ToxMan.runPrediction(algoIdx);
+							showhideInfo(row);
 							e.stopPropagation();
 						}
-					})(i);
+					})(i, row);
 				}
 			}
 		});
@@ -170,7 +178,9 @@ window.ToxMan = {
 		// the function that actually parses the results of predictions and fills up the UI
 		var predictParser = function(prediction){
 			var features = ToxMan.buildFeatures(prediction, 0);
-			ToxMan.addFeatures([features[0] ], algo.name);
+			ToxMan.addFeatures(features, algo.name, function(feature){
+				return feature.name.indexOf('#explanation') == -1;
+			});
 			
 			var results = document.getElementById(ToxMan.prefix + '-algo-' + algo.id).getElementsByClassName('results')[0];
 			results.classList.remove('invisible');
@@ -188,6 +198,17 @@ window.ToxMan = {
 				ConnMan.call(q, predictParser);	
 			}
 		});
+	},
+	
+	/* Run predictions that are marked as 'auto'. Rely on the properly set id of each row in the algorithms list
+	*/
+	runAutos: function() {
+		var autos = document.querySelectorAll('.' + this.prefix + '-algorithms .auto');
+		for (var i = 0;i < autos.length; ++i){
+			if (autos[i].id.length > 0 && autos[i].checked){
+				this.runPrediction(parseInt(autos[i].id.substr(this.prefix.length + 10)));
+			}
+		}	
 	},
 	
 	/* Build a new array of features from 'values' and 'feature' arrays in the dataset. 
@@ -209,7 +230,7 @@ window.ToxMan = {
 	/* Adds given features (the result of buildFeatures call) to the feature list. If header is passed
 	 one single header row is added with the given string
 	*/
-	addFeatures : function (features, header) {
+	addFeatures : function (features, header, filter) {
 		// proceed on filling the feature windows
 		var root = ToxMan.elements.featureList;
 		var tempRow = ToxMan.elements.featureRow;
@@ -228,6 +249,8 @@ window.ToxMan = {
 		
 		// now fill the features' key:value pairs.
 		for (var i = 0;i < features.length; ++i) {
+			if (filter && !filter(features[i]))
+				continue;
 			var row = tempRow.cloneNode(true);
 			fillTree(row, features[i], ToxMan.prefix + '-feature');
 			row.classList.remove('template');
