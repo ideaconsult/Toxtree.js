@@ -166,14 +166,18 @@ window.ToxMan = {
 	runPrediction : function (algoIndex) {
 		var algo = this.algorithms[algoIndex];
 		var q = formatString(this.queries.getModel, encodeURIComponent(algo.uri));
+		
+		// the function that actually parses the results of predictions and fills up the UI
 		var predictParser = function(prediction){
 			var features = ToxMan.buildFeatures(prediction, 0);
-			ToxMan.addFeatures(features, algo.name);
+			ToxMan.addFeatures([features[0] ], algo.name);
+			
 			var results = document.getElementById(ToxMan.prefix + '-algo-' + algo.id).getElementsByClassName('results')[0];
 			results.classList.remove('invisible');
 			results.innerHTML = features[1].value;
 		};
 		
+		// the prediction ivoke trickery...
 		ConnMan.call(q, function(model){
 			if (!model || model.model.length < 1){
 				// TODO: we need to make a POST call to create a model first.
