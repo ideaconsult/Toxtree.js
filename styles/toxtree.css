@@ -130,6 +130,11 @@ button.imaged:hover {
 	white-space: nowrap;
 }
 
+.toxtree-features td:nth-child(1) {
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
 /* Toxtree diagram styling
 */
 .toxtree-diagram {
