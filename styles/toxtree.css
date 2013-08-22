@@ -1,0 +1,122 @@
+/* toxtree.css - The stylesheet defining some behavioral styles, like 'visible', 'hidden', etc.
+*/
+
+.hidden {
+	display: none !important;
+}
+
+.template {
+	display: none;	
+}
+
+.visible {
+	height: auto;
+	visibility: visible;	
+}
+
+.fading {
+	opacity: 0.3;
+  -moz-transition: opacity ease 3000ms;
+  -ms-transition: opacity ease 3000ms;
+  -o-transition: opacity ease 3000ms;
+  -webkit-transition: opacity ease 3000ms;
+  transition: opacity ease 3000ms;
+}
+
+.invisible {
+	height: 0px !important;
+	visibility: hidden;
+  -moz-transition: height ease 300ms;
+  -ms-transition: height ease 300ms;
+  -o-transition: height ease 300ms;
+  -webkit-transition: height ease 300ms;
+  transition: height ease 300ms;
+}
+
+.container .columns.nomargin,
+.container .column.nomargin { 
+	margin-right: 0px; 
+	margin-left: 0px; 
+}
+
+.separator {
+	background: #999;
+	width:1px !important;
+	margin-left:0px !important;
+	margin-right: 0px !important;
+	padding-left: 1px !important;
+	padding-right: 0px !important;
+}
+/* And now some visual styling
+*/
+#query-needle {
+	font-size: 21px;
+	width: 100%;
+}
+
+#connection-error {
+	color: #bc3838;	
+}
+
+.panel,
+.panel-hovering {
+	background: #eee; /* Old browsers */
+	background: #eee -moz-linear-gradient(top, rgba(255,255,255,.1) 0%, rgba(127,127,127,.1) 100%); /* FF3.6+ */
+	background: #eee -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,.1)), color-stop(100%,rgba(127,127,127,.1))); /* Chrome,Safari4+ */
+	background: #eee -webkit-linear-gradient(top, rgba(255,255,255,.1) 0%,rgba(127,127,127,.1) 100%); /* Chrome10+,Safari5.1+ */
+	background: #eee -o-linear-gradient(top, rgba(255,255,255,.1) 0%,rgba(127,127,127,.1) 100%); /* Opera11.10+ */
+	background: #eee -ms-linear-gradient(top, rgba(255,255,255,.1) 0%,rgba(127,127,127,.1) 100%); /* IE10+ */
+	background: #eee linear-gradient(top, rgba(255,255,255,.1) 0%,rgba(127,127,127,.1) 100%); /* W3C */
+  border: 1px solid #ccc;
+  border-top: 1px solid #eee;
+  border-left: 1px solid #eee;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  color: #444;
+  margin: 0px;
+  
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.panel-hovering:hover {
+	color: #222;
+	background: #ddd; /* Old browsers */
+	background: #ddd -moz-linear-gradient(top, rgba(255,255,255,.2) 0%, rgba(127,127,127,.2) 100%); /* FF3.6+ */
+	background: #ddd -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,.2)), color-stop(100%,rgba(127,127,127,.2))); /* Chrome,Safari4+ */
+	background: #ddd -webkit-linear-gradient(top, rgba(255,255,255,.2) 0%,rgba(127,127,127,.2) 100%); /* Chrome10+,Safari5.1+ */
+	background: #ddd -o-linear-gradient(top, rgba(255,255,255,.2) 0%,rgba(127,127,127,.2) 100%); /* Opera11.10+ */
+	background: #ddd -ms-linear-gradient(top, rgba(255,255,255,.2) 0%,rgba(127,127,127,.2) 100%); /* IE10+ */
+	background: #ddd linear-gradient(top, rgba(255,255,255,.2) 0%,rgba(127,127,127,.2) 100%); /* W3C */
+  border: 1px solid #aaa;
+  border-top: 1px solid #ccc;
+  border-left: 1px solid #ccc; 
+}
+
+/* Toxtree features styling
+*/
+.toxtree-features  {
+	min-height: 240px;
+	overflow: scroll;
+}
+
+.toxtree-features td {
+	padding-left: 10px;
+	padding-right: 2px;
+	white-space: nowrap;
+}
+
+/* Toxtree diagram styling
+*/
+.toxtree-diagram {
+	min-height: 240px;
+}
+
+/* Toxtree algorithms styling
+*/
+.toxtree-algorithms {
+	overflow-y: scroll;
+}

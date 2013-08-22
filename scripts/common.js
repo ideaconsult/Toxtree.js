@@ -4,9 +4,30 @@ domready(function(){
     flexSchedule(flexs[i], flexVertically);
   }
 
-	attachButtons(document);  
+	// first initialize some general stuff - connection, list of supported algorithms, etc.
+	attachButtons(document);
+	ConnMan.init();
+	localMessage = languages[ConnMan.parameters.language !== undefined ? ConnMan.parameters.langauge : 'en'];
 	ToxMan.init('toxtree', document.getElementById('query-form'));
 	ToxMan.listAlgos();
+	
+	// now attach the query button
+	var needle = document.getElementById('query-needle');
+	var query = document.getElementById('query-button');
+	if (query && needle){
+		query.onclick = function(e){
+			ToxMan.query(needle.value);
+		}
+		
+		needle.onchange = function (e) {
+			if (this.value.length > 0)
+				ToxMan.query(needle.value);
+		}
+		
+		needle.onkeypress = function (e) {
+			query.disabled = this.value.length == 0;
+		}
+	}
 });
 
 function attachButtons(root){
@@ -324,6 +345,34 @@ function fillTree(root, json, prefix, filter) {
   }
 }
 
+function parseURL(url) {
+  var a =  document.createElement('a');
+  a.href = url;
+  return {
+    source: url,
+    protocol: a.protocol.replace(':',''),
+    host: a.hostname,
+    port: a.port,
+    query: a.search,
+    params: (function(){
+      var ret = {},
+        seg = a.search.replace(/^\?/,'').split('&'),
+        len = seg.length, i = 0, s;
+      for (;i<len;i++) {
+        if (!seg[i]) { continue; }
+        s = seg[i].split('=');
+        ret[s[0]] = (s.length>1)?decodeURIComponent(s[1].replace(/\+/g,  " ")):'';
+      }
+      return ret;
+    })(),
+    file: (a.pathname.match(/\/([^\/?#]+)$/i) || [,''])[1],
+    hash: a.hash.replace('#',''),
+    path: a.pathname.replace(/^([^\/])/,'/$1'),
+    relative: (a.href.match(/tps?:\/\/[^\/]+(.+)/) || [,''])[1],
+    segments: a.pathname.replace(/^\//,'').split('/')
+  };
+}
+
 /*
  * General message-box functionalty
  *
@@ -344,6 +393,8 @@ var messageBox = (function(){
   domready(function(){
 
     self.box = document.getElementById('message-box');
+    if (!self.box)
+    	return false;
     self.message = this.box.getElementsByTagName('p')[0];
     self.buttons = this.box.getElementsByTagName('button');
 

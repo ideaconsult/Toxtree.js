@@ -7,6 +7,8 @@ window.ConnMan = {
 	errorHandler: null,
 	baseURI: null,
 	timeoutSecs: 10,
+	parameters:null, // the parameters from the query - as they appera in the URL
+	fadeTimeout: null,
 	elements: {
 		server: null,
 		status: null,
@@ -24,9 +26,10 @@ window.ConnMan = {
 		else
 			this.errorHandler = errHandler;
 		
-		if (!baseUri){
-			// TODO: get the calling server URL and append the passed ?serviceRoot=<root> path			
-		}
+		var url = parseURL(document.location);
+		this.parameters = url.params;
+		if (!baseUri)
+			this.baseURI = url.params.server;		
 		else
 			this.baseURI = baseUri;
 			
@@ -34,13 +37,14 @@ window.ConnMan = {
 		this.elements.status = document.getElementById('connection-status');
 		this.elements.error = document.getElementById('connection-error');
 		
-		setObj(this.elements.server, this.baseURI);
+		if (this.elements.server)
+			setObjValue(this.elements.server, this.baseURI);
 	},
 	
 	/* Make the actual HTTPRequest to the server. Creates s new object, fills in the passed data, callback, etc.
 		setups all necessary handlers and voilah - go to the server. The callback will be called on success only.
 	*/
-	makeXHR: function(method, address, callback, data){
+	makeXHR: function(method, url, callback, data){
 	  var xhr = new XMLHttpRequest();
 	  if ("withCredentials" in xhr) {
 	    // Check if the XMLHttpRequest object has a "withCredentials" property.
@@ -68,7 +72,7 @@ window.ConnMan = {
 	    finished = true;
 	    clearTimeout(requestTimeout);
 	    ConnMan.setResult('ok');
-	    callback(request.responseText);
+	    callback(JSON.parse(xhr.responseText));
 		};
 
 		xhr.onerror = function () {
@@ -80,8 +84,9 @@ window.ConnMan = {
 
 		try
 		{
-			request.open(method, this.baseURI + url, true);
-			request.send(data);
+			xhr.open(method, this.baseURI + url, true);
+			xhr.setRequestHeader("Accept", "application/json");
+			xhr.send(data);
 		}
 		catch(e)
 		{
@@ -109,10 +114,18 @@ window.ConnMan = {
 	/* Set the result from the request - be it success or error
 	*/
 	setResult: function(status, error){
-		this.elements.status.src = "images/" + status + ".png";
+		if (this.elements.status)
+			this.elements.status.src = "images/" + status + ".png";
 		if (!error)
 			error = '';
-		this.elements.error.innerHTML = error;
+		if (this.elements.error){
+			var errEl = this.elements.error;
+			errEl.classList.remove('fading');
+			errEl.innerHTML = error;
+			if (this.fadeTimeout)
+				clearTimeout(this.fadeTimeout);
+			this.fadeTimeout = setTimeout(function() { errEl.classList.add('fading'); }, 200);
+		}
 	},
 	
 	/* The default error handling routing, if no other is passed on ConnMan.init() - this one is used.
