@@ -173,21 +173,30 @@ window.ToxMan = {
 	*/
 	runPrediction : function (algoIndex) {
 		var algo = this.algorithms[algoIndex];
-		var q = formatString(this.queries.getModel, encodeURIComponent(algo.uri));
+		
+		// let's clean a bit - the trick is we've added class='<algo.id>' on every feature row concerning this algorithm
+		var features = this.elements.featureList.getElementsByClassName(algo.id);
+		while(features.length > 0)
+			features[0].parentNode.removeChild(features[0]);
+			
+		// clear the previous prediction results.
+		var results = document.getElementById(ToxMan.prefix + '-algo-' + algo.id).getElementsByClassName('results')[0];
+		results.classList.add('invisible');
+		results.innerHTML = '';		
 		
 		// the function that actually parses the results of predictions and fills up the UI
 		var predictParser = function(prediction){
 			var features = ToxMan.buildFeatures(prediction, 0);
-			ToxMan.addFeatures(features, algo.name, function(feature){
+			ToxMan.addFeatures(features, algo.name, algo.id, function(feature){
 				return feature.name.indexOf('#explanation') == -1;
 			});
 			
-			var results = document.getElementById(ToxMan.prefix + '-algo-' + algo.id).getElementsByClassName('results')[0];
 			results.classList.remove('invisible');
 			results.innerHTML = features[1].value;
 		};
 		
-		// the prediction ivoke trickery...
+		// the prediction invoke trickery...
+		var q = formatString(this.queries.getModel, encodeURIComponent(algo.uri));
 		ConnMan.call(q, function(model){
 			if (!model || model.model.length < 1){
 				// TODO: we need to make a POST call to create a model first.
@@ -230,7 +239,7 @@ window.ToxMan = {
 	/* Adds given features (the result of buildFeatures call) to the feature list. If header is passed
 	 one single header row is added with the given string
 	*/
-	addFeatures : function (features, header, filter) {
+	addFeatures : function (features, header, classadd, filter) {
 		// proceed on filling the feature windows
 		var root = ToxMan.elements.featureList;
 		var tempRow = ToxMan.elements.featureRow;
@@ -243,6 +252,8 @@ window.ToxMan = {
 		// add a header row, if asked to do so.
 		if (header){
 			var hdr = ToxMan.elements.featureHeader.cloneNode(true);
+			if (classadd)
+				hdr.classList.add(classadd);
 			fillTree(hdr, {"header": header});
 			list.appendChild(hdr);
 		}
@@ -252,6 +263,8 @@ window.ToxMan = {
 			if (filter && !filter(features[i]))
 				continue;
 			var row = tempRow.cloneNode(true);
+			if (classadd)
+				row.classList.add(classadd);
 			fillTree(row, features[i], ToxMan.prefix + '-feature');
 			row.classList.remove('template');
 			list.appendChild(row);
