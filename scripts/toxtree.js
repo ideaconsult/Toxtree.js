@@ -1,5 +1,8 @@
 /* 
-	ToxMan.js - ToxMan JavaScript query helper
+	ToxMan.js - ToxMan JavaScript query helper.
+	Created by Ivan Georgiev, 2013.
+	
+	
 
 */
 
@@ -35,7 +38,7 @@ window.ToxMan = {
 	},
 	
 	/* Initializes the ToxMan, setting up all elements, that are going to be used, so it
-	need to be called whtn the DOM is ready.
+	need to be called when the DOM is ready.
 	*/
 	init : function(prefix) {
 		if (prefix)
@@ -105,7 +108,7 @@ window.ToxMan = {
 	/* Queries the server for list of all supported algorithms. The corresponding place in the UI is filled with the
 	results, all necessary 'run', 'auto', etc. buttons are configured too.
 	*/
-	listAlgos : function() {
+	listAlgos : function(onclick, onrun) {
 		ConnMan.call(this.queries.listAlgos, function(algos){
 			if (!algos) // i.e. error
 				return false;
@@ -122,48 +125,24 @@ window.ToxMan = {
 				var row = tempRow.cloneNode(true);
 				fillTree(row, algos[i], ToxMan.prefix + '-algo-');
 				
-				// after the row is filled with data - make the default screening - detailed info and results are invisible
+				// after the row is filled with data
 				row.classList.remove('template');
-				var info = row.getElementsByClassName('info')[0];
-				var res = row.getElementsByClassName('results')[0];
-				if (info)
-					info.classList.add('invisible');
-				if (res)
-					res.classList.add('invisible');
 				root.appendChild(row);
 
-				// now attach the handler for clicking on the line which opens / hides it.
-				var showhideInfo = function(row){
-					var info = row.getElementsByClassName('info')[0];
-					var res = row.getElementsByClassName('results')[0];
-					if (row.classList.contains('visible')){
-						row.classList.remove('visible');
-						if (info)
-							info.classList.add('invisible');
-					}
-					else {
-						row.classList.add('visible')
-						if (info)
-							info.classList.remove('invisible');
-					}
-				}
-				
-				row.getElementsByClassName('title')[0].onclick = function(e) { showhideInfo(this.parentNode); }
+				row.getElementsByClassName('show-hide')[0].onclick = onclick;
 				
 				// then put good id to auto checkboxes so that runAutos() can recognizes
-				var auto = row.getElementsByClassName('auto')[0].id = ToxMan.prefix + "-algoauto-" + i;
+				var auto = row.getElementsByClassName('auto')[0].id = ToxMan.prefix + "-auto-" + i;
 
 				// finally - attach the handler for running the prediction - create a new function each time so the proper index to be passed
 				var run = row.querySelector('.run');
-				if (run){
-					run.onclick = (function(algoIdx, row){
-						return function(e){
-							ToxMan.runPrediction(algoIdx);
-							showhideInfo(row);
-							e.stopPropagation();
-						}
-					})(i, row);
-				}
+				run.onclick = (function(algoIdx, row){
+					return function(e){
+						ToxMan.runPrediction(algoIdx);
+						if (onrun)
+							onrun(row, e);
+					}
+				})(i, row);
 			}
 		});
 	},
@@ -180,8 +159,9 @@ window.ToxMan = {
 			features[0].parentNode.removeChild(features[0]);
 			
 		// clear the previous prediction results.
-		var results = document.getElementById(ToxMan.prefix + '-algo-' + algo.id).getElementsByClassName('results')[0];
-		results.classList.add('invisible');
+		var row = document.getElementById(ToxMan.prefix + '-algo-' + algo.id);
+		var results = row.getElementsByClassName('results')[0];
+		row.classList.remove('predicted');
 		results.innerHTML = '';		
 		
 		// the function that actually parses the results of predictions and fills up the UI
@@ -191,7 +171,7 @@ window.ToxMan = {
 				return feature.name.indexOf('#explanation') == -1;
 			});
 			
-			results.classList.remove('invisible');
+			row.classList.add('predicted');
 			results.innerHTML = features[1].value;
 		};
 		
@@ -215,7 +195,7 @@ window.ToxMan = {
 		var autos = document.querySelectorAll('.' + this.prefix + '-algorithms .auto');
 		for (var i = 0;i < autos.length; ++i){
 			if (autos[i].id.length > 0 && autos[i].checked){
-				this.runPrediction(parseInt(autos[i].id.substr(this.prefix.length + 10)));
+				this.runPrediction(parseInt(autos[i].id.substr(this.prefix.length + 6)));
 			}
 		}	
 	},
@@ -265,7 +245,7 @@ window.ToxMan = {
 			var row = tempRow.cloneNode(true);
 			if (classadd)
 				row.classList.add(classadd);
-			fillTree(row, features[i], ToxMan.prefix + '-feature');
+			fillTree(row, features[i]);
 			row.classList.remove('template');
 			list.appendChild(row);
 		}

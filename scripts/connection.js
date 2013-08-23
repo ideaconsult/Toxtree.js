@@ -81,7 +81,7 @@ window.ConnMan = {
 	    finished = true;
 	    clearTimeout(requestTimeout);
 	    callback(null);
-			connectionError(xhr.errorCode, xhr.errorMessage);
+			connectionError(this.status, this.statusText);
 		};
 
 		// some nices...
@@ -99,7 +99,7 @@ window.ConnMan = {
 			if(finished)return;
 			finished = true;
 			clearTimeout(requestTimeout);
-			connectionError(xhr.errorCode, xhr.errorMessage);
+			connectionError(xhr.status, xhr.statusText);
 		}
 	},
 	

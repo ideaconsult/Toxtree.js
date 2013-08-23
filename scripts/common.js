@@ -5,11 +5,33 @@ domready(function(){
   }
 
 	// first initialize some general stuff - connection, list of supported algorithms, etc.
-	attachButtons(document);
 	ConnMan.init();
 	localMessage = languages[ConnMan.parameters.language !== undefined ? ConnMan.parameters.langauge : 'en'];
 	ToxMan.init('toxtree', document.getElementById('query-form'));
-	ToxMan.listAlgos();
+	
+	// some behavioural setup
+	// now attach the handler for clicking on the line which opens / hides it.
+	var showhideInfo = function(row){
+		var info = row.getElementsByClassName('info')[0];
+		if (row.classList.contains('visible')){
+			row.classList.remove('visible');
+			info.classList.add('hidden');
+		}
+		else{
+			row.classList.add('visible');
+			info.classList.remove('hidden');
+		}
+	}
+	
+	ToxMan.listAlgos(
+		function(e){  // onclick handler
+			showhideInfo(this.parentNode);
+		},
+		function(row, e){ // on run button handler. 
+			showhideInfo(row);
+			e.stopPropagation();
+		}
+	);
 	
 	// now attach the query button
 	var needle = document.getElementById('query-needle');
@@ -24,27 +46,6 @@ domready(function(){
 		}
 	}
 });
-
-function attachButtons(root){
-  // setup all buttons with data-action attribute
-  var buttons = root.getElementsByTagName("button");
-  var butcnt = buttons.length;
-  for (var i = 0;i < butcnt; i++){
-    var button = buttons[i];
-
-    // add onclick handler only if there is non-empty data-action or data-click
-    if (button.dataset.action && button.dataset.action !='') {
-      button.onclick = function (e){
-			  dataButtonClick(e.currentTarget);
-			  e.stopPropagation();
-			  return false;
-			};
-    }
-    else if (button.dataset.click && button.dataset.click !='' && typeof window[button.dataset.click] == 'function') {
-      button.onclick = window[button.dataset.click];
-    }
-  }
-}
 
 /* Event handling helpers - the first one attaches event handler in browser-independent way
 */
@@ -79,7 +80,8 @@ function applyEvent(elem, type, name, bubbles) {
   }
 }
 
-function flexSchedule(theFlexible, flexfn) {
+function flexSetup(theFlexible, flexfn) {
+	flexfn(theFlexible);
   addEventHandler(window, 'resize', function (e) { flexfn(theFlexible); }, true);
 }
 
@@ -137,27 +139,6 @@ function findPos(obj) {
   return {left: curleft, top: curtop};
 }
 
-// show the active view and hide the others
-function showPanel(panel, data){
-  var panelel = document.getElementById(panel);
-  if(!panelel || panelel.classList.contains('visible')){
-    return false;
-  }
-  var panels = document.querySelectorAll('.panel.visible');
-  for(var i = 0; i < panels.length; i++){
-    panels[i].classList.remove('visible');
-    panels[i].classList.add('hidden');
-  }
-
-  // Force reflow so that the removing of class hidden is applied.
-  panelel.classList.add('visible');
-  return true;
-}
-
-function getActivePanel() {
-  return document.querySelectorAll('.panel.visible')[0].id;
-}
-
 // show dialog-like element as overlay above the current view
 function showDialog(dialog, data){
   if((typeof(dialog)).toLowerCase() == 'string'){
@@ -209,14 +190,6 @@ function hideAllDialogs(exclude) {
   for (var i = 0;i < dlgs.length; ++i){
     hideDialog(dlgs[i]);
   }
-}
-
-function dataButtonClick(but){
-  var pars = but.dataset.params;
-  if (but.dataset.value !== undefined && but.dataset.field !== undefined) {
-    pars = pars.replace("<" + but.dataset.field + ">", but.dataset.value);
-  }
-  ConnMan.callQuery(but.dataset.action, pars);
 }
 
 // set the radio button with the given value as being checked
@@ -296,7 +269,6 @@ function setObjValue(obj, value){
       }
     }
   }
-
 }
 
 /*
@@ -367,67 +339,3 @@ function parseURL(url) {
     segments: a.pathname.replace(/^\//,'').split('/')
   };
 }
-
-/*
- * General message-box functionalty
- *
- * @param message The message to be shown to user, accepts HTML, be carefull!
- * @param type What buttons to show, currently "yes-no" and "ok-only" supported. "none" is used to hide it.
- * @param success Callback function to be executed when user accepts (clicks Ok or Yes)
- * @param cancel Callback function to be executed when the dialog is canceled.
- *
- * Example:
- * messageBox('alabala posrtokala.', 'yes-no', function(){alert('yes');}, function(){alert('no');});
- *
- */
-var messageBox = (function(){
-
-  var box = message = buttons = success = cancel = null,
-      self = this;
-
-  domready(function(){
-
-    self.box = document.getElementById('message-box');
-    if (!self.box)
-    	return false;
-    self.message = this.box.getElementsByTagName('p')[0];
-    self.buttons = this.box.getElementsByTagName('button');
-
-    self.box.classList.add('hidden');
-
-    for(var i = 0, bl = buttons.length; i < bl; i++){
-      buttons[i].onclick = function(){
-        self.box.classList.remove('visible');
-        if(typeof self[this.dataset.action]  == 'function'){
-          self[this.dataset.action]();
-        }
-        (function(self){
-          setTimeout(function(){
-            self.box.classList.add('hidden');
-          }, 500);
-        })(self);
-      }
-    }
-
-  });
-
-  return function(message, type, success, cancel){
-    if (type == 'none') {
-      self.box.classList.remove('visible');
-      setTimeout(function(){
-        self.box.classList.add('hidden');
-      }, 500);
-      return;
-    }
-    else if(type == undefined || type == '') {
-      type = 'ok-only';
-    }
-    self.box.className = type;
-    self.message.innerHTML = message;
-    var t = self.box.clientWidth;
-    self.success = success;
-    self.cancel = cancel;
-    self.box.classList.add('visible');
-  }
-
-})();

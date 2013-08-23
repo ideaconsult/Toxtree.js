@@ -23,16 +23,6 @@
   transition: opacity ease 3000ms;
 }
 
-.invisible {
-	height: 0px !important;
-	visibility: hidden;
-  -moz-transition: height ease 300ms;
-  -ms-transition: height ease 300ms;
-  -o-transition: height ease 300ms;
-  -webkit-transition: height ease 300ms;
-  transition: height ease 300ms;
-}
-
 .container .columns.nomargin,
 .container .column.nomargin { 
 	margin-right: 0px; 
@@ -67,10 +57,6 @@ button.imaged:hover {
 	vertical-align: text-top;
 }
 
-.fly-bottom {
-	position: absolute;
-	bottom: 0px;
-}
 /* And now some visual styling
 */
 #query-needle {
@@ -122,8 +108,35 @@ button.imaged:hover {
 
 /* Toxtree features styling
 */
+/*
+body, .container {
+	overflow: hidden;
+}
+*/
+
+.status-bar {
+	background: #eee;  /* Old browsers */
+
+	background: #eee -moz-linear-gradient(top, rgba(255,255,255,.1) 60%, rgba(127,127,127,.1) 80%); /* FF3.6+ */
+	background: #eee -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,.1)), color-stop(100%,rgba(127,127,127,.1))); /* Chrome,Safari4+ */
+	background: #eee -webkit-linear-gradient(top, rgba(255,255,255,.1) 0%,rgba(127,127,127,.1) 100%); /* Chrome10+,Safari5.1+ */
+	background: #eee -o-linear-gradient(top, rgba(255,255,255,.1) 0%,rgba(127,127,127,.1) 100%); /* Opera11.10+ */
+	background: #eee -ms-linear-gradient(top, rgba(255,255,255,.1) 0%,rgba(127,127,127,.1) 100%); /* IE10+ */
+	background: #eee linear-gradient(top, rgba(255,255,255,.1) 0%,rgba(127,127,127,.1) 100%); /* W3C */
+
+	opacity: 0.7;
+  border: 0px;
+  padding:4px 2px 2px 10px;
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  line-height: 18px;
+  width: 100%;
+}
+
 .toxtree-features  {
-	min-height: 240px;
+	min-height: 280px;
+	max-height: 350px;
 	overflow: scroll;
 }
 
@@ -138,7 +151,6 @@ button.imaged:hover {
   user-select: auto;
   
   vertical-align: top;
-	
 }
 
 .toxtree-features td:nth-child(1) {
@@ -149,17 +161,21 @@ button.imaged:hover {
 /* Toxtree diagram styling
 */
 .toxtree-diagram {
-	min-height: 240px;
+	min-height: 250px;
+	width: auto;
+	height: auto;
 }
 
 /* Toxtree algorithms styling
 */
+/*
 .toxtree-algorithms {
 	overflow-y: scroll;
 }
+*/
 
 .toxtree-algorithms li > *:nth-child(1) {
-	width: 87%;
+	width: 77%;
 	text-overflow: ellipsis;
 }
 
@@ -177,4 +193,9 @@ button.imaged:hover {
   margin-right: 10px;
   margin-bottom: 10px;
   background: #f0f0f0;
+}
+
+.toxtree-algorithms .row-blank:not(.predicted) .results{
+	visibility: hidden;
+	height: 0px;
 }
