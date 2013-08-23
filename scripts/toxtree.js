@@ -69,7 +69,7 @@ window.ToxMan = {
 		if (elements.featureImage)
 			elements.featureImage.style.visibility = 'hidden';
 		if (elements.featureList)
-			clearChildren(elements.featureList);
+			clearChildren(elements.featureList, elements.featureRow.parentNode == elements.featureList ? elements.featureRow : null);
 		
 		// now go with the predictions
 	},
@@ -120,9 +120,10 @@ window.ToxMan = {
 			if (!root || !tempRow)
 				return false;
 			
-			clearChildren(root, tempRow);
+			clearChildren(root, tempRow.parentNode == root ? tempRow : null);
 			for (var i = 0;i < algos.length; ++i) {
 				var row = tempRow.cloneNode(true);
+				algos[i].name = algos[i].name.substr(ToxMan.prefix.length + 2);
 				fillTree(row, algos[i], ToxMan.prefix + '-algo-');
 				
 				// after the row is filled with data

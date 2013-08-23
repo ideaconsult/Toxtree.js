@@ -54,7 +54,7 @@ button.imaged:hover {
 	display: inline-block;
 	margin-left: 10px;
 	margin-top: 5px;
-	vertical-align: text-top;
+	vertical-align: top;
 }
 
 /* And now some visual styling
@@ -108,12 +108,6 @@ button.imaged:hover {
 
 /* Toxtree features styling
 */
-/*
-body, .container {
-	overflow: hidden;
-}
-*/
-
 .status-bar {
 	background: #eee;  /* Old browsers */
 
@@ -127,16 +121,15 @@ body, .container {
 	opacity: 0.7;
   border: 0px;
   padding:4px 2px 2px 10px;
-  position: absolute;
-  left: 0px;
-  bottom: 0px;
+	position: fixed;
   line-height: 18px;
   width: 100%;
+  left: 0px;
+  bottom: 0px;
 }
 
 .toxtree-features  {
 	min-height: 280px;
-	max-height: 350px;
 	overflow: scroll;
 }
 
@@ -168,11 +161,9 @@ body, .container {
 
 /* Toxtree algorithms styling
 */
-/*
 .toxtree-algorithms {
-	overflow-y: scroll;
+	overflow: hidden;
 }
-*/
 
 .toxtree-algorithms li > *:nth-child(1) {
 	width: 77%;
