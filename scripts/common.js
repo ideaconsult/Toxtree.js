@@ -1,4 +1,4 @@
-domready(function(){
+$(document).ready(function(){
 	// some behavioural setup
 	// now attach the handler for clicking on the line which opens / hides it.
 	var showhideInfo = function(row){

@@ -13,7 +13,7 @@ window.ToxMan = {
 	/* The following parametes can be passed in settings object to ToxMan.init() - with the same names
 	*/
 	prefix: 'ToxMan',						// the default prefix for elements, when they are retrieved from the DOM. Part of settings.
-	media: 'application/json',	// the prefered media for receiving result. Setnt as 'Accept' header on requests. Part of settings.
+	media: 'json',	// the prefered media for receiving result. Setnt as 'Accept' header on requests. Part of settings.
 	server: null,								// the server actually used for connecting. Part of settings. If not set - attempts to get 'server' parameter of the query, if not - get's current server.
 	timeout: 5000,							// the timeout an call to the server should be wait before the attempt is considered error. Part of settings.
 	
@@ -386,71 +386,34 @@ window.ToxMan = {
 	
 	/* Makes a server call with the provided method. If none is given - the internally stored one is used
 	*/
-	call: function (service, callback, data){
-	  var xhr = new XMLHttpRequest();
-	  var self = this;
-	  if ("withCredentials" in xhr) {
-	    // Check if the XMLHttpRequest object has a "withCredentials" property.
-	    // "withCredentials" only exists on XMLHTTPRequest2 objects.
-	  } else if (typeof XDomainRequest != "undefined") {
-	    // Otherwise, check if XDomainRequest.
-	    // XDomainRequest only exists in IE, and is IE's way of making CORS requests.
-	    xhr = new XDomainRequest();
-	  } else {
-	    // Otherwise, CORS is not supported by the browser.
-	    throw new Error("The browser does not support cross-origin XMLHttpRequest.");
-	  }
-
-		var finished = false;
-		var requestTimeout = setTimeout(
-			function() {
-				if(finished) return;
-				finished = true;
-				if (self.onerror)
-					self.onerror(0, localMessage.timeout);
-			},
-			self.timeout);
-
-		xhr.onload = function () {
-	    if(finished) return;
-	    finished = true;
-	    clearTimeout(requestTimeout);
-	    self.onsuccess(xhr.status, xhr.statusText);
-	    callback(JSON.parse(xhr.responseText));
-		};
-
-		xhr.onerror = function () {
-	    if(finished)return;
-	    finished = true;
-	    clearTimeout(requestTimeout);
-			self.onerror(this.status, this.statusText);
-	    callback(null);
-		};
-
-		// inform the user that a connection starts
+	call: function (service, callback, adata){
+		var self = this;
 		self.onconnect(service);
 		var method = 'GET';
-		if (data !== undefined)
+		if (adata !== undefined)
 			method = 'POST';
-		else
-			data = null;
-			
-		try
-		{
-			xhr.open(method, self.server + service, true);
-			xhr.setRequestHeader("Accept", self.media);
-			xhr.send(data);
-		}
-		catch(e)
-		{
-			if(finished)return;
-			finished = true;
-			clearTimeout(requestTimeout);
-			self.onerror(xhr.status, xhr.statusText);
-		}
-		
+		else 
+			adata = {};
+
+		adata.media = 'application/' + self.media.substr(0, 4);
+		$.ajax(self.server + service, {
+			dataType: self.media,
+			crossDomain: true,
+			timeout: self.timeout,
+			type: method,
+			data: adata,
+			error: function(jhr, status, error){
+				self.onerror(status, error);
+				callback(null);
+			},
+			success: function(data, status, jhr){
+				self.onsuccess(status, jhr.statusText);
+				callback(data);
+			}
+		});
 	}
 };
+/* End of ToxMan object */
 
 window.languages = {
 	en : {
