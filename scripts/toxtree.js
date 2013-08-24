@@ -9,9 +9,11 @@
 window.ToxMan = {
 	currentQuery: null,
 	currentDataset: null,
-	prefix: 'ToxMan',
 	algorithms: null, // it gets filled from the listAlgos() query.
+
+	prefix: 'ToxMan',
 	featurePrefix: 'http://www.opentox.org/api/1.1#',
+	categoryRegex: /\^\^(\S+)Category/i,
 	
 	/* A single place to hold all necessary queries. Parameters are marked with <XX> and formatString() (common.js) is used
 	to prepare the actual URLs
@@ -37,10 +39,10 @@ window.ToxMan = {
 		algoRow: null,				// a single, template, row for filling the above
 	},
 	
-	/* Initializes the ToxMan, setting up all elements, that are going to be used, so it
+	/* Initializes the ToxMan, setting up all elements, if not passed, that are going to be used, so it
 	need to be called when the DOM is ready.
 	*/
-	init : function(prefix) {
+	init : function(prefix, elements) {
 		if (prefix)
 			this.prefix = prefix;
 		else
@@ -105,6 +107,21 @@ window.ToxMan = {
 		});
 	},
 	
+	/* Retrieves the model description for given algorithm. Used from both listAlgos() and runPrediction()
+	*/
+	getModel: function(algo, callback, post){
+		var q = formatString(this.queries.getModel, encodeURIComponent(algo.uri));
+		ConnMan.call(q, function(model){
+			if (!model || model.model.length < 1){
+				if (post)
+					ToxMan.getModel(algo, callback, true);
+			}
+			else { // OK, we have the model - attempt to get a prediction for our compound...
+				callback(model);
+			}
+		});
+	},
+	
 	/* Queries the server for list of all supported algorithms. The corresponding place in the UI is filled with the
 	results, all necessary 'run', 'auto', etc. buttons are configured too.
 	*/
@@ -160,33 +177,58 @@ window.ToxMan = {
 			features[0].parentNode.removeChild(features[0]);
 			
 		// clear the previous prediction results.
-		var row = document.getElementById(ToxMan.prefix + '-algo-' + algo.id);
-		var results = row.getElementsByClassName('results')[0];
-		row.classList.remove('predicted');
-		results.innerHTML = '';		
+		var mainRow = document.getElementById(ToxMan.prefix + '-algo-' + algo.id);
+		var explain = mainRow.getElementsByClassName('explanation')[0];
+		mainRow.classList.remove('predicted');
+		explain.innerHTML = '';		
 		
 		// the function that actually parses the results of predictions and fills up the UI
 		var predictParser = function(prediction){
 			var features = ToxMan.buildFeatures(prediction, 0);
+			var theFeature = null;
+			var expFeature = null;
 			ToxMan.addFeatures(features, algo.name, algo.id, function(feature){
-				return feature.name.indexOf('#explanation') == -1;
+				var res = feature.name.indexOf('#explanation') == -1;
+				if (res)
+					theFeature = feature;
+				else
+					expFeature = feature;
+				return res;
 			});
+
+			// now fill the categorization 
+			var resRoot = mainRow.getElementsByClassName('result')[0];
+			var resTemp = resRoot.getElementsByClassName('row-blank')[0];
+			if (resTemp){ // it is the very first time.
+				resTemp.parentNode.removeChild(resTemp);
+				resTemp.classList.remove('template');
+				
+				var annot = theFeature.annotation;
+				var frag = document.createDocumentFragment();
+				for (var i = 0;i < annot.length; ++i){
+					var row = resTemp.cloneNode(true);
+					fillTree(row, annot[i]);
+					row.classList.remove('template');
+					row.classList.add(annot[i].type.replace(ToxMan.categoryRegex, '$1').toLowerCase());
+					if (annot[i].o == theFeature.value)
+						row.classList.add('active');
+					frag.appendChild(row);
+				}
+				resRoot.appendChild(frag);
+			}
+			else { // we only need to set it up...
+				
+			}
 			
-			row.classList.add('predicted');
-			results.innerHTML = features[1].value;
+			// now mark the whole stuff as predicted
+			mainRow.classList.add('predicted');
+			explain.innerHTML = expFeature.value;
 		};
 		
 		// the prediction invoke trickery...
-		var q = formatString(this.queries.getModel, encodeURIComponent(algo.uri));
-		ConnMan.call(q, function(model){
-			if (!model || model.model.length < 1){
-				// TODO: we need to make a POST call to create a model first.
-				
-			}
-			else { // OK, we have the model - attempt to get a prediction for our compound...
-				var q = formatString(ToxMan.queries.getPrediction, encodeURIComponent(ToxMan.currentDataset.dataEntry[0].compound.id), encodeURIComponent(model.model[0].predicted));
-				ConnMan.call(q, predictParser);	
-			}
+		this.getModel(algo, function(model){
+			var q = formatString(ToxMan.queries.getPrediction, encodeURIComponent(ToxMan.currentDataset.dataEntry[0].compound.id), encodeURIComponent(model.model[0].predicted));
+			ConnMan.call(q, predictParser);	
 		});
 	},
 	
@@ -211,6 +253,7 @@ window.ToxMan = {
 			entry.id = i;
 			entry.value = dataset.dataEntry[index].values[i];
 			entry.name = dataset.feature[i].title.replace(this.featurePrefix, "");
+			entry.annotation = dataset.feature[i].annotation;
 			features.push(entry);
 		}
 		
@@ -255,6 +298,10 @@ window.ToxMan = {
 		root.appendChild(list);
 	},
 	
+	formClass: function(val){
+		return val.replace(' ', '_');
+	},
+	
 	/* Poll a given taskId and calls the callback when a result from the server comes - 
 	be it "running", "completed" or "error" - the callback is always called.
 	*/
@@ -262,3 +309,165 @@ window.ToxMan = {
 		
 	},
 };
+
+function formatCategory(val){
+	return val.replace(ToxMan.categoryRegex, '$1');	
+}
+
+window.languages = {
+	en : {
+		timeout: "Request timeout reached!",
+		nothingFound: "No compound with this name is found!",
+		ok: "Success",
+		error: "Error: ",
+		notfound: "Not found!",
+		waiting: "Waiting for server response...",
+	}
+}
+
+var localMessage = languages.en;
+
+window.ConnMan = {
+	errorHandler: null,
+	baseURI: null,
+	timeoutSecs: 10,
+	parameters:null, // the parameters from the query - as they appera in the URL
+	fadeTimeout: null,
+	elements: {
+		server: null,
+		status: null,
+		error: null
+	},
+	
+	/* Initialize the basics: URI, error handling callbacks, status reporting elements, etc.
+	*/
+	init : function(errHandler, baseUri) {
+	if (!errHandler){
+		this.errorHandler = function(code, mess){
+			window.ConnMan.defaultErrorHnd(code, mess);
+			}
+		}
+		else
+			this.errorHandler = errHandler;
+		
+		var url = parseURL(document.location);
+		this.parameters = url.params;
+		if (!baseUri)
+			this.baseURI = url.params.server;		
+		else
+			this.baseURI = baseUri;
+			
+		this.elements.server = document.getElementById('connection-baseuri');
+		this.elements.status = document.getElementById('connection-status');
+		this.elements.error = document.getElementById('connection-error');
+		
+		if (this.elements.server)
+			setObjValue(this.elements.server, this.baseURI);
+	},
+	
+	/* Make the actual HTTPRequest to the server. Creates s new object, fills in the passed data, callback, etc.
+		setups all necessary handlers and voilah - go to the server. The callback will be called in either way - 
+		success or error, with the later case passing 'null'.
+	*/
+	makeXHR: function(method, url, callback, data){
+	  var xhr = new XMLHttpRequest();
+	  if ("withCredentials" in xhr) {
+	    // Check if the XMLHttpRequest object has a "withCredentials" property.
+	    // "withCredentials" only exists on XMLHTTPRequest2 objects.
+	  } else if (typeof XDomainRequest != "undefined") {
+	    // Otherwise, check if XDomainRequest.
+	    // XDomainRequest only exists in IE, and is IE's way of making CORS requests.
+	    xhr = new XDomainRequest();
+	  } else {
+	    // Otherwise, CORS is not supported by the browser.
+	    throw new Error("The browser does not support cross-origin XMLHttpRequest.");
+	  }
+
+		var finished = false;
+		var requestTimeout = setTimeout(
+			function() {
+				if(finished) return;
+				finished = true;
+				connectionError(0, localMessage.timeout);
+			},
+			this.timeoutSecs * 1000);
+
+		xhr.onload = function () {
+	    if(finished) return;
+	    finished = true;
+	    clearTimeout(requestTimeout);
+	    ConnMan.setResult('ok');
+	    callback(JSON.parse(xhr.responseText));
+		};
+
+		xhr.onerror = function () {
+	    if(finished)return;
+	    finished = true;
+	    clearTimeout(requestTimeout);
+	    callback(null);
+			connectionError(this.status, this.statusText);
+		};
+
+		// some nices...
+		this.elements.status.src = "images/waiting_small.gif";
+		this.elements.status.title = localMessage.waiting;
+
+		try
+		{
+			xhr.open(method, this.baseURI + url, true);
+			xhr.setRequestHeader("Accept", "application/json");
+			xhr.send(data);
+		}
+		catch(e)
+		{
+			if(finished)return;
+			finished = true;
+			clearTimeout(requestTimeout);
+			connectionError(xhr.status, xhr.statusText);
+		}
+	},
+	
+	/* Make a normal GET call for the given server (along with parameteres, they must be encoded...). Uses makeXHR.
+	*/
+	call : function(service, callback) {
+		this.makeXHR('GET', service, callback, null);	
+	},
+	
+	/* Prepares the necessary formdata and makes a POST request (using makeXHR again) to the server.
+	*/
+	post : function(service, callback, parameters) {
+		var data;
+		// TODO: pack parameters into data for the callback
+		this.makeXHR('GET', service, callback, data);	
+	},
+	
+	/* Set the result from the request - be it success or error
+	*/
+	setResult: function(status, error){
+		if (this.elements.status){
+			this.elements.status.src = "images/" + status + ".png";
+			this.elements.status.title = localMessage[status];
+		}
+		if (!error)
+			error = '';
+		if (this.elements.error){
+			var errEl = this.elements.error;
+			errEl.classList.remove('fading');
+			errEl.innerHTML = error;
+			if (this.fadeTimeout)
+				clearTimeout(this.fadeTimeout);
+			this.fadeTimeout = setTimeout(function() { errEl.classList.add('fading'); }, 200);
+		}
+	},
+	
+	/* The default error handling routing, if no other is passed on ConnMan.init() - this one is used.
+	*/
+	defaultErrorHnd : function(code, mess) {
+		this.setResult('error', "(" + code + "): " + mess);
+	}
+};
+
+function connectionError(code, mess){
+	ConnMan.errorHandler(code, mess);
+}
+

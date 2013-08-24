@@ -174,7 +174,7 @@ button.imaged:hover {
 	text-align: center;
 }
 
-.toxtree-algorithms .results {
+.toxtree-algorithms .explanation {
 	height: auto;
   -moz-user-select: auto;
   -khtml-user-select: auto;
@@ -183,10 +183,51 @@ button.imaged:hover {
   
   margin-right: 10px;
   margin-bottom: 10px;
+  padding: 5px;
   background: #f0f0f0;
-}
-
-.toxtree-algorithms .row-blank:not(.predicted) .results{
 	visibility: hidden;
 	height: 0px;
+}
+
+.toxtree-algorithms .row-blank.predicted .explanation {
+	visibility: visible;
+	height: auto;
+}
+
+.toxtree-algorithms .result {
+	width: 100%;
+	margin-bottom: 10px;
+	display:none;
+	vertical-align: top;
+}
+
+.toxtree-algorithms .row-blank.predicted .result {
+	display: inherit;
+}
+
+.toxtree-algorithms .result .row-blank {
+	display: inline-block;
+	border: solid 1px;
+	border-color: #000;
+	border-radius: 5px;
+	opacity: 0.6;
+	margin-left: 5px;
+	margin-right: 5px;
+	padding-left: 5px;
+	padding-right: 5px;
+	width: 27%;
+}
+
+.toxtree-algorithms .result .row-blank.active {
+	opacity: 1.0;
+	color: #000;
+	font-weight: bold;
+}
+
+.toxtree-algorithms .result .row-blank.toxic {
+	background-color: #e24b4b;
+}
+
+.toxtree-algorithms .result .row-blank.nontoxic {
+	background-color:#49cb5b;
 }

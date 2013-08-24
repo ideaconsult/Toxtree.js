@@ -293,11 +293,12 @@ function formatString(format) {
 // which has class 'data-field' and their name corresponds to a property in json object.
 // If prefix is given AND json has id property - the root's id set to to prefix + json.id
 function fillTree(root, json, prefix, filter) {
-  var dataList = root.getElementsByClassName(filter ? filter : 'data-field');
+	if (!filter)
+		filter = 'data-field';
+  var dataList = root.getElementsByClassName(filter);
   var dataCnt = dataList.length;
-
-  for (var i = 0; i < dataCnt; ++i) {
-    var el = dataList[i];
+	
+	var processFn = function(el, json){
     if (json[el.dataset.field] !== undefined) {
       var value = json[el.dataset.field];
       if ( el.dataset.filter !='' && (typeof window[el.dataset.filter] == 'function') ) {
@@ -305,7 +306,13 @@ function fillTree(root, json, prefix, filter) {
       }
       setObjValue(el, value);
     }
-  }
+	}
+	
+	if (root.classList.contains(filter))
+		processFn(root, json);
+
+  for (var i = 0; i < dataCnt; ++i)
+  	processFn(dataList[i], json);
 
   if (prefix && json.id !== undefined) {
     root.id = prefix + json.id;
