@@ -1,26 +1,27 @@
 /* 
 	ToxMan.js - ToxMan JavaScript query helper.
 	Created by Ivan Georgiev, 2013.
-	
-	
 
 */
 
 window.ToxMan = {
 	currentQuery: null,
 	currentDataset: null,
-	algorithms: null, // it gets filled from the listAlgos() query.
+	models: null, // it gets filled from the listModels() query.
+	queryParams: null,					// an associative array of parameters supplied on the query. Some things like 'language' can be retrieved from there.
 
 	/* The following parametes can be passed in settings object to ToxMan.init() - with the same names
 	*/
-	method: 'GET',							// the prefered HTTP method. Part of settings.
 	prefix: 'ToxMan',						// the default prefix for elements, when they are retrieved from the DOM. Part of settings.
 	media: 'application/json',	// the prefered media for receiving result. Setnt as 'Accept' header on requests. Part of settings.
+	server: null,								// the server actually used for connecting. Part of settings. If not set - attempts to get 'server' parameter of the query, if not - get's current server.
+	timeout: 5000,							// the timeout an call to the server should be wait before the attempt is considered error. Part of settings.
 	
-	// some handler functions that can be configured from outside
-	onalgoadd: null,		// function (row, idx): called when each row for algorithm is added. idx is it's index in this.algorithms. Part of settings.
+	// some handler functions that can be configured from outside. They are 
+	onmodeladd: null,		// function (row, idx): called when each row for algorithm is added. idx is it's index in this.models. Part of settings.
 	onrun: null,				// function (row, e): called within click hander for run prediction button. 'e' is the original event. Part of settings.
-	onsuccess: null,		// function (code, mess): called on server request successful return. Part of settings.
+	onconnect: null,		// function (service): called when a server request is started - for proper visualization. Part of settings.
+	onsuccess: null,		// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
 	onerror: null,			// function (code, mess): called on server reques error. Part of settings.
 	
 	// Some elements from the DOM which we use - remember them here upon init. Part of settings.
@@ -29,8 +30,8 @@ window.ToxMan = {
 		featureRow: null,			// a single, template, row for filling the above
 		featureHeader: null,  // a single row, as above, with textual header information
 		diagramImage: null,		// the placeholder for the compund image
-		algoList: null,				// the container (table) for algorithms list
-		algoRow: null,				// a single, template, row for filling the above
+		modelList: null,				// the container (table) for algorithms list
+		modelRow: null,				// a single, template, row for filling the above
 	},
 	
 	/* A single place to hold all necessary queries. Parameters are marked with <XX> and formatString() (common.js) is used
@@ -38,7 +39,7 @@ window.ToxMan = {
 	*/
 	queries: {
 		query: "/query/compound/search/all?search=<1>&page=0&pagesize=1",
-		listAlgos: "/algorithm?search=ToxTree",
+		listModels: "/algorithm?search=ToxTree",
 		taskPoll: "/task/<1>",
 		getModel: "/model?algorithm=<1>",
 		postModel: "",
@@ -76,17 +77,17 @@ window.ToxMan = {
 		if (!this.elements.diagramImage)
 			this.elements.diagramImage = document.getElementsByClassName(prefix + '-diagram')[0];
 		
-		var algoList = settings.elements.algoList;
-		if (!algoList)
-			algoList = document.getElementsByClassName(prefix + '-algorithms')[0];
-		if (algoList){
-			this.elements.algoRow = algoList.getElementsByClassName('row-blank')[0];
-			this.elements.algoList = algoList.classList.contains('body') ? algoList : algoList.getElementsByClassName('body')[0];
+		var modelList = settings.elements.modelList;
+		if (!modelList)
+			modelList = document.getElementsByClassName(prefix + '-models')[0];
+		if (modelList){
+			this.elements.modelRow = modelList.getElementsByClassName('row-blank')[0];
+			this.elements.modelList = modelList.classList.contains('body') ? modelList : modelList.getElementsByClassName('body')[0];
 		}
 		
-		this.onalgoadd = settings.onalgoadd;
+		this.onmodeladd = settings.onmodeladd;
 		this.onrun = settings.onrun;
-		ConnMan.init();
+		this.initConnection(settings);
 	},
 	
 	/* Clear all results that appera on the page - features, diagrams, prediction results - all.
@@ -99,7 +100,7 @@ window.ToxMan = {
 		if (elements.featureList)
 			clearChildren(elements.featureList, elements.featureRow.parentNode == elements.featureList ? elements.featureRow : null);
 		
-		// now go with the predictions
+		// TODO: now go with the predictions
 	},
 	
 	/* Makes a query for dataset based on a needle - the starting point of all actions.
@@ -108,12 +109,12 @@ window.ToxMan = {
 		if (needle.length < 1)
 			return false;
 		var self = this;
-		this.currentQuery = formatString(this.queries.query, encodeURIComponent(needle)); // TODO: encode it?
-		ConnMan.call(this.currentQuery, function(dataset){
+		this.call(formatString(this.queries.query, encodeURIComponent(needle)), function(dataset){
 			// start with some clearing
 			self.clearResults();
 			if (!dataset || dataset.dataEntry.length < 1){
-				ConnMan.setResult('notfound', localMessage.nothingFound);
+				if (self.onerror)
+					self.onerror('notfound', localMessage.nothingFound);
 				return false;
 			}
 			// now parse to see the compund ID
@@ -134,17 +135,16 @@ window.ToxMan = {
 		});
 	},
 	
-	/* Retrieves the model description for given algorithm. Used from both listAlgos() and runPrediction()
+	/* Retrieves the model description for given algorithm. Used from both listModels() and runPrediction()
 	*/
 	getModel: function(algo, callback){
-		var q = formatString(this.queries.getModel, encodeURIComponent(algo.uri));
-		ConnMan.call(q, function(model){
+		this.call(formatString(this.queries.getModel, encodeURIComponent(algo.uri)), function(model){
 			if (!model || model.model.length < 1){
-				ConnMan.post(self.queries.postModel, data, function(task){
+				self.call(self.queries.postModel, data, function(task){
 					self.pollTask(task, function(ready){
 						self.getModel(algo, callback);
 					});					
-				});
+				}, 'POST');
 			}
 			else { // OK, we have the model - attempt to get a prediction for our compound...
 				callback(model);
@@ -155,16 +155,16 @@ window.ToxMan = {
 	/* Queries the server for list of all supported algorithms. The corresponding place in the UI is filled with the
 	results, all necessary 'run', 'auto', etc. buttons are configured too.
 	*/
-	listAlgos : function() {
+	listModels : function() {
 		var self = this;
-		ConnMan.call(this.queries.listAlgos, function(algos){
+		this.call(this.queries.listModels, function(algos){
 			if (!algos) // i.e. error
 				return false;
-			var root = self.elements.algoList;
-			var tempRow = self.elements.algoRow;
+			var root = self.elements.modelList;
+			var tempRow = self.elements.modelRow;
 			
 			algos = algos.algorithm;
-			self.algorithms = algos;
+			self.models = algos;
 			if (!root || !tempRow)
 				return false;
 			
@@ -178,7 +178,7 @@ window.ToxMan = {
 				row.classList.remove('template');
 				row.classList.remove('row-blank');
 				root.appendChild(row);
-				self.onalgoadd(row, i);
+				self.onmodeladd(row, i);
 
 				// finally - attach the handler for running the prediction - create a new function each time so the proper index to be passed
 				var run = row.querySelector('.run');
@@ -193,11 +193,11 @@ window.ToxMan = {
 		});
 	},
 	
-	/* Runs a prediction (algorithm) with given 'algo' (as reported upon listAlgos()) on the compound form the current dataset. 'algoId' is used to determine
+	/* Runs a prediction (algorithm) with given 'algo' (as reported upon listModels()) on the compound form the current dataset. 'algoId' is used to determine
 		which element in the UI should be filled, so that results can be shown later.
 	*/
 	runPrediction : function (algoIndex) {
-		var algo = this.algorithms[algoIndex];
+		var algo = this.models[algoIndex];
 		
 		// let's clean a bit - the trick is we've added class='<algo.id>' on every feature row concerning this algorithm
 		var features = this.elements.featureList.getElementsByClassName(algo.id);
@@ -247,16 +247,16 @@ window.ToxMan = {
 		};
 		
 		// the prediction invoke trickery...
-		this.getModel(algo, function(model){
+		self.getModel(algo, function(model){
 			var q = formatString(self.queries.getPrediction, encodeURIComponent(self.currentDataset.dataEntry[0].compound.id), encodeURIComponent(model.model[0].predicted));
-			ConnMan.call(q, predictParser);	
+			self.call(q, predictParser);	
 		});
 	},
 	
 	/* Run predictions that are marked as 'auto'. Rely on the properly set id of each row in the algorithms list
 	*/
 	runAutos: function() {
-		var autos = document.querySelectorAll('.' + this.prefix + '-algorithms .auto');
+		var autos = document.querySelectorAll('.' + this.prefix + '-models .auto');
 		for (var i = 0;i < autos.length; ++i){
 			if (autos[i].id.length > 0 && autos[i].checked){
 				this.runPrediction(parseInt(autos[i].id.substr(this.prefix.length + 6)));
@@ -367,70 +367,28 @@ window.ToxMan = {
 		
 	},
 	
+	/* Initialized the necessary connection data. Same settings as in ToxMan.init() are passed.
+	*/
+	initConnection: function(settings){
+		if (!settings.server){
+			var url = parseURL(document.location);
+			this.queryParams = url.params;
+			var server = url.params.server;
+			if (!server)
+				server = url.host;
+			this.server = server;
+		}
+		
+		this.onerror = settings.onerror;
+		this.onsuccess = settings.onsuccess;
+		this.onconnect = settings.onconnect;
+	},
+	
 	/* Makes a server call with the provided method. If none is given - the internally stored one is used
 	*/
-	call: function (service, callback){
-		
-	}
-};
-
-window.languages = {
-	en : {
-		timeout: "Request timeout reached!",
-		nothingFound: "No compound with this name is found!",
-		ok: "Success",
-		error: "Error: ",
-		notfound: "Not found!",
-		waiting: "Waiting for server response...",
-	}
-}
-
-var localMessage = languages.en;
-
-window.ConnMan = {
-	errorHandler: null,
-	baseURI: null,
-	timeoutSecs: 10,
-	parameters:null, // the parameters from the query - as they appera in the URL
-	fadeTimeout: null,
-	elements: {
-		server: null,
-		status: null,
-		error: null
-	},
-	
-	/* Initialize the basics: URI, error handling callbacks, status reporting elements, etc.
-	*/
-	init : function(errHandler, baseUri) {
-	if (!errHandler){
-		this.errorHandler = function(code, mess){
-			window.ConnMan.defaultErrorHnd(code, mess);
-			}
-		}
-		else
-			this.errorHandler = errHandler;
-		
-		var url = parseURL(document.location);
-		this.parameters = url.params;
-		if (!baseUri)
-			this.baseURI = url.params.server;		
-		else
-			this.baseURI = baseUri;
-			
-		this.elements.server = document.getElementById('connection-baseuri');
-		this.elements.status = document.getElementById('connection-status');
-		this.elements.error = document.getElementById('connection-error');
-		
-		if (this.elements.server)
-			setObjValue(this.elements.server, this.baseURI);
-	},
-	
-	/* Make the actual HTTPRequest to the server. Creates s new object, fills in the passed data, callback, etc.
-		setups all necessary handlers and voilah - go to the server. The callback will be called in either way - 
-		success or error, with the later case passing 'null'.
-	*/
-	makeXHR: function(method, url, callback, data){
+	call: function (service, callback, data){
 	  var xhr = new XMLHttpRequest();
+	  var self = this;
 	  if ("withCredentials" in xhr) {
 	    // Check if the XMLHttpRequest object has a "withCredentials" property.
 	    // "withCredentials" only exists on XMLHTTPRequest2 objects.
@@ -448,15 +406,16 @@ window.ConnMan = {
 			function() {
 				if(finished) return;
 				finished = true;
-				connectionError(0, localMessage.timeout);
+				if (self.onerror)
+					self.onerror(0, localMessage.timeout);
 			},
-			this.timeoutSecs * 1000);
+			self.timeout);
 
 		xhr.onload = function () {
 	    if(finished) return;
 	    finished = true;
 	    clearTimeout(requestTimeout);
-	    ConnMan.setResult('ok');
+	    self.onsuccess(xhr.status, xhr.statusText);
 	    callback(JSON.parse(xhr.responseText));
 		};
 
@@ -464,18 +423,22 @@ window.ConnMan = {
 	    if(finished)return;
 	    finished = true;
 	    clearTimeout(requestTimeout);
+			self.onerror(this.status, this.statusText);
 	    callback(null);
-			connectionError(this.status, this.statusText);
 		};
 
-		// some nices...
-		this.elements.status.src = "images/waiting_small.gif";
-		this.elements.status.title = localMessage.waiting;
-
+		// inform the user that a connection starts
+		self.onconnect(service);
+		var method = 'GET';
+		if (data !== undefined)
+			method = 'POST';
+		else
+			data = null;
+			
 		try
 		{
-			xhr.open(method, this.baseURI + url, true);
-			xhr.setRequestHeader("Accept", "application/json");
+			xhr.open(method, self.server + service, true);
+			xhr.setRequestHeader("Accept", self.media);
 			xhr.send(data);
 		}
 		catch(e)
@@ -483,51 +446,112 @@ window.ConnMan = {
 			if(finished)return;
 			finished = true;
 			clearTimeout(requestTimeout);
-			connectionError(xhr.status, xhr.statusText);
+			self.onerror(xhr.status, xhr.statusText);
 		}
-	},
-	
-	/* Make a normal GET call for the given server (along with parameteres, they must be encoded...). Uses makeXHR.
-	*/
-	call : function(service, callback) {
-		this.makeXHR('GET', service, callback, null);	
-	},
-	
-	/* Prepares the necessary formdata and makes a POST request (using makeXHR again) to the server.
-	*/
-	post : function(service, callback, parameters) {
-		var data;
-		// TODO: pack parameters into data for the callback
-		this.makeXHR('GET', service, callback, data);	
-	},
-	
-	/* Set the result from the request - be it success or error
-	*/
-	setResult: function(status, error){
-		if (this.elements.status){
-			this.elements.status.src = "images/" + status + ".png";
-			this.elements.status.title = localMessage[status];
-		}
-		if (!error)
-			error = '';
-		if (this.elements.error){
-			var errEl = this.elements.error;
-			errEl.classList.remove('fading');
-			errEl.innerHTML = error;
-			if (this.fadeTimeout)
-				clearTimeout(this.fadeTimeout);
-			this.fadeTimeout = setTimeout(function() { errEl.classList.add('fading'); }, 200);
-		}
-	},
-	
-	/* The default error handling routing, if no other is passed on ConnMan.init() - this one is used.
-	*/
-	defaultErrorHnd : function(code, mess) {
-		this.setResult('error', "(" + code + "): " + mess);
+		
 	}
 };
 
-function connectionError(code, mess){
-	ConnMan.errorHandler(code, mess);
+window.languages = {
+	en : {
+		timeout: "Request timeout reached!",
+		nothingFound: "No compound with this name is found!",
+		ok: "Success",
+		error: "Error: ",
+		notfound: "Not found!",
+		waiting: "Waiting for server response...",
+	}
 }
 
+var localMessage = languages.en;
+
+// some helper functions.
+function setObjValue(obj, value){
+	if ((value === undefined || value === null) && obj.dataset.default !== undefined)
+		value = obj.dataset.default;
+
+  if (obj.nodeName == "INPUT" || obj.nodeName == "SELECT")
+    obj.value = value;
+  else if (obj.nodeName == "IMG")
+    obj.src = value;
+  else if (obj.nodeName == "BUTTON")
+		obj.dataset.value = value;
+  else
+    obj.innerHTML = value;
+}
+
+/*
+Passed a HTML DOM element - it clears all children folowwing last one. Pass null for clearing all.
+*/
+function clearChildren(obj, last) {
+  while (obj.lastChild && obj.lastChild != last) {
+    obj.removeChild(obj.lastChild);
+  }
+}
+
+/* formats a string, replacing [<number>] in it with the corresponding value in the arguments
+*/
+function formatString(format) {
+  for (var i = 1;i < arguments.length; ++i) {
+    format = format.replace('<' + i + '>', arguments[i]);
+  }
+  return format;
+}
+
+// given a root DOM element and an JSON object it fills all (sub)element of the tree
+// which has class 'data-field' and their name corresponds to a property in json object.
+// If prefix is given AND json has id property - the root's id set to to prefix + json.id
+function fillTree(root, json, prefix, filter) {
+	if (!filter)
+		filter = 'data-field';
+  var dataList = root.getElementsByClassName(filter);
+  var dataCnt = dataList.length;
+	
+	var processFn = function(el, json){
+    if (json[el.dataset.field] !== undefined) {
+      var value = json[el.dataset.field];
+      if ( el.dataset.filter !='' && (typeof window[el.dataset.filter] == 'function') ) {
+        value = window[el.dataset.filter](value);
+      }
+      setObjValue(el, value);
+    }
+	}
+	
+	if (root.classList.contains(filter))
+		processFn(root, json);
+
+  for (var i = 0; i < dataCnt; ++i)
+  	processFn(dataList[i], json);
+
+  if (prefix && json.id !== undefined) {
+    root.id = prefix + json.id;
+  }
+}
+
+function parseURL(url) {
+  var a =  document.createElement('a');
+  a.href = url;
+  return {
+    source: url,
+    protocol: a.protocol.replace(':',''),
+    host: a.hostname,
+    port: a.port,
+    query: a.search,
+    params: (function(){
+      var ret = {},
+        seg = a.search.replace(/^\?/,'').split('&'),
+        len = seg.length, i = 0, s;
+      for (;i<len;i++) {
+        if (!seg[i]) { continue; }
+        s = seg[i].split('=');
+        ret[s[0]] = (s.length>1)?decodeURIComponent(s[1].replace(/\+/g,  " ")):'';
+      }
+      return ret;
+    })(),
+    file: (a.pathname.match(/\/([^\/?#]+)$/i) || [,''])[1],
+    hash: a.hash.replace('#',''),
+    path: a.pathname.replace(/^([^\/])/,'/$1'),
+    relative: (a.href.match(/tps?:\/\/[^\/]+(.+)/) || [,''])[1],
+    segments: a.pathname.replace(/^\//,'').split('/')
+  };
+}

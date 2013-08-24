@@ -159,22 +159,22 @@ button.imaged:hover {
 	height: auto;
 }
 
-/* Toxtree algorithms styling
+/* Toxtree models styling
 */
-.toxtree-algorithms {
+.toxtree-models {
 	overflow: hidden;
 }
 
-.toxtree-algorithms li > *:nth-child(1) {
+.toxtree-models li > *:nth-child(1) {
 	width: 77%;
 	text-overflow: ellipsis;
 }
 
-.toxtree-algorithms li > *:nth-child(2) {
+.toxtree-models li > *:nth-child(2) {
 	text-align: center;
 }
 
-.toxtree-algorithms .explanation {
+.toxtree-models .explanation {
 	height: auto;
   -moz-user-select: auto;
   -khtml-user-select: auto;
@@ -189,24 +189,24 @@ button.imaged:hover {
 	height: 0px;
 }
 
-.toxtree-algorithms .predicted .explanation {
+.toxtree-models .predicted .explanation {
 	visibility: visible;
 	height: auto;
 	width: 100%;
 }
 
-.toxtree-algorithms .result {
+.toxtree-models .result {
 	width: 100%;
 	margin-bottom: 10px;
 	display:none;
 	vertical-align: top;
 }
 
-.toxtree-algorithms .predicted .result {
+.toxtree-models .predicted .result {
 	display: inherit;
 }
 
-.toxtree-algorithms .result.body * {
+.toxtree-models .result.body * {
 	display: inline-block;
 	border: solid 1px;
 	border-color: #000;
@@ -219,20 +219,20 @@ button.imaged:hover {
 	width: 27%;
 }
 
-.toxtree-algorithms .result.body .active {
+.toxtree-models .result.body .active {
 	opacity: 1.0;
 	color: #000;
 	font-weight: bold;
 }
 
-.toxtree-algorithms .result.body .toxic {
+.toxtree-models .result.body .toxic {
 	background-color: #e24b4b;
 }
 
-.toxtree-algorithms .result.body .nontoxic {
+.toxtree-models .result.body .nontoxic {
 	background-color:#49cb5b;
 }
 
-.toxtree-algorithms .result.body .inconclusive {
+.toxtree-models .result.body .inconclusive {
 	background-color: #d0e81a;
 }
