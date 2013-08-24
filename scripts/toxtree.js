@@ -109,12 +109,15 @@ window.ToxMan = {
 	
 	/* Retrieves the model description for given algorithm. Used from both listAlgos() and runPrediction()
 	*/
-	getModel: function(algo, callback, post){
+	getModel: function(algo, callback){
 		var q = formatString(this.queries.getModel, encodeURIComponent(algo.uri));
 		ConnMan.call(q, function(model){
 			if (!model || model.model.length < 1){
-				if (post)
-					ToxMan.getModel(algo, callback, true);
+				ConnMan.post(ToxMan.queries.postModel, data, function(task){
+					ToxMan.pollTask(task, function(ready){
+						ToxMan.getModel(algo, callback);
+					});					
+				});
 			}
 			else { // OK, we have the model - attempt to get a prediction for our compound...
 				callback(model);
@@ -145,6 +148,7 @@ window.ToxMan = {
 				
 				// after the row is filled with data
 				row.classList.remove('template');
+				row.classList.remove('row-blank');
 				root.appendChild(row);
 
 				row.getElementsByClassName('show-hide')[0].onclick = onclick;
@@ -185,44 +189,35 @@ window.ToxMan = {
 		// the function that actually parses the results of predictions and fills up the UI
 		var predictParser = function(prediction){
 			var features = ToxMan.buildFeatures(prediction, 0);
-			var theFeature = null;
-			var expFeature = null;
 			ToxMan.addFeatures(features, algo.name, algo.id, function(feature){
-				var res = feature.name.indexOf('#explanation') == -1;
-				if (res)
-					theFeature = feature;
-				else
-					expFeature = feature;
-				return res;
+				return res = feature.name.indexOf('#explanation') == -1;
 			});
 
-			// now fill the categorization 
+			// now ask for categories, used as a summary ...
+			var categories = ToxMan.buildCategories(features);
+			
+			// ... and fill them up in the interface.
 			var resRoot = mainRow.getElementsByClassName('result')[0];
 			var resTemp = resRoot.getElementsByClassName('row-blank')[0];
-			if (resTemp){ // it is the very first time.
-				resTemp.parentNode.removeChild(resTemp);
-				resTemp.classList.remove('template');
-				
-				var annot = theFeature.annotation;
-				var frag = document.createDocumentFragment();
-				for (var i = 0;i < annot.length; ++i){
-					var row = resTemp.cloneNode(true);
-					fillTree(row, annot[i]);
-					row.classList.remove('template');
-					row.classList.add(annot[i].type.replace(ToxMan.categoryRegex, '$1').toLowerCase());
-					if (annot[i].o == theFeature.value)
-						row.classList.add('active');
-					frag.appendChild(row);
-				}
-				resRoot.appendChild(frag);
+			clearChildren(resRoot, resTemp.parentNode == resRoot ? resTemp : null);
+			var frag = document.createDocumentFragment();
+			for (var i = 0;i < categories.length; ++i){
+				var row = resTemp.cloneNode(true);
+				fillTree(row, categories[i]);
+				row.classList.remove('template');
+				row.classList.remove('row-blank');
+				row.classList.add(categories[i].toxicity);
+				if (categories[i].active)
+					row.classList.add('active');
+				frag.appendChild(row);
 			}
-			else { // we only need to set it up...
-				
-			}
+			resRoot.appendChild(frag);
 			
 			// now mark the whole stuff as predicted
 			mainRow.classList.add('predicted');
-			explain.innerHTML = expFeature.value;
+			var expFeature = features.filter(function(feat){ return feat.name.indexOf('#explanation') > -1; })[0];
+			if (expFeature)
+				explain.innerHTML = expFeature.value;
 		};
 		
 		// the prediction invoke trickery...
@@ -260,6 +255,45 @@ window.ToxMan = {
 		return features;
 	},
 	
+	/* This one build a category list from the feature list, built on the previous step. It returns a list, 
+	which contains all possible categories along with their toxicity class, id, whether it's active, etc.
+	*/
+	buildCategories: function(features){
+		var cats = [];
+		features = features.filter(function(feat){
+			return feat.annotation.length > 0 && feat.annotation[0].o !== undefined && feat.name.indexOf('#explanation') == -1;
+		});
+		
+		if (features.length == 1){ // the "normal" case
+			var anot = features[0].annotation;
+			for (var i = 0; i < anot.length; ++i)
+				cats.push({
+					id: features[0].id,
+					name: anot[i].o,
+					toxicity: anot[i].type.replace(this.categoryRegex, '$1').toLowerCase(),
+					active: anot[i].o == features[0].value
+				});
+		}
+		else {
+			for (var i = 0;i < features.length;++i){
+				var anot = features[i].annotation;
+				var toxic = "";
+				for (var j = 0;j < anot.length; ++j)
+					if (anot[j].o == features[i].value){
+						toxic = anot[j].type.replace(this.categoryRegex, '$1').toLowerCase();
+						break;
+					}
+				cats.push({
+					id: features[i].id,
+					name: features[i].name,
+					toxicity: toxic,
+					active: true,
+				});
+			}
+		}
+		
+		return cats;
+	},
 	/* Adds given features (the result of buildFeatures call) to the feature list. If header is passed
 	 one single header row is added with the given string
 	*/
@@ -291,6 +325,7 @@ window.ToxMan = {
 				row.classList.add(classadd);
 			fillTree(row, features[i]);
 			row.classList.remove('template');
+			row.classList.remove('row-blank');
 			list.appendChild(row);
 		}
 		
