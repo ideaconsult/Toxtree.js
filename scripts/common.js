@@ -1,14 +1,4 @@
 domready(function(){
-  var flexs = document.getElementsByClassName('layouted-flexible');
-  for (var i = 0; i < flexs.length; ++i) {
-    flexSchedule(flexs[i], flexVertically);
-  }
-
-	// first initialize some general stuff - connection, list of supported algorithms, etc.
-	ConnMan.init();
-	localMessage = languages[ConnMan.parameters.language !== undefined ? ConnMan.parameters.langauge : 'en'];
-	ToxMan.init('toxtree', document.getElementById('query-form'));
-	
 	// some behavioural setup
 	// now attach the handler for clicking on the line which opens / hides it.
 	var showhideInfo = function(row){
@@ -22,16 +12,24 @@ domready(function(){
 			info.classList.remove('hidden');
 		}
 	}
-	
-	ToxMan.listAlgos(
-		function(e){  // onclick handler
-			showhideInfo(this.parentNode);
+
+	ToxMan.init({ 
+		prefix: "toxtree",
+		onalgoadd: function(row){
+			row.getElementsByClassName('show-hide')[0].onclick = function(e) { showhideInfo(this.parentNode); };
+			
+			// then put good id to auto checkboxes so that runAutos() can recognizes
+			var auto = row.getElementsByClassName('auto')[0].id = ToxMan.prefix + "-auto-" + i;
 		},
-		function(row, e){ // on run button handler. 
+		onrun: function(row, e){
 			showhideInfo(row);
 			e.stopPropagation();
 		}
-	);
+		
+	});
+	
+	localMessage = languages[ConnMan.parameters.language !== undefined ? ConnMan.parameters.langauge : 'en'];
+	ToxMan.listAlgos();
 	
 	// now attach the query button
 	var needle = document.getElementById('query-needle');
@@ -66,35 +64,6 @@ function setCheckedValue(radioObj, newValue) {
       radioObj[i].checked = true;
       if(radioObj[i].onchange) {
         radioObj[i].onchange();
-      }
-    }
-  }
-}
-
-function getRadioButtonValue(radio) {
-  for (var i = 0; i < radio.length; i++) {
-    if (radio[i].checked) {
-      return radio[i].value;
-    }
-  }
-  return "";
-}
-
-
-function getObjValue(obj){
-  if (obj.nodeName == "INPUT" || obj.nodeName == "SELECT") {
-    return obj.value;
-  }
-  else {
-    if (obj.nodeName == "IMG") {
-      return obj.src;
-    }
-    else {
-      if (obj.nodeName == "BUTTON") {
-        return obj.dataset.value;
-      }
-      else {
-        return obj.innerHTML;
       }
     }
   }
