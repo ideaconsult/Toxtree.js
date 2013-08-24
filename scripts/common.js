@@ -15,11 +15,11 @@ domready(function(){
 
 	ToxMan.init({ 
 		prefix: "toxtree",
-		onalgoadd: function(row){
+		onalgoadd: function(row, idx){
 			row.getElementsByClassName('show-hide')[0].onclick = function(e) { showhideInfo(this.parentNode); };
 			
 			// then put good id to auto checkboxes so that runAutos() can recognizes
-			var auto = row.getElementsByClassName('auto')[0].id = ToxMan.prefix + "-auto-" + i;
+			var auto = row.getElementsByClassName('auto')[0].id = ToxMan.prefix + "-auto-" + idx;
 		},
 		onrun: function(row, e){
 			showhideInfo(row);

@@ -18,7 +18,7 @@ window.ToxMan = {
 	media: 'application/json',	// the prefered media for receiving result. Setnt as 'Accept' header on requests. Part of settings.
 	
 	// some handler functions that can be configured from outside
-	onalgorow: null,		// function (row): called when each row for algorithm is added. Part of settings.
+	onalgoadd: null,		// function (row, idx): called when each row for algorithm is added. idx is it's index in this.algorithms. Part of settings.
 	onrun: null,				// function (row, e): called within click hander for run prediction button. 'e' is the original event. Part of settings.
 	onsuccess: null,		// function (code, mess): called on server request successful return. Part of settings.
 	onerror: null,			// function (code, mess): called on server reques error. Part of settings.
@@ -178,7 +178,7 @@ window.ToxMan = {
 				row.classList.remove('template');
 				row.classList.remove('row-blank');
 				root.appendChild(row);
-				self.onalgoadd(row);
+				self.onalgoadd(row, i);
 
 				// finally - attach the handler for running the prediction - create a new function each time so the proper index to be passed
 				var run = row.querySelector('.run');
@@ -367,7 +367,8 @@ window.ToxMan = {
 		
 	},
 	
-	/* Makes a server call with the provided method. If none is given - the internally stored one is 
+	/* Makes a server call with the provided method. If none is given - the internally stored one is used
+	*/
 	call: function (service, callback){
 		
 	}
