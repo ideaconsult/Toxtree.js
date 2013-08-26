@@ -34,6 +34,7 @@ $(document).ready(function(){
 	// initialization of ToxMan - passing all necessary parameters and configuration.
 	ToxMan.init({ 
 		prefix: "toxtree",
+//		jsonp: true,
 		onmodeladd: function(row, idx){
 			row.getElementsByClassName('show-hide')[0].onclick = function(e) { showhideInfo(this.parentNode); };
 			

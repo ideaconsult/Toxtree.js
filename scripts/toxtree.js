@@ -12,10 +12,10 @@ window.ToxMan = {
 
 	/* The following parametes can be passed in settings object to ToxMan.init() - with the same names
 	*/
-	prefix: 'ToxMan',						// the default prefix for elements, when they are retrieved from the DOM. Part of settings.
-	media: 'json',	// the prefered media for receiving result. Setnt as 'Accept' header on requests. Part of settings.
-	server: null,								// the server actually used for connecting. Part of settings. If not set - attempts to get 'server' parameter of the query, if not - get's current server.
-	timeout: 5000,							// the timeout an call to the server should be wait before the attempt is considered error. Part of settings.
+	prefix: 'ToxMan',										// the default prefix for elements, when they are retrieved from the DOM. Part of settings.
+	jsonp: false,												// whether to use JSONP approach, instead of JSON. Part of settings.
+	server: null,												// the server actually used for connecting. Part of settings. If not set - attempts to get 'server' parameter of the query, if not - get's current server.
+	timeout: 5000,											// the timeout an call to the server should be wait before the attempt is considered error. Part of settings.
 	
 	// some handler functions that can be configured from outside. They are 
 	onmodeladd: null,		// function (row, idx): called when each row for algorithm is added. idx is it's index in this.models. Part of settings.
@@ -138,6 +138,7 @@ window.ToxMan = {
 	/* Retrieves the model description for given algorithm. Used from both listModels() and runPrediction()
 	*/
 	getModel: function(algo, callback){
+		var self = this;
 		this.call(formatString(this.queries.getModel, encodeURIComponent(algo.uri)), function(model){
 			if (!model || model.model.length < 1){
 				self.call(self.queries.postModel, data, function(task){
@@ -379,6 +380,11 @@ window.ToxMan = {
 			this.server = server;
 		}
 		
+		if (settings.jsonp !== undefined)
+			this.jsonp = settings.jsonp;
+		if (settings.timeout !== undefined)
+			this.timeout = settings.timeout;
+			
 		this.onerror = settings.onerror;
 		this.onsuccess = settings.onsuccess;
 		this.onconnect = settings.onconnect;
@@ -395,13 +401,14 @@ window.ToxMan = {
 		else 
 			adata = {};
 
-		adata.media = 'application/' + self.media.substr(0, 4);
+		adata.media = self.jsonp ? "application/x-javascript" : "application/json";
 		$.ajax(self.server + service, {
-			dataType: self.media,
+			dataType: self.jsonp ? 'jsonp' : 'json',
 			crossDomain: true,
 			timeout: self.timeout,
 			type: method,
 			data: adata,
+			jsonp: self.jsonp ? 'callback' : false,
 			error: function(jhr, status, error){
 				self.onerror(status, error);
 				callback(null);
