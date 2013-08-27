@@ -68,7 +68,7 @@ $(document).ready(function(){
 		needle.onchange = query.onclick = function(e){
 			if (needle.value.length > 0){
 				ToxMan.query(needle.value);
-				needle.setAttribute('placeholder', needle.value + "_");
+				needle.setAttribute('placeholder', needle.value);
 				needle.value = '';
 			}
 		}
