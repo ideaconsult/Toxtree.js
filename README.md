@@ -14,14 +14,10 @@ toxtree.html?server=http://ideaconsult...:8080/ambit2
 
 TODO:
 -----
-	* style driven showing and hiding of results. 'predicted', 'high', ...
-	* tested on ... browsers;
+* style driven showing and hiding of results. 'predicted', 'high', ...
+* tested on ... browsers;
 
-	* Use the query line as result messaging - be it with query description, be it with error
-	* POST requests to be finished;
-	* test on more browsers (includ. IE)
-	* Write help - some more in toxtree.js and more detailed here. Good description of elements.
-	
-BUGS:
------
-	* 
+* Use the query line as result messaging - be it with query description, be it with error
+* POST requests to be finished;
+* test on more browsers (includ. IE)
+* Write help - some more in toxtree.js and more detailed here. Good description of elements.
