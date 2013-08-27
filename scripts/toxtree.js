@@ -31,7 +31,7 @@ window.ToxMan = {
 		featureHeader: null,  // a single row, as above, with textual header information
 		diagramImage: null,		// the placeholder for the compund image
 		modelList: null,				// the container (table) for algorithms list
-		modelRow: null,				// a single, template, row for filling the above
+		modelRow: null				// a single, template, row for filling the above
 	},
 	
 	/* A single place to hold all necessary queries. Parameters are marked with <XX> and formatString() (common.js) is used
@@ -314,7 +314,7 @@ window.ToxMan = {
 					id: features[i].id,
 					name: features[i].name,
 					toxicity: toxic,
-					active: true,
+					active: true
 				});
 			}
 		}
@@ -429,7 +429,7 @@ window.languages = {
 		ok: "Success",
 		error: "Error: ",
 		notfound: "Not found!",
-		waiting: "Waiting for server response...",
+		waiting: "Waiting for server response..."
 	}
 }
 
