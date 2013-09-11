@@ -64,13 +64,23 @@ $(document).ready(function(){
 	// now attach the query button
 	var needle = document.getElementById('query-needle');
 	var query = document.getElementById('query-button');
+
+	var makeQuery = function(search){
+		ToxMan.query(search);
+		needle.setAttribute('placeholder', search);
+	}
+
 	if (query && needle){
 		needle.onchange = query.onclick = function(e){
 			if (needle.value.length > 0){
-				ToxMan.query(needle.value);
-				needle.setAttribute('placeholder', needle.value);
+				makeQuery(needle.value);
 				needle.value = '';
 			}
 		}
+	}
+	
+	// finally - check for search parameter in the URL
+	if (ToxMan.queryParams.search !== undefined){
+		makeQuery(ToxMan.queryParams.search);
 	}
 });
