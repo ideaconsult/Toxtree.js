@@ -13,6 +13,9 @@
 	height: auto;
 	visibility: visible;	
 }
+.go-right {
+	float: right;	
+}
 
 .fading {
 	opacity: 0.3;
@@ -206,7 +209,7 @@ button.imaged:hover {
 	display: inherit;
 }
 
-.toxtree-models .result.body * {
+.toxtree-models .result.body div {
 	display: inline-block;
 	border: solid 1px;
 	border-color: #000;
@@ -216,7 +219,7 @@ button.imaged:hover {
 	margin-right: 5px;
 	padding-left: 5px;
 	padding-right: 5px;
-	width: 27%;
+	width: 90%;
 }
 
 .toxtree-models .result.body .active {

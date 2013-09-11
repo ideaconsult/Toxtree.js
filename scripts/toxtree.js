@@ -298,7 +298,8 @@ window.ToxMan = {
 					id: features[0].id,
 					name: anot[i].o,
 					toxicity: anot[i].type.replace(this.categoryRegex, '$1').toLowerCase(),
-					active: anot[i].o == features[0].value
+					active: anot[i].o == features[0].value,
+					answer: anot[i].o == features[0].value ? 'YES' : ''
 				});
 		}
 		else {
@@ -313,6 +314,7 @@ window.ToxMan = {
 				cats.push({
 					id: features[i].id,
 					name: features[i].name,
+					answer: features[i].value,
 					toxicity: toxic,
 					active: true
 				});
