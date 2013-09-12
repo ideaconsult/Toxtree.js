@@ -28,7 +28,7 @@ $(document).ready(function(){
 		errorEl.innerHTML = error;
 		if (fadeTimeout)
 			clearTimeout(fadeTimeout);
-		fadeTimeout = setTimeout(function() { errorEl.classList.add('fading'); }, 200);
+		fadeTimeout = setTimeout(function() { errorEl.classList.add('fading'); }, 5000);
 	};
 
 	// initialization of ToxMan - passing all necessary parameters and configuration.

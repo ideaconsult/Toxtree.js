@@ -18,8 +18,7 @@ window.ToxMan = {
 		taskPoll: "/task/<1>",
 		getModel: "/model?algorithm=<1>",
 		getPrediction: "/compound/<1>?feature_uris[]=<2>",
-		// Now come the POST requests, when no model exists and must be created
-		createModel: "/algorithm/<1>", 
+		createModel: "/algorithm/<1>",  // used in POST requests.
 	},
 
 	featurePrefix: 'http://www.opentox.org/api/1.1#',
@@ -272,7 +271,7 @@ window.ToxMan = {
 	buildCategories: function(features){
 		var cats = [];
 		features = features.filter(function(feat){
-			return feat.annotation.length > 0 && feat.annotation[0].o !== undefined && feat.name.indexOf('#explanation') == -1;
+			return feat.name.indexOf('#explanation') == -1;
 		});
 		
 		if (features.length == 1){ // the "normal" case
@@ -289,7 +288,7 @@ window.ToxMan = {
 		else {
 			for (var i = 0;i < features.length;++i){
 				var anot = features[i].annotation;
-				var toxic = "";
+				var toxic = 'unknown';
 				for (var j = 0;j < anot.length; ++j)
 					if (anot[j].o == features[i].value){
 						toxic = anot[j].type.replace(this.categoryRegex, '$1').toLowerCase();
