@@ -1,9 +1,9 @@
 $(document).ready(function(){
 	// some behavioural setup
 	// now attach the handler for clicking on the line which opens / hides it.
-	var showhideInfo = function(row){
+	var showhideInfo = function(row, force){
 		var info = row.getElementsByClassName('info')[0];
-		if (row.classList.contains('visible')){
+		if (row.classList.contains('visible') || !force){
 			row.classList.remove('visible');
 			info.classList.add('hidden');
 		}
@@ -42,9 +42,14 @@ $(document).ready(function(){
 			// then put good id to auto checkboxes so that runAutos() can recognizes
 			var auto = row.getElementsByClassName('auto')[0].id = ToxMan.prefix + "-auto-" + idx;
 		},
-		onrun: function(row, idx, e){
-			showhideInfo(row);
+		onrun: function (row, idx, e){
 			e.stopPropagation();
+		},
+		onpredicted: function(row, idx){
+			showhideInfo(row, true);
+		},
+		onclear: function(row, idx){
+			showhideInfo(row, false);
 		},
 		onconnect : function(service){
 			statusEl.src = "images/waiting_small.gif";

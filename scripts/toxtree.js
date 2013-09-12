@@ -6,8 +6,8 @@
 
 window.ToxMan = {
 	currentDataset: null,
-	models: null, 							// it gets filled from the listModels() query.
-	queryParams: null,					// an associative array of parameters supplied on the query. Some things like 'language' can be retrieved from there.
+	models: [], 							// it gets filled from the listModels() query.
+	queryParams: null,				// an associative array of parameters supplied on the query. Some things like 'language' can be retrieved from there.
 
 	/* A single place to hold all necessary queries. Parameters are marked with <XX> and formatString() (common.js) is used
 	to prepare the actual URLs
@@ -38,6 +38,7 @@ window.ToxMan = {
 	onmodeladd: null,		// function (row, idx): called when each row for algorithm is added. idx is it's index in this.models. Part of settings.
 	onrun: null,				// function (row, idx, e): called within click hander for run prediction button. 'e' is the original event (like button pressed, for example). Part of settings.
 	onpredicted: null,	// function (row, idx): called when the prediction that was run for current query is ready. Part of settings.
+	onclear: null,			// function (row, idx): that is called when the prediction results need to be cleared. Part of settings.
 	onconnect: null,		// function (service): called when a server request is started - for proper visualization. Part of settings.
 	onsuccess: null,		// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
 	onerror: null,			// function (code, mess): called on server reques error. Part of settings.
@@ -92,20 +93,22 @@ window.ToxMan = {
 		this.onmodeladd = settings.onmodeladd;
 		this.onrun = settings.onrun;
 		this.onpredicted = settings.onpredicted;
+		this.onclear = settings.onclear;
 		this.initConnection(settings);
 	},
 	
 	/* Clear all results that appera on the page - features, diagrams, prediction results - all, so that a new query can be invoked.
 	*/
 	clear : function() {
-		// clear features and diagrams first
 		var elements = this.elements;
 		if (elements.diagramImage)
 			elements.diagramImage.style.visibility = 'hidden';
 		if (elements.featureList)
 			clearChildren(elements.featureList, elements.featureRow.parentNode == elements.featureList ? elements.featureRow : null);
 		
-		// TODO: now go with the predictions
+		// now go with the predictions clearing
+		for (var i = 0;i < this.models.length; ++i)
+			this.clearPrediction(i);
 	},
 	
 	/* Makes a query for dataset based on a needle - the starting point of all actions.
@@ -197,13 +200,9 @@ window.ToxMan = {
 			features[0].parentNode.removeChild(features[0]);
 			
 		// clear the previous prediction results.
-		var mainRow = document.getElementById(ToxMan.prefix + '-algo-' + algo.id);
-		var explain = mainRow.getElementsByClassName('explanation')[0];
-		mainRow.classList.remove('predicted');
-		explain.innerHTML = '';		
+		this.clearPrediction(algoIndex);
 		
 		var self = this;
-
 		var createPredictions = function (model){
 			// creating a prediction for our particular case.
 			self.call(model, function(task){
@@ -373,7 +372,6 @@ window.ToxMan = {
 		// ... and fill them up in the interface.
 		var resRoot = mainRow.getElementsByClassName('result')[0];
 		var resTemp = resRoot.getElementsByClassName('row-blank')[0];
-		clearChildren(resRoot, resTemp.parentNode == resRoot ? resTemp : null);
 		var frag = document.createDocumentFragment();
 		for (var i = 0;i < categories.length; ++i){
 			var row = resTemp.cloneNode(true);
@@ -394,6 +392,24 @@ window.ToxMan = {
 			explain.innerHTML = expFeature.value;
 		return true;
 	},
+	
+	clearPrediction: function(idx) {
+		algo = this.models[idx];
+		var mainRow = document.getElementById(ToxMan.prefix + '-algo-' + algo.id);
+		var explain = mainRow.getElementsByClassName('explanation')[0];
+		// ... and fill them up in the interface.
+		var resRoot = mainRow.getElementsByClassName('result')[0];
+		var resTemp = resRoot.getElementsByClassName('row-blank')[0];
+		clearChildren(resRoot, resTemp.parentNode == resRoot ? resTemp : null);
+		
+		// now mark the whole stuff as predicted
+		mainRow.classList.remove('predicted');
+		explain.innerHTML = '';
+		
+		if (this.onclear)
+			this.onclear(mainRow, idx);
+	},
+	
 	/* Poll a given taskId and calls the callback when a result from the server comes - 
 	be it "running", "completed" or "error" - the callback is always called.
 	*/
