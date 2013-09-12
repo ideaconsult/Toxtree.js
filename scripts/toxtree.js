@@ -29,9 +29,10 @@ window.ToxMan = {
 	*/
 	prefix: 'ToxMan',			// the default prefix for elements, when they are retrieved from the DOM. Part of settings.
 	jsonp: false,					// whether to use JSONP approach, instead of JSON. Part of settings.
+	forceCreate: false,		// always ask the server to create new model and new prediction, even it such might already exist. Part of settings.
 	server: null,					// the server actually used for connecting. Part of settings. If not set - attempts to get 'server' parameter of the query, if not - get's current server.
 	timeout: 5000,				// the timeout an call to the server should be wait before the attempt is considered error. Part of settings.
-	retryDelay:	200,			// after how many milliseconds a new attempt should be made during task polling. Part of settings.				
+	pollDelay: 200,				// after how many milliseconds a new attempt should be made during task polling. Part of settings.				
 	
 	// some handler functions that can be configured from outside with the settings parameter.
 	onmodeladd: null,		// function (row, idx): called when each row for algorithm is added. idx is it's index in this.models. Part of settings.
@@ -63,6 +64,8 @@ window.ToxMan = {
 		var prefix = this.prefix;
 		if (settings.prefix)
 			prefix = this.prefix = settings.prefix;
+		if (settings.forceCreate !== undefined)
+			this.forceCreate = settings.forceCreate;			
 			
 		var featureList = settings.elements.featureList;
 		if (!featureList)
@@ -201,31 +204,36 @@ window.ToxMan = {
 		
 		var self = this;
 
+		var createPredictions = function (model){
+			// creating a prediction for our particular case.
+			self.call(model, function(task){
+				// poll the prediction creation task...
+				self.pollTask(task, function(result){
+					// OK, we have the prediction with this model ready - retrieve it and send it for parsing.
+					self.call(result, function(prediction){
+						self.parsePrediction(algo, prediction);
+					});
+				});
+			}, { dataset_uri: self.currentDataset.dataEntry[0].compound.URI });
+		};
+		
 		// now attempts to retrieve the mode, if it exists...
 		this.call(formatString(this.queries.getModel, encodeURIComponent(algo.uri)), function(model){
-			if (!model || model.model.length < 1){ // No - doesn't exists.
+			if (self.forceCreate || !model || model.model.length < 1){ // No - doesn't exists.
 				// We need to POST a model creation and poll the received task until we have it completed 
 				self.call(formatString(self.queries.createModel, algo.id), function(task){
 					// poll the model creation task...
 					self.pollTask(task, function(result){
-						// now, when we have the model ready, we need to invoke another POST request - for
-						// creating a prediction for our particular case. the { dataset_uri: self.currentDataset.dataEntry[0].compound.URI } is for here.
-						self.call(result, function(task){
-							// poll the prediction creation task...
-							self.pollTask(task, function(result){
-								// OK, we have the prediction with this model ready - retrieve it and send it for parsing.
-								self.call(result, function(prediction){
-									self.parsePrediction(algo, prediction);
-								});
-							});
-						}, { dataset_uri: self.currentDataset.dataEntry[0].compound.URI });
+						// now, when we have the model ready, we need to invoke another POST request to create new predictions.
+						createPredictions(result);
 					});					
 				}, 'POST'); /// for initial POST request - to force call() function to use POST method for http request.
 			}
 			else { // OK, we have the model - attempt to get a prediction for our compound...
 				var q = formatString(self.queries.getPrediction, encodeURIComponent(self.currentDataset.dataEntry[0].compound.id), encodeURIComponent(model.model[0].predicted));
 				self.call(q, function(prediction){
-					self.parsePrediction(algo, prediction);
+					if (!self.parsePrediction(algo, prediction)) // i.e. - it was empty
+						createPredictions(model.model[0].URI);
 				});	
 			}
 		});
@@ -352,6 +360,9 @@ window.ToxMan = {
 			self.onpredicted(mainRow, algo.index);
 			
 		var features = self.buildFeatures(prediction, 0);
+		if (features.length == 0)
+			return false;
+			
 		self.addFeatures(features, algo.name, algo.id, function(feature){
 			return res = feature.name.indexOf('#explanation') == -1;
 		});
@@ -381,6 +392,7 @@ window.ToxMan = {
 		var expFeature = features.filter(function(feat){ return feat.name.indexOf('#explanation') > -1; })[0];
 		if (expFeature)
 			explain.innerHTML = expFeature.value;
+		return true;
 	},
 	/* Poll a given taskId and calls the callback when a result from the server comes - 
 	be it "running", "completed" or "error" - the callback is always called.
@@ -397,7 +409,7 @@ window.ToxMan = {
 				self.call(task.result, function(newTask){
 					self.pollTask(newTask, callback);
 				});
-			}, self.retryDelay);
+			}, self.pollDelay);
 		}
 		else if (!task.error){
 			callback(task.result);
@@ -423,6 +435,8 @@ window.ToxMan = {
 			this.jsonp = settings.jsonp;
 		if (settings.timeout !== undefined)
 			this.timeout = settings.timeout;
+		if (settings.pollDelay)
+			this.pollDelay = settings.pollDelay;
 			
 		this.onerror = settings.onerror;
 		this.onsuccess = settings.onsuccess;
