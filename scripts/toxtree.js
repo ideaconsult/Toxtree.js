@@ -369,7 +369,7 @@ window.ToxMan = {
 			
 		var features = self.buildFeatures(prediction, 0);
 		if (features.length == 0)
-			return false;
+			return false; // i.e. this is no valid prediction - we must rebuild it.
 			
 		self.addFeatures(features, algo.name, algo.id, function(feature){
 			return res = feature.name.indexOf('#explanation') == -1;
