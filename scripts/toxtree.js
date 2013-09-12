@@ -7,33 +7,9 @@
 window.ToxMan = {
 	currentQuery: null,
 	currentDataset: null,
-	models: null, // it gets filled from the listModels() query.
+	models: null, 							// it gets filled from the listModels() query.
 	queryParams: null,					// an associative array of parameters supplied on the query. Some things like 'language' can be retrieved from there.
 
-	/* The following parametes can be passed in settings object to ToxMan.init() - with the same names
-	*/
-	prefix: 'ToxMan',										// the default prefix for elements, when they are retrieved from the DOM. Part of settings.
-	jsonp: false,												// whether to use JSONP approach, instead of JSON. Part of settings.
-	server: null,												// the server actually used for connecting. Part of settings. If not set - attempts to get 'server' parameter of the query, if not - get's current server.
-	timeout: 5000,											// the timeout an call to the server should be wait before the attempt is considered error. Part of settings.
-	
-	// some handler functions that can be configured from outside. They are 
-	onmodeladd: null,		// function (row, idx): called when each row for algorithm is added. idx is it's index in this.models. Part of settings.
-	onrun: null,				// function (row, e): called within click hander for run prediction button. 'e' is the original event. Part of settings.
-	onconnect: null,		// function (service): called when a server request is started - for proper visualization. Part of settings.
-	onsuccess: null,		// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
-	onerror: null,			// function (code, mess): called on server reques error. Part of settings.
-	
-	// Some elements from the DOM which we use - remember them here upon init. Part of settings.
-	elements: {
-		featureList: null, 		// the whole container (table) for feature list
-		featureRow: null,			// a single, template, row for filling the above
-		featureHeader: null,  // a single row, as above, with textual header information
-		diagramImage: null,		// the placeholder for the compund image
-		modelList: null,				// the container (table) for algorithms list
-		modelRow: null				// a single, template, row for filling the above
-	},
-	
 	/* A single place to hold all necessary queries. Parameters are marked with <XX> and formatString() (common.js) is used
 	to prepare the actual URLs
 	*/
@@ -49,7 +25,31 @@ window.ToxMan = {
 
 	featurePrefix: 'http://www.opentox.org/api/1.1#',
 	categoryRegex: /\^\^(\S+)Category/i,
-		
+
+	/* SETTINGS. The following parametes can be passed in settings object to ToxMan.init() - with the same names
+	*/
+	prefix: 'ToxMan',										// the default prefix for elements, when they are retrieved from the DOM. Part of settings.
+	jsonp: false,												// whether to use JSONP approach, instead of JSON. Part of settings.
+	server: null,												// the server actually used for connecting. Part of settings. If not set - attempts to get 'server' parameter of the query, if not - get's current server.
+	timeout: 5000,											// the timeout an call to the server should be wait before the attempt is considered error. Part of settings.
+	
+	// some handler functions that can be configured from outside with the settings parameter.
+	onmodeladd: null,		// function (row, idx): called when each row for algorithm is added. idx is it's index in this.models. Part of settings.
+	onrun: null,				// function (row, idx, e): called within click hander for run prediction button. 'e' is the original event (like button pressed, for example). Part of settings.
+	onconnect: null,		// function (service): called when a server request is started - for proper visualization. Part of settings.
+	onsuccess: null,		// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
+	onerror: null,			// function (code, mess): called on server reques error. Part of settings.
+	
+	// Some elements from the DOM which we use - remember them here upon init. Part of settings.
+	elements: {
+		featureList: null, 		// the whole container (table) for feature list
+		featureRow: null,			// a single, template, row for filling the above
+		featureHeader: null,  // a single row, as above, with textual header information
+		diagramImage: null,		// the placeholder for the compound image
+		modelList: null,			// the container (table) for algorithms list
+		modelRow: null				// a single, template, row for filling the above
+	},
+			
 	/* Initializes the ToxMan, setting up all elements, if not passed, that are going to be used, so it
 	need to be called when the DOM is ready.
 	*/
@@ -90,9 +90,9 @@ window.ToxMan = {
 		this.initConnection(settings);
 	},
 	
-	/* Clear all results that appera on the page - features, diagrams, prediction results - all.
+	/* Clear all results that appera on the page - features, diagrams, prediction results - all, so that a new query can be invoked.
 	*/
-	clearResults : function() {
+	clear : function() {
 		// clear features and diagrams first
 		var elements = this.elements;
 		if (elements.diagramImage)
@@ -109,9 +109,10 @@ window.ToxMan = {
 		if (needle.length < 1)
 			return false;
 		var self = this;
+		self.clear();
+		
 		this.call(formatString(this.queries.query, encodeURIComponent(needle)), function(dataset){
 			// start with some clearing
-			self.clearResults();
 			if (!dataset || dataset.dataEntry.length < 1){
 				if (self.onerror)
 					self.onerror('notfound', localMessage.nothingFound);
@@ -132,24 +133,6 @@ window.ToxMan = {
 			}
 			
 			self.runAutos();
-		});
-	},
-	
-	/* Retrieves the model description for given algorithm. Used from both listModels() and runPrediction()
-	*/
-	getModel: function(algo, callback){
-		var self = this;
-		this.call(formatString(this.queries.getModel, encodeURIComponent(algo.uri)), function(model){
-			if (!model || model.model.length < 1){
-				self.call(self.queries.postModel, data, function(task){
-					self.pollTask(task, function(ready){
-						self.getModel(algo, callback);
-					});					
-				}, 'POST');
-			}
-			else { // OK, we have the model - attempt to get a prediction for our compound...
-				callback(model);
-			}
 		});
 	},
 	
@@ -183,13 +166,15 @@ window.ToxMan = {
 
 				// finally - attach the handler for running the prediction - create a new function each time so the proper index to be passed
 				var run = row.querySelector('.run');
-				run.onclick = (function(algoIdx, row){
-					return function(e){
-						self.runPrediction(algoIdx);
-						if (self.onrun)
-							self.onrun(row, e);
-					}
-				})(i, row);
+				if (run !== undefined){
+					run.onclick = (function(algoIdx, row){
+						return function(e){
+							self.runPrediction(algoIdx);
+							if (self.onrun)
+								self.onrun(row, algoIdx, e);
+						}
+					})(i, row);
+				}
 			}
 		});
 	},
@@ -265,6 +250,24 @@ window.ToxMan = {
 		}	
 	},
 	
+	/* Retrieves the model description for given algorithm. Used from both listModels() and runPrediction()
+	*/
+	getModel: function(algo, callback){
+		var self = this;
+		this.call(formatString(this.queries.getModel, encodeURIComponent(algo.uri)), function(model){
+			if (!model || model.model.length < 1){
+				self.call(self.queries.postModel, data, function(task){
+					self.pollTask(task, function(ready){
+						self.getModel(algo, callback);
+					});					
+				}, 'POST');
+			}
+			else { // OK, we have the model - attempt to get a prediction for our compound...
+				callback(model);
+			}
+		});
+	},
+		
 	/* Build a new array of features from 'values' and 'feature' arrays in the dataset. 
 		The resulting array has {id, name, value} properties for each feature.
 	*/
@@ -299,7 +302,7 @@ window.ToxMan = {
 					name: anot[i].o,
 					toxicity: anot[i].type.replace(this.categoryRegex, '$1').toLowerCase(),
 					active: anot[i].o == features[0].value,
-					answer: anot[i].o == features[0].value ? 'YES' : ''
+					answer: anot[i].o == features[0].value ? '✓' : ''
 				});
 		}
 		else {

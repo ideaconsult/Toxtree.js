@@ -41,7 +41,7 @@ $(document).ready(function(){
 			// then put good id to auto checkboxes so that runAutos() can recognizes
 			var auto = row.getElementsByClassName('auto')[0].id = ToxMan.prefix + "-auto-" + idx;
 		},
-		onrun: function(row, e){
+		onrun: function(row, idx, e){
 			showhideInfo(row);
 			e.stopPropagation();
 		},
