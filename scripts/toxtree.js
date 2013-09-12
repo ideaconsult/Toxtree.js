@@ -5,7 +5,6 @@
 */
 
 window.ToxMan = {
-	currentQuery: null,
 	currentDataset: null,
 	models: null, 							// it gets filled from the listModels() query.
 	queryParams: null,					// an associative array of parameters supplied on the query. Some things like 'language' can be retrieved from there.
@@ -18,24 +17,26 @@ window.ToxMan = {
 		listModels: "/algorithm?search=ToxTree",
 		taskPoll: "/task/<1>",
 		getModel: "/model?algorithm=<1>",
-		postModel: "",
 		getPrediction: "/compound/<1>?feature_uris[]=<2>",
-		postPrediction: ""
+		// Now come the POST requests, when no model exists and must be created
+		createModel: "/algorithm/<1>", 
 	},
 
 	featurePrefix: 'http://www.opentox.org/api/1.1#',
 	categoryRegex: /\^\^(\S+)Category/i,
 
-	/* SETTINGS. The following parametes can be passed in settings object to ToxMan.init() - with the same names
+	/* SETTINGS. The following parametes can be passed in settings object to ToxMan.init() - with the same names. Values set here are the defaults.
 	*/
-	prefix: 'ToxMan',										// the default prefix for elements, when they are retrieved from the DOM. Part of settings.
-	jsonp: false,												// whether to use JSONP approach, instead of JSON. Part of settings.
-	server: null,												// the server actually used for connecting. Part of settings. If not set - attempts to get 'server' parameter of the query, if not - get's current server.
-	timeout: 5000,											// the timeout an call to the server should be wait before the attempt is considered error. Part of settings.
+	prefix: 'ToxMan',			// the default prefix for elements, when they are retrieved from the DOM. Part of settings.
+	jsonp: false,					// whether to use JSONP approach, instead of JSON. Part of settings.
+	server: null,					// the server actually used for connecting. Part of settings. If not set - attempts to get 'server' parameter of the query, if not - get's current server.
+	timeout: 5000,				// the timeout an call to the server should be wait before the attempt is considered error. Part of settings.
+	retryDelay:	200,			// after how many milliseconds a new attempt should be made during task polling. Part of settings.				
 	
 	// some handler functions that can be configured from outside with the settings parameter.
 	onmodeladd: null,		// function (row, idx): called when each row for algorithm is added. idx is it's index in this.models. Part of settings.
 	onrun: null,				// function (row, idx, e): called within click hander for run prediction button. 'e' is the original event (like button pressed, for example). Part of settings.
+	onpredicted: null,	// function (row, idx): called when the prediction that was run for current query is ready. Part of settings.
 	onconnect: null,		// function (service): called when a server request is started - for proper visualization. Part of settings.
 	onsuccess: null,		// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
 	onerror: null,			// function (code, mess): called on server reques error. Part of settings.
@@ -87,6 +88,7 @@ window.ToxMan = {
 		
 		this.onmodeladd = settings.onmodeladd;
 		this.onrun = settings.onrun;
+		this.onpredicted = settings.onpredicted;
 		this.initConnection(settings);
 	},
 	
@@ -156,6 +158,7 @@ window.ToxMan = {
 			for (var i = 0;i < algos.length; ++i) {
 				var row = tempRow.cloneNode(true);
 				algos[i].name = algos[i].name.substr(self.prefix.length + 2);
+				algos[i].index = i;
 				fillTree(row, algos[i], self.prefix + '-algo-');
 				
 				// after the row is filled with data
@@ -197,45 +200,34 @@ window.ToxMan = {
 		explain.innerHTML = '';		
 		
 		var self = this;
-		
-		// the function that actually parses the results of predictions and fills up the UI
-		var predictParser = function(prediction){
-			var features = self.buildFeatures(prediction, 0);
-			self.addFeatures(features, algo.name, algo.id, function(feature){
-				return res = feature.name.indexOf('#explanation') == -1;
-			});
 
-			// now ask for categories, used as a summary ...
-			var categories = self.buildCategories(features);
-			
-			// ... and fill them up in the interface.
-			var resRoot = mainRow.getElementsByClassName('result')[0];
-			var resTemp = resRoot.getElementsByClassName('row-blank')[0];
-			clearChildren(resRoot, resTemp.parentNode == resRoot ? resTemp : null);
-			var frag = document.createDocumentFragment();
-			for (var i = 0;i < categories.length; ++i){
-				var row = resTemp.cloneNode(true);
-				fillTree(row, categories[i]);
-				row.classList.remove('template');
-				row.classList.remove('row-blank');
-				row.classList.add(categories[i].toxicity);
-				if (categories[i].active)
-					row.classList.add('active');
-				frag.appendChild(row);
+		// now attempts to retrieve the mode, if it exists...
+		this.call(formatString(this.queries.getModel, encodeURIComponent(algo.uri)), function(model){
+			if (!model || model.model.length < 1){ // No - doesn't exists.
+				// We need to POST a model creation and poll the received task until we have it completed 
+				self.call(formatString(self.queries.createModel, algo.id), function(task){
+					// poll the model creation task...
+					self.pollTask(task, function(result){
+						// now, when we have the model ready, we need to invoke another POST request - for
+						// creating a prediction for our particular case. the { dataset_uri: self.currentDataset.dataEntry[0].compound.URI } is for here.
+						self.call(result, function(task){
+							// poll the prediction creation task...
+							self.pollTask(task, function(result){
+								// OK, we have the prediction with this model ready - retrieve it and send it for parsing.
+								self.call(result, function(prediction){
+									self.parsePrediction(algo, prediction);
+								});
+							});
+						}, { dataset_uri: self.currentDataset.dataEntry[0].compound.URI });
+					});					
+				}, 'POST'); /// for initial POST request - to force call() function to use POST method for http request.
 			}
-			resRoot.appendChild(frag);
-			
-			// now mark the whole stuff as predicted
-			mainRow.classList.add('predicted');
-			var expFeature = features.filter(function(feat){ return feat.name.indexOf('#explanation') > -1; })[0];
-			if (expFeature)
-				explain.innerHTML = expFeature.value;
-		};
-		
-		// the prediction invoke trickery...
-		self.getModel(algo, function(model){
-			var q = formatString(self.queries.getPrediction, encodeURIComponent(self.currentDataset.dataEntry[0].compound.id), encodeURIComponent(model.model[0].predicted));
-			self.call(q, predictParser);	
+			else { // OK, we have the model - attempt to get a prediction for our compound...
+				var q = formatString(self.queries.getPrediction, encodeURIComponent(self.currentDataset.dataEntry[0].compound.id), encodeURIComponent(model.model[0].predicted));
+				self.call(q, function(prediction){
+					self.parsePrediction(algo, prediction);
+				});	
+			}
 		});
 	},
 	
@@ -250,24 +242,6 @@ window.ToxMan = {
 		}	
 	},
 	
-	/* Retrieves the model description for given algorithm. Used from both listModels() and runPrediction()
-	*/
-	getModel: function(algo, callback){
-		var self = this;
-		this.call(formatString(this.queries.getModel, encodeURIComponent(algo.uri)), function(model){
-			if (!model || model.model.length < 1){
-				self.call(self.queries.postModel, data, function(task){
-					self.pollTask(task, function(ready){
-						self.getModel(algo, callback);
-					});					
-				}, 'POST');
-			}
-			else { // OK, we have the model - attempt to get a prediction for our compound...
-				callback(model);
-			}
-		});
-	},
-		
 	/* Build a new array of features from 'values' and 'feature' arrays in the dataset. 
 		The resulting array has {id, name, value} properties for each feature.
 	*/
@@ -366,11 +340,71 @@ window.ToxMan = {
 		root.appendChild(list);
 	},
 	
+	// the function that actually parses the results of predictions and fills up the UI
+	parsePrediction: function(algo, prediction){
+		// get some elements references
+		var mainRow = document.getElementById(ToxMan.prefix + '-algo-' + algo.id);
+		var explain = mainRow.getElementsByClassName('explanation')[0];
+		var self = this;
+	
+		// call the user provided function, if any.
+		if (self.onpredicted)
+			self.onpredicted(mainRow, algo.index);
+			
+		var features = self.buildFeatures(prediction, 0);
+		self.addFeatures(features, algo.name, algo.id, function(feature){
+			return res = feature.name.indexOf('#explanation') == -1;
+		});
+
+		// now ask for categories, used as a summary ...
+		var categories = self.buildCategories(features);
+		
+		// ... and fill them up in the interface.
+		var resRoot = mainRow.getElementsByClassName('result')[0];
+		var resTemp = resRoot.getElementsByClassName('row-blank')[0];
+		clearChildren(resRoot, resTemp.parentNode == resRoot ? resTemp : null);
+		var frag = document.createDocumentFragment();
+		for (var i = 0;i < categories.length; ++i){
+			var row = resTemp.cloneNode(true);
+			fillTree(row, categories[i]);
+			row.classList.remove('template');
+			row.classList.remove('row-blank');
+			row.classList.add(categories[i].toxicity);
+			if (categories[i].active)
+				row.classList.add('active');
+			frag.appendChild(row);
+		}
+		resRoot.appendChild(frag);
+		
+		// now mark the whole stuff as predicted
+		mainRow.classList.add('predicted');
+		var expFeature = features.filter(function(feat){ return feat.name.indexOf('#explanation') > -1; })[0];
+		if (expFeature)
+			explain.innerHTML = expFeature.value;
+	},
 	/* Poll a given taskId and calls the callback when a result from the server comes - 
 	be it "running", "completed" or "error" - the callback is always called.
 	*/
-	pollTask : function(taskId, callback) {
-		
+	pollTask : function(task, callback) {
+		var self = this;
+		if (task === undefined || task.task === undefined || task.task.length < 1){
+			self.onerror('-1', localMessage.taskFailed);
+			return;
+		}
+		task = task.task[0];
+		if (task.completed == -1){ // i.e. - running
+			setTimeout(function(){
+				self.call(task.result, function(newTask){
+					self.pollTask(newTask, callback);
+				});
+			}, self.retryDelay);
+		}
+		else if (!task.error){
+			callback(task.result);
+		}
+		else { // error
+			self.onerror('-1', task.error);
+		}
 	},
 	
 	/* Initialized the necessary connection data. Same settings as in ToxMan.init() are passed.
@@ -406,8 +440,12 @@ window.ToxMan = {
 		else 
 			adata = {};
 
-		adata.media = self.jsonp ? "application/x-javascript" : "application/json";
-		$.ajax(self.server + service, {
+		adata.media = self.jsonp ? "application/x-javascript" : "application/json";	
+		// on some queries, like tasks, we DO have server at the beginning
+		if (service.indexOf("http") != 0)	
+			service = self.server + service;
+		// now make the actual call
+		$.ajax(service, {
 			dataType: self.jsonp ? 'jsonp' : 'json',
 			crossDomain: true,
 			timeout: self.timeout,
@@ -434,7 +472,8 @@ window.languages = {
 		ok: "Success",
 		error: "Error: ",
 		notfound: "Not found!",
-		waiting: "Waiting for server response..."
+		waiting: "Waiting for server response...",
+		taskFailed: "Polling of the task failed"
 	}
 }
 
