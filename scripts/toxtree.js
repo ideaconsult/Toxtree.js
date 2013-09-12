@@ -274,7 +274,7 @@ window.ToxMan = {
 			return feat.name.indexOf('#explanation') == -1;
 		});
 		
-		if (features.length == 1){ // the "normal" case
+		if (features.length == 1){ // the "normal" case - one classification answer
 			var anot = features[0].annotation;
 			for (var i = 0; i < anot.length; ++i)
 				cats.push({
@@ -284,6 +284,16 @@ window.ToxMan = {
 					active: anot[i].o == features[0].value,
 					answer: anot[i].o == features[0].value ? '✓' : ''
 				});
+			// in case we don't have annotation - consider the reported feature as an unknown class and still report it.
+			if (cats.length == 0){
+				cats.push({
+					id: features[0].id,
+					name: features[0].value,
+					toxicity: 'unknown',
+					active: true,
+					answer: '✓'
+				});
+			}
 		}
 		else {
 			for (var i = 0;i < features.length;++i){

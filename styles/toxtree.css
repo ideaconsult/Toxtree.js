@@ -195,7 +195,7 @@ button.imaged:hover {
 .toxtree-models .predicted .explanation {
 	visibility: visible;
 	height: auto;
-	width: 100%;
+	width: 95%;
 }
 
 .toxtree-models .info {
@@ -248,5 +248,5 @@ button.imaged:hover {
 }
 
 .toxtree-models .result.body .unknown {
-	background-color: #333333;
+	background-color: #aaaaaa;
 }
