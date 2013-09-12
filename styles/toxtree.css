@@ -88,11 +88,6 @@ button.imaged:hover {
   border-radius: 7px;
   color: #444;
   margin: 0px;
-  
-  -moz-user-select: none;
-  -khtml-user-select: none;
-  -webkit-user-select: none;
-  user-select: none;
 }
 
 .panel-hovering:hover {
@@ -140,11 +135,6 @@ button.imaged:hover {
 	padding-left: 10px;
 	padding-right: 2px;
 	white-space: nowrap;
-
-  -moz-user-select: auto;
-  -khtml-user-select: auto;
-  -webkit-user-select: auto;
-  user-select: auto;
   
   vertical-align: top;
 }
@@ -179,10 +169,6 @@ button.imaged:hover {
 
 .toxtree-models .explanation {
 	height: auto;
-  -moz-user-select: auto;
-  -khtml-user-select: auto;
-  -webkit-user-select: auto;
-  user-select: auto;
   
   margin-right: 10px;
   margin-bottom: 10px;

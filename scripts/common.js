@@ -3,7 +3,7 @@ $(document).ready(function(){
 	// now attach the handler for clicking on the line which opens / hides it.
 	var showhideInfo = function(row, force){
 		var info = row.getElementsByClassName('info')[0];
-		if (row.classList.contains('visible') || !force){
+		if (row.classList.contains('visible') || !force && force !== undefined){
 			row.classList.remove('visible');
 			info.classList.add('hidden');
 		}
