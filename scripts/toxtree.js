@@ -230,7 +230,7 @@ window.ToxMan = {
 			else { // OK, we have the model - attempt to get a prediction for our compound...
 				var q = formatString(self.queries.getPrediction, encodeURIComponent(self.currentDataset.dataEntry[0].compound.id), encodeURIComponent(model.model[0].predicted));
 				self.call(q, function(prediction){
-					if (!self.parsePrediction(algo, prediction)) // i.e. - it was empty
+					if (!prediction || !self.parsePrediction(algo, prediction)) // i.e. - it was empty
 						createPredictions(model.model[0].URI);
 				});	
 			}
