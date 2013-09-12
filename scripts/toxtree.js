@@ -18,7 +18,7 @@ window.ToxMan = {
 		taskPoll: "/task/<1>",
 		getModel: "/model?algorithm=<1>",
 		getPrediction: "/compound/<1>?feature_uris[]=<2>",
-		createModel: "/algorithm/<1>",  // used in POST requests.
+		createModel: "/algorithm/<1>"  // used in POST requests.
 	},
 
 	featurePrefix: 'http://www.opentox.org/api/1.1#',
@@ -514,11 +514,14 @@ window.languages = {
 		waiting: "Waiting for server response...",
 		taskFailed: "Polling of the task failed"
 	}
-}
+};
 
 var localMessage = languages.en;
 
-// some helper functions.
+// some HELPER functions.
+
+/* Set a given to the given element (obj) in the most appropriate way - be it property - the necessary one, on innetHTML
+*/
 function setObjValue(obj, value){
 	if ((value === undefined || value === null) && obj.dataset.default !== undefined)
 		value = obj.dataset.default;
@@ -532,6 +535,7 @@ function setObjValue(obj, value){
   else
     obj.innerHTML = value;
 }
+
 
 /*
 Passed a HTML DOM element - it clears all children folowwing last one. Pass null for clearing all.
