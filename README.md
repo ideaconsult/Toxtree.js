@@ -60,22 +60,22 @@ These are all elements that participate in building the UI. Few of them can be p
 
 ToxTree is initialized one of its functions - `init(settings)`. We'll explain the *settings* parameter here:
 
-- *`server`* - a link to OpenTox root. If not present the URL is parsed to search for *server* query parameter. It it is still not found - the calling *host* is considered.
-- *`jsonp`* - true / false to setup whether this method should be used to avoid Cross Domain security restrictions. If the server is not configured to provide the necessary header - this should be used, although some functionality will not be available - creation of new prediction models.
-- *`timeout`* - the connection timeout, after which the request will be considered failed. In milliseconds.
-- *`pollDelay`* - how much time to wait between request while waiting a certain server task to be finished. In milliseconds.
-- *`onconnect`* - a handler `function(url)` to be invoked at the beginning of each server request.
-- *`onerror`* - a handler `function(code, message)` to be invoked when a request fails.
-- *`onsuccess`* - a handler `function(code, message)` to be invoked on successful server request.
+- `server` - a link to OpenTox root. If not present the URL is parsed to search for *server* query parameter. It it is still not found - the calling *host* is considered.
+- `jsonp` - true / false to setup whether this method should be used to avoid Cross Domain security restrictions. If the server is not configured to provide the necessary header - this should be used, although some functionality will not be available - creation of new prediction models.
+- `timeout` - the connection timeout, after which the request will be considered failed. In milliseconds.
+- `pollDelay` - how much time to wait between request while waiting a certain server task to be finished. In milliseconds.
+- `onconnect` - a handler `function(url)` to be invoked at the beginning of each server request.
+- `onerror` - a handler `function(code, message)` to be invoked when a request fails.
+- `onsuccess` - a handler `function(code, message)` to be invoked on successful server request.
 
 These were connection-related settings. Now the UI-related ones.
 
-- *`prefix`* which is to be used when searching for certain UI elements as described above.
-- *`onmodeladd`* a handler `function (row, idx)` which is called when a new prediction model is added to the UI. `row` is the cloned blank row and `idx` is the model's index in *ToxMan*'s list.
-- *`onrun`* a handler `function(row, idx, event)` which is called when a prediction is run. The additional `event` parameter is from the original event that initiated the fun - button click, for example.
-- *`onpredicted`* a handler `function(row, idx)` called when the prediction is completed and the results are just about to be filled.
-- *`onclear`* a handler `function (row, idx)` called just after a row of prediction results was cleared.
-- *`elements`* an object containing all key UI elements to be used, as described above: `featureList`,`featureRow`, `featureHeader`, `diagramImage`, `modelList` and `modelRow`.
+- `prefix` which is to be used when searching for certain UI elements as described above.
+- `onmodeladd` a handler `function (row, idx)` which is called when a new prediction model is added to the UI. `row` is the cloned blank row and `idx` is the model's index in *ToxMan*'s list.
+- `onrun` a handler `function(row, idx, event)` which is called when a prediction is run. The additional `event` parameter is from the original event that initiated the fun - button click, for example.
+- `onpredicted` a handler `function(row, idx)` called when the prediction is completed and the results are just about to be filled.
+- `onclear` a handler `function (row, idx)` called just after a row of prediction results was cleared.
+- `elements` an object containing all key UI elements to be used, as described above: `featureList`,`featureRow`, `featureHeader`, `diagramImage`, `modelList` and `modelRow`.
 
 
 Toxtree.js API
