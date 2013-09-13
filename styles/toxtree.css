@@ -191,18 +191,18 @@ button.imaged:hover {
 	width: 95%;
 }
 
-.toxtree-models .result {
+.toxtree-models .class-result {
 	width: 100%;
 	margin-bottom: 10px;
 	display:none;
 	vertical-align: top;
 }
 
-.toxtree-models .predicted .result {
+.toxtree-models .predicted .class-result {
 	display: inherit;
 }
 
-.toxtree-models .result.body div {
+.toxtree-models .class-result div {
 	display: inline-block;
 	border: solid 1px;
 	border-color: #000;
@@ -215,24 +215,24 @@ button.imaged:hover {
 	width: 90%;
 }
 
-.toxtree-models .result.body .active {
+.toxtree-models .class-result .active {
 	opacity: 1.0;
 	color: #000;
 	font-weight: bold;
 }
 
-.toxtree-models .result.body .toxic {
+.toxtree-models .class-result .toxic {
 	background-color: #e24b4b;
 }
 
-.toxtree-models .result.body .nontoxic {
+.toxtree-models .class-result .nontoxic {
 	background-color:#49cb5b;
 }
 
-.toxtree-models .result.body .inconclusive {
+.toxtree-models .class-result .inconclusive {
 	background-color: #d0e81a;
 }
 
-.toxtree-models .result.body .unknown {
+.toxtree-models .class-result .unknown {
 	background-color: #aaaaaa;
 }

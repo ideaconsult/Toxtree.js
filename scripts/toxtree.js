@@ -379,14 +379,14 @@ window.ToxMan = {
 		var categories = self.buildCategories(features);
 		
 		// ... and fill them up in the interface.
-		var resRoot = mainRow.getElementsByClassName('result')[0];
-		var resTemp = resRoot.getElementsByClassName('row-blank')[0];
+		var resRoot = mainRow.getElementsByClassName('class-result')[0];
+		var resTemp = resRoot.getElementsByClassName('class-blank')[0];
 		var frag = document.createDocumentFragment();
 		for (var i = 0;i < categories.length; ++i){
 			var row = resTemp.cloneNode(true);
 			fillTree(row, categories[i]);
 			row.classList.remove('template');
-			row.classList.remove('row-blank');
+			row.classList.remove('class-blank');
 			row.classList.add(categories[i].toxicity);
 			if (categories[i].active)
 				row.classList.add('active');
@@ -407,8 +407,8 @@ window.ToxMan = {
 		var mainRow = document.getElementById(ToxMan.prefix + '-algo-' + algo.id);
 		var explain = mainRow.getElementsByClassName('explanation')[0];
 		// ... and fill them up in the interface.
-		var resRoot = mainRow.getElementsByClassName('result')[0];
-		var resTemp = resRoot.getElementsByClassName('row-blank')[0];
+		var resRoot = mainRow.getElementsByClassName('class-result')[0];
+		var resTemp = resRoot.getElementsByClassName('class-blank')[0];
 		clearChildren(resRoot, resTemp.parentNode == resRoot ? resTemp : null);
 		
 		// now mark the whole stuff as predicted
