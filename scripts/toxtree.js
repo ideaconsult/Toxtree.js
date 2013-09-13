@@ -2,6 +2,14 @@
 	ToxMan.js - ToxMan JavaScript query helper.
 	Created by Ivan Georgiev, 2013.
 
+	All functions and variables are commented next their presence in source. Functions that are most likely to be used are:
+	
+	init(settings);
+	clear();
+	query(needle);
+	listModels();
+	runPrediction(index);
+	runAutos();
 */
 
 window.ToxMan = {

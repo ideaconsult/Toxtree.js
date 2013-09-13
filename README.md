@@ -1,3 +1,4 @@
+
 Toxtree.js
 ==========
 
@@ -47,27 +48,93 @@ After we've discussed list declaration basics, we can move to main ToxTree eleme
 - `<prefix>-features` marks the element which is the root of features list.
 - `<prefix>-diagram` marks an image element that should be used to present the compound diagram.
 - `<prefix>-models` marks the element which is the root of list of models. There are several sub-elements that may exist here, which are *not* prepended with prefix (they are searched as sub-elements of the root):
--- `auto` marks the checkbox which determines whether this model should be run automatically on each new query.
--- `run` marks the button that initiates the prediction, so that toxtree.js can attach on its `onclick` event.
--- `explanation` marks an element which will be filled with complete textual information, reported from the model on successful prediction.
--- `class-result` the root element for filling all reported classification classes - just like `body` class for lists.
--- `class-blank` a blank element for a classification class - to be filled up there.
+- `auto` marks the checkbox which determines whether this model should be run automatically on each new query.
+- `run` marks the button that initiates the prediction, so that toxtree.js can attach on its `onclick` event.
+- `explanation` marks an element which will be filled with complete textual information, reported from the model on successful prediction.
+- `class-result` the root element for filling all reported classification classes - just like `body` class for lists.
+- `class-blank` a blank element for a classification class - to be filled up there.
 
 These are all elements that participate in building the UI. Few of them can be provided during initialization, which is explained in the next chapter.
 
 #### Initialization settings
 
+ToxTree is initialized one of its functions - `init(settings)`. We'll explain the *settings* parameter here:
+
+- *`server`* - a link to OpenTox root. If not present the URL is parsed to search for *server* query parameter. It it is still not found - the calling *host* is considered.
+- *`jsonp`* - true / false to setup whether this method should be used to avoid Cross Domain security restrictions. If the server is not configured to provide the necessary header - this should be used, although some functionality will not be available - creation of new prediction models.
+- *`timeout`* - the connection timeout, after which the request will be considered failed. In milliseconds.
+- *`pollDelay`* - how much time to wait between request while waiting a certain server task to be finished. In milliseconds.
+- *`onconnect`* - a handler `function(url)` to be invoked at the beginning of each server request.
+- *`onerror`* - a handler `function(code, message)` to be invoked when a request fails.
+- *`onsuccess`* - a handler `function(code, message)` to be invoked on successful server request.
+
+These were connection-related settings. Now the UI-related ones.
+
+- *`prefix`* which is to be used when searching for certain UI elements as described above.
+- *`onmodeladd`* a handler `function (row, idx)` which is called when a new prediction model is added to the UI. `row` is the cloned blank row and `idx` is the model's index in *ToxMan*'s list.
+- *`onrun`* a handler `function(row, idx, event)` which is called when a prediction is run. The additional `event` parameter is from the original event that initiated the fun - button click, for example.
+- *`onpredicted`* a handler `function(row, idx)` called when the prediction is completed and the results are just about to be filled.
+- *`onclear`* a handler `function (row, idx)` called just after a row of prediction results was cleared.
+- *`elements`* an object containing all key UI elements to be used, as described above: `featureList`,`featureRow`, `featureHeader`, `diagramImage`, `modelList` and `modelRow`.
 
 
 Toxtree.js API
 --------------
 
-TODO:
------
-* style driven showing and hiding of results. 'predicted', 'high', ...
-* tested on ... browsers;
+All communication with *ToxMan* is done using a short list of functions and few member-variables:
 
-* Use the query line as result messaging - be it with query description, be it with error
-* POST requests to be finished;
-* test on more browsers (includ. IE)
-* Write help - some more in toxtree.js and more detailed here. Good description of elements.
+```
+ToxMan.currentDataset
+```
+
+Holds the dataset, as reported from server from the current query. Refer to OpenTox JSON API for the dataset structure.
+
+```
+ToxMan.models
+```
+
+An array of available prediction models, as reported from server. Each element has OpenTox's structure, with two changes - from `name` the provided prefix is removed (most likely - *ToxTree* ) and `index` is added - it corresponds to the index in this array.
+It is filled from `ToxMan.listModels()`.
+
+```
+ToxMan.queryParams
+```
+
+Paramets in the URL which loaded the page. For example `server` and `search` can be found here.
+
+```
+ToxMan.init(settings)
+```
+
+We've already explained the parameter of that one. This is the first function to be called - it initializes the server string, searches and fills the elements in the UI, etc. Nothing else will work if this is not called prior it.
+
+```
+ToxMan.listModels()
+```
+
+This is most likely the second function to be called, because it fills the UI with all models supported from the server. Need to be called once and the list is stored in `ToxMan.models`. The provided `onmodeladd` handler is called for each reported model.
+
+```
+ToxMan.query(needle)
+```
+
+The starting point of each prediction - a query for certain compound. The needle is provided as Identifier (CAS, Name, EINECS) or SMILES or InChl - it is directly send to the server as is provided here. On success - the `featureList` and `diagramImage` are filled.
+
+```
+ToxMan.clear()
+```
+
+Clears all result from query and predictions - bring the interface to it's initial state. The provided `onclear` handler is called for each model row.
+
+```
+ToxMan.runPrediction(index)
+```
+
+Runs a prediction on the compound from the current query, identified by `index` in the `ToxMan.models` list. The provided `onrun` handler function is called immediately and `onpredicted` handler is called after the results arrived and just before they are filled in the UI.
+
+```
+ToxMan.runAutos()
+```
+
+A convenient function which walks on each prediction model row and make a call to `ToxMan.runPrediction()` if it's *auto* checkbox is marked.
+
