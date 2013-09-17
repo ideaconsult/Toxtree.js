@@ -16,6 +16,7 @@ window.ToxMan = {
 	currentDataset: null,
 	models: [], 							// it gets filled from the listModels() query.
 	queryParams: null,				// an associative array of parameters supplied on the query. Some things like 'language' can be retrieved from there.
+	inPrediction: false,			// true if we're in progress of making prediction.
 
 	/* A single place to hold all necessary queries. Parameters are marked with <XX> and formatString() (common.js) is used
 	to prepare the actual URLs
@@ -199,6 +200,13 @@ window.ToxMan = {
 		which element in the UI should be filled, so that results can be shown later.
 	*/
 	runPrediction : function (algoIndex) {
+		var self = this;
+		if (this.inPrediction){
+			setTimeout(function(){
+				self.runPrediction(algoIndex);
+			}, self.pollDelay);
+			return;
+		}
 		var algo = this.models[algoIndex];
 		
 		// let's clean a bit - the trick is we've added class='<algo.id>' on every feature row concerning this algorithm
@@ -209,29 +217,34 @@ window.ToxMan = {
 		// clear the previous prediction results.
 		this.clearPrediction(algoIndex);
 		
-		var self = this;
 		var createPredictions = function (model){
 			// creating a prediction for our particular case.
 			self.call(model, function(task){
 				// poll the prediction creation task...
-				if (!task)
-					return; // this means - error call.
+				if (!task){ // this means - error call.
+					self.inPrediction = false;
+					return; 
+				}
 				self.pollTask(task, function(result){
 					// OK, we have the prediction with this model ready - retrieve it and send it for parsing.
 					self.call(result, function(prediction){
 						self.parsePrediction(algo, prediction);
+						self.inPrediction = false;
 					});
 				});
 			}, { dataset_uri: self.currentDataset.dataEntry[0].compound.URI });
 		};
 		
+		this.inPrediction = true;
 		// now attempts to retrieve the mode, if it exists...
 		this.call(formatString(this.queries.getModel, encodeURIComponent(algo.uri)), function(model){
 			if (self.forceCreate || !model || model.model.length < 1){ // No - doesn't exists.
 				// We need to POST a model creation and poll the received task until we have it completed 
 				self.call(formatString(self.queries.createModel, algo.id), function(task){
-					if (!task)
-						return; // this means - error call.
+					if (!task){ // this means - error call.
+						self.inPrediction = false;
+						return; 
+					}
 					// poll the model creation task...
 					self.pollTask(task, function(result){
 						// now, when we have the model ready, we need to invoke another POST request to create new predictions.
@@ -244,6 +257,8 @@ window.ToxMan = {
 				self.call(q, function(prediction){
 					if (!prediction || !self.parsePrediction(algo, prediction)) // i.e. - it was empty
 						createPredictions(model.model[0].URI);
+					else
+						self.inPrediction = false;
 				});	
 			}
 		});
