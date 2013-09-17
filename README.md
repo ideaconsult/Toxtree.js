@@ -62,6 +62,7 @@ ToxTree is initialized one of its functions - `init(settings)`. We'll explain th
 
 - `server` - a link to OpenTox root. If not present the URL is parsed to search for *server* query parameter. It it is still not found - the calling *host* is considered.
 - `jsonp` - true / false to setup whether this method should be used to avoid Cross Domain security restrictions. If the server is not configured to provide the necessary header - this should be used, although some functionality will not be available - creation of new prediction models.
+- `forceCreate` - If set to *true* forces creation of a model and prediction on each prediction request, skipping the attempt to get an already existing one on the server.
 - `timeout` - the connection timeout, after which the request will be considered failed. In milliseconds.
 - `pollDelay` - how much time to wait between request while waiting a certain server task to be finished. In milliseconds.
 - `onconnect` - a handler `function(url)` to be invoked at the beginning of each server request.
