@@ -214,6 +214,8 @@ window.ToxMan = {
 			// creating a prediction for our particular case.
 			self.call(model, function(task){
 				// poll the prediction creation task...
+				if (!task)
+					return; // this means - error call.
 				self.pollTask(task, function(result){
 					// OK, we have the prediction with this model ready - retrieve it and send it for parsing.
 					self.call(result, function(prediction){
@@ -228,12 +230,14 @@ window.ToxMan = {
 			if (self.forceCreate || !model || model.model.length < 1){ // No - doesn't exists.
 				// We need to POST a model creation and poll the received task until we have it completed 
 				self.call(formatString(self.queries.createModel, algo.id), function(task){
+					if (!task)
+						return; // this means - error call.
 					// poll the model creation task...
 					self.pollTask(task, function(result){
 						// now, when we have the model ready, we need to invoke another POST request to create new predictions.
 						createPredictions(result);
 					});					
-				}, 'POST'); /// for initial POST request - to force call() function to use POST method for http request.
+				}, true); /// for initial POST request - to force call() function to use POST method for http request.
 			}
 			else { // OK, we have the model - attempt to get a prediction for our compound...
 				var q = formatString(self.queries.getPrediction, encodeURIComponent(self.currentDataset.dataEntry[0].compound.id), encodeURIComponent(model.model[0].predicted));
@@ -482,18 +486,23 @@ window.ToxMan = {
 		var self = this;
 		self.onconnect(service);
 		var method = 'GET';
-		if (adata !== undefined)
+		var accType = self.jsonp ? "application/x-javascript" : "application/json";	
+		
+		if (adata !== undefined){
 			method = 'POST';
-		else 
-			adata = {};
+			if (typeof adata == "boolean")
+				adata = {};
+		}
+		else
+			adata = { };
 
-		adata.media = self.jsonp ? "application/x-javascript" : "application/json";	
 		// on some queries, like tasks, we DO have server at the beginning
 		if (service.indexOf("http") != 0)	
 			service = self.server + service;
 		// now make the actual call
 		$.ajax(service, {
 			dataType: self.jsonp ? 'jsonp' : 'json',
+			headers: { Accept: accType },
 			crossDomain: true,
 			timeout: self.timeout,
 			type: method,
