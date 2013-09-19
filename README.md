@@ -104,6 +104,12 @@ ToxMan.queryParams
 Paramets in the URL which loaded the page. For example `server` and `search` can be found here.
 
 ```
+ToxMan.inQuery
+```
+
+A simple flag showing whether we're in a query process now. Attempting to call query while this is 'true' is ignored.
+
+```
 ToxMan.init(settings)
 ```
 
