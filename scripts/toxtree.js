@@ -17,6 +17,7 @@ window.ToxMan = {
 	models: [], 							// it gets filled from the listModels() query.
 	queryParams: null,				// an associative array of parameters supplied on the query. Some things like 'language' can be retrieved from there.
 	inPrediction: false,			// true if we're in progress of making prediction.
+	inQuery: false,						// to prevent in making double queries. Second attempts for queries, while one is being held are ignored, not postponed.
 
 	/* A single place to hold all necessary queries. Parameters are marked with <XX> and formatString() (common.js) is used
 	to prepare the actual URLs
@@ -122,9 +123,10 @@ window.ToxMan = {
 	/* Makes a query for dataset based on a needle - the starting point of all actions.
 	*/
 	query : function(needle) {
-		if (needle.length < 1)
+		if (needle.length < 1 || this.inQuery)
 			return false;
 		var self = this;
+		this.inQuery = true;
 		self.clear();
 		
 		this.call(formatString(this.queries.query, encodeURIComponent(needle)), function(dataset){
@@ -149,6 +151,7 @@ window.ToxMan = {
 			}
 			
 			self.runAutos();
+			self.inQuery = false;
 		});
 	},
 	
