@@ -1,87 +1,98 @@
-$(document).ready(function(){
-	// some behavioural setup
-	// now attach the handler for clicking on the line which opens / hides it.
-	var showhideInfo = function(row, force){
-		var info = row.getElementsByClassName('info')[0];
-		if (row.classList.contains('visible') || !force && force !== undefined){
-			row.classList.remove('visible');
-			info.classList.add('hidden');
-		}
-		else{
-			row.classList.add('visible');
-			info.classList.remove('hidden');
-		}
-	}
+/* 
+	common.js - Common, helper functions for value propagations, and similar DOM manipulations.
+	Created by Ivan Georgiev, 2013.
 
-	var serverEl = document.getElementById('connection-baseuri');
-	var statusEl = document.getElementById('connection-status');
-	var errorEl = document.getElementById('connection-error');
-	var fadeTimeout = null
-	var setResult = function(status, error){
-		statusEl.src = "images/" + status + ".png";
-		statusEl.title = localMessage[status];
+*/
 
-		if (!error)
-			error = '';
-			
-		errorEl.classList.remove('fading');
-		errorEl.innerHTML = error;
-		if (fadeTimeout)
-			clearTimeout(fadeTimeout);
-		fadeTimeout = setTimeout(function() { errorEl.classList.add('fading'); }, 5000);
-	};
+/* Function setObjValue(obj, value)Set a given to the given element (obj) in the most appropriate way - be it property - the necessary one, or innetHTML
+*/
+function setObjValue(obj, value){
+	if ((value === undefined || value === null) && obj.dataset.default !== undefined)
+		value = obj.dataset.default;
 
-	// initialization of ToxMan - passing all necessary parameters and configuration.
-	ToxMan.init({ 
-		prefix: "toxtree",
-//		jsonp: true,
-//		forceCreate: true,
-		onmodeladd: function(row, idx){
-			row.getElementsByClassName('show-hide')[0].onclick = function(e) { showhideInfo(this.parentNode); };
-			
-			// then put good id to auto checkboxes so that runAutos() can recognizes
-			var auto = row.getElementsByClassName('auto')[0].id = ToxMan.prefix + "-auto-" + idx;
-		},
-		onrun: function (row, idx, e){
-			e.stopPropagation();
-		},
-		onpredicted: function(row, idx){
-			showhideInfo(row, true);
-		},
-		onclear: function(row, idx){
-			showhideInfo(row, false);
-		},
-		onconnect : function(service){
-			statusEl.src = "images/waiting_small.gif";
-			statusEl.title = localMessage.waiting;
-		},
-		onsuccess: function(code, mess){
-			setResult('ok', '');
-		},
-		onerror: function(code, mess){
-			setResult('error', '(' + code + '): ' + mess);
-		}
-	});
+  if (obj.nodeName == "INPUT" || obj.nodeName == "SELECT")
+    obj.value = value;
+  else if (obj.nodeName == "IMG")
+    obj.src = value;
+  else if (obj.nodeName == "BUTTON")
+		obj.dataset.value = value;
+  else
+    obj.innerHTML = value;
+}
+
+
+/*
+Passed a HTML DOM element - it clears all children folowwing last one. Pass null for clearing all.
+*/
+function clearChildren(obj, last) {
+  while (obj.lastChild && obj.lastChild != last) {
+    obj.removeChild(obj.lastChild);
+  }
+}
+
+/* formats a string, replacing [<number>] in it with the corresponding value in the arguments
+*/
+function formatString(format) {
+  for (var i = 1;i < arguments.length; ++i) {
+    format = format.replace('<' + i + '>', arguments[i]);
+  }
+  return format;
+}
+
+// given a root DOM element and an JSON object it fills all (sub)element of the tree
+// which has class 'data-field' and their name corresponds to a property in json object.
+// If prefix is given AND json has id property - the root's id set to to prefix + json.id
+function fillTree(root, json, prefix, filter) {
+	if (!filter)
+		filter = 'data-field';
+  var dataList = root.getElementsByClassName(filter);
+  var dataCnt = dataList.length;
 	
-	serverEl.innerHTML = ToxMan.server;
-	localMessage = languages[ToxMan.queryParams.language !== undefined ? ToxMan.queryParams.language : 'en'];
-	ToxMan.listModels();
-	
-	// now attach the query button
-	var needle = document.getElementById('query-needle');
-	var query = document.getElementById('query-button');
-
-	if (query && needle){
-		needle.onchange = query.onclick = function(e){
-			if (needle.value.length > 0){
-				ToxMan.query(needle.value);
-			}
-		}
+	var processFn = function(el, json){
+    if (json[el.dataset.field] !== undefined) {
+      var value = json[el.dataset.field];
+      if ( el.dataset.filter !='' && (typeof window[el.dataset.filter] == 'function') ) {
+        value = window[el.dataset.filter](value);
+      }
+      setObjValue(el, value);
+    }
 	}
 	
-	// finally - check for search parameter in the URL
-	if (ToxMan.queryParams.search !== undefined){
-		ToxMan.query(ToxMan.queryParams.search);
-		needle.value = ToxMan.queryParams.search;
-	}
-});
+	if (root.classList.contains(filter))
+		processFn(root, json);
+
+  for (var i = 0; i < dataCnt; ++i)
+  	processFn(dataList[i], json);
+
+  if (prefix && json.id !== undefined) {
+    root.id = prefix + json.id;
+  }
+}
+
+function parseURL(url) {
+  var a =  document.createElement('a');
+  a.href = url;
+  return {
+    source: url,
+    protocol: a.protocol.replace(':',''),
+    host: a.hostname,
+    port: a.port,
+    query: a.search,
+    params: (function(){
+      var ret = {},
+        seg = a.search.replace(/^\?/,'').split('&'),
+        len = seg.length, i = 0, s;
+      for (;i<len;i++) {
+        if (!seg[i]) { continue; }
+        s = seg[i].split('=');
+        ret[s[0]] = (s.length>1)?decodeURIComponent(s[1].replace(/\+/g,  " ")):'';
+      }
+      return ret;
+    })(),
+    file: (a.pathname.match(/\/([^\/?#]+)$/i) || [,''])[1],
+    hash: a.hash.replace('#',''),
+    path: a.pathname.replace(/^([^\/])/,'/$1'),
+    relative: (a.href.match(/tps?:\/\/[^\/]+(.+)/) || [,''])[1],
+    segments: a.pathname.replace(/^\//,'').split('/')
+  };
+}

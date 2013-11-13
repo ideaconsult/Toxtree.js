@@ -25,15 +25,16 @@ The provided query string can be any compound identifier (CAS, Name, EINECS) or 
 
 Although one file is important - `toxtree.js` - several are necessary for completing the interface:
 
-- [toxtree.js] (scripts/toxtree.js) - implementation of ToxMan object, with it's functions, communication, etc. All ToxTree relatd logic lives here.
+- [toxtman.js] (scripts/toxman.js) - implementation of ToxMan object, with it's functions, communication, etc. All ToxTree relatd logic lives here.
 - [toxtree.html] (toxtree.html) - the interface itself, with all necessary elements to be used and filled.
-- [common.js] (scripts/common.js) - a small script for initializing ToxMan and providing necessary bindings - like pressing the Query button and call of ToxMan.query().
+- [toxtree.js] (scripts/toxtree.js) - a small script for initializing ToxMan and providing necessary bindings - like pressing the Query button and call of ToxMan.query().
+- [common.js] (scripts/common.js) - some helper functions, mainly for automatic filling of passed json data into a DOM tree.
 - [toxtree.css] (styles/toxtree.css) - all styles for *toxtree.html*, only `template` is used in *toxtree.js* - known to mark template rows and providing invisiblity, and toxicity categories `toxic`, `nontoxic`, `inconclusive`, `unknown` and `active` to mark which is the predicted one.
 - [jquery.js] (scripts/jquery.js) - jQuery library.
 - [dataset.js] (scripts/dataset.js) - Small library to make Element.dataset available for nice browsers like Internet Explorer.
 - Skeleton stylesheets - [base.css] (styles/base.css), [layout.css] (styles/layout.css) and [skeleton.css] (styles/skeleton.css).
 
-Actually *toxtree.html*, *common.js* and *toxtree.css* can be seen as an example of using *toxtree.js*
+Actually *toxtree.html*, *toxtree.js* and *toxtree.css* can be seen as an example of using *toxtree.js*
 
 #### Configure UI elements
 
