@@ -3,14 +3,8 @@ $(document).ready(function(){
 	// now attach the handler for clicking on the line which opens / hides it.
 	var showhideInfo = function(row, force){
 		var info = row.getElementsByClassName('info')[0];
-		if (row.classList.contains('visible') || !force && force !== undefined){
-			row.classList.remove('visible');
-			info.classList.add('hidden');
-		}
-		else{
-			row.classList.add('visible');
-			info.classList.remove('hidden');
-		}
+	  $(row).toggleClass('visible', force);
+	  $(info).toggleClass('hidden', (force === undefined) ? force : !force);
 	}
 
 	var serverEl = document.getElementById('connection-baseuri');
