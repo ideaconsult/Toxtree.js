@@ -1,1 +1,1 @@
-/Users/jonan/develop/jquery-ui-1.10.3/ui/jquery.ui.widget.js
+../../../WebLibs/jquery-ui-1.10.3/ui/jquery.ui.widget.js

@@ -1,0 +1,10 @@
+/* toxtstudy.css - Styling for toxstudy engine
+*/
+
+.jtox-study table td,
+.jtox-study table th,
+.jtox-study table tr {
+  border:black solid 1px;
+  padding: 0px;
+  font-size: small;
+}
