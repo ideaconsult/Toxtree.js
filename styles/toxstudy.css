@@ -6,5 +6,6 @@
 .jtox-study table tr {
   border:black solid 1px;
   padding: 0px;
-  font-size: small;
+  font-size: smaller;
+  padding: 1px;
 }
