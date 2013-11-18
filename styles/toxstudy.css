@@ -1,11 +1,28 @@
 /* toxtstudy.css - Styling for toxstudy engine
 */
 
-.jtox-study table td,
-.jtox-study table th,
-.jtox-study table tr {
-  border:black solid 1px;
+.jtox-study table.dataTable td,
+.jtox-study table.dataTable th {
+  border:1px solid black;
+  font-size: small;
+}
+
+td.middle {
+  vertical-align: middle;  
+}
+
+.jtox-study table.dataTable td.jtox-multi {
   padding: 0px;
-  font-size: smaller;
-  padding: 1px;
+}
+
+td.jtox-multi table td {
+  border-left: 0px !important;
+  border-right: 0px !important;
+  border-bottom: 0px !important;
+}
+
+
+td.jtox-multi table {
+  height: 100%;
+  width: 100%;
 }
