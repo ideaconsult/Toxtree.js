@@ -30,3 +30,7 @@ td.jtox-multi table {
   height: 100%;
   width: 100%;
 }
+
+#jtox-template {
+  display: none !important;
+}

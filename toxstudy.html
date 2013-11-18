@@ -50,31 +50,6 @@
 <!-- [[ jToxStudy.htmlOneTab = -->	    
 	    <div id="jtox-pchem" class="jtox-study-tab">
 	      <span class="jtox-study-filter">Filter:</span><input type="text" class="jtox-study-filter ui-widget ui-input"></input>
-<!--[[ jToxStudy.htmlOneStudy = -->	      
-        <div class="jtox-study ui-widget">
-          <p class="jtox-study-title">A exemplary title</p>
-          <table border="0" cellpadding="0" cellspacing="0" class="jtox-study-table">
-            <thead>
-              <tr>
-                <th rowspan="2">Name</th>
-                <th colspan="2">Conditions</th>
-                <th colspan="2">Effects</th>
-                <th colspan="3">Protocol</th>
-              </tr>
-              <tr>
-                <th>Species</th>
-                <th>Sex</th>
-                <th>Endpoint</th>
-                <th>Result</th>
-                <th>Guidance</th>
-                <th>Year</th>
-                <th>UUID/Owner</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-	      </div>
-<!--; // htmlOneStudy ]]-->
       </div>
 <!--; // htmlOneTab ]]-->
 <!--[[-->      
@@ -90,6 +65,25 @@
 	  </div>
 <!--]]-->	  
 <!--; // htmlTabs ]]-->
+	</div>
+	<div id="jtox-template">
+    <div id="jtox-study" class="jtox-study ui-widget">
+      <p class="jtox-study-title">An exemplary title</p>
+      <table border="0" cellpadding="0" cellspacing="0" class="jtox-study-table">
+        <thead>
+          <tr class="jtox-preheader">
+            <th rowspan="2">Name</th>
+            <th>Conditions</th>
+            <th colspan="2">Effects</th>
+            <th colspan="2">Protocol</th>
+          </tr>
+          <tr class="jtox-header">
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+	  
 	</div>
 </body>
 </html>
