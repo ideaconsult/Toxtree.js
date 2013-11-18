@@ -15,6 +15,10 @@ td.middle {
   padding: 0px;
 }
 
+.jtox-study.hidden div.dataTables_wrapper {
+  display: none;
+}
+
 td.jtox-multi table td {
   border-left: 0px !important;
   border-right: 0px !important;

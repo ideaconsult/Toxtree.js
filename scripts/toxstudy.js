@@ -1,4 +1,15 @@
 var jToxStudy = {
+  defaultColumns: [
+    { "mData": "protocol.endpoint", "sDefaultContent": "#1" }, // No
+    { "sClass" : "middle", "mData": "parameters.Species", "sDefaultContent": "-" }, // Parameters columns
+    { "sClass" : "middle", "mData": "parameters.Sex", "sDefaultContent": "-"},      
+    { "sClass": "jtox-multi", "mData": "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, "endpoint");  } },   // Effects columns
+    { "sClass": "jtox-multi", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, self.formatResult)} },
+    { "sClass": "center", "mData": "protocol.guidance", "mRender" : "[,]", "sDefaultContent": "EUCD !!"  },    // Protocol columns
+    { "sClass": "center", "mData": null, "sDefaultContent": "1986"  },
+    { "sClass": "center", "mData": null, "sDefaultContent": "EU"},
+  ],
+  
   getFormatted: function (data, type, format) {
     var value = null;
     if (typeof format === 'function' )
@@ -20,10 +31,10 @@ var jToxStudy = {
     var height = 100 / dlen;
     var df = '<table>';
     for (var i = 0, dlen = data.length; i < dlen; ++i) {
-      df += '<tr><td style="height: ' + height + '%">' + self.getFormatted(data[i], type, format) + '</td></tr>';
+      df += '<tr class="' + (i % 2 == 0 ? 'even' : 'odd') + '"><td style="height: ' + height + '%">' + self.getFormatted(data[i], type, format) + '</td></tr>';
     }
     
-    df += '</table>'
+    df += '</table>';
     return df;
   },
   
@@ -31,26 +42,24 @@ var jToxStudy = {
     return "" + data.result.loValue + data.result.unit;
   },
   
+  processSummary: function (summary) {
+    
+  },
+  
   processStudies: function (tab, study) {
     var self = this;
     var theTable = tab.getElementsByClassName('jtox-study-table')[0];
+    var cols = self.defaultColumns.slice(0);
     
     $(theTable).dataTable( {
       "bPaginate": true,
-      "aoColumns": [
-          { "mData": "protocol.endpoint", "sDefaultContent": "#1" },
-          { "sClass" : "middle", "mData": "parameters.Species", "sDefaultContent": "-" },
-          { "sClass" : "middle", "mData": "parameters.Sex", "sDefaultContent": "-"},
-          { "sClass": "jtox-multi", "mData": "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, "endpoint");  } },
-          { "sClass": "jtox-multi", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, self.formatResult)} },
-          { "sClass": "center", "mData": "protocol.guidance", "mRender" : "[,]", "sDefaultContent": "EUCD !!"  },
-          { "sClass": "center", "mData": null, "sDefaultContent": "1986"  },
-          { "sClass": "center", "mData": null, "sDefaultContent": "EU"},
-      ]
+      "aoColumns": cols,
     });
     
     $(theTable).dataTable().fnAddData(study.study);
-    $('.jtox-multi').each(function(index){
+    
+    // we need to fix columns of
+    $('#' + theTable.id + ' .jtox-multi').each(function(index){
       this.style.height = '' + this.offsetHeight + 'px';
     });
   },
