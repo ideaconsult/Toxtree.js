@@ -4,11 +4,15 @@
 .jtox-study table.dataTable td,
 .jtox-study table.dataTable th {
   border:1px solid black;
-  font-size: small;
 }
 
 td.middle {
   vertical-align: middle;  
+}
+
+div.jtox-study {
+  display: block;
+  font-size: small;
 }
 
 .jtox-study table.dataTable td.jtox-multi {
@@ -25,6 +29,9 @@ td.jtox-multi table td {
   border-bottom: 0px !important;
 }
 
+td.jtox-multi table tr:first-child td {
+  border-top: 0px !important;
+}
 
 td.jtox-multi table {
   height: 100%;

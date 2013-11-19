@@ -31,76 +31,75 @@ var jToxStudy = {
     return "" + data.result.loValue + data.result.unit;
   },
   
-  processSummary: function (summary) {
+  ensureCategory: function(tab, category, name, count) {
+    var self = this;
+
+    var theCat = $('.' + category + ' .jtox-study-table')[0];
+    if (!theCat) {
+      theCat = document.getElementById('jtox-study').cloneNode(true);
+      theCat.removeAttribute('id');
+      tab.appendChild(theCat);
+      $(theCat).addClass(category);
+    }
     
+    var titleEl = theCat.getElementsByClassName('jtox-study-title')[0];
+    titleEl.innerHTML = name + " (" + count + ")";
+    return theCat;
   },
   
   ensureTable: function (tab, study) {
     var self = this;
 
     var theTable = $('.' + study.protocol.category + ' .jtox-study-table')[0];
-    if (!theTable) {
+    if (!$(theTable).hasClass('dataTable')) {
 
       var colDefs = [
-        { "mData": "index", "mRender": function(data, type, full) { return '#' + data; } } // Number...
+        { "sClass": "middle", "mData": "index", "mRender": function(data, type, full) { return '#' + data; } } // Number...
       ];
-/*        { "sClass" : "middle", "mData": "parameters", "sDefaultContent": "-" }, // Parameters columns
-        { "sClass" : "middle", "mData": "parameters.Sex", "sDefaultContent": "-"},      
-        { "sClass": "jtox-multi", "mData": "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, "endpoint");  } },   // Effects columns
-        { "sClass": "jtox-multi", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, self.formatResult)} },
-        { "sClass": "center", "mData": "protocol.guidance", "mRender" : "[,]", "sDefaultContent": "EUCD !!"  },    // Protocol columns
-        { "sClass": "center", "mData": null, "sDefaultContent": "1986"  },
-        { "sClass": "center", "mData": null, "sDefaultContent": "EU" }, // Owner / UUID
-      ];
-*/
-      // ok, create and add it
-      theTable = document.getElementById('jtox-study').cloneNode(true);
-      theTable.id = '';
-      tab.appendChild(theTable);
-      theTable = theTable.getElementsByClassName('jtox-study-table')[0];
-  
+      
       // start filling it
-      var preheaderRow = theTable.getElementsByClassName('jtox-preheader')[0].firstElementChild.nextElementSibling;
       var headerRow = theTable.getElementsByClassName('jtox-header')[0];
+      var before = headerRow.firstElementChild;
+      var parCount = 0;
 
-      // push some parameters' columns
-      if (study.parameters.length > 0) {
-        preheaderRow.setAttribute('colspan', study.parameters.length);
-        preheaderRow = preheaderRow.nextElementSibling;
-        
-        for (var p in study.parameters) {
-          colDefs.push({ "sClass" : "middle", "mData" : "parameters." + p, "sDefaultContent": "-"});
+      // this function takes care to add as columns all elements from given array
+      var putAGroup = function(group, fProcess) {
+        for (var p in group) {
+          colDefs.push(fProcess(p));
+          
           var th = document.createElement('th');
           th.innerHTML = p;
-          headerRow.appendChild(th);
+          headerRow.insertBefore(th, before);
+          before = th.nextElementSibling;
+          parCount++;
         }
       }
-      else { // no parameters? Need to delete some preheader row
-        var next = preheaderRow.nextElementSibling;
-        preheaderRow.parentNode.removeChild(preheaderRow);
-        preheaderRow = next;
-      }
+
+      // use it to put parameters...
+      putAGroup(study.parameters, function(p) {
+        return { "sClass" : "middle", "mData" : "parameters." + p, "sDefaultContent": "-"};
+      });
+      // .. and conditions
+      putAGroup(study.effects[0].conditions, function(c){
+        return { "sClass" : "middle jtox-multi", 
+                 "mData" : "effects", 
+                 "sDefaultContent": "-", 
+                 "mRender" : function(data, type, full) { return self.renderMulti(data, type, full, function(data, type) { return data.conditions[c]; } )} 
+              };
+      });
       
-      // now come the effect/conditions group
-      for (var c in study.effects[0].conditions) {
-        colDefs.push({ "sClass" : "middle", 
-                       "mData" : "effects", 
-                       "sDefaultContent": "-", 
-                       "mRender" : function(data, type, full) { return self.renderMulti(data, type, full, function(data, type) { return data[c]; } )} 
-                    });
-        var th = document.createElement('th');
-        th.innerHTML = c;
-        headerRow.appendChild(th);
-      }
+      // now fix the colspan of 'Conditions' preheader cell
+      var preheaderCell = theTable.getElementsByClassName('jtox-preheader')[0].firstElementChild.nextElementSibling;
+      if (parCount > 0)
+        preheaderCell.setAttribute('colspan', parCount);
+      else
+        preheaderCell.parentNode.removeChild(preheaderCell);
       
       // add also the "default" effects columns
       colDefs.push(
-        { "sClass": "jtox-multi", "mData": "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, "endpoint");  } },   // Effects columns
-        { "sClass": "jtox-multi", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, self.formatResult) } }
+        { "sClass": "middle jtox-multi", "mData": "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, "endpoint");  } },   // Effects columns
+        { "sClass": "middle jtox-multi", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, self.formatResult) } }
       );
-      // finally - reflect it on colspan of the preheader.
-      preheaderRow.setAttribute('colspan', study.effects[0].conditions.length + 2);
-      preheaderRow = preheaderRow.nextElementSibling;
       
       // finally put the protocol entries
       colDefs.push(
@@ -120,22 +119,39 @@ var jToxStudy = {
     return theTable;
   },
   
+  processSummary: function (summary) {
+    
+  },
+  
   processStudies: function (tab, study) {
     var self = this;
+    var cats = [];
     
+    // first swipe to map them to different categories...
     for (var i = 0, slen = study.length; i < slen; ++i) {
-      var theTable = self.ensureTable(tab, study[i]);
-      
-      // need to proprocess to insert a number...
-      for (var j = 0, jlen = study[i].length; j < jlen; ++j)
-        study[i][j]['index'] = j;
-      $(theTable).dataTable().fnAddData(study[i]);
-      
-      // we need to fix columns of
-      $('#' + theTable.id + ' .jtox-multi').each(function(index){
-        this.style.height = '' + this.offsetHeight + 'px';
-      });
+      var ones = study[i];
+      if (cats[ones.protocol.category] === undefined) {
+        ones['index'] = 1;
+        cats[ones.protocol.category] = { "name": ones.protocol.endpoint, "array" : [ones]};
+      }
+      else {
+        ones['index'] = cats[ones.protocol.category].array.length + 1;
+        cats[ones.protocol.category].array.push(ones);
+      }
     }
+    
+    // now iterate within
+    for (var c in cats) {
+      var onec = cats[c];
+      self.ensureCategory(tab, c, onec.name, onec.array.length);
+      var theTable = self.ensureTable(tab, onec.array[0]);
+      $(theTable).dataTable().fnAddData(onec.array);
+    }
+    
+    // we need to fix columns of
+    $('#' + theTable.id + ' .jtox-multi').each(function(index){
+      this.style.height = '' + this.offsetHeight + 'px';
+    });
   },
 };
 
