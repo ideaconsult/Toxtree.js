@@ -147,7 +147,11 @@ window.ToxMan = {
 			var image = self.elements.diagramImage;
 			if (image){
 				image.style.visibility = 'visible';
-				image.src = dataset.dataEntry[0].compound.URI + '?media=image/png';
+				var cmpURI = dataset.dataEntry[0].compound.URI;
+				var pConformer = cmpURI.indexOf("/conformer");
+				if (pConformer>=0) 
+					cmpURI = cmpURI.substring(0,pConformer);
+				image.src = cmpURI + '?media=image/png';
 			}
 			
 			self.runAutos();
