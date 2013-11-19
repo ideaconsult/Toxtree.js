@@ -36,8 +36,7 @@ var jToxStudy = {
 
     var theCat = $('.' + category + ' .jtox-study-table')[0];
     if (!theCat) {
-      theCat = document.getElementById('jtox-study').cloneNode(true);
-      theCat.removeAttribute('id');
+      theCat = jToxKit.getTemplate('#jtox-study');
       tab.appendChild(theCat);
       $(theCat).addClass(category);
       
@@ -150,7 +149,10 @@ var jToxStudy = {
   },
   
   processSummary: function (summary) {
-    
+    for (var s in summary) {
+      var sum = summary[s];
+      
+    }  
   },
   
   processStudies: function (tab, study, map) {
@@ -163,7 +165,7 @@ var jToxStudy = {
       if (map) {
         if (cats[ones.protocol.category] === undefined) {
           ones['index'] = 1;
-          cats[ones.protocol.category] = { "name": ones.protocol.endpoint, "array" : [ones]};
+          cats[ones.protocol.category] = { "name": ones.protocol.category, "array" : [ones]};
         }
         else {
           ones['index'] = cats[ones.protocol.category].array.length + 1;
@@ -187,18 +189,17 @@ var jToxStudy = {
       $(theTable).dataTable().fnAddData(onec.array);
     }
     
-    // we need to fix columns of
+    // we need to fix columns height's because of multi-cells
     $('#' + theTable.id + ' .jtox-multi').each(function(index){
       this.style.height = '' + this.offsetHeight + 'px';
     });
   },
-};
-
-
-$(document).ready(function(){
-  $('#jtox-studies').tabs();
   
-  jToxStudy.processStudies(document.getElementById('jtox-pchem'), toxStudies.study, true);
-});
-
-
+  init: function(root, settings) {
+    var tree = jToxKit.getTemplate('#jtox-studies');
+    root.appendChild(tree);
+    $(tree).tabs();
+    
+    this.processStudies(document.getElementById('jtox-pchem'), toxStudies.study, true);
+  }
+};

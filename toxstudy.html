@@ -22,16 +22,16 @@
   <script src="scripts/jquery.ui.widget.js"></script>
   <script src="scripts/jquery.ui.tabs.js"></script>
   <script src="scripts/jquery.dataTables.js"></script>
-  <script src="scripts/dataset.js"></script>
-  <script src="scripts/common.js"></script> 
+
+  <script src="scripts/jtoxkit.js"></script>
   <script src="scripts/toxstudy.js"></script>
   
   <script src="tests/study.js"></script>
 </head>
 <body>
-<!--[[ jToxToolkit.htmlMain = -->
-	<div id="jtox-toolkit">
-<!--[[ jToxStudy.htmlTabs = -->
+	<div class="jtox-toolkit" data-kit="study"></div>
+<!--[[ jToxKit.htmlTemplate = -->
+	<div id="jtox-template">
 	  <div id="jtox-studies">
 	    <ul>
 	      <li><a href="#jtox-substid">Subst ID</a></li>
@@ -51,21 +51,17 @@
 	      <p><input type="text" class="jtox-study-filter ui-input" placeholder="Filter..."></input></p>
       </div>
 	    <div id="jtox-envfate">
-	      Environmental Fate study date
+	      <p><input type="text" class="jtox-study-filter ui-input" placeholder="Filter..."></input></p>
 	    </div>
 	    <div id="jtox-ecotox">
-	      Eco Tox study data
+	      <p><input type="text" class="jtox-study-filter ui-input" placeholder="Filter..."></input></p>
 	    </div>
 	    <div id="jtox-tox">
-	      Tox study data
+	      <p><input type="text" class="jtox-study-filter ui-input" placeholder="Filter..."></input></p>
 	    </div>
 	  </div>
-<!--]]-->	  
-<!--; // htmlTabs ]]-->
-	</div>
-	<div id="jtox-template">
     <div id="jtox-study" class="jtox-study jtox-foldable folded">
-      <p class="jtox-study-title">An exemplary title</p>
+      <p class="jtox-study-title">?</p>
       <table border="0" cellpadding="0" cellspacing="0" class="jtox-study-table">
         <thead>
           <tr class="jtox-preheader">
@@ -84,7 +80,7 @@
         <tbody></tbody>
       </table>
     </div>
-	  
 	</div>
+<!-- ]]-->
 </body>
 </html>
