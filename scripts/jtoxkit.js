@@ -20,9 +20,9 @@ window.jToxKit = {
   },
 	
 	// some handler functions that can be configured from outside with the settings parameter.
-	onconnect: null,		// function (service): called when a server request is started - for proper visualization. Part of settings.
-	onsuccess: null,		// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
-	onerror: null,			// function (code, mess): called on server reques error. Part of settings.
+	onconnect: function(s){ },		    // function (service): called when a server request is started - for proper visualization. Part of settings.
+	onsuccess: function(c, m) { },		// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
+	onerror: function (c, m) { },			// function (code, mess): called on server reques error. Part of settings.
   
 	init: function(settings) {
   	var self = this;
@@ -33,7 +33,7 @@ window.jToxKit = {
     	$('.jtox-toolkit').each(function(i) {
       	settings = $(this).data();
       	if (settings.kit == "study")
-      	  jToxStudy.init(this);
+      	  jToxStudy.init(this, self.settings);
     	});
   	}
   	for (var s in settings)
@@ -48,6 +48,15 @@ window.jToxKit = {
     return el;
 	},
 	
+	/* formats a string, replacing [<number>] in it with the corresponding value in the arguments
+  */
+  formatString: function(format) {
+    for (var i = 1;i < arguments.length; ++i) {
+      format = format.replace('<' + i + '>', arguments[i]);
+    }
+    return format;
+  },
+
   parseURL: function(url) {
     var a =  document.createElement('a');
     a.href = url;
@@ -115,9 +124,12 @@ window.jToxKit = {
 		else
 		  this.server = settings.server;
 					
-		this.onerror = settings.onerror;
-		this.onsuccess = settings.onsuccess;
-		this.onconnect = settings.onconnect;
+    if (settings.onerror !== undefined)
+		  this.onerror = settings.onerror;
+		if (settings.onsuccess !== undefined)
+		  this.onsuccess = settings.onsuccess;
+		if (settings.onconnect !== undefined)
+		  this.onconnect = settings.onconnect;
 	},
 	
 	/* Makes a server call with the provided method. If none is given - the internally stored one is used
@@ -162,4 +174,5 @@ window.jToxKit = {
 
 $(document).ready(function(){
   jToxKit.init();
+  jToxStudy.querySummary("test");
 });

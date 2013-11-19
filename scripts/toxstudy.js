@@ -1,4 +1,7 @@
 var jToxStudy = {
+  querySummary: "http://apps.ideaconsult.net:8080/biodeg/substance/<1>/studysummary?media=application/json",
+  rootElement: null,
+  
   getFormatted: function (data, type, format) {
     var value = null;
     if (typeof format === 'function' )
@@ -31,10 +34,10 @@ var jToxStudy = {
     return "" + data.result.loValue + data.result.unit;
   },
   
-  ensureCategory: function(tab, category, name) {
+  createCategory: function(tab, category, name) {
     var self = this;
 
-    var theCat = $('.' + category + ' .jtox-study-table')[0];
+    var theCat = $('.' + category + '.jtox-study', tab)[0];
     if (!theCat) {
       theCat = jToxKit.getTemplate('#jtox-study');
       tab.appendChild(theCat);
@@ -44,24 +47,6 @@ var jToxStudy = {
       theCat.onclick = function(e) {
         $(this).toggleClass('folded');
       };
-      
-      // now install the filter box handler. It delays the query a bit and then spaws is to all tables in the tab.
-      var filterTimeout = null;
-      var fFilter = function (ev) {
-        if (!!filterTimeout)
-          clearTimeout(filterTimeout);
-
-        var field = ev.currentTarget;
-        filterTimeout = setTimeout(function() {
-          var tabList = tab.getElementsByClassName('jtox-study-table');
-          for (var t = 0, tlen = tabList.length; t < tlen; ++t) {
-            $(tabList[t]).dataTable().fnFilter(field.value);
-          }
-        }, 300);
-      };
-      
-      var filterEl = tab.getElementsByClassName('jtox-study-filter')[0];
-      filterEl.onkeydown = fFilter;
     }
     
     var titleEl = theCat.getElementsByClassName('jtox-study-title')[0];
@@ -76,7 +61,7 @@ var jToxStudy = {
     if (!$(theTable).hasClass('dataTable')) {
 
       var colDefs = [
-        { "sClass": "center middle", "bSearchable": false, "mData": "index", "mRender": function(data, type, full) { return '#' + data; } } // Number...
+        { "sClass": "center", "mData": "protocol.endpoint" } // The name (endpoint)
       ];
       
       // start filling it
@@ -149,10 +134,43 @@ var jToxStudy = {
   },
   
   processSummary: function (summary) {
+    var self = this;
+    
+    // first - clear all existing tabs
+    var catList = self.rootElement.getElementsByClassName('jtox-study');
+    for (var i = 0,clen = catList.length; i < clen; ++i){
+      catList[i].parentNode.removeChild(catList[i]);
+    }
+    
+    // create the groups on the corresponding tabs
     for (var s in summary) {
       var sum = summary[s];
+      var tab = $('.jtox-study-tab.' + sum.value, self.rootElement)[0];
+      var cat = self.createCategory(tab, sum.subcategory, sum.subcategory);
+      $(cat).data('jtox-uri', sum.uri);
+    }
+    
+    // now install the filter box handler. It delays the query a bit and then spaws is to all tables in the tab.
+    var filterTimeout = null;
+    var fFilter = function (ev) {
+      if (!!filterTimeout)
+        clearTimeout(filterTimeout);
+  
+      var field = ev.currentTarget;
+      var tab = $(this).parentsUntil('.jtox-study-tab')[0].parentNode;
       
-    }  
+      filterTimeout = setTimeout(function() {
+        var tabList = tab.getElementsByClassName('jtox-study-table');
+        for (var t = 0, tlen = tabList.length; t < tlen; ++t) {
+          $(tabList[t]).dataTable().fnFilter(field.value);
+        }
+      }, 300);
+    };
+    
+    var tabList = document.getElementsByClassName('jtox-study-tab');
+    for (var t = 0, tlen = tabList.length;t < tlen; t++){
+      var filterEl = tabList[t].getElementsByClassName('jtox-study-filter')[0].onkeydown = fFilter;
+    }
   },
   
   processStudies: function (tab, study, map) {
@@ -164,29 +182,27 @@ var jToxStudy = {
       var ones = study[i];
       if (map) {
         if (cats[ones.protocol.category] === undefined) {
-          ones['index'] = 1;
-          cats[ones.protocol.category] = { "name": ones.protocol.category, "array" : [ones]};
+          cats[ones.protocol.category] = [ones];
         }
         else {
-          ones['index'] = cats[ones.protocol.category].array.length + 1;
-          cats[ones.protocol.category].array.push(ones);
+          cats[ones.protocol.category].push(ones);
         }
       }
-      else  // i.e. - don't remap - just add the index
-        ones['index'] = i + 1;
     }
 
     // add this one, if we're not remapping. map == false assumes that all passed studies will be from
     // one category.    
     if (!map)
-      cats[study[0].protocol.category] = { "name" : study[0].protocol.endpoint, "array" : study };
+      cats[study[0].protocol.category] = study;
     
-    // now iterate within
+    // now iterate within all categories (if many) and initialize the tables
     for (var c in cats) {
       var onec = cats[c];
-      self.ensureCategory(tab, c, onec.name);
-      var theTable = self.ensureTable(tab, onec.array[0]);
-      $(theTable).dataTable().fnAddData(onec.array);
+      if ($('.' + c + '.jtox-study', tab).length < 1)
+        continue;
+
+      var theTable = self.ensureTable(tab, onec[0]);
+      $(theTable).dataTable().fnAddData(onec);
     }
     
     // we need to fix columns height's because of multi-cells
@@ -195,11 +211,29 @@ var jToxStudy = {
     });
   },
   
+  querySummary: function(url) {
+    this.processSummary(toxSummary.facet);
+  },
+  
   init: function(root, settings) {
+    var self = this;
+    this.rootElement = root;
     var tree = jToxKit.getTemplate('#jtox-studies');
     root.appendChild(tree);
-    $(tree).tabs();
+    $(tree).tabs({
+      "beforeActivate" : function(event, ui) {
+        if (ui.newPanel){
+          $('.jtox-study', ui.newPanel[0]).each(function(i){
+            jToxKit.call($(this).data('jtox-uri'), function(study){
+              self.processStudies(ui.newPanel[0], study.study, true); // TODO: must be changed to 'false', when the real summary is supplied
+            });  
+          });
+        }
+      }
+    });
     
-    this.processStudies(document.getElementById('jtox-pchem'), toxStudies.study, true);
+    if (settings['substance'] !== undefined){
+      self.querySummary(jToxKit.formatString(self.querySummary, settings['substance']));
+    }
   }
 };
