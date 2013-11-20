@@ -53,6 +53,13 @@ var jToxStudy = {
     titleEl.innerHTML = name + " (0)";
     return theCat;
   },
+
+  updateCount: function(str, count) {
+    if (count === undefined)
+      count = 0;
+    return str.replace(/(.+)\s\(([0-9]+)\)/, "$1 (" + count + ")");
+  },
+  
   
   ensureTable: function (tab, study) {
     var self = this;
@@ -121,8 +128,7 @@ var jToxStudy = {
         "sDom" : "rt<Fip>",
         "fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
           var el = $('.jtox-study-title', $(this).parentsUntil('.jtox-study')[0].parentNode)[0];
-          var str = el.innerHTML;
-          el.innerHTML = str.replace(/(.+)\s\(([0-9]+)\)/, "$1 (" + iTotal + ")");
+          el.innerHTML = self.updateCount(el.innerHTML, iTotal);
           return sPre;
         }
       });
@@ -135,6 +141,7 @@ var jToxStudy = {
   
   processSummary: function (summary) {
     var self = this;
+    var typeSummary = [];
     
     // first - clear all existing tabs
     var catList = self.rootElement.getElementsByClassName('jtox-study');
@@ -148,7 +155,22 @@ var jToxStudy = {
       var tab = $('.jtox-study-tab.' + sum.value, self.rootElement)[0];
       var cat = self.createCategory(tab, sum.subcategory, sum.subcategory);
       $(cat).data('jtox-uri', sum.uri);
+      
+      if (typeSummary[sum.value] === undefined)
+        typeSummary[sum.value] = sum.count;
+      else
+        typeSummary[sum.value] += sum.count;
     }
+    
+    // update the number in the tabs...
+    $('ul li a', self.rootElement).each(function (i){
+      var data = $(this).data('type');
+      if (!!data){
+        var cnt = typeSummary[data];
+        var el = $(this)[0];
+        el.innerHTML = (self.updateCount(el.innerHTML, cnt));
+      }
+    });
     
     // now install the filter box handler. It delays the query a bit and then spaws is to all tables in the tab.
     var filterTimeout = null;
