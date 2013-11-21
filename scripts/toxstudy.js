@@ -114,15 +114,20 @@ var jToxStudy = {
 
       // use it to put parameters...
       parCount += putAGroup(study.parameters, function(p) {
-        return study.effects[0].conditions[p] === undefined ? { "sClass" : "center middle", "mData" : "parameters." + p, "sDefaultContent": "-"} : undefined;
+        return study.effects[0].conditions[p] === undefined  && study.effects[0].conditions[p + " unit"] === undefined ? 
+        { 
+          "sClass" : "center middle", 
+          "mData" : "parameters." + p, 
+          "mRender" : function (data, type, full) { return data !== undefined ? (data + ((full[p + " unit"] !== undefined) ? "&nbsp;" + full[p + " unit"] : "")) : "-"; }
+        } : undefined;
       });
       // .. and conditions
       parCount += putAGroup(study.effects[0].conditions, function(c){
-        return { "sClass" : "center middle jtox-multi", 
-                 "mData" : "effects", 
-                 "sDefaultContent": "-", 
-                 "mRender" : function(data, type, full) { return self.renderMulti(data, type, full, function(data, type) { return data.conditions[c]; } )} 
-              };
+        return study.effects[0].conditions[c + " unit"] === undefined ?
+        { "sClass" : "center middle jtox-multi", 
+          "mData" : "effects", 
+          "mRender" : function(data, type, full) { return self.renderMulti(data, type, full, function(data, type) { return data.conditions[c] !== undefined ? (data.conditions[c] + (data.conditions[c + " unit"] !== undefined ? "&nbsp;" + data.conditions[c + " unit"] : "")) : "-"; } )} 
+        } : undefined;
       });
       
       // now fix the colspan of 'Conditions' preheader cell
