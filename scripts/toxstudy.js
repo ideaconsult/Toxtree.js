@@ -1,5 +1,5 @@
 var jToxStudy = {
-  querySummary: "http://apps.ideaconsult.net:8080/biodeg/substance/<1>/studysummary?media=application/json",
+  summaryURI: "http://apps.ideaconsult.net:8080/biodeg/substance/<1>/studysummary?media=application/json",
   rootElement: null,
   
   getFormatted: function (data, type, format) {
@@ -68,7 +68,7 @@ var jToxStudy = {
     if (!$(theTable).hasClass('dataTable')) {
 
       var colDefs = [
-        { "sClass": "center", "mData": "protocol.endpoint" } // The name (endpoint)
+        { "sClass": "center", "sWidth": "125px", "mData": "protocol.endpoint" } // The name (endpoint)
       ];
       
       // start filling it
@@ -79,7 +79,10 @@ var jToxStudy = {
       // this function takes care to add as columns all elements from given array
       var putAGroup = function(group, fProcess) {
         for (var p in group) {
-          colDefs.push(fProcess(p));
+          var val = fProcess(p);
+          if (val === undefined)
+            continue;
+          colDefs.push(val);
           
           var th = document.createElement('th');
           th.innerHTML = p;
@@ -91,7 +94,7 @@ var jToxStudy = {
 
       // use it to put parameters...
       putAGroup(study.parameters, function(p) {
-        return { "sClass" : "center middle", "mData" : "parameters." + p, "sDefaultContent": "-"};
+        return study.effects[0].conditions[p] === undefined ? { "sClass" : "center middle", "mData" : "parameters." + p, "sDefaultContent": "-"} : undefined;
       });
       // .. and conditions
       putAGroup(study.effects[0].conditions, function(c){
@@ -117,8 +120,9 @@ var jToxStudy = {
       
       // finally put the protocol entries
       colDefs.push(
-        { "sClass": "center", "mData": "protocol.guidance", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
-        { "sClass": "center", "mData": "uuid", "bSearchable": false, "sDefaultContent": "?" }
+        { "sClass": "center", "sWidth": "125px", "mData": "protocol.guidance", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
+        { "sClass": "center", "sWidth": "125px", "mData": "owner.uuid", "sDefaultContent": "?"  }, 
+        { "sClass": "center", "sWidth": "125px", "mData": "uuid", "bSearchable": false, "sDefaultContent": "?" }
       );
       
       // READYY! Go and prepare THE table.
@@ -152,14 +156,20 @@ var jToxStudy = {
     // create the groups on the corresponding tabs
     for (var s in summary) {
       var sum = summary[s];
-      var tab = $('.jtox-study-tab.' + sum.value, self.rootElement)[0];
-      var cat = self.createCategory(tab, sum.subcategory, sum.subcategory);
-      $(cat).data('jtox-uri', sum.uri);
+      var top = sum.category.title;
+      if (!top)
+        continue;
+      var top = top.replace(/ /g, "_");
+      var tab = $('.jtox-study-tab.' + top, self.rootElement)[0];
       
-      if (typeSummary[sum.value] === undefined)
-        typeSummary[sum.value] = sum.count;
-      else
-        typeSummary[sum.value] += sum.count;
+      var catname = sum.subcategory.title;
+      if (!catname) {
+        typeSummary[top] = sum.count;
+      }
+      else {
+        var cat = self.createCategory(tab, catname, catname);
+        $(cat).data('jtox-uri', sum.subcategory.uri);
+      }
     }
     
     // update the number in the tabs...
@@ -233,8 +243,11 @@ var jToxStudy = {
     });
   },
   
-  querySummary: function(url) {
-    this.processSummary(toxSummary.facet);
+  querySummary: function(substanceId) {
+    var self = this;
+    jToxKit.call(jToxKit.formatString(self.summaryURI, substanceId), function(summary) {
+      self.processSummary(summary.facet);
+    });
   },
   
   init: function(root, settings) {

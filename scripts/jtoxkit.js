@@ -56,7 +56,7 @@ window.jToxKit = {
     }
     return format;
   },
-
+  
   parseURL: function(url) {
     var a =  document.createElement('a');
     a.href = url;
@@ -174,5 +174,5 @@ window.jToxKit = {
 
 $(document).ready(function(){
   jToxKit.init();
-  jToxStudy.querySummary("test");
+  jToxStudy.querySummary("IUC4-efdb21bb-e79f-3286-a988-b6f6944d3734");
 });

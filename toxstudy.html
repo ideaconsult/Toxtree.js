@@ -35,21 +35,21 @@
 	  <div id="jtox-studies">
 	    <ul>
 	      <li><a href="#jtox-composition">Composition</a></li>
-	      <li><a href="#jtox-pchem" data-type="PCH">P-Chem (0)</a></li>
-	      <li><a href="#jtox-envfate" data-type="ENV">Env Fate (0)</a></li>
-	      <li><a href="#jtox-ecotox" data-type="ECO">Eco Tox (0)</a></li>
+	      <li><a href="#jtox-pchem" data-type="P-CHEM">P-Chem (0)</a></li>
+	      <li><a href="#jtox-envfate" data-type="ENV_FATE">Env Fate (0)</a></li>
+	      <li><a href="#jtox-ecotox" data-type="ECOTOX">Eco Tox (0)</a></li>
 	      <li><a href="#jtox-tox" data-type="TOX">Tox (0)</a></li>
 	    </ul>
 	    <div id="jtox-composition">
-	      Composition information
+	      <p>Substance: <span class="data-field" data-field="SubstanceID"></span></p>
 	    </div>
-	    <div id="jtox-pchem" class="jtox-study-tab PCH">
+	    <div id="jtox-pchem" class="jtox-study-tab P-CHEM">
 	      <p><input type="text" class="jtox-study-filter ui-input" placeholder="Filter..."></input></p>
       </div>
-	    <div id="jtox-envfate" class="jtox-study-tab ENV">
+	    <div id="jtox-envfate" class="jtox-study-tab ENV_FATE">
 	      <p><input type="text" class="jtox-study-filter ui-input" placeholder="Filter..."></input></p>
 	    </div>
-	    <div id="jtox-ecotox" class="jtox-study-tab ECO">
+	    <div id="jtox-ecotox" class="jtox-study-tab ECOTOX">
 	      <p><input type="text" class="jtox-study-filter ui-input" placeholder="Filter..."></input></p>
 	    </div>
 	    <div id="jtox-tox" class="jtox-study-tab TOX">
@@ -64,13 +64,14 @@
             <th rowspan="2">Name</th>
             <th>Conditions</th>
             <th colspan="2">Effects</th>
-            <th colspan="2">Protocol</th>
+            <th colspan="3">Protocol</th>
           </tr>
           <tr class="jtox-header">
             <th>Endpoint</th>
             <th>Result</th>
             <th>Guidance</th>
-            <th>Owner / Document UUID</th>
+            <th>Owner</th>
+            <th>UUID</th>
           </tr>
         </thead>
         <tbody></tbody>
