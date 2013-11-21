@@ -31,7 +31,25 @@ var jToxStudy = {
   },
   
   formatResult: function (data, type) {
-    return "" + data.result.loValue + data.result.unit;
+    var out = "";
+    data = data.result;
+    if (data.loValue !== undefined && data.upValue !== undefined) {
+      out += (data.loQualifier == ">=") ? "[" : "(";
+      out += data.loValue + ", " + data.upValue;
+      out += (data.upQualifier == "<=") ? "]" : ") ";
+    }
+    else // either of them is non-undefined
+    {
+      var fnFormat = function (q, v) {
+        return ((q !== undefined) ? q : "=") + " " + v;
+      };
+      
+      out += (data.loValue !== undefined) ? fnFormat(data.loQualifier, data.loValue) : fnFormat(data.upQualifier, data.upValue);
+    }
+    
+    if (!!data.unit)
+      out += data.unit;
+    return out.replace(/ /g, "&nbsp;");
   },
   
   createCategory: function(tab, category, name) {
@@ -116,22 +134,25 @@ var jToxStudy = {
       
       // add also the "default" effects columns
       colDefs.push(
-        { "sClass": "center middle jtox-multi", "mData": "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, "endpoint");  } },   // Effects columns
+        { "sClass": "center middle jtox-multi", "sWidth": "50px", "mData": "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, "endpoint");  } },   // Effects columns
         { "sClass": "center middle jtox-multi", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, self.formatResult) } }
       );
       
       // finally put the protocol entries
       colDefs.push(
         { "sClass": "center", "sWidth": "125px", "mData": "protocol.guidance", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
-        { "sClass": "center", "sWidth": "75px", "mData": "owner.substanceuuid", "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>' }  }, 
+        { "sClass": "center", "sWidth": "75px", "mData": "owner.substance.uuid", "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>' }  }, 
         { "sClass": "center", "sWidth": "75px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>' }  }
       );
       
       // READYY! Go and prepare THE table.
       $(theTable).dataTable( {
         "bPaginate": true,
-        "aoColumns": colDefs,
+        "bProcessing": true,
+        "bLengthChange": false,
+//        "sPaginationType": "full_numbers",
         "sDom" : "rt<Fip>",
+        "aoColumns": colDefs,
         "fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
           var el = $('.jtox-study-title .data-field', $(this).parentsUntil('.jtox-study')[0].parentNode)[0];
           el.innerHTML = self.updateCount(el.innerHTML, iTotal);
@@ -265,7 +286,7 @@ var jToxStudy = {
           $('.jtox-study.unloaded', ui.newPanel[0]).each(function(i){
             var table = this;
             jToxKit.call($(table).data('jtox-uri'), function(study){
-              $(table).removeClass('unloaded');
+              $(table).removeClass('unloaded folded');
               $(table).addClass('loaded');
               self.processStudies(ui.newPanel[0], study.study, true); // TODO: must be changed to 'false', when the real summary is supplied
             });  
