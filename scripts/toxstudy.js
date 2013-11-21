@@ -142,6 +142,21 @@ var jToxStudy = {
         { "sClass": "center middle jtox-multi", "sWidth": "50px", "mData": "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, "endpoint");  } },   // Effects columns
         { "sClass": "center middle jtox-multi", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, self.formatResult) } }
       );
+
+      // jump over those two - they are already in the DOM      
+      before = before.nextElementSibling.nextElementSibling;
+      
+      // now is time to put interpretation columns..
+      parCount = putAGroup(study.interpretation, function(i){
+        return { "sClass" : "center middle jtox-multi", "mData" : "interpretation." + i, "sDefaultContent": "-"};
+      });
+
+      // jump over Effects preheader-column      
+      preheaderCell = preheaderCell.nextElementSibling.nextElementSibling;
+      if (parCount > 0)
+        preheaderCell.setAttribute('colspan', parCount);
+      else
+        preheaderCell.parentNode.removeChild(preheaderCell);
       
       // finally put the protocol entries
       colDefs.push(

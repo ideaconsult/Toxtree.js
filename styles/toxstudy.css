@@ -1,11 +1,5 @@
 /* toxtstudy.css - Styling for toxstudy engine
 */
-
-.jtox-study table.dataTable td,
-.jtox-study table.dataTable th {
-  border:1px solid black;
-}
-
 .jtox-foldable {
 	background: #eee; /* Old browsers */
 	background: -moz-linear-gradient(top, rgba(255,255,255,.5) 0%, rgba(200,200,200,.5) 100%); /* FF3.6+ */
@@ -64,7 +58,16 @@ div.jtox-study .jtox-study-title {
 .jtox-study-filter {
   width: 50% !important;
 }
+
 /* Start of table-related classes */
+.jtox-study table.dataTable td,
+.jtox-study table.dataTable th {
+  border:1px solid black;
+}
+
+.jtox-study table.dataTable th {
+  text-transform: capitalize;
+}
 
 .jtox-study table.dataTable td .shortened {
   width: 75px;
