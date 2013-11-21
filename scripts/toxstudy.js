@@ -299,6 +299,16 @@ var jToxStudy = {
   init: function(root, settings) {
     var self = this;
     this.rootElement = root;
+
+    // inject the template, if not already there
+    if (self.htmlMain !== undefined && self.htmlStudy !== undefined) {
+      var temp = document.createElement('div');
+      temp.className = 'jtox-template';
+      root.appendChild(temp);
+      temp.innerHTML = self.htmlStudy;
+//      temp.innerHTML += self.htmlMain;
+    }
+
     var tree = jToxKit.getTemplate('#jtox-studies');
     root.appendChild(tree);
     $(tree).tabs({
