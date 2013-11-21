@@ -69,7 +69,7 @@ div.jtox-study .jtox-study-title {
 .jtox-study table.dataTable td .shortened {
   width: 75px;
   max-height: 20px;
-  overflow: auto;
+  overflow: hidden;
   text-overflow: ellipsis;  
   white-space: nowrap;
 }
