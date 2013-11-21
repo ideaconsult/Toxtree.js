@@ -141,7 +141,7 @@ var jToxStudy = {
       // finally put the protocol entries
       colDefs.push(
         { "sClass": "center", "sWidth": "125px", "mData": "protocol.guidance", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
-        { "sClass": "center", "sWidth": "75px", "mData": "owner.substance.uuid", "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>' }  }, 
+        { "sClass": "center", "sWidth": "75px", "mData": "owner.company.name", "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>' }  }, 
         { "sClass": "center", "sWidth": "75px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>' }  }
       );
       
@@ -179,19 +179,19 @@ var jToxStudy = {
     // create the groups on the corresponding tabs
     for (var s in summary) {
       var sum = summary[s];
-      var top = sum.category.title;
+      var top = sum.topcategory.title;
       if (!top)
         continue;
       var top = top.replace(/ /g, "_");
       var tab = $('.jtox-study-tab.' + top, self.rootElement)[0];
       
-      var catname = sum.subcategory.title;
+      var catname = sum.category.title;
       if (!catname) {
         typeSummary[top] = sum.count;
       }
       else {
         var cat = self.createCategory(tab, catname, catname);
-        $(cat).data('jtox-uri', sum.subcategory.uri);
+        $(cat).data('jtox-uri', sum.category.uri);
       }
     }
     
@@ -266,11 +266,12 @@ var jToxStudy = {
     });
   },
   
-  querySummary: function(subId) {
+  querySummary: function(substanceURI) {
     var self = this;
+    var subId = substanceURI.replace(/.+\/(.+)/, "$1");
     jToxKit.fillTree($('#jtox-composition .data-field', self.rootElement)[0], {substanceID: subId});
     
-    jToxKit.call(jToxKit.formatString(self.summaryURI, subId), function(summary) {
+    jToxKit.call(substanceURI + "/studysummary", function(summary) {
       self.processSummary(summary.facet);
     });
   },
@@ -296,7 +297,7 @@ var jToxStudy = {
     });
     
     if (settings['substance'] !== undefined){
-      self.querySummary(jToxKit.formatString(self.querySummary, settings['substance']));
+      self.querySummary(settings['substance'] + "/studysummary");
     }
   }
 };

@@ -227,5 +227,5 @@ window.jToxKit = {
 
 $(document).ready(function(){
   jToxKit.init();
-  jToxStudy.querySummary("IUC4-efdb21bb-e79f-3286-a988-b6f6944d3734");
+  jToxStudy.querySummary("http://apps.ideaconsult.net:8080/biodeg/substance/IUC4-efdb21bb-e79f-3286-a988-b6f6944d3734");
 });
