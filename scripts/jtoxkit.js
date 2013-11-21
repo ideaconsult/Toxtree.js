@@ -43,11 +43,64 @@ window.jToxKit = {
 	},
 	
 	getTemplate: function(selector) {
-  	var el = $(selector, this.templateRoot)[0].cloneNode(true);
-    el.removeAttribute('id');
+  	var el = $(selector, this.templateRoot)[0];
+  	if (!!el){
+    	var el = $(selector, this.templateRoot)[0].cloneNode(true);
+      el.removeAttribute('id');
+    }
     return el;
 	},
-	
+
+	/* Function setObjValue(obj, value)Set a given to the given element (obj) in the most appropriate way - be it property - the necessary one, or innetHTML
+  */
+  setObjValue: function (obj, value){
+  	if ((value === undefined || value === null) && obj.dataset.default !== undefined)
+  		value = obj.dataset.default;
+  
+    if (obj.nodeName == "INPUT" || obj.nodeName == "SELECT")
+      obj.value = value;
+    else if (obj.nodeName == "IMG")
+      obj.src = value;
+    else if (obj.nodeName == "BUTTON")
+  		obj.dataset.value = value;
+    else
+      obj.innerHTML = value;
+  },
+  
+  // given a root DOM element and an JSON object it fills all (sub)element of the tree
+  // which has class 'data-field' and their name corresponds to a property in json object.
+  // If prefix is given AND json has id property - the root's id set to to prefix + json.id
+  fillTree: function(root, json, prefix, filter) {
+    var self = this;
+  	if (!filter)
+  		filter = 'data-field';
+    var dataList = root.getElementsByClassName(filter);
+    var dataCnt = dataList.length;
+  	
+  	var processFn = function(el, json){
+  	  var field = $(el).data('field');
+      if (json[field] !== undefined) {
+        var value = json[field];
+        var format = $(el).data('format');
+        if ( !!format && (typeof window[format] == 'function') ) {
+          value = window[format](value, json);
+        }
+        self.setObjValue(el, value);
+      }
+  	}
+  	
+  	if (root.classList.contains(filter))
+  		processFn(root, json);
+  
+    for (var i = 0; i < dataCnt; ++i)
+    	processFn(dataList[i], json);
+  
+    if (prefix && json.id !== undefined) {
+      root.id = prefix + json.id;
+    }
+  },
+  
+
 	/* formats a string, replacing [<number>] in it with the corresponding value in the arguments
   */
   formatString: function(format) {

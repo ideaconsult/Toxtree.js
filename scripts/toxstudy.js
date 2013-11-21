@@ -44,13 +44,13 @@ var jToxStudy = {
       $(theCat).addClass(category);
       
       // install the click handler for fold / unfold
-      theCat.onclick = function(e) {
-        $(this).toggleClass('folded');
-      };
+      var titleEl = $('.jtox-study-title', theCat);
+      $(titleEl).click(function() {
+        $(theCat).toggleClass('folded');
+      });
     }
     
-    var titleEl = theCat.getElementsByClassName('jtox-study-title')[0];
-    titleEl.innerHTML = name + " (0)";
+    jToxKit.fillTree(titleEl[0], { title: "" + name + " (0)"});
     return theCat;
   },
 
@@ -78,6 +78,7 @@ var jToxStudy = {
 
       // this function takes care to add as columns all elements from given array
       var putAGroup = function(group, fProcess) {
+        var count = 0;
         for (var p in group) {
           var val = fProcess(p);
           if (val === undefined)
@@ -88,16 +89,17 @@ var jToxStudy = {
           th.innerHTML = p;
           headerRow.insertBefore(th, before);
           before = th.nextElementSibling;
-          parCount++;
+          count++;
         }
+        return count;
       }
 
       // use it to put parameters...
-      putAGroup(study.parameters, function(p) {
+      parCount += putAGroup(study.parameters, function(p) {
         return study.effects[0].conditions[p] === undefined ? { "sClass" : "center middle", "mData" : "parameters." + p, "sDefaultContent": "-"} : undefined;
       });
       // .. and conditions
-      putAGroup(study.effects[0].conditions, function(c){
+      parCount += putAGroup(study.effects[0].conditions, function(c){
         return { "sClass" : "center middle jtox-multi", 
                  "mData" : "effects", 
                  "sDefaultContent": "-", 
@@ -121,8 +123,8 @@ var jToxStudy = {
       // finally put the protocol entries
       colDefs.push(
         { "sClass": "center", "sWidth": "125px", "mData": "protocol.guidance", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
-        { "sClass": "center", "sWidth": "125px", "mData": "owner.uuid", "sDefaultContent": "?"  }, 
-        { "sClass": "center", "sWidth": "125px", "mData": "uuid", "bSearchable": false, "sDefaultContent": "?" }
+        { "sClass": "center", "sWidth": "75px", "mData": "owner.substanceuuid", "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>' }  }, 
+        { "sClass": "center", "sWidth": "75px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>' }  }
       );
       
       // READYY! Go and prepare THE table.
@@ -131,7 +133,7 @@ var jToxStudy = {
         "aoColumns": colDefs,
         "sDom" : "rt<Fip>",
         "fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
-          var el = $('.jtox-study-title', $(this).parentsUntil('.jtox-study')[0].parentNode)[0];
+          var el = $('.jtox-study-title .data-field', $(this).parentsUntil('.jtox-study')[0].parentNode)[0];
           el.innerHTML = self.updateCount(el.innerHTML, iTotal);
           return sPre;
         }
@@ -243,9 +245,11 @@ var jToxStudy = {
     });
   },
   
-  querySummary: function(substanceId) {
+  querySummary: function(subId) {
     var self = this;
-    jToxKit.call(jToxKit.formatString(self.summaryURI, substanceId), function(summary) {
+    jToxKit.fillTree($('#jtox-composition .data-field', self.rootElement)[0], {substanceID: subId});
+    
+    jToxKit.call(jToxKit.formatString(self.summaryURI, subId), function(summary) {
       self.processSummary(summary.facet);
     });
   },
@@ -258,8 +262,11 @@ var jToxStudy = {
     $(tree).tabs({
       "beforeActivate" : function(event, ui) {
         if (ui.newPanel){
-          $('.jtox-study', ui.newPanel[0]).each(function(i){
-            jToxKit.call($(this).data('jtox-uri'), function(study){
+          $('.jtox-study.unloaded', ui.newPanel[0]).each(function(i){
+            var table = this;
+            jToxKit.call($(table).data('jtox-uri'), function(study){
+              $(table).removeClass('unloaded');
+              $(table).addClass('loaded');
               self.processStudies(ui.newPanel[0], study.study, true); // TODO: must be changed to 'false', when the real summary is supplied
             });  
           });
