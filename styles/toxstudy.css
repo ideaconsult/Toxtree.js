@@ -42,6 +42,22 @@ div.jtox-study {
   display: none;
 }
 
+div.jtox-study.unloaded,
+div.jtox-study.unloaded.folded {
+  background: url(../images/waiting_small.gif) right top no-repeat;
+  background-size: 16px 16px;
+}
+
+div.jtox-study.loaded.folded {
+  background: url(../images/sort_desc.png) right top no-repeat;
+  background-size: 19px 19px;
+}
+
+div.jtox-study.loaded {
+  background: url(../images/sort_asc.png) right top no-repeat;
+  background-size: 19px 19px;
+}
+
 div.jtox-study.folded {
   padding-bottom: 5px;
 }
