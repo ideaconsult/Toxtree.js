@@ -5,7 +5,7 @@ outdir='../www'
 jsdir='../scripts'
 cssdir='../styles'
 htmldir='..'
-target='jtoxkit toxstudy'
+target='toxstudy jtoxkit'
 append=0
 
 # test the parameters first
@@ -47,44 +47,44 @@ while (( "$#" )); do
 			;;
 		*)
 			if [ $append -eq 1 ]; then
-				target="$target $1"
+				target="$1 $target"
 			fi
 	esac
 	
 	shift
 done
 
-echo "Building with parameters: "
-echo "html = $htmldir"
-echo "css = $cssdir"
-echo "js = $jsdir"
-echo "out = $outdir"
-echo "minimize = $minimize"
-echo "target = $target"
-
 outJS="$outdir/jtoxkit.js"
 outCSS="$outdir/jtoxkit.css"
 
-echo "Merging JS files..."
+echo "Clearing old files..."
+rm -f $outJS
+rm -f $outCSS
+
+echo "Processing targets [$target]..."
+echo "Merging JS files from [$jsdir] ..."
 for t in ${target[@]}; do
 	if [ -e "$jsdir/$t.js" ]; then
-		cat "$jsdir/$t.js" >> "$outJS"
+		cat "$jsdir/$t.js" >> $outJS
 	fi
 done
 
-echo "Adding html2js transformed ones..."
+echo "Adding html2js transformed ones from [$htmldir]..."
 for t in ${target[@]}; do
 	if [ -e "$htmldir/$t.html" ]; then
-		./html2js.pl "$htmldir/$t.html" >> "$outJS"
+		./html2js.pl "$htmldir/$t.html" >> $outJS
 	fi
 done
 
-echo "Minification..."
+if [ $minimize -eq 1 ]; then
+	echo "Minification..."
+	./jsminify.pl $outJS > "$outdir/jtoxkit.min.js"
+fi
 
-echo "Merging CSS files..."
+echo "Merging CSS files from [$cssdir] ..."
 for t in ${target[@]}; do
 	if [ -e "$cssdir/$t.css" ]; then
-		cat "$cssdir/$t.css" >> "$outCSS"
+		cat "$cssdir/$t.css" >> $outCSS
 	fi
 done
 
