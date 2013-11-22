@@ -170,8 +170,6 @@ var jToxStudy = {
         "bPaginate": true,
         "bProcessing": true,
         "bLengthChange": false,
-				"bAutoWidth": false,
-				"bJQueryUI": true,
 //        "sPaginationType": "full_numbers",
         "sDom" : "rt<Fip>",
         "aoColumns": colDefs,
