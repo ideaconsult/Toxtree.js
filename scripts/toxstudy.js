@@ -292,7 +292,8 @@ var jToxStudy = {
     jToxKit.fillTree($('#jtox-composition .data-field', self.rootElement)[0], {substanceID: subId});
     
     jToxKit.call(substanceURI + "/studysummary", function(summary) {
-      self.processSummary(summary.facet);
+      if (!!summary && !!summary.facet)
+        self.processSummary(summary.facet);
     });
   },
   
@@ -301,12 +302,10 @@ var jToxStudy = {
     this.rootElement = root;
 
     // inject the template, if not already there
-    if (self.htmlMain !== undefined && self.htmlStudy !== undefined) {
+    if (self.htmlTemplate !== undefined) {
       var temp = document.createElement('div');
-      temp.className = 'jtox-template';
       root.appendChild(temp);
-      temp.innerHTML = self.htmlStudy;
-//      temp.innerHTML += self.htmlMain;
+      temp.outerHTML = self.htmlTemplate;
     }
 
     var tree = jToxKit.getTemplate('#jtox-studies');

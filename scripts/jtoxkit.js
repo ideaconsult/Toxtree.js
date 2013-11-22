@@ -9,6 +9,8 @@ window.jToxKit = {
 	queries: {
 		taskPoll: "/task/<1>",
 	},
+	
+	templates: { },        // html2js routine will fill up this variable
 
 	/* SETTINGS. The following parametes can be passed in settings object to jToxKit.init(), or as data-XXX - with the same names. Values set here are the defaults.
 	*/
@@ -27,7 +29,7 @@ window.jToxKit = {
 	init: function(settings) {
   	var self = this;
   	
-  	self.templateRoot = document.getElementById('jtox-template');
+  	self.initTemplates();
   	// no configuration
   	if (!settings) {
     	$('.jtox-toolkit').each(function(i) {
@@ -40,6 +42,25 @@ window.jToxKit = {
     	self.settings[s] = settings[s];
 
   	self.initConnection(self.settings);
+	},
+	
+	initTemplates: function() {
+	  var self = this;
+
+    var root = document.getElementsByClassName('jtox-template')[0];
+    if (root === undefined) {
+  	  var html = '';
+    	for (var t in self.templates) {
+      	html += self.templates[t];
+    	}
+    	
+    	root = document.createElement('div');
+    	root.className = 'jtox-template';
+    	root.innerHTML = html;
+    	document.body.appendChild(root);
+    }
+    
+  	self.templateRoot = root;
 	},
 	
 	getTemplate: function(selector) {

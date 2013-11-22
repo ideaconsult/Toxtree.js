@@ -1,4 +1,4 @@
-jToxStudy.htmlMain  = 
+jToxKit.templates['all-studies']  = 
 "	  <div id=\"jtox-studies\">" +
 "	    <ul>" +
 "	      <li><a href=\"#jtox-composition\">Composition</a></li>" +
@@ -23,9 +23,9 @@ jToxStudy.htmlMain  =
 "	      <p><input type=\"text\" class=\"jtox-study-filter ui-input\" placeholder=\"Filter...\"></input></p>" +
 "	    </div>" +
 "	  </div>" +
-"";// end of htmlMain 
+""; // end of #jtox-studies 
 
-jToxStudy.htmlStudy  = 
+jToxKit.templates['one-study']  = 
 "    <div id=\"jtox-study\" class=\"jtox-study jtox-foldable folded unloaded\">" +
 "      <div class=\"jtox-study-title\"><p class=\"data-field\" data-field=\"title\">? (0)</p></div>" +
 "      <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"jtox-study-table\">" +
@@ -48,5 +48,5 @@ jToxStudy.htmlStudy  =
 "        <tbody></tbody>" +
 "      </table>" +
 "    </div>" +
-""; // end of htmlStudy 
+""; // end of #jtox-study 
 
