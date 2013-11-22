@@ -1,8 +1,6 @@
 TODO:
 
-- HTML->JS converter
-- Project packaging
-- Encapsulation of all
 - Test within AMBIT
+- Make unintialized tables hidden
 - 
 

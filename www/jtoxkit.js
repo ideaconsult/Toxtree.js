@@ -170,6 +170,8 @@ var jToxStudy = {
         "bPaginate": true,
         "bProcessing": true,
         "bLengthChange": false,
+				"bAutoWidth": false,
+				"bJQueryUI": true,
 //        "sPaginationType": "full_numbers",
         "sDom" : "rt<Fip>",
         "aoColumns": colDefs,
@@ -319,6 +321,7 @@ var jToxStudy = {
               $(table).removeClass('unloaded folded');
               $(table).addClass('loaded');
               self.processStudies(ui.newPanel[0], study.study, true); // TODO: must be changed to 'false', when the real summary is supplied
+              $('.dataTable', table).dataTable().fnAdjustColumnSizing();
             });  
           });
         }

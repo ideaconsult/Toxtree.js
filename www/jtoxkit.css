@@ -72,10 +72,24 @@ div.jtox-study .jtox-study-title {
   width: 50% !important;
 }
 
+div.jtox-study-tab.ui-tabs-panel {
+  padding-left: 0px;
+  padding-bottom: 0px;
+  padding-right: 0px;
+  width: 100%;
+  height: 100%;
+}
+
+div.jtox-study-tab .dataTables_wrapper {
+  overflow-x: scroll;
+  overflow-y: visible;
+  width: 100%;
+}
+
 /* Start of table-related classes */
 .jtox-study table.dataTable td,
 .jtox-study table.dataTable th {
-  border:1px solid black;
+  border:1px solid #ccc;
 }
 
 .jtox-study table.dataTable th {
