@@ -45,6 +45,10 @@ div.jtox-study.unloaded.folded .jtox-study-title {
   background-size: 16px 16px;
 }
 
+div.jtox-study.unloaded .jtox-study-table {
+  display: none;
+}
+
 div.jtox-study.loaded.folded .jtox-study-title {
   background: url(../images/sort_desc.png) right top no-repeat;
   background-size: 19px 19px;

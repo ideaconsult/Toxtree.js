@@ -16,12 +16,12 @@ while (( "$#" )); do
 			shift
 			htmldir=$1
 			;;
-		--output|--out)
+		--output)
 			append=0
 			shift
 			outdir=$1
 			;;
-		--css|--styles)
+		--css)
 			append=0
 			shift
 			cssdir=$1
@@ -40,8 +40,17 @@ while (( "$#" )); do
 			append=1
 			;;
 		--help|-h)
-			echo "Usage: build.sh [--min] [--html <html dir>] [--out <output dir>] [-css <styles dir>] [--js <js dir>] [--target (toxstudy)] [--help]"
+			echo "Usage: build.sh [options]"
+			echo "Options can be one or more from the following:"
 			echo
+			echo "    [--min | -m]           : run minification of the output js, producing additional .min.js file."
+			echo "    [--html <html dir>]    : the directory where html files live. Default is [..]."
+			echo "    [--out <output dir>]   : the directory where output files should be put. Default is [../www]."
+			echo "    [-css <styles dir>]    : the directory where styling files live. Default is [../styles]."
+			echo "    [--js <js dir>]        : the directory where script files live. Default is [../scripts]."
+			echo "    [--target <kit list>]  : list of kits to be included. Omit jtoxkit. Default [toxstudy]."
+			echo "    [--help | -h]          : this help."
+			echo 
 			echo "Default is like: build.sh --html .. --out ../www --css ../styles --js ../script --target jtoxkit toxstudy"
 			exit -1
 			;;

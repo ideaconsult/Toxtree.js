@@ -326,8 +326,8 @@ var jToxStudy = {
       }
     });
     
-    if (settings['substance'] !== undefined){
-      self.querySummary(settings['substance'] + "/studysummary");
+    if (settings['substanceUri'] !== undefined){
+      self.querySummary(settings['substanceUri']);
     }
   }
 };

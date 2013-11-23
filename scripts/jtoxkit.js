@@ -1,5 +1,4 @@
 window.jToxKit = {
-	queryParams: null,				// an associative array of parameters supplied on the query. Some things like 'language' can be retrieved from there.
 	templateRoot: null,
 	server: null,
 
@@ -26,22 +25,39 @@ window.jToxKit = {
 	onsuccess: function(c, m) { },		// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
 	onerror: function (c, m) { },			// function (code, mess): called on server reques error. Part of settings.
   
+  mergeSettings: function (settings) {
+    if (settings !== undefined)
+    	for (var s in settings)
+      	this.settings[s] = settings[s];
+  },
+  
 	init: function(settings) {
   	var self = this;
   	
   	self.initTemplates();
-  	// no configuration
+
+    // scan the query parameter for settings
+		var url = this.parseURL(document.location);
+		var queryParams = url.params;
+		queryParams.host = url.host;
+  	
+  	// now scan all insertion divs
   	if (!settings) {
     	$('.jtox-toolkit').each(function(i) {
-      	settings = $(this).data();
-      	if (settings.kit == "study")
-      	  jToxStudy.init(this, self.settings);
+      	var dataParams = $(this).data();
+      	if (!dataParams.manualInit || settings !== undefined){
+          // this order determines the priority..
+          self.mergeSettings(dataParams);
+          self.mergeSettings(queryParams);
+          self.mergeSettings(settings);
+          
+        	if (self.settings.kit == "study")
+        	  jToxStudy.init(this, self.settings);
+        }
     	});
   	}
-  	for (var s in settings)
-    	self.settings[s] = settings[s];
 
-  	self.initConnection(self.settings);
+  	self.initConnection();
 	},
 	
 	initTemplates: function() {
@@ -186,17 +202,13 @@ window.jToxKit = {
 	
 	/* Initialized the necessary connection data. Same settings as in ToxMan.init() are passed.
 	*/
-	initConnection: function(settings){
-		if (!settings.server){
-			var url = this.parseURL(document.location);
-			this.queryParams = url.params;
-			var server = url.params.server;
-			if (!server)
-				server = url.host;
-			this.server = server;
+	initConnection: function(){
+	  var settings = this.settings;
+		if (!settings.server) {
+		  settings.server = settings.host;
 		}
-		else
-		  this.server = settings.server;
+		  
+		this.server = settings.server;
 					
     if (settings.onerror !== undefined)
 		  this.onerror = settings.onerror;
@@ -248,5 +260,4 @@ window.jToxKit = {
 
 $(document).ready(function(){
   jToxKit.init();
-  jToxStudy.querySummary("http://apps.ideaconsult.net:8080/biodeg/substance/IUC4-efdb21bb-e79f-3286-a988-b6f6944d3734");
 });
