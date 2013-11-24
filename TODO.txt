@@ -1,7 +1,5 @@
 TODO:
 
-- write documentation
-- test with multiple querySummary calls.
 - test with Nina, integrating it in AMBIT
 - make toxtree part of jToxKit
 - 

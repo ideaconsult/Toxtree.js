@@ -192,8 +192,8 @@ var jToxStudy = {
     
     // first - clear all existing tabs
     var catList = self.rootElement.getElementsByClassName('jtox-study');
-    for (var i = 0,clen = catList.length; i < clen; ++i){
-      catList[i].parentNode.removeChild(catList[i]);
+    while(catList.length > 0) {
+      catList[0].parentNode.removeChild(catList[0]);
     }
     
     // create the groups on the corresponding tabs
