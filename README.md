@@ -242,9 +242,9 @@ As a single page interface, it can be loaded from any place, including locally.
 To make this possible the location of the server to be used should be provided
 as URL parameter:
 
-\`\``
+`
 file:///.../toxtree.html?server=http://apps.ideaconsult.net:8080/ambit2&search=caffeine
-`\`\`
+`
 
 As can be seen from the example - the root of OpenTox installation should be
 provided in `server` parameter and it'll be prepended to all future requests.
@@ -364,61 +364,61 @@ These were connection-related settings. Now the UI-related ones.
 All communication with *ToxMan* is done using a short list of functions and few
 member-variables:
 
-\`\`` ToxMan.currentDataset `\`\`
+``` ToxMan.currentDataset ```
 
 Holds the dataset, as reported from server from the current query. Refer to
 OpenTox JSON API for the dataset structure.
 
-\`\`` ToxMan.models `\`\`
+``` ToxMan.models ```
 
 An array of available prediction models, as reported from server. Each element
 has OpenTox's structure, with two changes - from `name` the provided prefix is
 removed (most likely - *ToxTree* ) and `index` is added - it corresponds to the
 index in this array. It is filled from `ToxMan.listModels()`.
 
-\`\`` ToxMan.queryParams `\`\`
+``` ToxMan.queryParams ```
 
 Paramets in the URL which loaded the page. For example `server` and `search` can
 be found here.
 
-\`\`` ToxMan.inQuery `\`\`
+``` ToxMan.inQuery ```
 
 A simple flag showing whether we're in a query process now. Attempting to call
 query while this is 'true' is ignored.
 
-\`\`` ToxMan.init(settings) `\`\`
+``` ToxMan.init(settings) ```
 
 We've already explained the parameter of that one. This is the first function to
 be called - it initializes the server string, searches and fills the elements in
 the UI, etc. Nothing else will work if this is not called prior it.
 
-\`\`` ToxMan.listModels() `\`\`
+``` ToxMan.listModels() ```
 
 This is most likely the second function to be called, because it fills the UI
 with all models supported from the server. Need to be called once and the list
 is stored in `ToxMan.models`. The provided `onmodeladd` handler is called for
 each reported model.
 
-\`\`` ToxMan.query(needle) `\`\`
+``` ToxMan.query(needle) ```
 
 The starting point of each prediction - a query for certain compound. The needle
 is provided as Identifier (CAS, Name, EINECS) or SMILES or InChl - it is
 directly send to the server as is provided here. On success - the `featureList`
 and `diagramImage` are filled.
 
-\`\`` ToxMan.clear() `\`\`
+``` ToxMan.clear() ```
 
 Clears all result from query and predictions - bring the interface to it's
 initial state. The provided `onclear` handler is called for each model row.
 
-\`\`` ToxMan.runPrediction(index) `\`\`
+``` ToxMan.runPrediction(index) ```
 
 Runs a prediction on the compound from the current query, identified by `index`
 in the `ToxMan.models` list. The provided `onrun` handler function is called
 immediately and `onpredicted` handler is called after the results arrived and
 just before they are filled in the UI.
 
-\`\`` ToxMan.runAutos() `\`\`
+``` ToxMan.runAutos() ```
 
 A convenient function which walks on each prediction model row and make a call
 to `ToxMan.runPrediction()` if it's *auto* checkbox is marked.
