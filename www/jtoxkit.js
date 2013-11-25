@@ -1,5 +1,4 @@
 var jToxStudy = {
-  summaryURI: "http://apps.ideaconsult.net:8080/biodeg/substance/<1>/studysummary?media=application/json",
   rootElement: null,
   
   getFormatted: function (data, type, format) {
