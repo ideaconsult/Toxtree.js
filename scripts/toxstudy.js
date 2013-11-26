@@ -309,19 +309,26 @@ var jToxStudy = {
 
     var tree = jToxKit.getTemplate('#jtox-studies');
     root.appendChild(tree);
+    var loadPanel = function(panel){
+      if (panel){
+        $('.jtox-study.unloaded', panel).each(function(i){
+          var table = this;
+          jToxKit.call($(table).data('jtox-uri'), function(study){
+            $(table).removeClass('unloaded folded');
+            $(table).addClass('loaded');
+            self.processStudies(panel, study.study, true); // TODO: must be changed to 'false', when the real summary is supplied
+            $('.dataTable', table).dataTable().fnAdjustColumnSizing();
+          });  
+        });
+      }
+    };
     $(tree).tabs({
+      "select" : function(event, ui) {
+        loadPanel(ui.panel);
+      },
       "beforeActivate" : function(event, ui) {
-        if (ui.newPanel){
-          $('.jtox-study.unloaded', ui.newPanel[0]).each(function(i){
-            var table = this;
-            jToxKit.call($(table).data('jtox-uri'), function(study){
-              $(table).removeClass('unloaded folded');
-              $(table).addClass('loaded');
-              self.processStudies(ui.newPanel[0], study.study, true); // TODO: must be changed to 'false', when the real summary is supplied
-              $('.dataTable', table).dataTable().fnAdjustColumnSizing();
-            });  
-          });
-        }
+        if (ui.newPanel)
+          loadPanel(ui.newPanel[0]);
       }
     });
     
