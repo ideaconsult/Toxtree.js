@@ -61,7 +61,7 @@ This kit gives front-end to AMBIT services, which provide import of IUCTL genera
 
 ##### Dependencies
 
-From [jQueryUI](http://www.jqueryui.com) based library *jQueryUI tabs* and jQuery based [DataTables](http:/www.datatables.net):
+From [jQueryUI](http://www.jqueryui.com) Version 1.8+, based library *jQueryUI tabs* and jQuery based [DataTables](http:/www.datatables.net) Version 1.9+:
 
 ```
 	<link rel="stylesheet" href="jquery.ui.tabs.css"/>
