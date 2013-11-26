@@ -300,13 +300,6 @@ var jToxStudy = {
     var self = this;
     this.rootElement = root;
 
-    // inject the template, if not already there
-    if (self.htmlTemplate !== undefined) {
-      var temp = document.createElement('div');
-      root.appendChild(temp);
-      temp.outerHTML = self.htmlTemplate;
-    }
-
     var tree = jToxKit.getTemplate('#jtox-studies');
     root.appendChild(tree);
     var loadPanel = function(panel){
