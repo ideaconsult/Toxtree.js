@@ -67,7 +67,7 @@ var jToxStudy = {
       });
     }
     
-    jToxKit.fillTree(titleEl[0], { title: "" + name + " (0)"});
+    ccLib.fillTree(titleEl[0], { title: "" + name + " (0)"});
     return theCat;
   },
 
@@ -288,7 +288,7 @@ var jToxStudy = {
   querySummary: function(substanceURI) {
     var self = this;
     var subId = substanceURI.replace(/.+\/(.+)/, "$1");
-    jToxKit.fillTree($('#jtox-composition .data-field', self.rootElement)[0], {substanceID: subId});
+    ccLib.fillTree($('#jtox-composition .data-field', self.rootElement)[0], {substanceID: subId});
     
     jToxKit.call(substanceURI + "/studysummary", function(summary) {
       if (!!summary && !!summary.facet)

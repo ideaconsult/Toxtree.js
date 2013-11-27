@@ -37,7 +37,7 @@ window.jToxKit = {
   	self.initTemplates();
 
     // scan the query parameter for settings
-		var url = this.parseURL(document.location);
+		var url = ccLib.parseURL(document.location);
 		var queryParams = url.params;
 		queryParams.host = url.host;
   	
@@ -87,94 +87,7 @@ window.jToxKit = {
     }
     return el;
 	},
-
-	/* Function setObjValue(obj, value)Set a given to the given element (obj) in the most appropriate way - be it property - the necessary one, or innetHTML
-  */
-  setObjValue: function (obj, value){
-  	if ((value === undefined || value === null) && obj.dataset.default !== undefined)
-  		value = obj.dataset.default;
-  
-    if (obj.nodeName == "INPUT" || obj.nodeName == "SELECT")
-      obj.value = value;
-    else if (obj.nodeName == "IMG")
-      obj.src = value;
-    else if (obj.nodeName == "BUTTON")
-  		obj.dataset.value = value;
-    else
-      obj.innerHTML = value;
-  },
-  
-  // given a root DOM element and an JSON object it fills all (sub)element of the tree
-  // which has class 'data-field' and their name corresponds to a property in json object.
-  // If prefix is given AND json has id property - the root's id set to to prefix + json.id
-  fillTree: function(root, json, prefix, filter) {
-    var self = this;
-  	if (!filter)
-  		filter = 'data-field';
-    var dataList = root.getElementsByClassName(filter);
-    var dataCnt = dataList.length;
-  	
-  	var processFn = function(el, json){
-  	  var field = $(el).data('field');
-      if (json[field] !== undefined) {
-        var value = json[field];
-        var format = $(el).data('format');
-        if ( !!format && (typeof window[format] == 'function') ) {
-          value = window[format](value, json);
-        }
-        self.setObjValue(el, value);
-      }
-  	}
-  	
-  	if (root.classList.contains(filter))
-  		processFn(root, json);
-  
-    for (var i = 0; i < dataCnt; ++i)
-    	processFn(dataList[i], json);
-  
-    if (prefix && json.id !== undefined) {
-      root.id = prefix + json.id;
-    }
-  },
-  
-
-	/* formats a string, replacing [<number>] in it with the corresponding value in the arguments
-  */
-  formatString: function(format) {
-    for (var i = 1;i < arguments.length; ++i) {
-      format = format.replace('<' + i + '>', arguments[i]);
-    }
-    return format;
-  },
-  
-  parseURL: function(url) {
-    var a =  document.createElement('a');
-    a.href = url;
-    return {
-      source: url,
-      protocol: a.protocol.replace(':',''),
-      host: a.hostname,
-      port: a.port,
-      query: a.search,
-      params: (function(){
-        var ret = {},
-          seg = a.search.replace(/^\?/,'').split('&'),
-          len = seg.length, i = 0, s;
-        for (;i<len;i++) {
-          if (!seg[i]) { continue; }
-          s = seg[i].split('=');
-          ret[s[0]] = (s.length>1)?decodeURIComponent(s[1].replace(/\+/g,  " ")):'';
-        }
-        return ret;
-      })(),
-      file: (a.pathname.match(/\/([^\/?#]+)$/i) || [,''])[1],
-      hash: a.hash.replace('#',''),
-      path: a.pathname.replace(/^([^\/])/,'/$1'),
-      relative: (a.href.match(/tps?:\/\/[^\/]+(.+)/) || [,''])[1],
-      segments: a.pathname.replace(/^\//,'').split('/')
-    };
-  },
-	
+		
 	/* Poll a given taskId and calls the callback when a result from the server comes - 
 	be it "running", "completed" or "error" - the callback is always called.
 	*/

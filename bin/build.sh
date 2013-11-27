@@ -5,7 +5,7 @@ outdir='../www'
 jsdir='../scripts'
 cssdir='../styles'
 htmldir='..'
-target='toxstudy jtoxkit'
+target='toxstudy'
 append=0
 
 # test the parameters first
@@ -36,7 +36,7 @@ while (( "$#" )); do
 			minimize=1
 			;;
 		--target|-t)
-			target='jtoxkit'
+			target=''
 			append=1
 			;;
 		--help|-h)
@@ -70,6 +70,10 @@ echo "Clearing old files..."
 rm -f $outJS
 rm -f $outCSS
 
+# form the final target list
+target="common $target jtoxkit"
+
+# start the building process...
 echo "Processing targets [$target]..."
 echo "Merging JS files from [$jsdir] ..."
 for t in ${target[@]}; do

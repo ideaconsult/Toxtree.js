@@ -19,7 +19,7 @@ window.ToxMan = {
 	inPrediction: false,			// true if we're in progress of making prediction.
 	inQuery: false,						// to prevent in making double queries. Second attempts for queries, while one is being held are ignored, not postponed.
 
-	/* A single place to hold all necessary queries. Parameters are marked with <XX> and formatString() (common.js) is used
+	/* A single place to hold all necessary queries. Parameters are marked with <XX> and ccLib.formatString() (common.js) is used
 	to prepare the actual URLs
 	*/
 	queries: {
@@ -113,7 +113,7 @@ window.ToxMan = {
 		if (elements.diagramImage)
 			elements.diagramImage.style.visibility = 'hidden';
 		if (elements.featureList)
-			clearChildren(elements.featureList, elements.featureRow.parentNode == elements.featureList ? elements.featureRow : null);
+			ccLib.clearChildren(elements.featureList, elements.featureRow.parentNode == elements.featureList ? elements.featureRow : null);
 		
 		// now go with the predictions clearing
 		for (var i = 0;i < this.models.length; ++i)
@@ -129,7 +129,7 @@ window.ToxMan = {
 		this.inQuery = true;
 		self.clear();
 		
-		this.call(formatString(this.queries.query, encodeURIComponent(needle)), function(dataset){
+		this.call(ccLib.formatString(this.queries.query, encodeURIComponent(needle)), function(dataset){
 			// start with some clearing
 			if (!dataset || dataset.dataEntry.length < 1){
 				if (self.onerror)
@@ -171,12 +171,12 @@ window.ToxMan = {
 			if (!root || !tempRow)
 				return false;
 			
-			clearChildren(root, tempRow.parentNode == root ? tempRow : null);
+			ccLib.clearChildren(root, tempRow.parentNode == root ? tempRow : null);
 			for (var i = 0;i < algos.length; ++i) {
 				var row = tempRow.cloneNode(true);
 				algos[i].name = algos[i].name.substr(self.prefix.length + 2);
 				algos[i].index = i;
-				fillTree(row, algos[i], self.prefix + '-algo-');
+				ccLib.fillTree(row, algos[i], self.prefix + '-algo-');
 				
 				// after the row is filled with data
 				row.classList.remove('template');
@@ -240,10 +240,10 @@ window.ToxMan = {
 		
 		this.inPrediction = true;
 		// now attempts to retrieve the mode, if it exists...
-		this.call(formatString(this.queries.getModel, encodeURIComponent(algo.uri)), function(model){
+		this.call(ccLib.formatString(this.queries.getModel, encodeURIComponent(algo.uri)), function(model){
 			if (self.forceCreate || !model || model.model.length < 1){ // No - doesn't exists.
 				// We need to POST a model creation and poll the received task until we have it completed 
-				self.call(formatString(self.queries.createModel, algo.id), function(task){
+				self.call(ccLib.formatString(self.queries.createModel, algo.id), function(task){
 					if (!task){ // this means - error call.
 						self.inPrediction = false;
 						return; 
@@ -256,7 +256,7 @@ window.ToxMan = {
 				}, true); /// for initial POST request - to force call() function to use POST method for http request.
 			}
 			else { // OK, we have the model - attempt to get a prediction for our compound...
-				var q = formatString(self.queries.getPrediction, encodeURIComponent(self.currentDataset.dataEntry[0].compound.id), encodeURIComponent(model.model[0].predicted));
+				var q = ccLib.formatString(self.queries.getPrediction, encodeURIComponent(self.currentDataset.dataEntry[0].compound.id), encodeURIComponent(model.model[0].predicted));
 				self.call(q, function(prediction){
 					if (!prediction || !self.parsePrediction(algo, prediction)) // i.e. - it was empty
 						createPredictions(model.model[0].URI);
@@ -365,7 +365,7 @@ window.ToxMan = {
 			var hdr = this.elements.featureHeader.cloneNode(true);
 			if (classadd)
 				hdr.classList.add(classadd);
-			fillTree(hdr, {"header": header});
+			ccLib.fillTree(hdr, {"header": header});
 			list.appendChild(hdr);
 		}
 		
@@ -376,7 +376,7 @@ window.ToxMan = {
 			var row = tempRow.cloneNode(true);
 			if (classadd)
 				row.classList.add(classadd);
-			fillTree(row, features[i]);
+			ccLib.fillTree(row, features[i]);
 			row.classList.remove('template');
 			row.classList.remove('row-blank');
 			list.appendChild(row);
@@ -414,7 +414,7 @@ window.ToxMan = {
 		var frag = document.createDocumentFragment();
 		for (var i = 0;i < categories.length; ++i){
 			var row = resTemp.cloneNode(true);
-			fillTree(row, categories[i]);
+			ccLib.fillTree(row, categories[i]);
 			row.classList.remove('template');
 			row.classList.remove('class-blank');
 			row.classList.add(categories[i].toxicity);
@@ -439,7 +439,7 @@ window.ToxMan = {
 		// ... and fill them up in the interface.
 		var resRoot = mainRow.getElementsByClassName('class-result')[0];
 		var resTemp = resRoot.getElementsByClassName('class-blank')[0];
-		clearChildren(resRoot, resTemp.parentNode == resRoot ? resTemp : null);
+		ccLib.clearChildren(resRoot, resTemp.parentNode == resRoot ? resTemp : null);
 		
 		// now mark the whole stuff as predicted
 		mainRow.classList.remove('predicted');
@@ -478,7 +478,7 @@ window.ToxMan = {
 	*/
 	initConnection: function(settings){
 		if (!settings.server){
-			var url = parseURL(document.location);
+			var url = ccLib.parseURL(document.location);
 			this.queryParams = url.params;
 			var server = url.params.server;
 			if (!server)
