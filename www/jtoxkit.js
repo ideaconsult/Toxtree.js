@@ -278,7 +278,7 @@ var jToxStudy = {
         "sDom" : "rt<Fip>",
         "aoColumns": colDefs,
         "fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
-          var el = $('.jtox-study-title .data-field', $(this).parentsUntil('.jtox-study').parent())[0];
+          var el = $('.jtox-study-title .data-field', $(this).parents('.jtox-study'))[0];
           el.innerHTML = self.updateCount(el.innerHTML, iTotal);
           return sPre;
         }
@@ -336,7 +336,7 @@ var jToxStudy = {
         clearTimeout(filterTimeout);
   
       var field = ev.currentTarget;
-      var tab = $(this).parentsUntil('.jtox-study-tab')[0].parentNode;
+      var tab = $(this).parents('.jtox-study-tab')[0];
       
       filterTimeout = setTimeout(function() {
         var tabList = tab.getElementsByClassName('jtox-study-table');
