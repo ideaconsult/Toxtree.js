@@ -2,15 +2,15 @@ var ccLib = {
   /* Function setObjValue(obj, value)Set a given to the given element (obj) in the most appropriate way - be it property - the necessary one, or innetHTML
   */
   setObjValue: function (obj, value){
-  	if ((value === undefined || value === null) && obj.dataset.default !== undefined)
-  		value = obj.dataset.default;
+  	if ((value === undefined || value === null) && $(obj).data('default') !== undefined)
+  		value = $(obj).data('default');
   
     if (obj.nodeName == "INPUT" || obj.nodeName == "SELECT")
       obj.value = value;
     else if (obj.nodeName == "IMG")
       obj.src = value;
     else if (obj.nodeName == "BUTTON")
-  		obj.dataset.value = value;
+  		$(obj).data('value', value);
     else
       obj.innerHTML = value;
   },
