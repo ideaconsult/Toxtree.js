@@ -461,7 +461,7 @@ var jToxStudy = {
     });
     
     if (settings['substanceUri'] !== undefined){
-      self.querySubstance(settings['substnceUri']);
+      self.querySubstance(settings['substanceUri']);
     }
   }  
 };

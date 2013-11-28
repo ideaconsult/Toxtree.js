@@ -1,4 +1,10 @@
 var ccLib = {
+  mergeSettings: function (settings, base) {
+    if (settings !== undefined)
+    	for (var s in settings)
+      	base[s] = settings[s];
+  },
+
   /* Function setObjValue(obj, value)Set a given to the given element (obj) in the most appropriate way - be it property - the necessary one, or innetHTML
   */
   setObjValue: function (obj, value){
@@ -12,7 +18,7 @@ var ccLib = {
     else if (obj.nodeName == "BUTTON")
   		$(obj).data('value', value);
     else
-      obj.innerHTML = value;
+      obj.innerHTML = value;      
   },
   
   getJsonValue: function (json, field){
@@ -105,6 +111,7 @@ var ccLib = {
 }
 var jToxStudy = {
   rootElement: null,
+  baseUrl: null,
   
   getFormatted: function (data, type, format) {
     var value = null;
@@ -265,8 +272,8 @@ var jToxStudy = {
       // finally put the protocol entries
       colDefs.push(
         { "sClass": "center", "sWidth": "125px", "mData": "protocol.guidance", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
-        { "sClass": "center", "sWidth": "75px", "mData": "owner.company.name", "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>' }  }, 
-        { "sClass": "center", "sWidth": "75px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>' }  }
+        { "sClass": "center", "sWidth": "75px", "mData": "owner.company.name", "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<span class="shortened">' + data + '</span>'; }  }, 
+        { "sClass": "center", "sWidth": "75px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<span class="shortened">' + data + '</span>'; }  }
       );
       
       // READYY! Go and prepare THE table.
@@ -281,6 +288,20 @@ var jToxStudy = {
           var el = $('.jtox-study-title .data-field', $(this).parents('.jtox-study'))[0];
           el.innerHTML = self.updateCount(el.innerHTML, iTotal);
           return sPre;
+        },
+				"oLanguage": {
+          "sProcessing": "<img src='" + self.baseUrl + "images/24x24_ambit.gif' border='0'>",
+          "sLoadingRecords": "No studies found.",
+          "sZeroRecords": "No studies found.",
+          "sEmptyTable": "No studies available.",
+          "sInfo": "Showing _TOTAL_ study(s) (_START_ to _END_)",
+          "sLengthMenu": 'Display <select>' +
+            '<option value="10">10</option>' +
+            '<option value="20">20</option>' +
+            '<option value="50">50</option>' +
+            '<option value="100">100</option>' +
+            '<option value="-1">all</option>' +
+            '</select> studies.'
         }
       });
     }
@@ -390,10 +411,107 @@ var jToxStudy = {
     });
   },
   
+  formatConcentration: function (precision, val, unit) {
+  	return (!precision || "=" == precision ? "" : precision) + val + " " + (unit == null ? "" : unit);
+  },
+  
+  processComposition: function(composition){
+    var self = this;
+    var theTable = $('#jtox-composition table');
+    if (!$(theTable).hasClass('dataTable')) {
+      // prepare the table...
+      $(theTable).dataTable({
+				"sSearch": "Filter:",
+				"bSearchable": true,
+				"bProcessing" : true,
+				"bPaginate" : true,
+/* 				"sDom" : '<"help remove-bottom"i><"help"p>Trt<"help"lf>', */
+				"sPaginationType": "full_numbers",
+				"sPaginate" : ".dataTables_paginate _paging",
+				"oLanguage": {
+          "sProcessing": "<img src='" + self.baseUrl + "images/24x24_ambit.gif' border='0'>",
+          "sLoadingRecords": "No substances found.",
+          "sZeroRecords": "No substances found.",
+          "sEmptyTable": "No substances available.",
+          "sInfo": "Showing _TOTAL_ substance(s) (_START_ to _END_)",
+          "sLengthMenu": 'Display <select>' +
+            '<option value="10">10</option>' +
+            '<option value="20">20</option>' +
+            '<option value="50">50</option>' +
+            '<option value="100">100</option>' +
+            '<option value="-1">all</option>' +
+            '</select> substances.'	            
+        },
+		    "aoColumns": [
+  				{  //1
+  					"sClass" : "left",
+  					"sWidth" : "10%",
+  					"mData" : "compositionUUID",
+  					"mRender" : function(data, type, full) { return type != 'display' ? '' + data : '<span class="shortened">' + data + '</span>'; }
+  				},	
+          {  //2
+  					"sClass" : "left",
+  					"sWidth" : "10%",
+  					"mData" : "relation",
+  					"mRender" : function(val, type, full) {
+  					  return  (type != 'display') ? '' + val : 
+                "<span class='camelCase'>" +  val.replace("HAS_", "").toLowerCase() + "</span>" +
+    						("HAS_ADDITIVE" == val ? "" : " (" + full["proportion"]["function_as_additive"] + ")");
+            }
+          },	    
+  				{ //3
+  					"sClass" : "camelCase left",
+  					"sWidth" : "20%",
+  					"mData" : "component.compound.name",
+  					"mRender" : function(val, type, full) {
+  						return (type != 'display') ? '' + val : 
+  						  '<a href="' + full.component.compound.URI + '" target="_blank" title="Click to view the compound"><span class="ui-icon ui-icon-link" style="float: left; margin-right: .3em;"></span></a>' + val;
+  					}
+  				},	    	
+  				{ //4
+  					"sClass" : "left",
+  					"sWidth" : "10%",
+  					"mData" : "component.compound.einecs",
+  				},
+  				{ //5
+  					"sClass" : "left",
+  					"sWidth" : "10%",
+  					"mData" : "component.compound.cas",
+  				},
+  				{ //6
+  					"sClass" : "center",
+  					"mData" : "proportion.typical",
+  					"mRender" : function(val, type, full) { return type != 'display' ? '' + val.value : self.formatConcentration(val.precision, val.value, val.unit); }
+  				},
+  				{ //7
+  					"sClass" : "center",
+  					"mData" : "proportion.real",
+  					"mRender" : function(val, type, full) { return type != 'display' ? '' + val.lowerValue : self.formatConcentration(val.lowerPrecision, val.lowerValue, val.unit); }
+  				},
+  				{ //8
+  					"sClass" : "center",
+  					"mData" : "proportion.real",
+  					"mRender" : function(val, type, full) { return type != 'display' ? '' + val.upperValue : self.formatConcentration(val.upperPrecision, val.upperValue, val.unit); }
+  				},			    				
+  				{ //9
+  					"sClass" : "center",
+  					"mData" : "component.compound.URI",
+  					"mRender" : function(val, type, full) {
+  					  return !val ? '' : '<a href="' + self.baseUrl + 'substance?type=related&compound_uri=' + encodeURIComponent(val) + '" target="_blank">Also contained in...</span></a>';
+  					}
+	    		}		    				
+		    ]
+		  });
+    }
+    else
+      $(theTable).dataTable().fnClearTable();
+    
+    // proprocess data and fill it up
+    $(theTable).dataTable().fnAddData(composition);
+  },
+  
   querySummary: function(substanceURI) {
     var self = this;
-    var subId = substanceURI.replace(/.+\/(.+)/, "$1");
-    ccLib.fillTree($('#jtox-composition .data-field', self.rootElement)[0], {substanceID: subId});
     
     jToxKit.call(substanceURI + "/studysummary", function(summary) {
       if (!!summary && !!summary.facet)
@@ -401,9 +519,32 @@ var jToxStudy = {
     });
   },
   
+  queryComposition: function(substanceURI) {
+    var self = this;
+    
+    jToxKit.call(substanceURI + "/composition", function(composition) {
+      if (!!composition && !!composition.composition)
+        self.processComposition(composition.composition);
+    });
+  },
+  
+  querySubstance: function(substanceURI){
+    var self = this;
+
+    var rootTab = $('#jtox-substance')[0];
+    jToxKit.call(substanceURI, function(substance){
+       if (!!substance && !!substance.substance && substance.substance.length > 0){
+         ccLib.fillTree(rootTab, substance.substance[0]);
+         self.querySummary(substanceURI);
+         self.queryComposition(substanceURI);
+       }
+    });
+  },
+  
   init: function(root, settings) {
     var self = this;
     this.rootElement = root;
+    this.baseUrl = jToxKit.baseUrl;
 
     var tree = jToxKit.getTemplate('#jtox-studies');
     root.appendChild(tree);
@@ -431,13 +572,13 @@ var jToxStudy = {
     });
     
     if (settings['substanceUri'] !== undefined){
-      self.querySummary(settings['substanceUri']);
+      self.querySubstance(settings['substanceUri']);
     }
-  }
+  }  
 };
 window.jToxKit = {
 	templateRoot: null,
-	server: null,
+	baseUrl: null,
 
 	/* A single place to hold all necessary queries. Parameters are marked with <XX> and formatString() (common.js) is used
 	to prepare the actual URLs
@@ -452,7 +593,7 @@ window.jToxKit = {
 	*/
 	settings: {
   	jsonp: false,					// whether to use JSONP approach, instead of JSON.
-  	server: null,					// the server actually used for connecting. Part of settings. If not set - attempts to get 'server' parameter of the query, if not - get's current server.
+  	baseUrl: null,					// the server actually used for connecting. Part of settings. If not set - attempts to get 'baseUrl' parameter of the query, if not - get's current server.
   	timeout: 5000,				// the timeout an call to the server should be wait before the attempt is considered error.
   	pollDelay: 200,				// after how many milliseconds a new attempt should be made during task polling.
   },
@@ -461,13 +602,7 @@ window.jToxKit = {
 	onconnect: function(s){ },		    // function (service): called when a server request is started - for proper visualization. Part of settings.
 	onsuccess: function(c, m) { },		// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
 	onerror: function (c, m) { },			// function (code, mess): called on server reques error. Part of settings.
-  
-  mergeSettings: function (settings) {
-    if (settings !== undefined)
-    	for (var s in settings)
-      	this.settings[s] = settings[s];
-  },
-  
+    
 	init: function(settings) {
   	var self = this;
   	
@@ -477,6 +612,10 @@ window.jToxKit = {
 		var url = ccLib.parseURL(document.location);
 		var queryParams = url.params;
 		queryParams.host = url.host;
+	
+	  ccLib.mergeSettings(settings, self.settings);
+	  ccLib.mergeSettings(queryParams, self.settings);
+  	self.initConnection();
   	
   	// now scan all insertion divs
   	if (!settings) {
@@ -484,17 +623,15 @@ window.jToxKit = {
       	var dataParams = $(this).data();
       	if (!dataParams.manualInit || settings !== undefined){
           // this order determines the priority..
-          self.mergeSettings(dataParams);
-          self.mergeSettings(queryParams);
-          self.mergeSettings(settings);
+          var newset = {};
+          ccLib.mergeSettings(self.settings, newset);
+          ccLib.mergeSettings(dataParams, newset);
           
-        	if (self.settings.kit == "study")
-        	  jToxStudy.init(this, self.settings);
+        	if (newset.kit == "study")
+        	  jToxStudy.init(this, newset);
         }
     	});
   	}
-
-  	self.initConnection();
 	},
 	
 	initTemplates: function() {
@@ -554,11 +691,11 @@ window.jToxKit = {
 	*/
 	initConnection: function(){
 	  var settings = this.settings;
-		if (!settings.server) {
-		  settings.server = settings.host;
+		if (!settings.baseUrl) {
+		  settings.baseUrl = settings.host;
 		}
 		  
-		this.server = settings.server;
+		this.baseUrl = settings.baseUrl;
 					
     if (settings.onerror !== undefined)
 		  this.onerror = settings.onerror;
@@ -584,9 +721,9 @@ window.jToxKit = {
 		else
 			adata = { };
 
-		// on some queries, like tasks, we DO have server at the beginning
+		// on some queries, like tasks, we DO have baseUrl at the beginning
 		if (service.indexOf("http") != 0)	
-			service = self.server + service;
+			service = self.baseUrl + service;
 		// now make the actual call
 		$.ajax(service, {
 			dataType: self.jsonp ? 'jsonp' : 'json',
@@ -614,26 +751,71 @@ $(document).ready(function(){
 jToxKit.templates['all-studies']  = 
 "	  <div id=\"jtox-studies\">" +
 "	    <ul>" +
+"	      <li><a href=\"#jtox-substance\">Substance</a></li>" +
 "	      <li><a href=\"#jtox-composition\">Composition</a></li>" +
 "	      <li><a href=\"#jtox-pchem\" data-type=\"P-CHEM\">P-Chem (0)</a></li>" +
 "	      <li><a href=\"#jtox-envfate\" data-type=\"ENV_FATE\">Env Fate (0)</a></li>" +
 "	      <li><a href=\"#jtox-ecotox\" data-type=\"ECOTOX\">Eco Tox (0)</a></li>" +
 "	      <li><a href=\"#jtox-tox\" data-type=\"TOX\">Tox (0)</a></li>" +
 "	    </ul>" +
+"	    <div id=\"jtox-substance\">" +
+"	      <table class=\"dataTable\">" +
+"	        <thead>" +
+"	          <tr>" +
+"	            <th class=\"jtox-size-third\">Name:</th>" +
+"	            <td class=\"data-field camelCase\" data-field=\"name\"> ? </td>" +
+"	          </tr>" +
+"	          <tr>" +
+"	            <th>Company UUID:</th>" +
+"	            <td class=\"data-field\" data-field=\"i5uuid\"> ? </td>" +
+"	          </tr>" +
+"	          <tr>" +
+"	            <th>Owner UUID:</th>" +
+"	            <td class=\"data-field\" data-field=\"ownerUUID\"> ? </td>" +
+"	          </tr>" +
+"	          <tr>" +
+"	            <th>Type:</th>" +
+"	            <td class=\"data-field\" data-field=\"substanceType\"> ? </td>" +
+"	          </tr>" +
+"	          <tr>" +
+"	            <th>Public name:</th>" +
+"	            <td class=\"data-field camelCase\" data-field=\"publicname\"> ? </td>" +
+"	          </tr>" +
+"	          <tr>" +
+"	            <th>Reference substance UUID:</th>" +
+"	            <td class=\"data-field\" data-field=\"referenceSubstance.i5uuid\"> ? </td>" +
+"	          </tr>" +
+"	        </thead>" +
+"	      </table>" +
+"	    </div>" +
 "	    <div id=\"jtox-composition\">" +
-"	      <p>Substance: <span class=\"data-field\" data-field=\"substanceID\"></span></p>" +
+"	      <table>" +
+"          <thead>" +
+"            <tr>" +
+"              <th>Composition ID</th>" +
+"              <th>Type</th>" +
+"              <th>Name</th>" +
+"              <th>EC No.</th>" +
+"              <th>CAS No.</th>" +
+"              <th>Typical concentration</th>" +
+"              <th>Real concentration (lower)</th>" +
+"              <th>Real concentration (upper)</th>" +
+"              <th>Other related substances</th>" +
+"            </tr>" +
+"          </thead>" +
+"        </table>" +
 "	    </div>" +
 "	    <div id=\"jtox-pchem\" class=\"jtox-study-tab P-CHEM\">" +
-"	      <p><input type=\"text\" class=\"jtox-study-filter ui-input\" placeholder=\"Filter...\"></input></p>" +
+"	      <p><input type=\"text\" class=\"jtox-study-filter ui-input\" placeholder=\"Filter...\" /></p>" +
 "      </div>" +
 "	    <div id=\"jtox-envfate\" class=\"jtox-study-tab ENV_FATE\">" +
-"	      <p><input type=\"text\" class=\"jtox-study-filter ui-input\" placeholder=\"Filter...\"></input></p>" +
+"	      <p><input type=\"text\" class=\"jtox-study-filter ui-input\" placeholder=\"Filter...\" /></p>" +
 "	    </div>" +
 "	    <div id=\"jtox-ecotox\" class=\"jtox-study-tab ECOTOX\">" +
-"	      <p><input type=\"text\" class=\"jtox-study-filter ui-input\" placeholder=\"Filter...\"></input></p>" +
+"	      <p><input type=\"text\" class=\"jtox-study-filter ui-input\" placeholder=\"Filter...\" /></p>" +
 "	    </div>" +
 "	    <div id=\"jtox-tox\" class=\"jtox-study-tab TOX\">" +
-"	      <p><input type=\"text\" class=\"jtox-study-filter ui-input\" placeholder=\"Filter...\"></input></p>" +
+"	      <p><input type=\"text\" class=\"jtox-study-filter ui-input\" placeholder=\"Filter...\" /></p>" +
 "	    </div>" +
 "	  </div>" +
 ""; // end of #jtox-studies 
@@ -641,7 +823,7 @@ jToxKit.templates['all-studies']  =
 jToxKit.templates['one-study']  = 
 "    <div id=\"jtox-study\" class=\"jtox-study jtox-foldable folded unloaded\">" +
 "      <div class=\"jtox-study-title\"><p class=\"data-field\" data-field=\"title\">? (0)</p></div>" +
-"      <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"jtox-study-table\">" +
+"      <table class=\"jtox-study-table\">" +
 "        <thead>" +
 "          <tr class=\"jtox-preheader\">" +
 "            <th rowspan=\"2\">Name</th>" +
