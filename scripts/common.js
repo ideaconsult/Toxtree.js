@@ -4,6 +4,16 @@ var ccLib = {
     	for (var s in settings)
       	base[s] = settings[s];
   },
+  
+  mergeArrays: function (arr, base) {
+    if (arr !== undefined && arr !== null){
+      for (var i = 0, al = arr.length; i < al; ++i){
+        if (base.indexOf(arr[i]) < 0)
+          base.push(arr[i]);
+      }
+    }
+    return base;
+  },
 
   /* Function setObjValue(obj, value)Set a given to the given element (obj) in the most appropriate way - be it property - the necessary one, or innetHTML
   */

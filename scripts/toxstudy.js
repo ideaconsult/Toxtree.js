@@ -301,10 +301,10 @@ var jToxStudy = {
   },
   
   formatConcentration: function (precision, val, unit) {
-  	return (!precision || "=" == precision ? "" : precision) + val + " " + (unit == null ? "" : unit);
+  	return (precision === undefined || precision === null || "=" == precision ? "" : precision) + val + " " + (unit == null ? "" : unit);
   },
   
-  processComposition: function(composition){
+  processComposition: function(json){
     var self = this;
     var theTable = $('#jtox-composition table');
     if (!$(theTable).hasClass('dataTable')) {
@@ -343,9 +343,10 @@ var jToxStudy = {
   					"sWidth" : "10%",
   					"mData" : "relation",
   					"mRender" : function(val, type, full) {
-  					  return  (type != 'display') ? '' + val : 
-                "<span class='camelCase'>" +  val.replace("HAS_", "").toLowerCase() + "</span>" +
-    						("HAS_ADDITIVE" == val ? "" : " (" + full["proportion"]["function_as_additive"] + ")");
+  					  if (type != 'display')
+  					    return '' + val;
+  					  var func = ("HAS_ADDITIVE" == val) ? full.proportion.function_as_additive : "";
+  					  return "<span class='camelCase'>" +  val.replace("HAS_", "").toLowerCase() + "</span>" + ((func === undefined || func === null || func == '') ? "" : " (" + func + ")");
             }
           },	    
   				{ //3
@@ -396,7 +397,29 @@ var jToxStudy = {
       $(theTable).dataTable().fnClearTable();
     
     // proprocess data and fill it up
-    $(theTable).dataTable().fnAddData(composition);
+    for (var i = 0, cmpl = json.composition.length; i < cmpl; ++i) {
+      var cmp = json.composition[i];
+      
+			cmp.component.compound["name"] = [];
+			cmp.component.compound["cas"] = [];
+			cmp.component.compound["einecs"] = [];
+			for (var key in cmp.component.values){
+  			var value = cmp.component.values[key];
+  			var feature = json.feature[key];
+				if ((feature != null) && (value != null)) {
+  			  var valArr = value.trim().toLowerCase().split("|");
+          
+			 		if (feature.sameAs == "http://www.opentox.org/api/1.1#IUPACName" || feature.sameAs == "http://www.opentox.org/api/1.1#ChemicalName")
+			 		 ccLib.mergeArrays(valArr, cmp.component.compound["name"]);
+			 		else if (feature.sameAs == "http://www.opentox.org/api/1.1#CASRN")
+			 		 ccLib.mergeArrays(valArr, cmp.component.compound["cas"]);
+			 		else if (feature.sameAs == "http://www.opentox.org/api/1.1#EINECS")
+			 		 ccLib.mergeArrays(valArr, cmp.component.compound["einecs"]);
+        }
+      }
+    }
+    
+    $(theTable).dataTable().fnAddData(json.composition);
   },
   
   querySummary: function(substanceURI) {
@@ -413,7 +436,7 @@ var jToxStudy = {
     
     jToxKit.call(substanceURI + "/composition", function(composition) {
       if (!!composition && !!composition.composition)
-        self.processComposition(composition.composition);
+        self.processComposition(composition);
     });
   },
   
