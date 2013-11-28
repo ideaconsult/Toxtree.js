@@ -272,8 +272,8 @@ var jToxStudy = {
       // finally put the protocol entries
       colDefs.push(
         { "sClass": "center", "sWidth": "125px", "mData": "protocol.guidance", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
-        { "sClass": "center", "sWidth": "75px", "mData": "owner.company.name", "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<span class="shortened">' + data + '</span>'; }  }, 
-        { "sClass": "center", "sWidth": "75px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<span class="shortened">' + data + '</span>'; }  }
+        { "sClass": "center", "sWidth": "75px", "mData": "owner.company.name", "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>'; }  }, 
+        { "sClass": "center", "sWidth": "75px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>'; }  }
       );
       
       // READYY! Go and prepare THE table.
@@ -445,9 +445,9 @@ var jToxStudy = {
 		    "aoColumns": [
   				{  //1
   					"sClass" : "left",
-  					"sWidth" : "10%",
+  					"sWidth" : "50px",
   					"mData" : "compositionUUID",
-  					"mRender" : function(data, type, full) { return type != 'display' ? '' + data : '<span class="shortened">' + data + '</span>'; }
+  					"mRender" : function(data, type, full) { return type != 'display' ? '' + data : '<div class="shortened">' + data + '</div>'; }
   				},	
           {  //2
   					"sClass" : "left",
@@ -826,18 +826,18 @@ jToxKit.templates['one-study']  =
 "      <table class=\"jtox-study-table\">" +
 "        <thead>" +
 "          <tr class=\"jtox-preheader\">" +
-"            <th rowspan=\"2\">Name</th>" +
+"            <th class=\"middle\" rowspan=\"2\">Name</th>" +
 "            <th>Conditions</th>" +
 "            <th colspan=\"2\">Effects</th>" +
 "            <th>Interpretation</th>" +
 "            <th colspan=\"3\">Protocol</th>" +
 "          </tr>" +
 "          <tr class=\"jtox-header\">" +
-"            <th>Endpoint</th>" +
-"            <th>Result</th>" +
-"            <th>Guidance</th>" +
-"            <th>Owner</th>" +
-"            <th>UUID</th>" +
+"            <th class=\"middle\">Endpoint</th>" +
+"            <th class=\"middle\">Result</th>" +
+"            <th class=\"middle\">Guidance</th>" +
+"            <th class=\"middle\">Owner</th>" +
+"            <th class=\"middle\">UUID</th>" +
 "          </tr>" +
 "        </thead>" +
 "        <tbody></tbody>" +

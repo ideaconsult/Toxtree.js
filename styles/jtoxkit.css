@@ -42,3 +42,10 @@
 .jtox-size-half {
   width: 50%;
 }
+
+td.middle,
+th.middle {
+  vertical-align: middle;  
+}
+
+

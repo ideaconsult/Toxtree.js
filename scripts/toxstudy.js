@@ -161,8 +161,8 @@ var jToxStudy = {
       // finally put the protocol entries
       colDefs.push(
         { "sClass": "center", "sWidth": "125px", "mData": "protocol.guidance", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
-        { "sClass": "center", "sWidth": "75px", "mData": "owner.company.name", "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<span class="shortened">' + data + '</span>'; }  }, 
-        { "sClass": "center", "sWidth": "75px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<span class="shortened">' + data + '</span>'; }  }
+        { "sClass": "center", "sWidth": "75px", "mData": "owner.company.name", "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>'; }  }, 
+        { "sClass": "center", "sWidth": "75px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>'; }  }
       );
       
       // READYY! Go and prepare THE table.
@@ -334,9 +334,9 @@ var jToxStudy = {
 		    "aoColumns": [
   				{  //1
   					"sClass" : "left",
-  					"sWidth" : "10%",
+  					"sWidth" : "50px",
   					"mData" : "compositionUUID",
-  					"mRender" : function(data, type, full) { return type != 'display' ? '' + data : '<span class="shortened">' + data + '</span>'; }
+  					"mRender" : function(data, type, full) { return type != 'display' ? '' + data : '<div class="shortened">' + data + '</div>'; }
   				},	
           {  //2
   					"sClass" : "left",

@@ -82,10 +82,6 @@ div.jtox-study-tab .dataTables_wrapper {
   white-space: nowrap;
 }
 
-td.middle {
-  vertical-align: middle;  
-}
-
 .jtox-toolkit table.dataTable td.jtox-multi {
   padding: 0px;
 }
