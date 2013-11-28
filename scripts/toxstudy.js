@@ -1,5 +1,6 @@
 var jToxStudy = {
   rootElement: null,
+  baseUrl: null,
   
   getFormatted: function (data, type, format) {
     var value = null;
@@ -160,8 +161,8 @@ var jToxStudy = {
       // finally put the protocol entries
       colDefs.push(
         { "sClass": "center", "sWidth": "125px", "mData": "protocol.guidance", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
-        { "sClass": "center", "sWidth": "75px", "mData": "owner.company.name", "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>' }  }, 
-        { "sClass": "center", "sWidth": "75px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>' }  }
+        { "sClass": "center", "sWidth": "75px", "mData": "owner.company.name", "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<span class="shortened">' + data + '</span>'; }  }, 
+        { "sClass": "center", "sWidth": "75px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<span class="shortened">' + data + '</span>'; }  }
       );
       
       // READYY! Go and prepare THE table.
@@ -176,6 +177,20 @@ var jToxStudy = {
           var el = $('.jtox-study-title .data-field', $(this).parents('.jtox-study'))[0];
           el.innerHTML = self.updateCount(el.innerHTML, iTotal);
           return sPre;
+        },
+				"oLanguage": {
+          "sProcessing": "<img src='" + self.baseUrl + "images/24x24_ambit.gif' border='0'>",
+          "sLoadingRecords": "No studies found.",
+          "sZeroRecords": "No studies found.",
+          "sEmptyTable": "No studies available.",
+          "sInfo": "Showing _TOTAL_ study(s) (_START_ to _END_)",
+          "sLengthMenu": 'Display <select>' +
+            '<option value="10">10</option>' +
+            '<option value="20">20</option>' +
+            '<option value="50">50</option>' +
+            '<option value="100">100</option>' +
+            '<option value="-1">all</option>' +
+            '</select> studies.'
         }
       });
     }
@@ -285,10 +300,107 @@ var jToxStudy = {
     });
   },
   
+  formatConcentration: function (precision, val, unit) {
+  	return (!precision || "=" == precision ? "" : precision) + val + " " + (unit == null ? "" : unit);
+  },
+  
+  processComposition: function(composition){
+    var self = this;
+    var theTable = $('#jtox-composition table');
+    if (!$(theTable).hasClass('dataTable')) {
+      // prepare the table...
+      $(theTable).dataTable({
+				"sSearch": "Filter:",
+				"bSearchable": true,
+				"bProcessing" : true,
+				"bPaginate" : true,
+/* 				"sDom" : '<"help remove-bottom"i><"help"p>Trt<"help"lf>', */
+				"sPaginationType": "full_numbers",
+				"sPaginate" : ".dataTables_paginate _paging",
+				"oLanguage": {
+          "sProcessing": "<img src='" + self.baseUrl + "images/24x24_ambit.gif' border='0'>",
+          "sLoadingRecords": "No substances found.",
+          "sZeroRecords": "No substances found.",
+          "sEmptyTable": "No substances available.",
+          "sInfo": "Showing _TOTAL_ substance(s) (_START_ to _END_)",
+          "sLengthMenu": 'Display <select>' +
+            '<option value="10">10</option>' +
+            '<option value="20">20</option>' +
+            '<option value="50">50</option>' +
+            '<option value="100">100</option>' +
+            '<option value="-1">all</option>' +
+            '</select> substances.'	            
+        },
+		    "aoColumns": [
+  				{  //1
+  					"sClass" : "left",
+  					"sWidth" : "10%",
+  					"mData" : "compositionUUID",
+  					"mRender" : function(data, type, full) { return type != 'display' ? '' + data : '<span class="shortened">' + data + '</span>'; }
+  				},	
+          {  //2
+  					"sClass" : "left",
+  					"sWidth" : "10%",
+  					"mData" : "relation",
+  					"mRender" : function(val, type, full) {
+  					  return  (type != 'display') ? '' + val : 
+                "<span class='camelCase'>" +  val.replace("HAS_", "").toLowerCase() + "</span>" +
+    						("HAS_ADDITIVE" == val ? "" : " (" + full["proportion"]["function_as_additive"] + ")");
+            }
+          },	    
+  				{ //3
+  					"sClass" : "camelCase left",
+  					"sWidth" : "20%",
+  					"mData" : "component.compound.name",
+  					"mRender" : function(val, type, full) {
+  						return (type != 'display') ? '' + val : 
+  						  '<a href="' + full.component.compound.URI + '" target="_blank" title="Click to view the compound"><span class="ui-icon ui-icon-link" style="float: left; margin-right: .3em;"></span></a>' + val;
+  					}
+  				},	    	
+  				{ //4
+  					"sClass" : "left",
+  					"sWidth" : "10%",
+  					"mData" : "component.compound.einecs",
+  				},
+  				{ //5
+  					"sClass" : "left",
+  					"sWidth" : "10%",
+  					"mData" : "component.compound.cas",
+  				},
+  				{ //6
+  					"sClass" : "center",
+  					"mData" : "proportion.typical",
+  					"mRender" : function(val, type, full) { return type != 'display' ? '' + val.value : self.formatConcentration(val.precision, val.value, val.unit); }
+  				},
+  				{ //7
+  					"sClass" : "center",
+  					"mData" : "proportion.real",
+  					"mRender" : function(val, type, full) { return type != 'display' ? '' + val.lowerValue : self.formatConcentration(val.lowerPrecision, val.lowerValue, val.unit); }
+  				},
+  				{ //8
+  					"sClass" : "center",
+  					"mData" : "proportion.real",
+  					"mRender" : function(val, type, full) { return type != 'display' ? '' + val.upperValue : self.formatConcentration(val.upperPrecision, val.upperValue, val.unit); }
+  				},			    				
+  				{ //9
+  					"sClass" : "center",
+  					"mData" : "component.compound.URI",
+  					"mRender" : function(val, type, full) {
+  					  return !val ? '' : '<a href="' + self.baseUrl + 'substance?type=related&compound_uri=' + encodeURIComponent(val) + '" target="_blank">Also contained in...</span></a>';
+  					}
+	    		}		    				
+		    ]
+		  });
+    }
+    else
+      $(theTable).dataTable().fnClearTable();
+    
+    // proprocess data and fill it up
+    $(theTable).dataTable().fnAddData(composition);
+  },
+  
   querySummary: function(substanceURI) {
     var self = this;
-    var subId = substanceURI.replace(/.+\/(.+)/, "$1");
-    ccLib.fillTree($('#jtox-composition .data-field', self.rootElement)[0], {substanceID: subId});
     
     jToxKit.call(substanceURI + "/studysummary", function(summary) {
       if (!!summary && !!summary.facet)
@@ -296,9 +408,32 @@ var jToxStudy = {
     });
   },
   
+  queryComposition: function(substanceURI) {
+    var self = this;
+    
+    jToxKit.call(substanceURI + "/composition", function(composition) {
+      if (!!composition && !!composition.composition)
+        self.processComposition(composition.composition);
+    });
+  },
+  
+  querySubstance: function(substanceURI){
+    var self = this;
+
+    var rootTab = $('#jtox-substance')[0];
+    jToxKit.call(substanceURI, function(substance){
+       if (!!substance && !!substance.substance && substance.substance.length > 0){
+         ccLib.fillTree(rootTab, substance.substance[0]);
+         self.querySummary(substanceURI);
+         self.queryComposition(substanceURI);
+       }
+    });
+  },
+  
   init: function(root, settings) {
     var self = this;
     this.rootElement = root;
+    this.baseUrl = jToxKit.baseUrl;
 
     var tree = jToxKit.getTemplate('#jtox-studies');
     root.appendChild(tree);
@@ -326,7 +461,7 @@ var jToxStudy = {
     });
     
     if (settings['substanceUri'] !== undefined){
-      self.querySummary(settings['substanceUri']);
+      self.querySubstance(settings['substnceUri']);
     }
-  }
+  }  
 };

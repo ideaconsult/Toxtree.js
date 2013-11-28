@@ -1,4 +1,10 @@
 var ccLib = {
+  mergeSettings: function (settings, base) {
+    if (settings !== undefined)
+    	for (var s in settings)
+      	base[s] = settings[s];
+  },
+
   /* Function setObjValue(obj, value)Set a given to the given element (obj) in the most appropriate way - be it property - the necessary one, or innetHTML
   */
   setObjValue: function (obj, value){
@@ -12,7 +18,7 @@ var ccLib = {
     else if (obj.nodeName == "BUTTON")
   		$(obj).data('value', value);
     else
-      obj.innerHTML = value;
+      obj.innerHTML = value;      
   },
   
   getJsonValue: function (json, field){

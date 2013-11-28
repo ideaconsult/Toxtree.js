@@ -30,3 +30,15 @@
 .jtox-template {
   display: none !important;
 }
+
+.jtox-size-quarter {
+  width: 25%;
+}
+
+.jtox-size-third {
+  width: 33%;
+}
+
+.jtox-size-half {
+  width: 50%;
+}

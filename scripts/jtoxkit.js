@@ -1,6 +1,6 @@
 window.jToxKit = {
 	templateRoot: null,
-	server: null,
+	baseUrl: null,
 
 	/* A single place to hold all necessary queries. Parameters are marked with <XX> and formatString() (common.js) is used
 	to prepare the actual URLs
@@ -15,7 +15,7 @@ window.jToxKit = {
 	*/
 	settings: {
   	jsonp: false,					// whether to use JSONP approach, instead of JSON.
-  	server: null,					// the server actually used for connecting. Part of settings. If not set - attempts to get 'server' parameter of the query, if not - get's current server.
+  	baseUrl: null,					// the server actually used for connecting. Part of settings. If not set - attempts to get 'baseUrl' parameter of the query, if not - get's current server.
   	timeout: 5000,				// the timeout an call to the server should be wait before the attempt is considered error.
   	pollDelay: 200,				// after how many milliseconds a new attempt should be made during task polling.
   },
@@ -24,13 +24,7 @@ window.jToxKit = {
 	onconnect: function(s){ },		    // function (service): called when a server request is started - for proper visualization. Part of settings.
 	onsuccess: function(c, m) { },		// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
 	onerror: function (c, m) { },			// function (code, mess): called on server reques error. Part of settings.
-  
-  mergeSettings: function (settings) {
-    if (settings !== undefined)
-    	for (var s in settings)
-      	this.settings[s] = settings[s];
-  },
-  
+    
 	init: function(settings) {
   	var self = this;
   	
@@ -40,6 +34,10 @@ window.jToxKit = {
 		var url = ccLib.parseURL(document.location);
 		var queryParams = url.params;
 		queryParams.host = url.host;
+	
+	  ccLib.mergeSettings(settings, self.settings);
+	  ccLib.mergeSettings(queryParams, self.settings);
+  	self.initConnection();
   	
   	// now scan all insertion divs
   	if (!settings) {
@@ -47,17 +45,15 @@ window.jToxKit = {
       	var dataParams = $(this).data();
       	if (!dataParams.manualInit || settings !== undefined){
           // this order determines the priority..
-          self.mergeSettings(dataParams);
-          self.mergeSettings(queryParams);
-          self.mergeSettings(settings);
+          var newset = {};
+          ccLib.mergeSettings(self.settings, newset);
+          ccLib.mergeSettings(dataParams, newset);
           
-        	if (self.settings.kit == "study")
-        	  jToxStudy.init(this, self.settings);
+        	if (newset.kit == "study")
+        	  jToxStudy.init(this, newset);
         }
     	});
   	}
-
-  	self.initConnection();
 	},
 	
 	initTemplates: function() {
@@ -117,11 +113,11 @@ window.jToxKit = {
 	*/
 	initConnection: function(){
 	  var settings = this.settings;
-		if (!settings.server) {
-		  settings.server = settings.host;
+		if (!settings.baseUrl) {
+		  settings.baseUrl = settings.host;
 		}
 		  
-		this.server = settings.server;
+		this.baseUrl = settings.baseUrl;
 					
     if (settings.onerror !== undefined)
 		  this.onerror = settings.onerror;
@@ -147,9 +143,9 @@ window.jToxKit = {
 		else
 			adata = { };
 
-		// on some queries, like tasks, we DO have server at the beginning
+		// on some queries, like tasks, we DO have baseUrl at the beginning
 		if (service.indexOf("http") != 0)	
-			service = self.server + service;
+			service = self.baseUrl + service;
 		// now make the actual call
 		$.ajax(service, {
 			dataType: self.jsonp ? 'jsonp' : 'json',

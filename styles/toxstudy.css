@@ -64,17 +64,17 @@ div.jtox-study-tab .dataTables_wrapper {
 }
 
 /* Start of table-related classes */
-.jtox-study table.dataTable td,
-.jtox-study table.dataTable th {
+.jtox-toolkit table.dataTable td,
+.jtox-toolkit table.dataTable th {
   border:1px solid #ccc;
   overflow: hidden;
 }
 
-.jtox-study table.dataTable th {
+.jtox-toolkit table.dataTable th {
   text-transform: capitalize;
 }
 
-.jtox-study table.dataTable td .shortened {
+.jtox-toolkit table.dataTable td .shortened {
   width: 75px;
   max-height: 20px;
   overflow: hidden;
@@ -86,7 +86,7 @@ td.middle {
   vertical-align: middle;  
 }
 
-.jtox-study table.dataTable td.jtox-multi {
+.jtox-toolkit table.dataTable td.jtox-multi {
   padding: 0px;
 }
 
