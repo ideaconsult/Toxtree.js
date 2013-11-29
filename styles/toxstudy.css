@@ -7,7 +7,8 @@
 }
 
 div.jtox-study,
-div.jtox-composition {
+div.jtox-composition,
+div.jtox-substance {
   display: block;
   font-size: small;
   border-radius: 5px;

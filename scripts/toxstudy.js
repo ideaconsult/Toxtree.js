@@ -514,7 +514,7 @@ var jToxStudy = (function () {
       // re-initialize us on each of these calls.
       self.baseUrl = jToxKit.grabBaseUrl(substanceURI, 'substance');
       
-      var rootTab = $('#jtox-substance' + self.suffix)[0];
+      var rootTab = $('.jtox-substance', self.rootElement)[0];
       jToxKit.call(self, substanceURI, function(substance){
          if (!!substance && !!substance.substance && substance.substance.length > 0){
            ccLib.fillTree(rootTab, substance.substance[0]);
