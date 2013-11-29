@@ -16,6 +16,12 @@ var ccLib = {
     return base;
   },
 
+  fireCallback: function (callback, self) {
+    if (typeof callback != 'function')
+      callback = window[callback];
+    callback.apply((self !== undefined && self != null) ? self : document, Array.prototype.slice.call(arguments, 2));
+  },
+  
   /* Function setObjValue(obj, value)Set a given to the given element (obj) in the most appropriate way - be it property - the necessary one, or innetHTML
   */
   setObjValue: function (obj, value){
@@ -660,7 +666,7 @@ window.jToxKit = {
 		var queryParams = url.params;
 		queryParams.host = url.host;
 	
-    self.settings = queryParams;
+    ccLib.mergeSettings(queryParams, self.settings); // merge with defaults!
 	  
 		if (!self.settings.baseUrl)
 		  self.settings.baseUrl = self.settings.host;
@@ -695,7 +701,7 @@ window.jToxKit = {
   	self.templateRoot = root;
 	},
 	
-	getTemplate: function(selector) {
+	getTemplate: function(selector, suffix) {
   	var el = $(selector, this.templateRoot)[0];
   	if (!!el){
     	var el = $(selector, this.templateRoot)[0].cloneNode(true);
@@ -710,7 +716,7 @@ window.jToxKit = {
 	pollTask : function(task, callback) {
 		var self = this;
 		if (task === undefined || task.task === undefined || task.task.length < 1){
-			self.settings.onError('-1', localMessage.taskFailed);
+		  ccLib.fireCallback(self.settings.onError, self, '-1', localMessage.taskFailed);
 			return;
 		}
 		task = task.task[0];
@@ -725,7 +731,7 @@ window.jToxKit = {
 			callback(task.result);
 		}
 		else { // error
-			self.settings.onError('-1', task.error);
+		  ccLib.fireCallback(self.settings.onError, self, '-1', task.error);
 		}
 	},
 	
@@ -747,7 +753,7 @@ window.jToxKit = {
 		if (kit == null)
 		  kit = this;
 		  
-	  kit.settings.onConnect(service);
+		ccLib.fireCallback(kit.settings.onConnect, kit, service);
 		  
 		var method = 'GET';
 		var accType = kit.settings.jsonp ? "application/x-javascript" : "application/json";	
@@ -774,11 +780,11 @@ window.jToxKit = {
 			data: adata,
 			jsonp: kit.settings.jsonp ? 'callback' : false,
 			error: function(jhr, status, error){
-			  kit.settings.onError(status, error);
+			  ccLib.fireCallback(kit.settings.onError, kit, status, error);
 				callback(null);
 			},
 			success: function(data, status, jhr){
-			  kit.settings.onSuccess(status, jhr.statusText);
+			  ccLib.fireCallback(kit.settings.onSuccess, kit, status, jhr.statusText);
 				callback(data);
 			}
 		});
