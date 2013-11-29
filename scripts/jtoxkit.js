@@ -1,6 +1,5 @@
 window.jToxKit = {
 	templateRoot: null,
-	baseUrl: null,
 
 	/* A single place to hold all necessary queries. Parameters are marked with <XX> and formatString() (common.js) is used
 	to prepare the actual URLs
@@ -18,14 +17,14 @@ window.jToxKit = {
   	baseUrl: null,					// the server actually used for connecting. Part of settings. If not set - attempts to get 'baseUrl' parameter of the query, if not - get's current server.
   	timeout: 5000,				// the timeout an call to the server should be wait before the attempt is considered error.
   	pollDelay: 200,				// after how many milliseconds a new attempt should be made during task polling.
+  	onConnect: function(s){ },		    // function (service): called when a server request is started - for proper visualization. Part of settings.
+  	onSuccess: function(c, m) { },		// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
+  	onError: function (c, m) { },			// function (code, mess): called on server reques error. Part of settings.
   },
 	
 	// some handler functions that can be configured from outside with the settings parameter.
-	onconnect: function(s){ },		    // function (service): called when a server request is started - for proper visualization. Part of settings.
-	onsuccess: function(c, m) { },		// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
-	onerror: function (c, m) { },			// function (code, mess): called on server reques error. Part of settings.
     
-	init: function(settings) {
+	init: function() {
   	var self = this;
   	
   	self.initTemplates();
@@ -35,25 +34,20 @@ window.jToxKit = {
 		var queryParams = url.params;
 		queryParams.host = url.host;
 	
-	  ccLib.mergeSettings(settings, self.settings);
-	  ccLib.mergeSettings(queryParams, self.settings);
-  	self.initConnection();
-  	
+    self.settings = queryParams;
+	  
+		if (!self.settings.baseUrl)
+		  self.settings.baseUrl = self.settings.host;
+	  
   	// now scan all insertion divs
-  	if (!settings) {
-    	$('.jtox-toolkit').each(function(i) {
-      	var dataParams = $(this).data();
-      	if (!dataParams.manualInit || settings !== undefined){
-          // this order determines the priority..
-          var newset = {};
-          ccLib.mergeSettings(self.settings, newset);
-          ccLib.mergeSettings(dataParams, newset);
-          
-        	if (newset.kit == "study")
-        	  jToxStudy.init(this, newset);
-        }
-    	});
-  	}
+  	$('.jtox-toolkit').each(function(i) {
+    	var dataParams = $(this).data();
+    	if (!dataParams.manualInit){
+    	  // initializes the kit, based on the passed kit name
+      	if (dataParams.kit == "study")
+      	  jToxStudy.init(this, dataParams);
+      }
+  	});
 	},
 	
 	initTemplates: function() {
@@ -90,7 +84,7 @@ window.jToxKit = {
 	pollTask : function(task, callback) {
 		var self = this;
 		if (task === undefined || task.task === undefined || task.task.length < 1){
-			self.onerror('-1', localMessage.taskFailed);
+			self.settings.onError('-1', localMessage.taskFailed);
 			return;
 		}
 		task = task.task[0];
@@ -105,7 +99,7 @@ window.jToxKit = {
 			callback(task.result);
 		}
 		else { // error
-			self.onerror('-1', task.error);
+			self.settings.onError('-1', task.error);
 		}
 	},
 	
@@ -118,34 +112,19 @@ window.jToxKit = {
       return url.replace(re, "$1");
     }
     else
-      return this.baseUrl;
-	},
-	
-	/* Initialized the necessary connection data. Same settings as in ToxMan.init() are passed.
-	*/
-	initConnection: function(){
-	  var settings = this.settings;
-		if (!settings.baseUrl) {
-		  settings.baseUrl = settings.host;
-		}
-		  
-		this.baseUrl = settings.baseUrl;
-					
-    if (settings.onerror !== undefined)
-		  this.onerror = settings.onerror;
-		if (settings.onsuccess !== undefined)
-		  this.onsuccess = settings.onsuccess;
-		if (settings.onconnect !== undefined)
-		  this.onconnect = settings.onconnect;
+      return this.settings.baseUrl;
 	},
 	
 	/* Makes a server call with the provided method. If none is given - the internally stored one is used
 	*/
 	call: function (kit, service, callback, adata){
-		var self = this;
-		self.onconnect(service);
+		if (kit == null)
+		  kit = this;
+		  
+	  kit.settings.onConnect(service);
+		  
 		var method = 'GET';
-		var accType = self.jsonp ? "application/x-javascript" : "application/json";	
+		var accType = kit.settings.jsonp ? "application/x-javascript" : "application/json";	
 		
 		if (adata !== undefined){
 			method = 'POST';
@@ -157,23 +136,23 @@ window.jToxKit = {
 
 		// on some queries, like tasks, we DO have baseUrl at the beginning
 		if (service.indexOf("http") != 0)
-			service = (kit !== null && (!!kit.baseUrl) ? kit.baseUrl : self.baseUrl) + service;
+			service = (!!kit.settings.baseUrl ? kit.settings.baseUrl : this.settings.baseUrl) + service;
 			
 		// now make the actual call
 		$.ajax(service, {
-			dataType: self.jsonp ? 'jsonp' : 'json',
+			dataType: kit.settings.jsonp ? 'jsonp' : 'json',
 			headers: { Accept: accType },
 			crossDomain: true,
-			timeout: self.timeout,
+			timeout: kit.settings.timeout,
 			type: method,
 			data: adata,
-			jsonp: self.jsonp ? 'callback' : false,
+			jsonp: kit.settings.jsonp ? 'callback' : false,
 			error: function(jhr, status, error){
-				self.onerror(status, error);
+			  kit.settings.onError(status, error);
 				callback(null);
 			},
 			success: function(data, status, jhr){
-				self.onsuccess(status, jhr.statusText);
+			  kit.settings.onSuccess(status, jhr.statusText);
 				callback(data);
 			}
 		});

@@ -1,6 +1,6 @@
 var jToxStudy = {
-  rootElement: null,
-  baseUrl: null,
+  rootElement: null,    // the root element of this kit instance
+  settings: { },        // all settings, specific for the kit, with their default. These got merged with general (jToxKit) ones.
   
   getFormatted: function (data, type, format) {
     var value = null;
@@ -463,9 +463,12 @@ var jToxStudy = {
   },
   
   init: function(root, settings) {
-    var self = this;
     this.rootElement = root;
+    ccLib.mergeSettings(jToxKit.settings, this.settings);
+    ccLib.mergeSettings(settings, this.settings);
+    // now we have our, local copy of settings.
 
+    var self = this;
     var tree = jToxKit.getTemplate('#jtox-studies');
     root.appendChild(tree);
     var loadPanel = function(panel){
@@ -494,8 +497,8 @@ var jToxStudy = {
     });
 
     // when all handlers are setup - make a call, if needed.    
-    if (settings['substanceUri'] !== undefined){
-      self.querySubstance(settings['substanceUri']);
+    if (self.settings['substanceUri'] !== undefined){
+      self.querySubstance(self.settings['substanceUri']);
     }
   }  
 };

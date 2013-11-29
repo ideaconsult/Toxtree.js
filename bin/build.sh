@@ -56,7 +56,7 @@ while (( "$#" )); do
 			;;
 		*)
 			if [ $append -eq 1 ]; then
-				target="$1 $target"
+				target="$target tox$1"
 			fi
 	esac
 	

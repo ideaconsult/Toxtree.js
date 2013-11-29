@@ -1,12 +1,12 @@
 jToxKit
 =======
 
-A kit of frontends for accessing toxicological web services, based on [AMBIT](http://ambit.sourceforge.net). It is designed to provide easy-to-integrate
+A kit of front-ends for accessing toxicological web services, based on [AMBIT](http://ambit.sourceforge.net). It is designed to provide easy-to-integrate
 approach for using any or all of available front ends in third-party web pages.
 Each different front-end is referred as _kit_. Currently available are:
 
 - `study` - IUCTL
-- `toxtree` - a Web front end to OpenTox services. Currently developed as standalone web front-end and soon-to-be integrated in the kit. Described [below](#Toxtree.js).
+- `tree` - a Web front end to OpenTox services. Currently developed as standalone web front-end and soon-to-be integrated in the kit. Described [below](#Toxtree.js).
 
 The toolkit is intended to be used by non-programmers, and thus it's integration process is rather simple - referring two files and marking a placeholder in HTML of where all the structure to be inserted. However, it relies that certain external libraries like [jQuery](http://www.jquery.com) and some of [jQueryUI](http://www.jqueryui.com) widgets are already included in the page.
 
@@ -25,11 +25,11 @@ In order to use **jToxKit** in your page, you need to implement these steps:
   <script src="jquery.js"></script>
   <script src="jquery.ui.core.js"></script>
 ```
--  The above steps are enough to have all structure inserted and _jToxKit_ initialized. If you need to make additional query calls, or similar, you can do so at any time **after** DOM is ready. For example quering _jToxStydy_ for studies for a substance from a given URL can go like this:
+-  The above steps are enough to have all structure inserted and _jToxKit_ initialized. If you need to make additional query calls, or similar, you can do so at any time **after** DOM is ready. For example querying _jToxStydy_ for studies for a substance from a given URL can go like this:
 
 ```
 $(document).ready(function() { 
-  jToxStudy.querySummary("http://apps.ideaconsult.net:8080/biodeg/substance/IUC4-efdb21bb-e79f-3286-a988-b6f6944d3734");
+  jToxStudy.querySubstance("http://apps.ideaconsult.net:8080/biodeg/substance/IUC4-efdb21bb-e79f-3286-a988-b6f6944d3734");
 });
 ```
 
@@ -38,22 +38,24 @@ $(document).ready(function() {
 
 Beside specifying the exact place of code insertion the `<div>` tag, referred above, is also used to setup the type and configuration of the front-end. There are three ways to pass configuration parameters to _jToxKit_:
 
-- As **query parameters** on the page request itself. For example jToxTree query might look like: `toxtree.html?server=http://apps.ideaconsult.net:8080/ambit2&search=caffeine`, providing `server` parameter to _jToxKit_.
-- As **data-XXX** attributes of the inserting _div_. They follow the common *data-XXX* naming convention, i.e. `pollDelay` is referred with `data-poll-delay`.
-- As **JS object** when calling `jToxKit.init({ })` manually. By default on page loading jToxKit scans and initialized itself based on above parameters. If that need to be supressed a `data-manual-init` can be set to *true* and `jToxKit.init()`, be called with desired parameters.
+- As **query parameters** on the page request itself. For example jToxTree query might look like: `toxtree.html?server=http://apps.ideaconsult.net:8080/ambit2&search=caffeine`, providing `server` parameter to _jToxKit_. These become the general, jToxKit's configuration parameters.
+- As **data-XXX** attributes of the inserting _div_. They follow the common *data-XXX* naming convention, i.e. `pollDelay` is referred with `data-poll-delay`. When (each) kit it automatically inserted (the default behaviour), these settings are merged with jToxKit's and are passed on kit's initialization. They take precedence over jToxKit's.
+- As **JS object** when calling `j<kit name>.init(root, settings)` manually. By default on page loading, *jToxKit* scans and initialized itself, also traversing each jToxKit's `<div>`s. The later can be supressed by adding `data-manual-init` attribute, set to *true* to the `<div>`. In this case *j<tox-kit>* should be manually initialized, passing any desired parameters, which (again) will be merged, taking precedence over jToxKit's.
 
-Although different kits can have different configuration parameteres, these are common:
+Although different kits can have different configuration parameters, these are common:
 
 - `kit`  (attr. `data-kit`), _required_: specifies the exact type of front-end to be inserted. Only one type is allowed (of course!) - currently available kits are explained in the beginning.
-- `server` (attr. `data-server`), _optional_: the default server to be used on AJAX requests, if the serevr is not specified on the call itself.
+- `server` (attr. `data-server`), _optional_: the default server to be used on AJAX requests, if the server is not specified on the call itself.
 - `jsonp` (attr. `data-jsonp`), _optional_: whether to use _JSONP_ style queries to the server, instead of asynchronous ones. Mind that _JSONP_ setting does not influence _POST_ requests. Default is *false*.
 - `timeout` (attr. `data-timeout`), _optional_: the timeout for AJAX requests, in milliseconds. Default is 5000.
 - `pollDelay` (attr. `data-poll-delay`), _optional_: certain services involve creating a task on the server and waiting for it to finish - this is the time between poll request, while waiting it to finish. In milliseconds. Default is 200.
-- attr. `data-manual-init`, _optional_: informs _jToxKit_ to skip processing the element now and wait for explicit call from the user with custom parameters provided.
+- `onConnect` (attr. `data-on-connect`), _optional_: a function name, or function to be called just before any AJAX call.
+- `onSuccess` (attr. `data-on-success`), _optional_: a function name, or function to be called upon successful complete of a AJAX call.
+- `onError` (attr. `data-on-error`), _optional_: a function name, or function to be called when there's an error on AJAX call. The passed _callback_ to `jToxKit.call()` is still called, but with _null_ result.
 
-If same parameter is provided in more than one way, there is certain priority - lowest goes to **data-XXX** configuration, which can be overriden by the **query line**, which can be overriden with **manual settings**.
+As, can be seen, the later three callbacks can be local for each kit, so it is possible to report connection statuses in the most appropriate for the kit's way. This is also true for Url's, which means that not all kits, needs to communicate with one and the same server.
 
-**IMPORTANT!:** Currently only one instance of _jToxKit_ per page is allowed.
+**IMPORTANT!:** Currently only one instance of _kit_ of type per page is allowed.
 
 ### jToxStudy kit
 
@@ -66,33 +68,40 @@ From [jQueryUI](http://www.jqueryui.com) Version 1.8+, based library *jQueryUI t
 ```
 	<link rel="stylesheet" href="jquery.ui.tabs.css"/>
 	<link rel="stylesheet" href="jquery.dataTables.css"/>
-	<link rel="stylesheet" href="jquery.dataTables.css"/>
 	<script src="jquery.ui.widget.js"></script>
 	<script src="jquery.ui.tabs.js"></script>
 	<script src="jquery.dataTables.js"></script>
 ```
 
-These are needed in the same page in orther for _jToxStudy_ to work. It has some additional
+These are needed in the same page in order for _jToxStudy_ to work. It has some additional
 
 ##### Parameters
 
 Not quite a lot yet, though:
 
-- `substanceUri` (attr. `data-substance-uri`), _optional_: This is the URL of the substance. The initial query for a summary of all studies is automatically made. If not provided this way, a query must be made explicitly with `jToxStudy.querySummary(uri)`.
+- `substanceUri` (attr. `data-substance-uri`), _optional_: This is the URL of the substance in question. If it is passed during _jToxStudy_ initialization a call to `jToxStudy.querySubstance(uri)` is made. In either case upon successful substance info retrieval automatic calls to `jToxStudy.querySummary(uri)` and `jToxStudy.queryComposition(uri)` are made.
 
 
 ##### Methods
 
-_jToxStudy_ methods that can be invoked from outside are quite few, acutally:
+_jToxStudy_ methods that can be invoked from outside are quite few, actually:
 
-`jToxStudy.init(settings)`
+`jToxStudy.init(root, settings)`
 
-It is called internally from _jToxKit_ upon initialization, so the user should not call this.
+It is called either internally from _jToxKit_ upon initialization, or later from the user. The first parameter is an _HTMLElement_ which will be used for base for populating necessary DOM tree.
 
+
+`jToxKit.querySubstance(substanceUri)`
+
+If `substanceUri` parameter is not provided during initialization, this is the way to ask for studies for particular substance. Fill's up the fist tab and queries for _composition_ and _studies summary_.
+
+`jToxKit.queryComposition(substanceUri)`
+
+The `substanceUri` is the same as in previous function, but this one takes care only for _Composition_ tab. Usually called automatically from previous function, when it successfully retrieved substance information.
 
 `jToxKit.querySummary(substanceUri)`
 
-If `substanceUri` parameter is not provided during initialization, this is the way to ask for studies for particular substance.
+The `substanceUri` is the same as in previous function. This one queries for a summary of all studies available for the given substance. It fills up the numbers in the studies' tabs and prepares the tables for particular queries later on, which are executes upon each tab's activation.
 
 
 ### jToxTree kit
@@ -109,20 +118,20 @@ The following information is not intended for end users, but it gives a detailed
 
 As described in the beginning, the main concept is to allow easy use of the whole toolkit - even easier than _jQuery_-based widgets and libraries. This usually contradicts with ease of development. That's why we established certain structure and rules of development process, so we can keep it easy, while providing ways for automatic production of end-user files for user-page integration.
 
-In order to achive this, these rules are folllowed:
+In order to archive this, these rules are followed:
 
-- All normal HTML, JS and CSS files that are needed, have to work as-is during the developkent process, so that changing anything in either of them can be immediatly tested in the (development) browser.
+- All normal HTML, JS and CSS files that are needed, have to work as-is during the development process, so that changing anything in either of them can be immediately tested in the (development) browser.
 - Development files should be separate, so each kit lives in separate (script and/or styling) files. Working on thousand-lines behemoths is not an acceptable option.
 - The process of preparing and packaging of the above should be automated, i.e. - no manual procedure should be involved while just-tested in development structure needs to go to production files (in our case: one JS and one CSS file).
 
-In order to achive these there are few things that we've established
+In order to archive these there are few things that we've established
 
 
 ##### File naming
 
-Each different kit, presumbly needs three files: one JS, one HTML and one CSS. They all need to have same names, built like this: `tox<kit name>.<extension>`. For example for `study` kit, the three files are:`toxstudy.html`, `toxstudy.js` and `toxstudy.css`.
+Each different kit, presumably needs three files: one JS, one HTML and one CSS. They all need to have same names, built like this: `tox<kit name>.<extension>`. For example for `study` kit, the three files are:`toxstudy.html`, `toxstudy.js` and `toxstudy.css`.
 
-There is also one, general set - fot the jToxKit as a whole. It has slightly different convention: `jtoxkit.<extension>`. The key moment here is that `toxstudy.html` for example, is used during the development of jToxStudy, refering jQuery, jQeuryUI, jtoxkit.js, etc. files. In the same time - it **_is_** the source for final, production `jtoxkit.js` file.
+There is also one, general set - fot the jToxKit as a whole. It has slightly different convention: `jtoxkit.<extension>`. The key moment here is that `toxstudy.html` for example, is used during the development of jToxStudy, referring jQuery, jQeuryUI, jtoxkit.js, etc. files. In the same time - it **_is_** the source for final, production `jtoxkit.js` file.
 
 ##### Script and styling files merging
 
@@ -216,7 +225,7 @@ Options can be one or more from the following:
 Default is like: build.sh --html .. --out ../www --css ../styles --js ../script --target toxstudy
 ```
 
-The result of this script can be directly used. There is a test page for proper result, which should not produce errors when openned in the browser [test.html](www/test.html).
+The result of this script can be directly used. There is a test page for proper result, which should not produce errors when opened in the browser [test.html](www/test.html).
 
 
 
