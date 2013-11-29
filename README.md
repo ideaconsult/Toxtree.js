@@ -55,8 +55,6 @@ Although different kits can have different configuration parameters, these are c
 
 As, can be seen, the later three callbacks can be local for each kit, so it is possible to report connection statuses in the most appropriate for the kit's way. This is also true for Url's, which means that not all kits, needs to communicate with one and the same server.
 
-**IMPORTANT!:** Currently only one instance of _kit_ of type per page is allowed.
-
 ### jToxStudy kit
 
 This kit gives front-end to AMBIT services, which provide import of IUCTL generated and maintained data for toxicological studies (experiments). The kit name is `study` (for use in `data-kit` initialization attribute). First, there are several additional
@@ -86,20 +84,20 @@ Not quite a lot yet, though:
 
 _jToxStudy_ methods that can be invoked from outside are quite few, actually:
 
-`jToxStudy.init(root, settings)`
+`new jToxStudy(root, settings)`
 
-It is called either internally from _jToxKit_ upon initialization, or later from the user. The first parameter is an _HTMLElement_ which will be used for base for populating necessary DOM tree.
+It is called either internally from _jToxKit_ upon initialization, or later from the user. The first parameter is an _HTMLElement_ which will be used for base for populating necessary DOM tree. It returns a new instance of jToxStudy, referred as `<jToxStudy>` that can later be queried with methods, described below:
 
 
-`jToxKit.querySubstance(substanceUri)`
+`<jToxStudy>.querySubstance(substanceUri)`
 
 If `substanceUri` parameter is not provided during initialization, this is the way to ask for studies for particular substance. Fill's up the fist tab and queries for _composition_ and _studies summary_.
 
-`jToxKit.queryComposition(substanceUri)`
+`<jToxStudy>.queryComposition(substanceUri)`
 
 The `substanceUri` is the same as in previous function, but this one takes care only for _Composition_ tab. Usually called automatically from previous function, when it successfully retrieved substance information.
 
-`jToxKit.querySummary(substanceUri)`
+`<jToxStudy>.querySummary(substanceUri)`
 
 The `substanceUri` is the same as in previous function. This one queries for a summary of all studies available for the given substance. It fills up the numbers in the studies' tabs and prepares the tables for particular queries later on, which are executes upon each tab's activation.
 

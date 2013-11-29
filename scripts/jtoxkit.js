@@ -45,7 +45,7 @@ window.jToxKit = {
     	if (!dataParams.manualInit){
     	  // initializes the kit, based on the passed kit name
       	if (dataParams.kit == "study")
-      	  jToxStudy.init(this, dataParams);
+      	  new jToxStudy(this, dataParams);
       }
   	});
 	},

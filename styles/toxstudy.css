@@ -18,7 +18,7 @@ div.jtox-study.unloaded.folded .jtox-study-title {
   background-size: 16px 16px;
 }
 
-div.jtox-study.unloaded .jtox-study-table {
+.jtox-toolkit .unloaded table {
   display: none;
 }
 

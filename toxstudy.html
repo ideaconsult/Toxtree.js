@@ -28,12 +28,13 @@
   <script src="scripts/toxstudy.js"></script>
   <script language="javascript">
     $(document).ready(function(){
-      jToxStudy.querySubstance("http://apps.ideaconsult.net:8080/biodeg/substance/IUC4-efdb21bb-e79f-3286-a988-b6f6944d3734");
+      var st = new jToxStudy($(".jtox-toolkit")[0]);
+      st.querySubstance("http://apps.ideaconsult.net:8080/biodeg/substance/IUC4-efdb21bb-e79f-3286-a988-b6f6944d3734");
     });
   </script>
 </head>
 <body>
-	<div class="jtox-toolkit" data-kit="study"></div>
+	<div class="jtox-toolkit" data-kit="study" data-manual-init="yes"></div>
 	<div class="jtox-template">
 <!--[[ jToxKit.templates['all-studies'] -->
 	  <div id="jtox-studies">
@@ -75,7 +76,7 @@
 	        </thead>
 	      </table>
 	    </div>
-	    <div id="jtox-composition">
+	    <div id="jtox-composition" class="jtox-composition unloaded">
 	      <table>
           <thead>
             <tr>

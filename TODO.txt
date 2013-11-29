@@ -1,7 +1,6 @@
 TODO:
 
 - fix improper scrollbars, next/prev, etc.: checkout sScrollX in datatables.
-- enable mutliple instances of kits, i.e. jToxStudy.
 - make toxtree part of jToxKit
 - 
 
