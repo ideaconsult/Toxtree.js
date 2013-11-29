@@ -1,10 +1,9 @@
 TODO:
 
 - fix improper scrollbars, next/prev, etc.: checkout sScrollX in datatables.
-- checkout baseUrl to have locak (for each kit) copy.
+- checkout baseUrl to have local (for each kit) copy.
 - enable mutliple instances of jToxStudy.
 - reflect in the documents;
-- make composition tab
 - make toxtree part of jToxKit
 - 
 

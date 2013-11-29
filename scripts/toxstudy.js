@@ -23,7 +23,7 @@ var jToxStudy = {
     var height = 100 / dlen;
     var df = '<table>';
     for (var i = 0, dlen = data.length; i < dlen; ++i) {
-      df += '<tr class="' + (i % 2 == 0 ? 'even' : 'odd') + '"><td style="height: ' + height + '%">' + self.getFormatted(data[i], type, format) + '</td></tr>';
+      df += '<tr class="' + (i % 2 == 0 ? 'even' : 'odd') + '"><td class="center" style="height: ' + height + '%">' + self.getFormatted(data[i], type, format) + '</td></tr>';
     }
     
     df += '</table>';
@@ -86,7 +86,7 @@ var jToxStudy = {
     if (!$(theTable).hasClass('dataTable')) {
 
       var colDefs = [
-        { "sClass": "center", "sWidth": "125px", "mData": "protocol.endpoint" } // The name (endpoint)
+        { "sClass": "center", "sWidth": "20%", "mData": "protocol.endpoint" } // The name (endpoint)
       ];
       
       // start filling it
@@ -139,8 +139,8 @@ var jToxStudy = {
       
       // add also the "default" effects columns
       colDefs.push(
-        { "sClass": "center middle jtox-multi", "sWidth": "50px", "mData": "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, "endpoint");  } },   // Effects columns
-        { "sClass": "center middle jtox-multi", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, self.formatResult) } }
+        { "sClass": "center middle jtox-multi", "sWidth": "15%", "mData": "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, "endpoint");  } },   // Effects columns
+        { "sClass": "center middle jtox-multi", "sWidth": "15%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, self.formatResult) } }
       );
 
       // jump over those two - they are already in the DOM      
@@ -160,9 +160,9 @@ var jToxStudy = {
       
       // finally put the protocol entries
       colDefs.push(
-        { "sClass": "center", "sWidth": "125px", "mData": "protocol.guidance", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
-        { "sClass": "center", "sWidth": "75px", "mData": "owner.company.name", "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>'; }  }, 
-        { "sClass": "center", "sWidth": "75px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>'; }  }
+        { "sClass": "center", "sWidth": "15%", "mData": "protocol.guidance", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
+        { "sClass": "center", "sWidth": "50px", "mData": "owner.company.name", "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>'; }  }, 
+        { "sClass": "center", "sWidth": "50px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>'; }  }
       );
       
       // READYY! Go and prepare THE table.
@@ -170,6 +170,7 @@ var jToxStudy = {
         "bPaginate": true,
         "bProcessing": true,
         "bLengthChange": false,
+				"bAutoWidth": false,
 //        "sPaginationType": "full_numbers",
         "sDom" : "rt<Fip>",
         "aoColumns": colDefs,
@@ -317,6 +318,7 @@ var jToxStudy = {
 /* 				"sDom" : '<"help remove-bottom"i><"help"p>Trt<"help"lf>', */
 				"sPaginationType": "full_numbers",
 				"sPaginate" : ".dataTables_paginate _paging",
+				"bAutoWidth": false,
 				"oLanguage": {
           "sProcessing": "<img src='" + self.baseUrl + "images/24x24_ambit.gif' border='0'>",
           "sLoadingRecords": "No substances found.",
@@ -351,7 +353,7 @@ var jToxStudy = {
           },	    
   				{ //3
   					"sClass" : "camelCase left",
-  					"sWidth" : "20%",
+  					"sWidth" : "15%",
   					"mData" : "component.compound.name",
   					"mRender" : function(val, type, full) {
   						return (type != 'display') ? '' + val : 
@@ -370,16 +372,19 @@ var jToxStudy = {
   				},
   				{ //6
   					"sClass" : "center",
+  					"sWidth" : "15%",
   					"mData" : "proportion.typical",
   					"mRender" : function(val, type, full) { return type != 'display' ? '' + val.value : self.formatConcentration(val.precision, val.value, val.unit); }
   				},
   				{ //7
   					"sClass" : "center",
+  					"sWidth" : "15%",
   					"mData" : "proportion.real",
   					"mRender" : function(val, type, full) { return type != 'display' ? '' + val.lowerValue : self.formatConcentration(val.lowerPrecision, val.lowerValue, val.unit); }
   				},
   				{ //8
   					"sClass" : "center",
+  					"sWidth" : "15%",
   					"mData" : "proportion.real",
   					"mRender" : function(val, type, full) { return type != 'display' ? '' + val.upperValue : self.formatConcentration(val.upperPrecision, val.upperValue, val.unit); }
   				},			    				
@@ -396,7 +401,7 @@ var jToxStudy = {
     else
       $(theTable).dataTable().fnClearTable();
     
-    // proprocess data and fill it up
+    // proprocess the data...
     for (var i = 0, cmpl = json.composition.length; i < cmpl; ++i) {
       var cmp = json.composition[i];
       
@@ -419,6 +424,7 @@ var jToxStudy = {
       }
     }
     
+    // and fill up the table.
     $(theTable).dataTable().fnAddData(json.composition);
   },
   
