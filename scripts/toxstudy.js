@@ -387,13 +387,13 @@ var jToxStudy = (function () {
             "sZeroRecords": "No substances found.",
             "sEmptyTable": "No substances available.",
             "sInfo": "Showing _TOTAL_ substance(s) (_START_ to _END_)",
-            "sLengthMenu": 'Display<select>' +
+            "sLengthMenu": 'Display&nbsp;<select>' +
               '<option value="10">10</option>' +
               '<option value="20">20</option>' +
               '<option value="50">50</option>' +
               '<option value="100">100</option>' +
               '<option value="-1">all</option>' +
-              '</select>substances.'	            
+              '</select>&nbsp;substances.'	            
           },
   		    "aoColumns": [
     				{  //1
