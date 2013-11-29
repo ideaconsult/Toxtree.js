@@ -8,8 +8,9 @@ var ccLib = {
   mergeArrays: function (arr, base) {
     if (arr !== undefined && arr !== null){
       for (var i = 0, al = arr.length; i < al; ++i){
-        if (base.indexOf(arr[i]) < 0)
-          base.push(arr[i]);
+        var v = arr[i];
+        if (base.indexOf(v) < 0 && v !== undefined && v != null)
+          base.push(v);
       }
     }
     return base;

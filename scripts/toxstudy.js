@@ -302,7 +302,7 @@ var jToxStudy = {
   },
   
   formatConcentration: function (precision, val, unit) {
-  	return (precision === undefined || precision === null || "=" == precision ? "" : precision) + val + " " + (unit == null ? "" : unit);
+  	return ((precision === undefined || precision === null || "=" == precision ? "" : precision) + val + " " + (unit == null ? "" : unit)).replace(/ /g, "&nbsp;");
   },
   
   processComposition: function(json){
@@ -311,27 +311,27 @@ var jToxStudy = {
     if (!$(theTable).hasClass('dataTable')) {
       // prepare the table...
       $(theTable).dataTable({
-				"sSearch": "Filter:",
 				"bSearchable": true,
 				"bProcessing" : true,
 				"bPaginate" : true,
 /* 				"sDom" : '<"help remove-bottom"i><"help"p>Trt<"help"lf>', */
-				"sPaginationType": "full_numbers",
+/* 				"sPaginationType": "full_numbers", */
 				"sPaginate" : ".dataTables_paginate _paging",
 				"bAutoWidth": false,
 				"oLanguage": {
+				  "sSearch": "Filter:",
           "sProcessing": "<img src='" + self.baseUrl + "images/24x24_ambit.gif' border='0'>",
           "sLoadingRecords": "No substances found.",
           "sZeroRecords": "No substances found.",
           "sEmptyTable": "No substances available.",
           "sInfo": "Showing _TOTAL_ substance(s) (_START_ to _END_)",
-          "sLengthMenu": 'Display <select>' +
+          "sLengthMenu": 'Display<select>' +
             '<option value="10">10</option>' +
             '<option value="20">20</option>' +
             '<option value="50">50</option>' +
             '<option value="100">100</option>' +
             '<option value="-1">all</option>' +
-            '</select> substances.'	            
+            '</select>substances.'	            
         },
 		    "aoColumns": [
   				{  //1
@@ -412,7 +412,7 @@ var jToxStudy = {
   			var value = cmp.component.values[key];
   			var feature = json.feature[key];
 				if ((feature != null) && (value != null)) {
-  			  var valArr = value.trim().toLowerCase().split("|");
+  			  var valArr = value.trim().toLowerCase().split("|").filter(function (v) { return v !== undefined && v != null && v != ''; });
           
 			 		if (feature.sameAs == "http://www.opentox.org/api/1.1#IUPACName" || feature.sameAs == "http://www.opentox.org/api/1.1#ChemicalName")
 			 		 ccLib.mergeArrays(valArr, cmp.component.compound["name"]);
@@ -431,7 +431,7 @@ var jToxStudy = {
   querySummary: function(substanceURI) {
     var self = this;
     
-    jToxKit.call(substanceURI + "/studysummary", function(summary) {
+    jToxKit.call(self, substanceURI + "/studysummary", function(summary) {
       if (!!summary && !!summary.facet)
         self.processSummary(summary.facet);
     });
@@ -440,7 +440,7 @@ var jToxStudy = {
   queryComposition: function(substanceURI) {
     var self = this;
     
-    jToxKit.call(substanceURI + "/composition", function(composition) {
+    jToxKit.call(self, substanceURI + "/composition", function(composition) {
       if (!!composition && !!composition.composition)
         self.processComposition(composition);
     });
@@ -448,9 +448,12 @@ var jToxStudy = {
   
   querySubstance: function(substanceURI){
     var self = this;
-
+    
+    // re-initialize us on each of these calls.
+    self.baseUrl = jToxKit.grabBaseUrl(substanceURI, 'substance');
+    
     var rootTab = $('#jtox-substance')[0];
-    jToxKit.call(substanceURI, function(substance){
+    jToxKit.call(self, substanceURI, function(substance){
        if (!!substance && !!substance.substance && substance.substance.length > 0){
          ccLib.fillTree(rootTab, substance.substance[0]);
          self.querySummary(substanceURI);
@@ -462,7 +465,6 @@ var jToxStudy = {
   init: function(root, settings) {
     var self = this;
     this.rootElement = root;
-    this.baseUrl = jToxKit.baseUrl;
 
     var tree = jToxKit.getTemplate('#jtox-studies');
     root.appendChild(tree);
@@ -470,8 +472,8 @@ var jToxStudy = {
       if (panel){
         $('.jtox-study.unloaded', panel).each(function(i){
           var table = this;
-          jToxKit.call($(table).data('jtox-uri'), function(study){
-            $(table).removeClass('unloaded folded');
+          jToxKit.call(self, $(table).data('jtox-uri'), function(study){
+            $(table).removeClass('unloaded folded');  
             $(table).addClass('loaded');
             self.processStudies(panel, study.study, true); // TODO: must be changed to 'false', when the real summary is supplied
             $('.dataTable', table).dataTable().fnAdjustColumnSizing();
@@ -479,6 +481,8 @@ var jToxStudy = {
         });
       }
     };
+    
+    // initialize the tab structure for several versions of dataTables.
     $(tree).tabs({
       "select" : function(event, ui) {
         loadPanel(ui.panel);
@@ -488,7 +492,8 @@ var jToxStudy = {
           loadPanel(ui.newPanel[0]);
       }
     });
-    
+
+    // when all handlers are setup - make a call, if needed.    
     if (settings['substanceUri'] !== undefined){
       self.querySubstance(settings['substanceUri']);
     }

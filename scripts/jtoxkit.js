@@ -109,6 +109,18 @@ window.jToxKit = {
 		}
 	},
 	
+	/* Deduce the baseUrl from a given Url - either if it is full url, of fallback to jToxKit's if it is local
+	Passed is the first "non-base" component of the path...
+	*/
+	grabBaseUrl: function(url, main){
+    if (url !== undefined && url != null && url.indexOf('http') == 0) {
+      var re = new RegExp("(.+\/)" + main + ".*");
+      return url.replace(re, "$1");
+    }
+    else
+      return this.baseUrl;
+	},
+	
 	/* Initialized the necessary connection data. Same settings as in ToxMan.init() are passed.
 	*/
 	initConnection: function(){
@@ -129,7 +141,7 @@ window.jToxKit = {
 	
 	/* Makes a server call with the provided method. If none is given - the internally stored one is used
 	*/
-	call: function (service, callback, adata){
+	call: function (kit, service, callback, adata){
 		var self = this;
 		self.onconnect(service);
 		var method = 'GET';
@@ -144,8 +156,9 @@ window.jToxKit = {
 			adata = { };
 
 		// on some queries, like tasks, we DO have baseUrl at the beginning
-		if (service.indexOf("http") != 0)	
-			service = self.baseUrl + service;
+		if (service.indexOf("http") != 0)
+			service = (kit !== null && (!!kit.baseUrl) ? kit.baseUrl : self.baseUrl) + service;
+			
 		// now make the actual call
 		$.ajax(service, {
 			dataType: self.jsonp ? 'jsonp' : 'json',
