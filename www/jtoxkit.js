@@ -1,11 +1,10 @@
 var ccLib = {
-  mergeSettings: function (settings, base) {
-    if (settings !== undefined)
-    	for (var s in settings)
-      	base[s] = settings[s];
-  },
-  
-  mergeArrays: function (arr, base) {
+  extendArray: function (base, arr) {
+    // initialize, if needed
+    if (base === undefined || base == null)
+      base = [];
+    
+    // now proceed with extending
     if (arr !== undefined && arr !== null){
       for (var i = 0, al = arr.length; i < al; ++i){
         var v = arr[i];
@@ -126,36 +125,30 @@ var ccLib = {
     };
   }    
 }
+/* toxstudy.js - Study-related functions from jToxKit.
+ *
+ * Copyright 2012-2013, IDEAconsult Ltd. http://www.ideaconsult.net/
+ * Created by Ivan Georgiev
+**/
+
 var jToxStudy = (function () {
   var defaultSettings = { };    // all settings, specific for the kit, with their default. These got merged with general (jToxKit) ones.
   var instanceCount = 0;
-  var changeIds = function (root, suffix) {
-    $('ul li a', root).each(function() {
-      var id = $(this).attr('href').substr(1);
-      var el = document.getElementById(id);
-      id += suffix;
-      el.id = id;
-      $(this).attr('href', '#' + id);
-    })  
-  };
   
   // constructor
   var cls = function (root, settings) {
     var self = this;
     self.rootElement = root;
-    self.settings = {};
     self.suffix = '_' + instanceCount++;
     
-    ccLib.mergeSettings(defaultSettings, self.settings); // i.e. defaults from jToxStudy
-    ccLib.mergeSettings(jToxKit.settings, self.settings);
-    ccLib.mergeSettings(settings, self.settings);
+    self.settings = $.extend({}, defaultSettings, jToxKit.settings, settings); // i.e. defaults from jToxStudy
     // now we have our, local copy of settings.
 
     // get the main template, add it (so that jQuery traversal works) and THEN change the ids.
     // There should be no overlap, because already-added instances will have their IDs changed already...
     var tree = jToxKit.getTemplate('#jtox-studies');
     root.appendChild(tree);
-    changeIds(tree, self.suffix);
+    jToxKit.changeTabsIds(tree, self.suffix);
     
     // keep on initializing...
     var loadPanel = function(panel){
@@ -603,13 +596,7 @@ var jToxStudy = (function () {
     			var feature = json.feature[key];
   				if ((feature != null) && (value != null)) {
     			  var valArr = value.trim().toLowerCase().split("|").filter(function (v) { return v !== undefined && v != null && v != ''; });
-            
-  			 		if (feature.sameAs == "http://www.opentox.org/api/1.1#IUPACName" || feature.sameAs == "http://www.opentox.org/api/1.1#ChemicalName")
-  			 		 ccLib.mergeArrays(valArr, cmp.component.compound["name"]);
-  			 		else if (feature.sameAs == "http://www.opentox.org/api/1.1#CASRN")
-  			 		 ccLib.mergeArrays(valArr, cmp.component.compound["cas"]);
-  			 		else if (feature.sameAs == "http://www.opentox.org/api/1.1#EINECS")
-  			 		 ccLib.mergeArrays(valArr, cmp.component.compound["einecs"]);
+            ccLib.extendArray(cmp.component.compound[jToxKit.featureGroup(feature.sameAs)], valArr);
           }
         }
       }
@@ -691,7 +678,7 @@ window.jToxKit = {
 		var queryParams = url.params;
 		queryParams.host = url.host;
 	
-    ccLib.mergeSettings(queryParams, self.settings); // merge with defaults!
+    self.settings = $.extend(self.settings, queryParams); // merge with defaults
 	  
 		if (!self.settings.baseUrl)
 		  self.settings.baseUrl = self.settings.host;
@@ -734,6 +721,30 @@ window.jToxKit = {
     }
     return el;
 	},
+		
+  changeTabsIds: function (root, suffix) {
+    $('ul li a', root).each(function() {
+      var id = $(this).attr('href').substr(1);
+      var el = document.getElementById(id);
+      id += suffix;
+      el.id = id;
+      $(this).attr('href', '#' + id);
+    })  
+  },
+
+  // extract a group from feature, based on it's sameAs attribute  
+  featureGroup: function (sameAs) {
+    var grp = sameAs.substr(sameAs.indexOf('#') + 1); // trick - on 'not-found' it returns -1, which, adding 1 is exatly what we need :-)
+    
+ 		if (grp == "IUPACName" || grp == "ChemicalName")
+      grp = "name";
+    else if (grp == "CASRN")
+      grp = "cas";
+    else if (grp == "EINECS")
+      grp = "einecs";
+    
+    return grp;
+  },
 		
 	/* Poll a given taskId and calls the callback when a result from the server comes - 
 	be it "running", "completed" or "error" - the callback is always called.

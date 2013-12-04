@@ -1,0 +1,14 @@
+/* toxtdataset.css - Styling for tox-dataset engine
+*/
+
+#jtox-dataset table tr * {
+  border: 1px solid black;
+}
+
+
+.jtox-ds-fixed,
+.jtox-ds-variable {
+  border: 0px;
+  padding: 0px;
+  margin: 0px;
+}

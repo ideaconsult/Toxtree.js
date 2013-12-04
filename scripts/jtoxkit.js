@@ -34,7 +34,7 @@ window.jToxKit = {
 		var queryParams = url.params;
 		queryParams.host = url.host;
 	
-    ccLib.mergeSettings(queryParams, self.settings); // merge with defaults!
+    self.settings = $.extend(self.settings, queryParams); // merge with defaults
 	  
 		if (!self.settings.baseUrl)
 		  self.settings.baseUrl = self.settings.host;
@@ -77,6 +77,16 @@ window.jToxKit = {
     }
     return el;
 	},
+		
+  changeTabsIds: function (root, suffix) {
+    $('ul li a', root).each(function() {
+      var id = $(this).attr('href').substr(1);
+      var el = document.getElementById(id);
+      id += suffix;
+      el.id = id;
+      $(this).attr('href', '#' + id);
+    })  
+  },
 		
 	/* Poll a given taskId and calls the callback when a result from the server comes - 
 	be it "running", "completed" or "error" - the callback is always called.

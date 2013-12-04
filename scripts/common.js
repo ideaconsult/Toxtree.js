@@ -1,11 +1,12 @@
 var ccLib = {
-  mergeSettings: function (settings, base) {
-    if (settings !== undefined)
-    	for (var s in settings)
-      	base[s] = settings[s];
-  },
-  
-  mergeArrays: function (arr, base) {
+  extendArray: function (base, arr) {
+    // initialize, if needed
+    if (base === undefined || base == null)
+      base = [];
+    else if (typeof base != 'array')
+      base = [base];
+    
+    // now proceed with extending
     if (arr !== undefined && arr !== null){
       for (var i = 0, al = arr.length; i < al; ++i){
         var v = arr[i];
@@ -38,6 +39,17 @@ var ccLib = {
       obj.innerHTML = value;      
   },
   
+  setJsonValue: function (json, field, val) {
+    if (field !== undefined){
+      try {
+        eval("json." + field + " = val");
+      }
+      catch(e){
+        ;
+      }
+    }  
+  },
+  
   getJsonValue: function (json, field){
     var value = undefined;
     if (field !== undefined) {
@@ -50,7 +62,7 @@ var ccLib = {
     }
     return value;
   },
-
+  
   // given a root DOM element and an JSON object it fills all (sub)element of the tree
   // which has class 'data-field' and their name corresponds to a property in json object.
   // If prefix is given AND json has id property - the root's id set to to prefix + json.id
@@ -125,4 +137,8 @@ var ccLib = {
       segments: a.pathname.replace(/^\//,'').split('/')
     };
   }    
+};
+
+function ccNonEmptyFilter(v) {
+  return v !== undefined && v != null && v != '';  
 }

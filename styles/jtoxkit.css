@@ -48,4 +48,14 @@ th.middle {
   vertical-align: middle;  
 }
 
+/* Make table helper elements, like paging, filter, etc. in one line...
+*/
+.jtox-toolkit .dataTables_filter label input,
+.jtox-toolkit .dataTables_length label select,
+.jtox-inline {
+  display: inline-block;
+  width: auto;  
+}
+
+
 

@@ -1,6 +1,18 @@
 TODO:
 
+- Make feature-sets analysis and combination
+- Column hiding removal / editing;
+- make feature-set selection;
+- 
+- Make scrolling table support;
 - fix improper scrollbars, next/prev, etc.: checkout sScrollX in datatables.
 - make toxtree part of jToxKit
+- 
+
+
+jToxDataset:
+- options: editColumns: true / dalse, columnSets: [], 
+- queryDataset(datasetUri);
+- queryFeatures(dataetUri);, group based on sameAs
 - 
 
