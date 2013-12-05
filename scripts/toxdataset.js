@@ -19,13 +19,13 @@ var jToxDataset = (function () {
   
   var commonFeatures = {
 /*     "IUCLID5_UUID": {"sameAs": "i5uuid"} */
-    "diagram": {"title": "Diagram", "group": "Common", "dataLocation": "compound.URI"},
-    "cas": {"title": "CAS", "group": "Common", "dataLocation": "compound.cas"},
-    "einecs": {"title": "EINECS", "group": "Common", "dataLocation": "compound.einecs"},
-    "name": {"title": "Name", "group": "Common", "dataLocation": "compound.name"},
-    "SMILES": {"title": "Smiles", "units": "", "group": "Common"},
-    "InChI": {"title": "InChI", "units": "", "group": "Common"},
-    "reachdate": {"title": "REACHRegistration", "units": "", "group": "Common"}
+    "diagram": {"column": 0, "title": "Diagram", "group": "Common", "dataLocation": "compound.URI"},
+    "cas": {"column": 1, "title": "CAS", "group": "Common", "dataLocation": "compound.cas"},
+    "einecs": {"colun": 2, "title": "EINECS", "group": "Common", "dataLocation": "compound.einecs"},
+    "name": {"column": 3, "title": "Name", "group": "Common", "dataLocation": "compound.name"},
+    "SMILES": {"column": 4, "title": "Smiles", "units": "", "group": "Common", "dataLocation": "compound.smiles"},
+    "InChI": {"column": 5, "title": "InChI", "units": "", "group": "Common", "dataLocation": "compound.inchi"},
+    "reachdate": {"column": 6, "title": "REACHRegistration", "units": "", "group": "Common", "dataLocation": "compound.reachdate"}
   };
   
   // constructor
@@ -34,7 +34,8 @@ var jToxDataset = (function () {
     self.rootElement = root;
     self.settings = $.extend({}, defaultSettings, jToxKit.settings, settings); // i.e. defaults from jToxDataset
     self.features = null; // almost exactly as downloaded form server - just a group member is added based on sameAs
-    self.featureGroups = {};
+    self.featureGroups = {"common": []};
+    self.featureOrder = ["common"];
 
     instanceCount++;
   };
@@ -53,15 +54,29 @@ var jToxDataset = (function () {
     processFeatures: function (features) {
       var self = this;
       
-      self.featureList = features;
+      self.features = features;
       if (!!features) {
         for (var f in features) {
           
           var fullf = features[f];
-          var gr = cls.featureInfo(fullf.sameAs);
-          self.featureGroups[info.group] = ccLib.extendArray(self.featureGroups[info.group], [f]);
-          fullf['group'] = info.group;
+          var gr = cls.fixSameAs(fullf.sameAs);
+          if (commonFeatures[gr] === undefined) {
+            if (self.featureGroups[gr] === undefined){ // add new one
+              self.featureOrder.push(gr);
+              self.featureGroups[gr] = [];
+            }
+            
+            self.featureGroups[gr].push(f);
+          }
+
+          fullf.group = gr;
         }
+       
+        // finally - append our, custom groups at the end, so that they appear as usual groups
+        for (var f in commonFeatures)
+          self.featureGroups["Common"].push(f);
+        
+        $.extend(self.features, commonFeatures);
       }
     },
 
@@ -81,34 +96,35 @@ var jToxDataset = (function () {
         if (!!dataset){
           self.processFeatures(dataset.feature);
           var mainTabs = self.prepareTabs(self.rootElement);
+
+          var fixedCols = [];
+          var varCols = [];
           
-          // now go to prepare the table(s)
-          var fixedDefs = [];
-          var varDefs = [];
-          
-          for (var i in self.featureGroups) {
-            var grp = self.featureGroups[i];
-            if (grp == "Common"){
-              fixedDefs = []
-              for (var j = 0, glen = grp.length;j < glen; ++j) {
-                var f = grp[j];
-                varDefs.push({
-        					"mData" : "values." + f,
-        					"sTitle" : self.features[f].title,
-        					"sDefaultContent": "?"
-      					});
-      				}
+          for (var i = 0, glen = self.featureOrder.length; i < glen; ++i) {
+            var grp = self.featureOrder[i];
+            var gfull = self.featureGroups[grp];
+            
+            for (var j = 0, flen = gfull.length; j < flen; ++j){
+              var f = gfull[j];
+              var ffull = self.features[f];
+              var col = {
+                "sTitle": ffull.title + ffull.units,
+                "sDefaultContent": "?",
+                "mData": ffull.dataLocation !== undefined ? ffull.dataLocation : "values"
+              };
               
-            }
-            else { // Others
-              for (var j = 0, glen = grp.length;j < glen; ++j) {
-                var f = grp[j];
-                varDefs.push({
-        					"mData" : "values." + f,
-        					"sTitle" : self.features[f].title,
-        					"sDefaultContent": "?"
-      					});
-      				}
+              if (ffull.dataLocation === undefined){
+                col["mRender"] = (function (fid) { 
+                  return function (data, type, full) {
+                    return data[fid];
+                  };
+                })(f);
+              }
+              
+              if (grp == "common")
+                fixedCols.push(col);
+              else
+                varCols.push(col);
             }
           }
         }
