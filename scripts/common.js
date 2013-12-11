@@ -98,6 +98,13 @@ var ccLib = {
     return format;
   },
   
+  copyToClipboard: function(text, prompt) {
+    if (!prompt) {
+      prompt = "Press Ctrl-C (Command-C) to copy and then Enter.";
+    }
+    window.prompt(prompt, text);
+  },
+  
   parseURL: function(url) {
     var a =  document.createElement('a');
     a.href = url;

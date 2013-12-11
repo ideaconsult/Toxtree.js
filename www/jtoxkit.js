@@ -98,6 +98,13 @@ var ccLib = {
     return format;
   },
   
+  copyToClipboard: function(text, prompt) {
+    if (!prompt) {
+      prompt = "Press Ctrl-C (Command-C) to copy and then Enter.";
+    }
+    window.prompt(prompt, text);
+  },
+  
   parseURL: function(url) {
     var a =  document.createElement('a');
     a.href = url;
@@ -138,6 +145,9 @@ var jToxStudy = (function () {
       $(this).attr('href', '#' + id);
     })  
   };
+  
+  // make this handler for UUID copying. Once here - it's live, so it works for all tables in the future
+  $(document).on('click', '.jtox-toolkit span.ui-icon-copy', function (e) { ccLib.copyToClipboard($(this).data('uuid'), "Press Ctrl-C (Command-C) to copy UUID:"); return false;});
   
   // constructor
   var cls = function (root, settings) {
@@ -182,7 +192,7 @@ var jToxStudy = (function () {
           loadPanel(ui.newPanel[0]);
       }
     });
-
+    
     // when all handlers are setup - make a call, if needed.    
     if (self.settings['substanceUri'] !== undefined){
       self.querySubstance(self.settings['substanceUri']);
@@ -351,7 +361,7 @@ var jToxStudy = (function () {
         colDefs.push(
           { "sClass": "center", "sWidth": "15%", "mData": "protocol.guidance", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
           { "sClass": "center", "sWidth": "50px", "mData": "owner.company.name", "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>'; }  }, 
-          { "sClass": "center", "sWidth": "50px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>'; }  }
+          { "sClass": "center", "sWidth": "50px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div><span class="ui-icon ui-icon-copy" data-uuid="' + data + '"></span>'; } }
         );
         
         // READYY! Go and prepare THE table.
