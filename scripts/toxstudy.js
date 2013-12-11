@@ -368,10 +368,16 @@ var jToxStudy = (function () {
     
     processComposition: function(json){
       var self = this;
-      $('.jtox-composition', self.rootElement).removeClass('unloaded');
+      var tab = $('.jtox-composition', self.rootElement)[0];
       
-      var prepareFillTable = function (json) {
-        var theTable = $('.jtox-composition .substancesTable', self.rootElement);
+      // clear the old tabs, if any.
+      if ($(tab).hasClass('unloaded')){
+        $(tab).removeClass('unloaded');
+        $(tab).empty();
+      }
+      
+      var prepareFillTable = function (json, panel) {
+        var theTable = $('.substances-table', panel);
         // prepare the table...
         $(theTable).dataTable({
   				"bSearchable": true,
@@ -442,11 +448,12 @@ var jToxStudy = (function () {
   		  });
 
         // and fill up the table.
-        $(theTable).dataTable().fnAddData(json.composition);
+        $(theTable).dataTable().fnAddData(json);
         return theTable;
       };
       
       var substances = {};
+
       // proprocess the data...
       for (var i = 0, cmpl = json.composition.length; i < cmpl; ++i) {
         var cmp = json.composition[i];
@@ -475,19 +482,22 @@ var jToxStudy = (function () {
           substances[cmp.compositionUUID] = theSubs = { name: "", purity: "", maxvalue: 0, uuid : cmp.compositionUUID, composition : [] };
         
         theSubs.composition.push(cmp);
-        var val = cmp.proportion.real;
-        if (cmp.relation == 'HAS_CONSTITUENT' && theSubs.maxvalue < val.upperValue) {
-          theSubs.name = cmp.component.compound['name'] + ' ' + self.formatConcentration(val.upperPrecision, val.upperValue, val.unit);
-          theSubs.maxvalue = val.upperValue;
-          theSubs.purity = (val.lowerValue + '-' + val.upperValue + ' ' + (val.unit == null || val.unit == '' ? "% (w/w)" : unit)).replace(/ /g, "&nbsp;");
+        var val = cmp.proportion.typical;
+        if (cmp.relation == 'HAS_CONSTITUENT' && (theSubs.maxvalue < val.value || theSubs.name == '')) {
+          theSubs.name = cmp.component.compound['name'] + ' ' + self.formatConcentration(val.precision, val.value, val.unit);
+          theSubs.maxvalue = val.value;
+          val = cmp.proportion.real;
+          theSubs.purity = (val.lowerValue + '-' + val.upperValue + ' ' + (val.unit == null || val.unit == '' ? "% (w/w)" : val.unit)).replace(/ /g, "&nbsp;");
         }
       }
       
+      // now make the actual filling
       for (var i in substances){
-        ccLib.fillTree($('.compositionInfo', self.rootElement)[0], substances[i]);
-        break;
+        var panel = jToxKit.getTemplate('#jtox-compoblock');
+        tab.appendChild(panel);
+        ccLib.fillTree($('.composition-info', panel)[0], substances[i]);
+        prepareFillTable(substances[i].composition, panel);
       }
-      prepareFillTable(json);
     },
     
     querySummary: function(substanceURI) {

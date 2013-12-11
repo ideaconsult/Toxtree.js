@@ -1,6 +1,7 @@
 TODO:
 
-- fix improper scrollbars, next/prev, etc.: checkout sScrollX in datatables.
+- finish composition tab fill-ups and mutiplication
+- make UUID copiable everywhere in consistent way
 - make toxtree part of jToxKit
 - 
 
