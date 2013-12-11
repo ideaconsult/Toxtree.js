@@ -29,7 +29,7 @@
   <script language="javascript">
     $(document).ready(function(){
       var st = new jToxStudy($(".jtox-toolkit")[0]);
-      st.querySubstance("http://apps.ideaconsult.net:8080/biodeg/substance/IUC4-efdb21bb-e79f-3286-a988-b6f6944d3734");
+      st.querySubstance("http://apps.ideaconsult.net:8080/biodeg/substance/IUC5-410e026d-f182-4e36-b14f-28013022f906");
     });
   </script>
 </head>
@@ -50,45 +50,49 @@
 	      <table class="dataTable">
 	        <thead>
 	          <tr>
-	            <th class="jtox-size-third">IUC Substance name:</th>
+	            <th class="right jtox-size-third">IUC Substance name:</th>
 	            <td class="data-field camelCase" data-field="name"> ? </td>
 	          </tr>
 	          <tr>
-	            <th>IUC Substance UUID:</th>
+	            <th class="right">IUC Substance UUID:</th>
 	            <td class="data-field" data-field="i5uuid"> ? </td>
 	          </tr>
 	          <tr>
-	            <th>IUC Public name:</th>
+	            <th class="right">IUC Public name:</th>
 	            <td class="data-field camelCase" data-field="publicname"> ? </td>
 	          </tr>
 	          <tr>
-	            <th>Legal entity UUID:</th>
+	            <th class="right">Legal entity UUID:</th>
 	            <td class="data-field" data-field="ownerUUID"> ? </td>
 	          </tr>
 	          <tr>
-	            <th>Type substance composition:</th>
+	            <th class="right">Type substance composition:</th>
 	            <td class="data-field" data-field="substanceType"> ? </td>
 	          </tr>
 	          <tr>
-	            <th>Reference substance UUID:</th>
+	            <th class="right">Reference substance UUID:</th>
 	            <td class="data-field" data-field="referenceSubstance.i5uuid"> ? </td>
 	          </tr>
 	        </thead>
 	      </table>
 	    </div>
 	    <div id="jtox-composition" class="jtox-composition unloaded">
-	      <table>
+	      <table class="dataTable compositionInfo jtox-font-small">
+	        <thead>
+	          <tr><th class="jtox-size-quarter right">Composition name:</th><td class="data-field camelCase" data-field="name"> ? </td></tr>
+	          <tr><th class="right">Composition UUID:</th><td class="data-field" data-field="uuid"> ? </td></tr>
+	          <tr><th class="right">Purity of IUC Substance:</th><td class="data-field" data-field="purity"> ? </td></tr>
+	        </thead>
+	      </table>
+	      <table class="substancesTable">
           <thead>
             <tr>
-              <th>Composition ID</th>
               <th>Type</th>
               <th>Name</th>
               <th>EC No.</th>
               <th>CAS No.</th>
               <th>Typical concentration</th>
-              <th>Real concentration (lower)</th>
-              <th>Real concentration (upper)</th>
-              <th>Other related substances</th>
+              <th colspan="2">Concentration ranges</th>
             </tr>
           </thead>
         </table>

@@ -363,46 +363,34 @@ var jToxStudy = (function () {
     },
     
     formatConcentration: function (precision, val, unit) {
-    	return ((precision === undefined || precision === null || "=" == precision ? "" : precision) + val + " " + (unit == null ? "" : unit)).replace(/ /g, "&nbsp;");
+    	return ((precision === undefined || precision === null || "=" == precision ? "" : precision) + val + " " + (unit == null || unit == '' ? "% (w/w)" : unit)).replace(/ /g, "&nbsp;");
     },
     
     processComposition: function(json){
       var self = this;
       $('.jtox-composition', self.rootElement).removeClass('unloaded');
-      var theTable = $('.jtox-composition table', self.rootElement);
-      if (!$(theTable).hasClass('dataTable')) {
+      
+      var prepareFillTable = function (json) {
+        var theTable = $('.jtox-composition .substancesTable', self.rootElement);
         // prepare the table...
         $(theTable).dataTable({
   				"bSearchable": true,
   				"bProcessing" : true,
   				"bPaginate" : true,
-  /* 				"sDom" : '<"help remove-bottom"i><"help"p>Trt<"help"lf>', */
+          "sDom" : "rt<Fip>",
+/*   				"sDom" : '<"help remove-bottom"i><"help"p>Trt<"help"lf>', */
   /* 				"sPaginationType": "full_numbers", */
   				"sPaginate" : ".dataTables_paginate _paging",
   				"bAutoWidth": false,
   				"oLanguage": {
-  				  "sSearch": "Filter:",
             "sProcessing": "<img src='" + self.baseUrl + "images/24x24_ambit.gif' border='0'>",
             "sLoadingRecords": "No substances found.",
             "sZeroRecords": "No substances found.",
             "sEmptyTable": "No substances available.",
             "sInfo": "Showing _TOTAL_ substance(s) (_START_ to _END_)",
-            "sLengthMenu": 'Display&nbsp;<select>' +
-              '<option value="10">10</option>' +
-              '<option value="20">20</option>' +
-              '<option value="50">50</option>' +
-              '<option value="100">100</option>' +
-              '<option value="-1">all</option>' +
-              '</select>&nbsp;substances.'	            
           },
   		    "aoColumns": [
-    				{  //1
-    					"sClass" : "left",
-    					"sWidth" : "50px",
-    					"mData" : "compositionUUID",
-    					"mRender" : function(data, type, full) { return type != 'display' ? '' + data : '<div class="shortened">' + data + '</div>'; }
-    				},	
-            {  //2
+            {  //1
     					"sClass" : "left",
     					"sWidth" : "10%",
     					"mData" : "relation",
@@ -413,7 +401,7 @@ var jToxStudy = (function () {
     					  return '<span class="camelCase">' +  val.replace("HAS_", "").toLowerCase() + '</span>' + ((func === undefined || func === null || func == '') ? "" : " (" + func + ")");
               }
             },	    
-    				{ //3
+    				{ //2
     					"sClass" : "camelCase left",
     					"sWidth" : "15%",
     					"mData" : "component.compound.name",
@@ -422,47 +410,43 @@ var jToxStudy = (function () {
     						  '<a href="' + full.component.compound.URI + '" target="_blank" title="Click to view the compound"><span class="ui-icon ui-icon-link" style="float: left; margin-right: .3em;"></span></a>' + val;
     					}
     				},	    	
-    				{ //4
+    				{ //3
     					"sClass" : "left",
     					"sWidth" : "10%",
     					"mData" : "component.compound.einecs",
     				},
-    				{ //5
+    				{ //4
     					"sClass" : "left",
     					"sWidth" : "10%",
     					"mData" : "component.compound.cas",
     				},
-    				{ //6
+    				{ //5
     					"sClass" : "center",
     					"sWidth" : "15%",
     					"mData" : "proportion.typical",
     					"mRender" : function(val, type, full) { return type != 'display' ? '' + val.value : self.formatConcentration(val.precision, val.value, val.unit); }
     				},
-    				{ //7
+    				{ //6
     					"sClass" : "center",
     					"sWidth" : "15%",
     					"mData" : "proportion.real",
     					"mRender" : function(val, type, full) { return type != 'display' ? '' + val.lowerValue : self.formatConcentration(val.lowerPrecision, val.lowerValue, val.unit); }
     				},
-    				{ //8
+    				{ //7
     					"sClass" : "center",
     					"sWidth" : "15%",
     					"mData" : "proportion.real",
     					"mRender" : function(val, type, full) { return type != 'display' ? '' + val.upperValue : self.formatConcentration(val.upperPrecision, val.upperValue, val.unit); }
-    				},			    				
-    				{ //9
-    					"sClass" : "center",
-    					"mData" : "component.compound.URI",
-    					"mRender" : function(val, type, full) {
-    					  return !val ? '' : '<a href="' + self.baseUrl + 'substance?type=related&compound_uri=' + encodeURIComponent(val) + '" target="_blank">Also contained in...</a>';
-    					}
-  	    		}		    				
+    				}
   		    ]
   		  });
-      }
-      else
-        $(theTable).dataTable().fnClearTable();
+
+        // and fill up the table.
+        $(theTable).dataTable().fnAddData(json.composition);
+        return theTable;
+      };
       
+      var substances = {};
       // proprocess the data...
       for (var i = 0, cmpl = json.composition.length; i < cmpl; ++i) {
         var cmp = json.composition[i];
@@ -484,10 +468,26 @@ var jToxStudy = (function () {
   			 		 ccLib.mergeArrays(valArr, cmp.component.compound["einecs"]);
           }
         }
+
+        // now prepare the subs        
+        var theSubs = substances[cmp.compositionUUID];
+        if (theSubs === undefined)
+          substances[cmp.compositionUUID] = theSubs = { name: "", purity: "", maxvalue: 0, uuid : cmp.compositionUUID, composition : [] };
+        
+        theSubs.composition.push(cmp);
+        var val = cmp.proportion.real;
+        if (cmp.relation == 'HAS_CONSTITUENT' && theSubs.maxvalue < val.upperValue) {
+          theSubs.name = cmp.component.compound['name'] + ' ' + self.formatConcentration(val.upperPrecision, val.upperValue, val.unit);
+          theSubs.maxvalue = val.upperValue;
+          theSubs.purity = (val.lowerValue + '-' + val.upperValue + ' ' + (val.unit == null || val.unit == '' ? "% (w/w)" : unit)).replace(/ /g, "&nbsp;");
+        }
       }
       
-      // and fill up the table.
-      $(theTable).dataTable().fnAddData(json.composition);
+      for (var i in substances){
+        ccLib.fillTree($('.compositionInfo', self.rootElement)[0], substances[i]);
+        break;
+      }
+      prepareFillTable(json);
     },
     
     querySummary: function(substanceURI) {
