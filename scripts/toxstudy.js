@@ -40,7 +40,7 @@ var jToxStudy = (function () {
           jToxKit.call(self, $(table).data('jtox-uri'), function(study){
             $(table).removeClass('unloaded folded');  
             $(table).addClass('loaded');
-            self.processStudies(panel, study.study, true); // TODO: must be changed to 'false', when the real summary is supplied
+            self.processStudies(panel, study.study, false);
             $('.dataTable', table).dataTable().fnAdjustColumnSizing();
           });  
         });
@@ -116,7 +116,7 @@ var jToxStudy = (function () {
       return out.replace(/ /g, "&nbsp;");
     },
     
-    createCategory: function(tab, category, name) {
+    createCategory: function(tab, category) {
       var self = this;
   
       var theCat = $('.' + category + '.jtox-study', tab)[0];
@@ -126,13 +126,11 @@ var jToxStudy = (function () {
         $(theCat).addClass(category);
         
         // install the click handler for fold / unfold
-        var titleEl = $('.jtox-study-title', theCat);
-        $(titleEl).click(function() {
+        $('.jtox-study-title', theCat).click(function() {
           $(theCat).toggleClass('folded');
         });
       }
       
-      ccLib.fillTree(titleEl[0], { title: "" + name + " (0)"});
       return theCat;
     },
   
@@ -146,7 +144,7 @@ var jToxStudy = (function () {
     ensureTable: function (tab, study) {
       var self = this;
   
-      var theTable = $('.' + study.protocol.category + ' .jtox-study-table')[0];
+      var theTable = $('.' + study.protocol.category.code + ' .jtox-study-table')[0];
       if (!$(theTable).hasClass('dataTable')) {
   
         var colDefs = [
@@ -289,7 +287,7 @@ var jToxStudy = (function () {
           typeSummary[top] = sum.count;
         }
         else {
-          var cat = self.createCategory(tab, catname, catname);
+          var cat = self.createCategory(tab, catname);
           $(cat).data('jtox-uri', sum.category.uri);
         }
       }
@@ -332,29 +330,33 @@ var jToxStudy = (function () {
       var cats = [];
       
       // first swipe to map them to different categories...
-      for (var i = 0, slen = study.length; i < slen; ++i) {
-        var ones = study[i];
-        if (map) {
-          if (cats[ones.protocol.category] === undefined) {
-            cats[ones.protocol.category] = [ones];
-          }
-          else {
-            cats[ones.protocol.category].push(ones);
+      if (!map){
+        // add this one, if we're not remapping. map == false assumes that all passed studies will be from
+        // one category.    
+        cats[study[0].protocol.category.code] = study;
+      }
+      else{
+        for (var i = 0, slen = study.length; i < slen; ++i) {
+          var ones = study[i];
+          if (map) {
+            if (cats[ones.protocol.category] === undefined) {
+              cats[ones.protocol.category.code] = [ones];
+            }
+            else {
+              cats[ones.protocol.category.code].push(ones);
+            }
           }
         }
       }
   
-      // add this one, if we're not remapping. map == false assumes that all passed studies will be from
-      // one category.    
-      if (!map)
-        cats[study[0].protocol.category] = study;
-      
       // now iterate within all categories (if many) and initialize the tables
       for (var c in cats) {
         var onec = cats[c];
-        if ($('.' + c + '.jtox-study', tab).length < 1)
+        var aStudy = $('.' + c + '.jtox-study', tab)[0];
+        if (aStudy === undefined)
           continue;
   
+        ccLib.fillTree(aStudy, {title: onec[0].protocol.category.title + " (0)"});
         var theTable = self.ensureTable(tab, onec[0]);
         $(theTable).dataTable().fnAddData(onec);
       }

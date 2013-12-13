@@ -1,5 +1,8 @@
 TODO:
 
+- reflect last updates
+- фактура
+- договор
 - make toxtree part of jToxKit
 - 
 
