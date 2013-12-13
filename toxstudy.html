@@ -30,6 +30,7 @@
   <script language="javascript">
     $(document).ready(function(){
       var st = new jToxStudy($(".jtox-toolkit")[0]);
+/*       st.querySubstance("http://apps.ideaconsult.net:8080/biodeg/substance/IUC5-410e026d-f182-4e36-b14f-28013022f906"); */
       st.querySubstance("http://apps.ideaconsult.net:8080/biodeg/substance/IUC4-efdb21bb-e79f-3286-a988-b6f6944d3734");
     });
   </script>
@@ -40,7 +41,7 @@
 <!--[[ jToxKit.templates['all-studies'] -->
 	  <div id="jtox-studies">
 	    <ul>
-	      <li><a href="#jtox-substance">Substance</a></li>
+	      <li><a href="#jtox-substance">IUC Substance</a></li>
 	      <li><a href="#jtox-composition">Composition</a></li>
 	      <li><a href="#jtox-pchem" data-type="P-CHEM">P-Chem (0)</a></li>
 	      <li><a href="#jtox-envfate" data-type="ENV_FATE">Env Fate (0)</a></li>
@@ -51,49 +52,33 @@
 	      <table class="dataTable">
 	        <thead>
 	          <tr>
-	            <th class="jtox-size-third">Name:</th>
+	            <th class="right jtox-size-third">IUC Substance name:</th>
 	            <td class="data-field camelCase" data-field="name"> ? </td>
 	          </tr>
 	          <tr>
-	            <th>Company UUID:</th>
+	            <th class="right">IUC Substance UUID:</th>
 	            <td class="data-field" data-field="i5uuid"> ? </td>
 	          </tr>
 	          <tr>
-	            <th>Owner UUID:</th>
-	            <td class="data-field" data-field="ownerUUID"> ? </td>
-	          </tr>
-	          <tr>
-	            <th>Type:</th>
-	            <td class="data-field" data-field="substanceType"> ? </td>
-	          </tr>
-	          <tr>
-	            <th>Public name:</th>
+	            <th class="right">IUC Public name:</th>
 	            <td class="data-field camelCase" data-field="publicname"> ? </td>
 	          </tr>
 	          <tr>
-	            <th>Reference substance UUID:</th>
+	            <th class="right">Legal entity UUID:</th>
+	            <td class="data-field" data-field="ownerUUID"> ? </td>
+	          </tr>
+	          <tr>
+	            <th class="right">Type substance composition:</th>
+	            <td class="data-field" data-field="substanceType"> ? </td>
+	          </tr>
+	          <tr>
+	            <th class="right">Reference substance UUID:</th>
 	            <td class="data-field" data-field="referenceSubstance.i5uuid"> ? </td>
 	          </tr>
 	        </thead>
 	      </table>
 	    </div>
-	    <div id="jtox-composition" class="jtox-composition unloaded">
-	      <table>
-          <thead>
-            <tr>
-              <th>Composition ID</th>
-              <th>Type</th>
-              <th>Name</th>
-              <th>EC No.</th>
-              <th>CAS No.</th>
-              <th>Typical concentration</th>
-              <th>Real concentration (lower)</th>
-              <th>Real concentration (upper)</th>
-              <th>Other related substances</th>
-            </tr>
-          </thead>
-        </table>
-	    </div>
+	    <div id="jtox-composition" class="jtox-composition unloaded"></div>
 	    <div id="jtox-pchem" class="jtox-study-tab P-CHEM">
 	      <p><input type="text" class="jtox-study-filter ui-input" placeholder="Filter..." /></p>
       </div>
@@ -108,6 +93,29 @@
 	    </div>
 	  </div>
 <!-- // end of #jtox-studies ]]-->
+<!--[[ jToxKit.templates['composition-block'] -->
+    <div id="jtox-compoblock" class="jtox-compoblock">
+      <table class="dataTable composition-info jtox-font-small">
+        <thead>
+          <tr><th>Composition name:</th><td class="data-field camelCase" data-field="name"> ? </td></tr>
+          <tr><th>Composition UUID:</th><td class="data-field" data-field="uuid"> ? </td></tr>
+          <tr><th>Purity of IUC Substance:</th><td class="data-field" data-field="purity"> ? </td></tr>
+        </thead>
+      </table>
+      <table class="substances-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Name</th>
+            <th>EC No.</th>
+            <th>CAS No.</th>
+            <th>Typical concentration</th>
+            <th colspan="2">Concentration ranges</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+<!-- // end of #jtox-compoblock ]]-->
 <!--[[ jToxKit.templates['one-study'] -->
     <div id="jtox-study" class="jtox-study jtox-foldable folded unloaded">
       <div class="jtox-study-title"><p class="data-field" data-field="title">? (0)</p></div>

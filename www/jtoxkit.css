@@ -1,5 +1,10 @@
 /* toxtstudy.css - Styling for toxstudy engine
 */
+.jtox-toolkit .dataTables_filter label input,
+.jtox-toolkit .dataTables_length label select {
+  display: inline-block;
+  width: auto;  
+}
 
 div.jtox-study,
 div.jtox-composition,
@@ -13,6 +18,23 @@ div.jtox-substance {
 .jtox-study.folded table,
 .jtox-study.folded div.dataTables_wrapper {
   display: none;
+}
+
+.jtox-compoblock {
+  margin-top: 25px;
+  margin-bottom: 45px;  
+}
+
+.jtox-toolkit table.composition-info.dataTable td,
+.jtox-toolkit table.composition-info.dataTable th {
+  border: 0px;
+  padding-bottom: 0px;
+  padding-top: 0px;
+}
+
+.jtox-toolkit table.composition-info.dataTable th {
+  width: 20%;
+  text-align: right;
 }
 
 div.jtox-study.unloaded .jtox-study-title,
@@ -152,19 +174,22 @@ td.jtox-multi table {
   width: 50%;
 }
 
-td.middle,
-th.middle {
+.jtox-size-full {
+  width: 100%;
+}
+
+.middle {
   vertical-align: middle;  
 }
 
-/* Make table helper elements, like paging, filter, etc. in one line...
-*/
-.jtox-toolkit .dataTables_filter label input,
-.jtox-toolkit .dataTables_length label select,
-.jtox-inline {
-  display: inline-block;
-  width: auto;  
+.right {
+  text-align: right;
 }
 
+.jtox-font-small {
+  font-size: small;
+}
 
-
+.jtox-font-smaller {
+  font-size: smaller;
+}

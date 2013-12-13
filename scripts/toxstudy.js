@@ -8,6 +8,9 @@ var jToxStudy = (function () {
   var defaultSettings = { };    // all settings, specific for the kit, with their default. These got merged with general (jToxKit) ones.
   var instanceCount = 0;
   
+  // make this handler for UUID copying. Once here - it's live, so it works for all tables in the future
+  $(document).on('click', '.jtox-toolkit span.ui-icon-copy', function (e) { ccLib.copyToClipboard($(this).data('uuid'), "Press Ctrl-C (Command-C) to copy UUID:"); return false;});
+  
   // constructor
   var cls = function (root, settings) {
     var self = this;
@@ -31,7 +34,7 @@ var jToxStudy = (function () {
           jToxKit.call(self, $(table).data('jtox-uri'), function(study){
             $(table).removeClass('unloaded folded');  
             $(table).addClass('loaded');
-            self.processStudies(panel, study.study, true); // TODO: must be changed to 'false', when the real summary is supplied
+            self.processStudies(panel, study.study, false);
             $('.dataTable', table).dataTable().fnAdjustColumnSizing();
           });  
         });
@@ -48,7 +51,7 @@ var jToxStudy = (function () {
           loadPanel(ui.newPanel[0]);
       }
     });
-
+    
     // when all handlers are setup - make a call, if needed.    
     if (self.settings['substanceUri'] !== undefined){
       self.querySubstance(self.settings['substanceUri']);
@@ -85,29 +88,7 @@ var jToxStudy = (function () {
       return df;
     },
     
-    formatResult: function (data, type) {
-      var out = "";
-      data = data.result;
-      if (data.loValue !== undefined && data.upValue !== undefined) {
-        out += (data.loQualifier == ">=") ? "[" : "(";
-        out += data.loValue + ", " + data.upValue;
-        out += (data.upQualifier == "<=") ? "]" : ") ";
-      }
-      else // either of them is non-undefined
-      {
-        var fnFormat = function (q, v) {
-          return ((q !== undefined) ? q : "=") + " " + v;
-        };
-        
-        out += (data.loValue !== undefined) ? fnFormat(data.loQualifier, data.loValue) : fnFormat(data.upQualifier, data.upValue);
-      }
-      
-      if (!!data.unit)
-        out += data.unit;
-      return out.replace(/ /g, "&nbsp;");
-    },
-    
-    createCategory: function(tab, category, name) {
+    createCategory: function(tab, category) {
       var self = this;
   
       var theCat = $('.' + category + '.jtox-study', tab)[0];
@@ -117,13 +98,11 @@ var jToxStudy = (function () {
         $(theCat).addClass(category);
         
         // install the click handler for fold / unfold
-        var titleEl = $('.jtox-study-title', theCat);
-        $(titleEl).click(function() {
+        $('.jtox-study-title', theCat).click(function() {
           $(theCat).toggleClass('folded');
         });
       }
       
-      ccLib.fillTree(titleEl[0], { title: "" + name + " (0)"});
       return theCat;
     },
   
@@ -137,7 +116,7 @@ var jToxStudy = (function () {
     ensureTable: function (tab, study) {
       var self = this;
   
-      var theTable = $('.' + study.protocol.category + ' .jtox-study-table')[0];
+      var theTable = $('.' + study.protocol.category.code + ' .jtox-study-table')[0];
       if (!$(theTable).hasClass('dataTable')) {
   
         var colDefs = [
@@ -167,21 +146,54 @@ var jToxStudy = (function () {
           return count;
         }
   
+        // some value formatting functions
+        var formatLoHigh = function (data, type) {
+          var out = "";
+          data = data.result;
+          if (data.loValue !== undefined && data.upValue !== undefined) {
+            out += (data.loQualifier == ">=") ? "[" : "(";
+            out += data.loValue + ", " + data.upValue;
+            out += (data.upQualifier == "<=") ? "]" : ") ";
+          }
+          else // either of them is non-undefined
+          {
+            var fnFormat = function (q, v) {
+              return ((q !== undefined) ? q : "=") + " " + v;
+            };
+            
+            out += (data.loValue !== undefined) ? fnFormat(data.loQualifier, data.loValue) : fnFormat(data.upQualifier, data.upValue);
+          }
+          
+          if (!!data.unit)
+            out += data.unit;
+          return out.replace(/ /g, "&nbsp;");
+        };
+        
+        var formatUnits = function(data, unit) {
+          return data !== undefined ? (data + ((unit !== undefined) ? "&nbsp;" + unit : "")) : "-";
+        };
+
         // use it to put parameters...
         parCount += putAGroup(study.parameters, function(p) {
-          return study.effects[0].conditions[p] === undefined  && study.effects[0].conditions[p + " unit"] === undefined ? 
-          { 
+          if (study.effects[0].conditions[p] !== undefined  || study.effects[0].conditions[p + " unit"] !== undefined)
+            return undefined;
+          
+          var rFn = study.parameters[p].loValue === undefined ? 
+            function (data, type, full) { return formatUnits(data, full[p + " unit"]); } : 
+            function (data, type, full) { return formatLoHigh(data, type); };
+          return  { 
             "sClass" : "center middle", 
             "mData" : "parameters." + p, 
-            "mRender" : function (data, type, full) { return data !== undefined ? (data + ((full[p + " unit"] !== undefined) ? "&nbsp;" + full[p + " unit"] : "")) : "-"; }
-          } : undefined;
+            "mRender" : rFn
+          };
         });
         // .. and conditions
         parCount += putAGroup(study.effects[0].conditions, function(c){
+          var rnFn = study.effects[0].conditions[c].loValue === undefined ? function(data, type) { return formatUnits(data.conditions[c],  data.conditions[c + " unit"]); } : formatLoHigh;
           return study.effects[0].conditions[c + " unit"] === undefined ?
           { "sClass" : "center middle jtox-multi", 
             "mData" : "effects", 
-            "mRender" : function(data, type, full) { return self.renderMulti(data, type, full, function(data, type) { return data.conditions[c] !== undefined ? (data.conditions[c] + (data.conditions[c + " unit"] !== undefined ? "&nbsp;" + data.conditions[c + " unit"] : "")) : "-"; } )} 
+            "mRender" : function(data, type, full) { return self.renderMulti(data, type, full, rnFn); } 
           } : undefined;
         });
         
@@ -195,7 +207,7 @@ var jToxStudy = (function () {
         // add also the "default" effects columns
         colDefs.push(
           { "sClass": "center middle jtox-multi", "sWidth": "15%", "mData": "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, "endpoint");  } },   // Effects columns
-          { "sClass": "center middle jtox-multi", "sWidth": "15%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, self.formatResult) } }
+          { "sClass": "center middle jtox-multi", "sWidth": "15%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, formatLoHigh) } }
         );
   
         // jump over those two - they are already in the DOM      
@@ -217,7 +229,7 @@ var jToxStudy = (function () {
         colDefs.push(
           { "sClass": "center", "sWidth": "15%", "mData": "protocol.guidance", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
           { "sClass": "center", "sWidth": "50px", "mData": "owner.company.name", "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>'; }  }, 
-          { "sClass": "center", "sWidth": "50px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>'; }  }
+          { "sClass": "center", "sWidth": "50px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div><span class="ui-icon ui-icon-copy" title="Press to copy the UUID in the clipboard" data-uuid="' + data + '"></span>'; } }
         );
         
         // READYY! Go and prepare THE table.
@@ -280,7 +292,7 @@ var jToxStudy = (function () {
           typeSummary[top] = sum.count;
         }
         else {
-          var cat = self.createCategory(tab, catname, catname);
+          var cat = self.createCategory(tab, catname);
           $(cat).data('jtox-uri', sum.category.uri);
         }
       }
@@ -323,29 +335,33 @@ var jToxStudy = (function () {
       var cats = [];
       
       // first swipe to map them to different categories...
-      for (var i = 0, slen = study.length; i < slen; ++i) {
-        var ones = study[i];
-        if (map) {
-          if (cats[ones.protocol.category] === undefined) {
-            cats[ones.protocol.category] = [ones];
-          }
-          else {
-            cats[ones.protocol.category].push(ones);
+      if (!map){
+        // add this one, if we're not remapping. map == false assumes that all passed studies will be from
+        // one category.    
+        cats[study[0].protocol.category.code] = study;
+      }
+      else{
+        for (var i = 0, slen = study.length; i < slen; ++i) {
+          var ones = study[i];
+          if (map) {
+            if (cats[ones.protocol.category] === undefined) {
+              cats[ones.protocol.category.code] = [ones];
+            }
+            else {
+              cats[ones.protocol.category.code].push(ones);
+            }
           }
         }
       }
   
-      // add this one, if we're not remapping. map == false assumes that all passed studies will be from
-      // one category.    
-      if (!map)
-        cats[study[0].protocol.category] = study;
-      
       // now iterate within all categories (if many) and initialize the tables
       for (var c in cats) {
         var onec = cats[c];
-        if ($('.' + c + '.jtox-study', tab).length < 1)
+        var aStudy = $('.' + c + '.jtox-study', tab)[0];
+        if (aStudy === undefined)
           continue;
   
+        ccLib.fillTree(aStudy, {title: onec[0].protocol.category.title + " (0)"});
         var theTable = self.ensureTable(tab, onec[0]);
         $(theTable).dataTable().fnAddData(onec);
       }
@@ -357,46 +373,40 @@ var jToxStudy = (function () {
     },
     
     formatConcentration: function (precision, val, unit) {
-    	return ((precision === undefined || precision === null || "=" == precision ? "" : precision) + val + " " + (unit == null ? "" : unit)).replace(/ /g, "&nbsp;");
+    	return ((precision === undefined || precision === null || "=" == precision ? "" : precision) + val + " " + (unit == null || unit == '' ? "% (w/w)" : unit)).replace(/ /g, "&nbsp;");
     },
     
     processComposition: function(json){
       var self = this;
-      $('.jtox-composition', self.rootElement).removeClass('unloaded');
-      var theTable = $('.jtox-composition table', self.rootElement);
-      if (!$(theTable).hasClass('dataTable')) {
+      var tab = $('.jtox-composition', self.rootElement)[0];
+      
+      // clear the old tabs, if any.
+      if ($(tab).hasClass('unloaded')){
+        $(tab).removeClass('unloaded');
+        $(tab).empty();
+      }
+      
+      var prepareFillTable = function (json, panel) {
+        var theTable = $('.substances-table', panel);
         // prepare the table...
         $(theTable).dataTable({
   				"bSearchable": true,
   				"bProcessing" : true,
   				"bPaginate" : true,
-  /* 				"sDom" : '<"help remove-bottom"i><"help"p>Trt<"help"lf>', */
+          "sDom" : "rt<Fip>",
+/*   				"sDom" : '<"help remove-bottom"i><"help"p>Trt<"help"lf>', */
   /* 				"sPaginationType": "full_numbers", */
   				"sPaginate" : ".dataTables_paginate _paging",
   				"bAutoWidth": false,
   				"oLanguage": {
-  				  "sSearch": "Filter:",
             "sProcessing": "<img src='" + self.baseUrl + "images/24x24_ambit.gif' border='0'>",
             "sLoadingRecords": "No substances found.",
             "sZeroRecords": "No substances found.",
             "sEmptyTable": "No substances available.",
             "sInfo": "Showing _TOTAL_ substance(s) (_START_ to _END_)",
-            "sLengthMenu": 'Display&nbsp;<select>' +
-              '<option value="10">10</option>' +
-              '<option value="20">20</option>' +
-              '<option value="50">50</option>' +
-              '<option value="100">100</option>' +
-              '<option value="-1">all</option>' +
-              '</select>&nbsp;substances.'	            
           },
   		    "aoColumns": [
-    				{  //1
-    					"sClass" : "left",
-    					"sWidth" : "50px",
-    					"mData" : "compositionUUID",
-    					"mRender" : function(data, type, full) { return type != 'display' ? '' + data : '<div class="shortened">' + data + '</div>'; }
-    				},	
-            {  //2
+            {  //1
     					"sClass" : "left",
     					"sWidth" : "10%",
     					"mData" : "relation",
@@ -407,7 +417,7 @@ var jToxStudy = (function () {
     					  return '<span class="camelCase">' +  val.replace("HAS_", "").toLowerCase() + '</span>' + ((func === undefined || func === null || func == '') ? "" : " (" + func + ")");
               }
             },	    
-    				{ //3
+    				{ //2
     					"sClass" : "camelCase left",
     					"sWidth" : "15%",
     					"mData" : "component.compound.name",
@@ -416,47 +426,44 @@ var jToxStudy = (function () {
     						  '<a href="' + full.component.compound.URI + '" target="_blank" title="Click to view the compound"><span class="ui-icon ui-icon-link" style="float: left; margin-right: .3em;"></span></a>' + val;
     					}
     				},	    	
-    				{ //4
+    				{ //3
     					"sClass" : "left",
     					"sWidth" : "10%",
     					"mData" : "component.compound.einecs",
     				},
-    				{ //5
+    				{ //4
     					"sClass" : "left",
     					"sWidth" : "10%",
     					"mData" : "component.compound.cas",
     				},
-    				{ //6
+    				{ //5
     					"sClass" : "center",
     					"sWidth" : "15%",
     					"mData" : "proportion.typical",
     					"mRender" : function(val, type, full) { return type != 'display' ? '' + val.value : self.formatConcentration(val.precision, val.value, val.unit); }
     				},
-    				{ //7
+    				{ //6
     					"sClass" : "center",
     					"sWidth" : "15%",
     					"mData" : "proportion.real",
     					"mRender" : function(val, type, full) { return type != 'display' ? '' + val.lowerValue : self.formatConcentration(val.lowerPrecision, val.lowerValue, val.unit); }
     				},
-    				{ //8
+    				{ //7
     					"sClass" : "center",
     					"sWidth" : "15%",
     					"mData" : "proportion.real",
     					"mRender" : function(val, type, full) { return type != 'display' ? '' + val.upperValue : self.formatConcentration(val.upperPrecision, val.upperValue, val.unit); }
-    				},			    				
-    				{ //9
-    					"sClass" : "center",
-    					"mData" : "component.compound.URI",
-    					"mRender" : function(val, type, full) {
-    					  return !val ? '' : '<a href="' + self.baseUrl + 'substance?type=related&compound_uri=' + encodeURIComponent(val) + '" target="_blank">Also contained in...</a>';
-    					}
-  	    		}		    				
+    				}
   		    ]
   		  });
-      }
-      else
-        $(theTable).dataTable().fnClearTable();
+
+        // and fill up the table.
+        $(theTable).dataTable().fnAddData(json);
+        return theTable;
+      };
       
+      var substances = {};
+
       // proprocess the data...
       for (var i = 0, cmpl = json.composition.length; i < cmpl; ++i) {
         var cmp = json.composition[i];
@@ -464,10 +471,29 @@ var jToxStudy = (function () {
         jToxDataset.processEntry(cmp.component, json.feature, function (value){
   				return value != null ? value.trim().toLowerCase().split("|").filter(ccNonEmptyFilter) : value;
         });
+
+        // now prepare the subs        
+        var theSubs = substances[cmp.compositionUUID];
+        if (theSubs === undefined)
+          substances[cmp.compositionUUID] = theSubs = { name: "", purity: "", maxvalue: 0, uuid : cmp.compositionUUID, composition : [] };
+        
+        theSubs.composition.push(cmp);
+        var val = cmp.proportion.typical;
+        if (cmp.relation == 'HAS_CONSTITUENT' && (theSubs.maxvalue < val.value || theSubs.name == '')) {
+          theSubs.name = cmp.component.compound['name'] + ' ' + self.formatConcentration(val.precision, val.value, val.unit);
+          theSubs.maxvalue = val.value;
+          val = cmp.proportion.real;
+          theSubs.purity = (val.lowerValue + '-' + val.upperValue + ' ' + (val.unit == null || val.unit == '' ? "% (w/w)" : val.unit)).replace(/ /g, "&nbsp;");
+        }
       }
       
-      // and fill up the table.
-      $(theTable).dataTable().fnAddData(json.composition);
+      // now make the actual filling
+      for (var i in substances){
+        var panel = jToxKit.getTemplate('#jtox-compoblock');
+        tab.appendChild(panel);
+        ccLib.fillTree($('.composition-info', panel)[0], substances[i]);
+        prepareFillTable(substances[i].composition, panel);
+      }
     },
     
     querySummary: function(substanceURI) {

@@ -69,7 +69,7 @@ window.jToxKit = {
   	self.templateRoot = root;
 	},
 	
-	getTemplate: function(selector, suffix) {
+	getTemplate: function(selector) {
   	var el = $(selector, this.templateRoot)[0];
   	if (!!el){
     	var el = $(selector, this.templateRoot)[0].cloneNode(true);

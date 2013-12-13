@@ -43,9 +43,24 @@
   width: 50%;
 }
 
-td.middle,
-th.middle {
+.jtox-size-full {
+  width: 100%;
+}
+
+.middle {
   vertical-align: middle;  
+}
+
+.right {
+  text-align: right;
+}
+
+.jtox-font-small {
+  font-size: small;
+}
+
+.jtox-font-smaller {
+  font-size: smaller;
 }
 
 /* Make table helper elements, like paging, filter, etc. in one line...
@@ -56,6 +71,3 @@ th.middle {
   display: inline-block;
   width: auto;  
 }
-
-
-
