@@ -94,28 +94,6 @@ var jToxStudy = (function () {
       return df;
     },
     
-    formatResult: function (data, type) {
-      var out = "";
-      data = data.result;
-      if (data.loValue !== undefined && data.upValue !== undefined) {
-        out += (data.loQualifier == ">=") ? "[" : "(";
-        out += data.loValue + ", " + data.upValue;
-        out += (data.upQualifier == "<=") ? "]" : ") ";
-      }
-      else // either of them is non-undefined
-      {
-        var fnFormat = function (q, v) {
-          return ((q !== undefined) ? q : "=") + " " + v;
-        };
-        
-        out += (data.loValue !== undefined) ? fnFormat(data.loQualifier, data.loValue) : fnFormat(data.upQualifier, data.upValue);
-      }
-      
-      if (!!data.unit)
-        out += data.unit;
-      return out.replace(/ /g, "&nbsp;");
-    },
-    
     createCategory: function(tab, category) {
       var self = this;
   
@@ -174,21 +152,54 @@ var jToxStudy = (function () {
           return count;
         }
   
+        // some value formatting functions
+        var formatLoHigh = function (data, type) {
+          var out = "";
+          data = data.result;
+          if (data.loValue !== undefined && data.upValue !== undefined) {
+            out += (data.loQualifier == ">=") ? "[" : "(";
+            out += data.loValue + ", " + data.upValue;
+            out += (data.upQualifier == "<=") ? "]" : ") ";
+          }
+          else // either of them is non-undefined
+          {
+            var fnFormat = function (q, v) {
+              return ((q !== undefined) ? q : "=") + " " + v;
+            };
+            
+            out += (data.loValue !== undefined) ? fnFormat(data.loQualifier, data.loValue) : fnFormat(data.upQualifier, data.upValue);
+          }
+          
+          if (!!data.unit)
+            out += data.unit;
+          return out.replace(/ /g, "&nbsp;");
+        };
+        
+        var formatUnits = function(data, unit) {
+          return data !== undefined ? (data + ((unit !== undefined) ? "&nbsp;" + unit : "")) : "-";
+        };
+
         // use it to put parameters...
         parCount += putAGroup(study.parameters, function(p) {
-          return study.effects[0].conditions[p] === undefined  && study.effects[0].conditions[p + " unit"] === undefined ? 
-          { 
+          if (study.effects[0].conditions[p] !== undefined  || study.effects[0].conditions[p + " unit"] !== undefined)
+            return undefined;
+          
+          var rFn = study.parameters[p].loValue === undefined ? 
+            function (data, type, full) { return formatUnits(data, full[p + " unit"]); } : 
+            function (data, type, full) { return formatLoHigh(data, type); };
+          return  { 
             "sClass" : "center middle", 
             "mData" : "parameters." + p, 
-            "mRender" : function (data, type, full) { return data !== undefined ? (data + ((full[p + " unit"] !== undefined) ? "&nbsp;" + full[p + " unit"] : "")) : "-"; }
-          } : undefined;
+            "mRender" : rFn
+          };
         });
         // .. and conditions
         parCount += putAGroup(study.effects[0].conditions, function(c){
+          var rnFn = study.effects[0].conditions[c].loValue === undefined ? function(data, type) { return formatUnits(data.conditions[c],  data.conditions[c + " unit"]); } : formatLoHigh;
           return study.effects[0].conditions[c + " unit"] === undefined ?
           { "sClass" : "center middle jtox-multi", 
             "mData" : "effects", 
-            "mRender" : function(data, type, full) { return self.renderMulti(data, type, full, function(data, type) { return data.conditions[c] !== undefined ? (data.conditions[c] + (data.conditions[c + " unit"] !== undefined ? "&nbsp;" + data.conditions[c + " unit"] : "")) : "-"; } )} 
+            "mRender" : function(data, type, full) { return self.renderMulti(data, type, full, rnFn); } 
           } : undefined;
         });
         
@@ -202,7 +213,7 @@ var jToxStudy = (function () {
         // add also the "default" effects columns
         colDefs.push(
           { "sClass": "center middle jtox-multi", "sWidth": "15%", "mData": "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, "endpoint");  } },   // Effects columns
-          { "sClass": "center middle jtox-multi", "sWidth": "15%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, self.formatResult) } }
+          { "sClass": "center middle jtox-multi", "sWidth": "15%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, formatLoHigh) } }
         );
   
         // jump over those two - they are already in the DOM      
@@ -224,7 +235,7 @@ var jToxStudy = (function () {
         colDefs.push(
           { "sClass": "center", "sWidth": "15%", "mData": "protocol.guidance", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
           { "sClass": "center", "sWidth": "50px", "mData": "owner.company.name", "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>'; }  }, 
-          { "sClass": "center", "sWidth": "50px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div><span class="ui-icon ui-icon-copy" data-uuid="' + data + '"></span>'; } }
+          { "sClass": "center", "sWidth": "50px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div><span class="ui-icon ui-icon-copy" title="Press to copy the UUID in the clipboard" data-uuid="' + data + '"></span>'; } }
         );
         
         // READYY! Go and prepare THE table.
