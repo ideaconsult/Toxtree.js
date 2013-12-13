@@ -3,10 +3,6 @@ TODO:
 - Make feature-sets analysis and combination
 - Column hiding removal / editing;
 - make feature-set selection;
-- 
-- Make scrolling table support;
-- fix improper scrollbars, next/prev, etc.: checkout sScrollX in datatables.
-- договор
 - make toxtree part of jToxKit
 - 
 

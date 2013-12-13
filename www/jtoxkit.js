@@ -3,6 +3,8 @@ var ccLib = {
     // initialize, if needed
     if (base === undefined || base == null)
       base = [];
+    else if (typeof base != 'array')
+      base = [base];
     
     // now proceed with extending
     if (arr !== undefined && arr !== null){
@@ -37,6 +39,17 @@ var ccLib = {
       obj.innerHTML = value;      
   },
   
+  setJsonValue: function (json, field, val) {
+    if (field !== undefined){
+      try {
+        eval("json." + field + " = val");
+      }
+      catch(e){
+        ;
+      }
+    }  
+  },
+  
   getJsonValue: function (json, field){
     var value = undefined;
     if (field !== undefined) {
@@ -49,7 +62,7 @@ var ccLib = {
     }
     return value;
   },
-
+  
   // given a root DOM element and an JSON object it fills all (sub)element of the tree
   // which has class 'data-field' and their name corresponds to a property in json object.
   // If prefix is given AND json has id property - the root's id set to to prefix + json.id
@@ -131,6 +144,10 @@ var ccLib = {
       segments: a.pathname.replace(/^\//,'').split('/')
     };
   }    
+};
+
+function ccNonEmptyFilter(v) {
+  return v !== undefined && v != null && v != '';  
 }
 /* toxstudy.js - Study-related functions from jToxKit.
  *
@@ -602,17 +619,9 @@ var jToxStudy = (function () {
       for (var i = 0, cmpl = json.composition.length; i < cmpl; ++i) {
         var cmp = json.composition[i];
         
-  			cmp.component.compound["name"] = [];
-  			cmp.component.compound["cas"] = [];
-  			cmp.component.compound["einecs"] = [];
-  			for (var key in cmp.component.values){
-    			var value = cmp.component.values[key];
-    			var feature = json.feature[key];
-  				if ((feature != null) && (value != null)) {
-    			  var valArr = value.trim().toLowerCase().split("|").filter(function (v) { return v !== undefined && v != null && v != ''; });
-            ccLib.extendArray(cmp.component.compound[jToxKit.featureGroup(feature.sameAs)], valArr);
-          }
-        }
+        jToxDataset.processEntry(cmp.component, json.feature, function (value){
+  				return value != null ? value.trim().toLowerCase().split("|").filter(ccNonEmptyFilter) : value;
+        });
 
         // now prepare the subs        
         var theSubs = substances[cmp.compositionUUID];
@@ -763,20 +772,6 @@ window.jToxKit = {
       el.id = id;
       $(this).attr('href', '#' + id);
     })  
-  },
-
-  // extract a group from feature, based on it's sameAs attribute  
-  featureGroup: function (sameAs) {
-    var grp = sameAs.substr(sameAs.indexOf('#') + 1); // trick - on 'not-found' it returns -1, which, adding 1 is exatly what we need :-)
-    
- 		if (grp == "IUPACName" || grp == "ChemicalName")
-      grp = "name";
-    else if (grp == "CASRN")
-      grp = "cas";
-    else if (grp == "EINECS")
-      grp = "einecs";
-    
-    return grp;
   },
 		
 	/* Poll a given taskId and calls the callback when a result from the server comes - 
