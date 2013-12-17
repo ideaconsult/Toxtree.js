@@ -15,7 +15,7 @@ window.jToxKit = {
 	settings: {
   	jsonp: false,					// whether to use JSONP approach, instead of JSON.
   	baseUrl: null,					// the server actually used for connecting. Part of settings. If not set - attempts to get 'baseUrl' parameter of the query, if not - get's current server.
-  	timeout: 5000,				// the timeout an call to the server should be wait before the attempt is considered error.
+  	timeout: 15000,				// the timeout an call to the server should be wait before the attempt is considered error.
   	pollDelay: 200,				// after how many milliseconds a new attempt should be made during task polling.
   	onConnect: function(s){ },		    // function (service): called when a server request is started - for proper visualization. Part of settings.
   	onSuccess: function(c, m) { },		// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.

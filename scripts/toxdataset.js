@@ -34,8 +34,8 @@ var jToxDataset = (function () {
     self.rootElement = root;
     self.settings = $.extend({}, defaultSettings, jToxKit.settings, settings); // i.e. defaults from jToxDataset
     self.features = null; // almost exactly as downloaded form server - just a group member is added based on sameAs
-    self.featureGroups = {"common": []};
-    self.featureOrder = ["common"];
+    self.featureGroups = {"Common": []};
+    self.featureOrder = ["Common"];
 
     instanceCount++;
   };
@@ -46,7 +46,81 @@ var jToxDataset = (function () {
     prepareTabs: function (root, entry) {
       var self = this;
       
-      return tabs;
+      var fr = document.createDocumentFragment();
+      var all = document.createElement('div');
+      fr.appendChild(all);
+      ulEl = document.createElement('ul');
+      all.appendChild(ulEl);
+
+      var featNames = {};
+      for (var gr in self.featureGroups) {
+        var grId = "jtox-ds-" + gr + "-" + instanceCount;
+        
+        var liEl = document.createElement('li');
+        ulEl.appendChild(liEl);
+        var aEl = document.createElement('a');
+        aEl.href = "#" + grId;
+        aEl.innerHTML = gr.replace(/_/g, " ");
+        liEl.appendChild(aEl);
+        
+        // now prepare the content.
+        var divEl = document.createElement('div');
+        divEl.id = grId;
+        for (var i = 0;i < self.featureGroups[gr].length; ++i) {
+          var feat = self.featureGroups[gr][i];
+          var fEl = jToxKit.getTemplate('#jtox-ds-feature');
+          featNames[feat] = self.features[feat].title;
+          fEl.setAttribute('data-feature', feat);
+          divEl.appendChild(fEl);
+        }
+        
+        all.appendChild(divEl);
+      }
+      
+      root.appendChild(fr);
+      // fill, the already prepared names for each checkbox-ed item.
+      $('.jtox-ds-feature', all).each(function() {
+        var fId = $(this).data('feature');
+        $('.jtox-title', this).html(featNames[fId]);
+      });
+      return $(all).tabs();
+    },
+    
+    prepareTables: function() {
+      var fixedCols = [];
+      var varCols = [];
+      
+      for (var i = 0, glen = self.featureOrder.length; i < glen; ++i) {
+        var grp = self.featureOrder[i];
+        var gfull = self.featureGroups[grp];
+        
+        for (var j = 0, flen = gfull.length; j < flen; ++j){
+          var f = gfull[j];
+          var ffull = self.features[f];
+          var col = {
+            "sTitle": ffull.title + ffull.units,
+            "sDefaultContent": "?",
+            "mData": ffull.dataLocation !== undefined ? ffull.dataLocation : "values"
+          };
+          
+          if (ffull.dataLocation === undefined){
+            col["mRender"] = (function (fid) { 
+              return function (data, type, full) {
+                return data[fid];
+              };
+            })(f);
+          }
+          
+          if (grp == "common")
+            fixedCols.push(col);
+          else
+            varCols.push(col);
+        }
+      }
+      
+      // now - create the tables.
+      var fixTable = null;
+      var varTable = null;
     },
 
     /* Process features as reported in the dataset. Works on result of standalone calls to <datasetUri>/feature
@@ -61,6 +135,7 @@ var jToxDataset = (function () {
           var fullf = features[f];
           var gr = cls.fixSameAs(fullf.sameAs);
           if (commonFeatures[gr] === undefined) {
+            gr = gr.replace(/\s/g, '_');
             if (self.featureGroups[gr] === undefined){ // add new one
               self.featureOrder.push(gr);
               self.featureGroups[gr] = [];
@@ -79,7 +154,7 @@ var jToxDataset = (function () {
         $.extend(self.features, commonFeatures);
       }
     },
-
+    
     /* Clears the page from any dataset fillings, so a new call can be made.
     */
     clearDataset: function () {
@@ -92,41 +167,20 @@ var jToxDataset = (function () {
       var self = this;
       
       self.clearDataset();
-      jToxKit.call(self, datasetUri, function(dataset){
-        if (!!dataset){
-          self.processFeatures(dataset.feature);
-          var mainTabs = self.prepareTabs(self.rootElement);
-
-          var fixedCols = [];
-          var varCols = [];
-          
-          for (var i = 0, glen = self.featureOrder.length; i < glen; ++i) {
-            var grp = self.featureOrder[i];
-            var gfull = self.featureGroups[grp];
-            
-            for (var j = 0, flen = gfull.length; j < flen; ++j){
-              var f = gfull[j];
-              var ffull = self.features[f];
-              var col = {
-                "sTitle": ffull.title + ffull.units,
-                "sDefaultContent": "?",
-                "mData": ffull.dataLocation !== undefined ? ffull.dataLocation : "values"
-              };
-              
-              if (ffull.dataLocation === undefined){
-                col["mRender"] = (function (fid) { 
-                  return function (data, type, full) {
-                    return data[fid];
-                  };
-                })(f);
-              }
-              
-              if (grp == "common")
-                fixedCols.push(col);
-              else
-                varCols.push(col);
+      jToxKit.call(self, datasetUri + '/feature', function (feature) {
+        if (!!feature) {
+          self.processFeatures(feature.feature);
+          self.prepareTabs($('.jtox-ds-features', self.rootElement)[0]);
+          self.prepareTables();
+      
+          // finally - make a call for the dataset and fill up the tables.
+          jToxKit.call(self, datasetUri, function(dataset){
+            if (!!dataset){
+              cls.processDataset(dataset);
+              $('.jtox-ds-fixed table', self.rootElement).dataTable().fnAddData(dataset.dataEntry);
+              $('.jtox-ds-variable table', self.rootElement).dataTable().fnAddData(dataset.dataEntry);
             }
-          }
+          });
         }
       });
     },
@@ -154,6 +208,13 @@ var jToxDataset = (function () {
       ccLib.setJsonValue(entry, data, ccLib.extendArray(oldVal, val).filter(ccNonEmptyFilter));
     }
     return entry;
+  };
+  
+  cls.processDataset(dataset, fnValue) {
+    var features = dataset.feature;
+    for (var i = 0, dl = dataset.dataEntry.length; i < dl; ++i) {
+      cls.processEntry(dataset.dataEntry[i], features, fnValue);
+    }
   };
   
   return cls;

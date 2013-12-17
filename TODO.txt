@@ -1,8 +1,11 @@
 TODO:
 
-- Make feature-sets analysis and combination
+- Make "main" feature tabs hidable.
+- Make dataset / compound processing universal
+- Use it in study reference substance visuzalization
+- Make table initialization
 - Column hiding removal / editing;
-- make feature-set selection;
+- Detailed information row
 - make toxtree part of jToxKit
 - 
 

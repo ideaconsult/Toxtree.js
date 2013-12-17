@@ -29,15 +29,18 @@
   <script language="javascript">
     $(document).ready(function(){
       var ds = new jToxDataset($(".jtox-toolkit")[0]);
-      ds.queryDataset("http://apps.ideaconsult.net:8080/biodeg/dataset/12");
+      ds.queryDataset("http://apps.ideaconsult.net:8080/biodeg/dataset/1");
     });
   </script>
 </head>
 <body>
 	<div class="jtox-toolkit" data-kit="dataset" data-manual-init="yes" data-show-features="yes" data-show-export="yes"></div>
-<!--	<div class="jtox-template"> -->
+  <div class="jtox-template">
 <!--[[ jToxKit.templates['all-dataset'] -->
 	  <div id="jtox-dataset">
+	    <div class="jtox-ds-fearures">
+  	    
+	    </div>
 	    <div class="jtox-ds-tables">
 	      <div class="jtox-ds-fixed jtox-inline">
 	        <table></table>
@@ -51,14 +54,9 @@
     <div id="jtox-details" class="jtox-details">
     </div>
 <!-- // end of #jtox-details ]]-->
-<!--[[ jToxKit.templates['dataset-features'] -->
-    <div id="jtox-features" class="jtox-features">
-      <ul>
-        <li><a href="jtox-common">Common</a></li>
-      </ul>
-      <div 
-    </div>
-<!-- // end of #jtox-details ]]-->
-<!--	</div> -->
+<!--[[ jToxKit.templates['dataset-one-feature'] -->
+    <div id="jtox-ds-feature" class="jtox-ds-feature"><input type="checkbox" checked="yes" class="jtox-checkbox" /><span class="jtox-title"> ? </span></div>
+<!-- // end of #jtox-ds-feature ]]-->
+  </div>
 </body>
 </html>
