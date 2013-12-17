@@ -3,7 +3,7 @@ var ccLib = {
     // initialize, if needed
     if (base === undefined || base == null)
       base = [];
-    else if (typeof base != 'array')
+    else if (!$.isArray(base))
       base = [base];
     
     // now proceed with extending

@@ -11,6 +11,10 @@ var jToxStudy = (function () {
   // make this handler for UUID copying. Once here - it's live, so it works for all tables in the future
   $(document).on('click', '.jtox-toolkit span.ui-icon-copy', function (e) { ccLib.copyToClipboard($(this).data('uuid'), "Press Ctrl-C (Command-C) to copy UUID:"); return false;});
   
+  var fnDatasetValue = function (old, value){
+		return ccLib.extendArray(old, value != null ? value.trim().toLowerCase().split("|") : [value]).filter(ccNonEmptyFilter);
+  };
+  
   // constructor
   var cls = function (root, settings) {
     var self = this;
@@ -464,13 +468,12 @@ var jToxStudy = (function () {
       
       var substances = {};
 
+      jToxDataset.processFeatures(json.feature);
       // proprocess the data...
       for (var i = 0, cmpl = json.composition.length; i < cmpl; ++i) {
         var cmp = json.composition[i];
         
-        jToxDataset.processEntry(cmp.component, json.feature, function (value){
-  				return value != null ? value.trim().toLowerCase().split("|").filter(ccNonEmptyFilter) : value;
-        });
+        jToxDataset.processEntry(cmp.component, json.feature, fnDatasetValue);
 
         // now prepare the subs        
         var theSubs = substances[cmp.compositionUUID];
@@ -488,7 +491,7 @@ var jToxStudy = (function () {
       }
       
       // now make the actual filling
-      for (var i in substances){
+      for (var i in substances) {
         var panel = jToxKit.getTemplate('#jtox-compoblock');
         tab.appendChild(panel);
         ccLib.fillTree($('.composition-info', panel)[0], substances[i]);
@@ -511,10 +514,10 @@ var jToxStudy = (function () {
       jToxKit.call(self, substanceURI + "/composition", function(composition) {
         if (!!composition && !!composition.composition)
           self.processComposition(composition);
-      });
+        });
     },
     
-    querySubstance: function(substanceURI){
+    querySubstance: function(substanceURI) {
       var self = this;
       
       // re-initialize us on each of these calls.
@@ -523,9 +526,19 @@ var jToxStudy = (function () {
       var rootTab = $('.jtox-substance', self.rootElement)[0];
       jToxKit.call(self, substanceURI, function(substance){
          if (!!substance && !!substance.substance && substance.substance.length > 0){
-           ccLib.fillTree(rootTab, substance.substance[0]);
-           self.querySummary(substanceURI);
-           self.queryComposition(substanceURI);
+           substance = substance.substance[0];
+           ccLib.fillTree(rootTab, substance);
+           // go and query for the reference query
+           jToxKit.call(self, substance.referenceSubstance.uri, function (dataset){
+             if (!!dataset) {
+              jToxDataset.processDataset(dataset, fnDatasetValue);
+              ccLib.fillTree(rootTab, dataset.dataEntry[0]);
+             }
+           });
+           
+           // query for the summary and the composition too.
+           self.querySummary(substance.URI);
+           self.queryComposition(substance.URI);
          }
       });
     }

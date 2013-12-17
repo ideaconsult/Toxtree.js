@@ -8,15 +8,29 @@ var jToxDataset = (function () {
   var defaultSettings = { };    // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
   var instanceCount = 0;
 
-  // featureInfo(feature)
-  var featureLinks = {
-    "IUPACName": {"sameAs": "name"},
-    "ChemicalName": {"sameAs": "name"},
-    "CASRN": {"sameAs": "cas"},
-    "EINECS": {"sameAs": "einecs"},
-    "REACHRegistrationDate": {"sameAs": "reachdate"}
-  }
-  
+  var baseFeatures = {
+    "http://www.opentox.org/api/1.1#REACHRegistrationDate" : { title: "REACH Date", accumulate: "compound.reachdate"},
+    "http://www.opentox.org/api/1.1#CASRN" : { title: "CAS", accumulate: "compound.cas"},
+  	"http://www.opentox.org/api/1.1#ChemicalName" : { title: "Name", accumulate: "compound.name"},
+  	"http://www.opentox.org/api/1.1#TradeName" : {title: "Trade Name", accumulate: "compound.name"},
+  	"http://www.opentox.org/api/1.1#IUPACName": {title: "IUPAC Name", accumulate: "compound.name"},
+  	"http://www.opentox.org/api/1.1#EINECS": {title: "EINECS", accumulate: "compound.einecs"},
+    "http://www.opentox.org/api/1.1#InChI": {title: "InChI", accumulate: "compound.inchi"},
+  	"http://www.opentox.org/api/1.1#InChI_std": {title: "InChI", accumulate: "compound.inchi"},
+    "http://www.opentox.org/api/1.1#InChIKey": {title: "InChI Key", accumulate: "compound.inchikey"},
+  	"http://www.opentox.org/api/1.1#InChIKey_std": {title: "InChI Key", accumulate: "compound.inchikey"},
+    "http://www.opentox.org/api/1.1#InChI_AuxInfo": {title: "InChI Aux", accumulate: "compound.inchi"},
+  	"http://www.opentox.org/api/1.1#InChI_AuxInfo_std": {title: "InChI Aux", accumulate: "compound.inchi"},
+  	"http://www.opentox.org/api/1.1#IUCLID5_UUID": {title: "IUCLID5 UUID", accumulate: "compound.i5uuid"},
+  	"http://www.opentox.org/api/1.1#SMILES": {title: "SMILES", accumulate: "compound.smiles"},
+  	"http://www.opentox.org/api/dblinks#CMS": {title: "CMS", accumulate: "compound.cms"},
+  	"http://www.opentox .org/api/dblinks#ChEBI": {title: "ChEBI"},
+  	"http://www.opentox.org/api/dblinks#Pubchem": {title: "Public Chem"},
+  	"http://www.opentox.org/api/dblinks#ChemSpider": {title: "Chem Spider"},
+  	"http://www.opentox.org/api/dblinks#ChEMBL": {title: "ChEMBL"},
+  	"http://www.opentox.org/api/dblinks#ToxbankWiki": {title: "Toxban Wiki"}
+  };
+
   var commonFeatures = {
 /*     "IUCLID5_UUID": {"sameAs": "i5uuid"} */
     "diagram": {"column": 0, "title": "Diagram", "group": "Common", "dataLocation": "compound.URI"},
@@ -125,7 +139,7 @@ var jToxDataset = (function () {
 
     /* Process features as reported in the dataset. Works on result of standalone calls to <datasetUri>/feature
     */
-    processFeatures: function (features) {
+    groupFeatures: function (features) {
       var self = this;
       
       self.features = features;
@@ -169,7 +183,7 @@ var jToxDataset = (function () {
       self.clearDataset();
       jToxKit.call(self, datasetUri + '/feature', function (feature) {
         if (!!feature) {
-          self.processFeatures(feature.feature);
+          self.groupFeatures(feature.feature);
           self.prepareTabs($('.jtox-ds-features', self.rootElement)[0]);
           self.prepareTables();
       
@@ -188,32 +202,58 @@ var jToxDataset = (function () {
   }; // end of prototype
   
   // some public, static methods
-  cls.fixSameAs = function (sameAs) {
-      sameAs = sameAs.substr(sameAs.indexOf('#') + 1); // trick - on 'not-found' it returns -1, which, adding 1 is exatly what we need :-)
-      return featureLinks[sameAs] !== undefined ? featureLinks[sameAs].sameAs : sameAs;
-  },
-  
-  cls.processEntry = function (entry, features, fnValue){
-    for (var feat in entry.values) {
-      var sameAs = cls.fixSameAs(features[feat].sameAs);
-      if (commonFeatures[sameAs] === undefined || commonFeatures[sameAs].dataLocation === undefined)
-        continue;
-        
-      var val = entry.values[feat];
-      if (fnValue != null)
-        val = fnValue(val);
+  cls.processEntry = function (entry, features, fnValue) {
+    for (var fid in entry.values) {
+      var feature = features[fid];
       
-      var data = commonFeatures[sameAs].dataLocation;
-      var oldVal = ccLib.getJsonValue(entry, data);
-      ccLib.setJsonValue(entry, data, ccLib.extendArray(oldVal, val).filter(ccNonEmptyFilter));
+      // if applicable - accumulate the feature value to a specific location whithin the entry
+      if (feature.accumulate !== undefined) {
+        var oldVal = ccLib.getJsonValue(entry, feature.accumulate);
+        var newVal = entry.values[fid];
+        if (typeof fnValue !== undefined)
+          ccLib.setJsonValue(entry, feature.accumulate, fnValue(oldVal, newVal));
+        else if (!$.isArray(oldVal))
+          ccLib.setJsonValue(entry, feature.accumulate, oldVal + newVal);
+        else
+          oldVal.push(newVal);
+      }
     }
+    
     return entry;
   };
   
-  cls.processDataset(dataset, fnValue) {
-    var features = dataset.feature;
+  cls.processFeatures = function(features) {
+    features = $.extend(features, baseFeatures);
+    for (var fid in features) {
+      // find the feature title first
+      var feature = features[fid];
+      
+      for (;;){
+        if (feature.sameAs === undefined || feature.sameAs == null)
+          break;
+        if (features[feature.sameAs] !== undefined)
+          feature = features[feature.sameAs];
+        else {
+          var base = fid.replace(/(http.+\/feature\/).*/g, "$1");
+          if (features[base + feature.sameAs] !== undefined)
+            feature = features[base + feature.sameAs];
+          else
+            break;
+        }
+      }
+
+      // now merge with this one... it copies everything that we've added, if we've reached to it. Including 'accumulate'
+      features[fid] = $.extend(features[fid], feature);
+    }
+    
+    return features;
+  };
+  
+  cls.processDataset = function(dataset, fnValue) {
+    cls.processFeatures(dataset.feature);
+    
     for (var i = 0, dl = dataset.dataEntry.length; i < dl; ++i) {
-      cls.processEntry(dataset.dataEntry[i], features, fnValue);
+      cls.processEntry(dataset.dataEntry[i], dataset.feature, fnValue);
     }
   };
   
