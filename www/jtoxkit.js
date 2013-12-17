@@ -160,7 +160,7 @@ var jToxDataset = (function () {
   var instanceCount = 0;
 
   /* define the standard features-synonymes, working with 'sameAs' property. Beside the title we define the 'accumulate' property
-  as well which is used in processEntry() to accumulate value(s) from given (synonym) properties into specific property of the compound entri itself.
+  as well which is used in processEntry() to accumulate value(s) from given (synonym) properties into specific property of the compound entry itself.
   'accumulate' can be an array, which results in adding value to several places.
   */
   var baseFeatures = {
@@ -386,16 +386,17 @@ var jToxDataset = (function () {
   cls.processFeatures = function(features) {
     features = $.extend(features, baseFeatures);
     for (var fid in features) {
-      // find the feature title first
+      // starting from the feature itself move to 'sameAs'-referred features, until sameAs is missing or points to itself
+      // This, final feature should be considered "main" and title and others taken from it.
       var feature = features[fid];
+      var base = fid.replace(/(http.+\/feature\/).*/g, "$1");
       
       for (;;){
-        if (feature.sameAs === undefined || feature.sameAs == null)
+        if (feature.sameAs === undefined || feature.sameAs == null || feature.sameAs == fid || fid == base + feature.sameAs)
           break;
         if (features[feature.sameAs] !== undefined)
           feature = features[feature.sameAs];
         else {
-          var base = fid.replace(/(http.+\/feature\/).*/g, "$1");
           if (features[base + feature.sameAs] !== undefined)
             feature = features[base + feature.sameAs];
           else
