@@ -1,0 +1,18 @@
+TODO:
+
+- Make "main" feature tabs hidable.
+- Make dataset / compound processing universal
+- Use it in study reference substance visuzalization
+- Make table initialization
+- Column hiding removal / editing;
+- Detailed information row
+- make toxtree part of jToxKit
+- 
+
+
+jToxDataset:
+- options: editColumns: true / dalse, columnSets: [], 
+- queryDataset(datasetUri);
+- queryFeatures(dataetUri);, group based on sameAs
+- 
+

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+
+  <title>ToxDataset development page</title>
+  <link rel="stylesheet" href="styles/base.css">
+	<link rel="stylesheet" href="styles/skeleton.css">
+	<link rel="stylesheet" href="styles/layout.css">
+	<link rel="stylesheet" href="styles/toxdataset.css">
+	<link rel="stylesheet" href="styles/jtoxkit.css">
+	<link rel="stylesheet" href="styles/jquery-ui.css">
+	<link rel="stylesheet" href="styles/jquery.dataTables.css">
+
+  <script src="scripts/jquery.js"></script>
+  <script src="scripts/jquery.ui.core.js"></script>
+  <script src="scripts/jquery.ui.widget.js"></script>
+  <script src="scripts/jquery.ui.tabs.js"></script>
+  <script src="scripts/jquery.dataTables.js"></script>
+
+  <script src="scripts/common.js"></script>
+  <script src="scripts/jtoxkit.js"></script>
+  <script src="scripts/toxdataset.js"></script>
+  <script language="javascript">
+    $(document).ready(function(){
+      var ds = new jToxDataset($(".jtox-toolkit")[0]);
+      ds.queryDataset("http://apps.ideaconsult.net:8080/biodeg/dataset/1");
+    });
+  </script>
+</head>
+<body>
+	<div class="jtox-toolkit" data-kit="dataset" data-manual-init="yes" data-show-features="yes" data-show-export="yes"></div>
+  <div class="jtox-template">
+<!--[[ jToxKit.templates['all-dataset'] -->
+	  <div id="jtox-dataset">
+	    <div class="jtox-ds-fearures">
+  	    
+	    </div>
+	    <div class="jtox-ds-tables">
+	      <div class="jtox-ds-fixed jtox-inline">
+	        <table></table>
+	      </div><div class="jtox-ds-variable jtox-inline">
+	        <table></table>
+	      </div>
+	    </div>
+	  </div>
+<!-- // end of #jtox-dataset ]]-->
+<!--[[ jToxKit.templates['dataset-details'] -->
+    <div id="jtox-details" class="jtox-details">
+    </div>
+<!-- // end of #jtox-details ]]-->
+<!--[[ jToxKit.templates['dataset-one-feature'] -->
+    <div id="jtox-ds-feature" class="jtox-ds-feature"><input type="checkbox" checked="yes" class="jtox-checkbox" /><span class="jtox-title"> ? </span></div>
+<!-- // end of #jtox-ds-feature ]]-->
+  </div>
+</body>
+</html>
