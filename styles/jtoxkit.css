@@ -63,6 +63,17 @@
   font-size: smaller;
 }
 
+.jtox-toolkit .borderless-top,
+.jtox-toolkit .borderless-top * {
+  border-top: 0px !important;
+}
+
+.jtox-toolkit .borderless-bottom,
+.jtox-toolkit .borderless-bottom * {
+  border-bottom: 0px !important;
+}
+
+
 /* Make table helper elements, like paging, filter, etc. in one line...
 */
 .jtox-toolkit .dataTables_filter label input,

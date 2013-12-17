@@ -71,7 +71,7 @@ rm -f $outJS
 rm -f $outCSS
 
 # form the final target list
-target="common $target jtoxkit"
+target="common toxdataset $target jtoxkit"
 
 # start the building process...
 echo "Processing targets [$target]..."

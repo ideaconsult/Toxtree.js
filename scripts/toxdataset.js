@@ -8,12 +8,16 @@ var jToxDataset = (function () {
   var defaultSettings = { };    // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
   var instanceCount = 0;
 
+  /* define the standard features-synonymes, working with 'sameAs' property. Beside the title we define the 'accumulate' property
+  as well which is used in processEntry() to accumulate value(s) from given (synonym) properties into specific property of the compound entri itself.
+  'accumulate' can be an array, which results in adding value to several places.
+  */
   var baseFeatures = {
     "http://www.opentox.org/api/1.1#REACHRegistrationDate" : { title: "REACH Date", accumulate: "compound.reachdate"},
     "http://www.opentox.org/api/1.1#CASRN" : { title: "CAS", accumulate: "compound.cas"},
   	"http://www.opentox.org/api/1.1#ChemicalName" : { title: "Name", accumulate: "compound.name"},
-  	"http://www.opentox.org/api/1.1#TradeName" : {title: "Trade Name", accumulate: "compound.name"},
-  	"http://www.opentox.org/api/1.1#IUPACName": {title: "IUPAC Name", accumulate: "compound.name"},
+  	"http://www.opentox.org/api/1.1#TradeName" : {title: "Trade Name", accumulate: ["compound.name", "compound.tradename"]},
+  	"http://www.opentox.org/api/1.1#IUPACName": {title: "IUPAC Name", accumulate: ["compound.name", "compound.iupac"]},
   	"http://www.opentox.org/api/1.1#EINECS": {title: "EINECS", accumulate: "compound.einecs"},
     "http://www.opentox.org/api/1.1#InChI": {title: "InChI", accumulate: "compound.inchi"},
   	"http://www.opentox.org/api/1.1#InChI_std": {title: "InChI", accumulate: "compound.inchi"},
@@ -23,8 +27,8 @@ var jToxDataset = (function () {
   	"http://www.opentox.org/api/1.1#InChI_AuxInfo_std": {title: "InChI Aux", accumulate: "compound.inchi"},
   	"http://www.opentox.org/api/1.1#IUCLID5_UUID": {title: "IUCLID5 UUID", accumulate: "compound.i5uuid"},
   	"http://www.opentox.org/api/1.1#SMILES": {title: "SMILES", accumulate: "compound.smiles"},
-  	"http://www.opentox.org/api/dblinks#CMS": {title: "CMS", accumulate: "compound.cms"},
-  	"http://www.opentox .org/api/dblinks#ChEBI": {title: "ChEBI"},
+  	"http://www.opentox.org/api/dblinks#CMS": {title: "CMS"},
+  	"http://www.opentox.org/api/dblinks#ChEBI": {title: "ChEBI"},
   	"http://www.opentox.org/api/dblinks#Pubchem": {title: "Public Chem"},
   	"http://www.opentox.org/api/dblinks#ChemSpider": {title: "Chem Spider"},
   	"http://www.opentox.org/api/dblinks#ChEMBL": {title: "ChEMBL"},
@@ -208,14 +212,20 @@ var jToxDataset = (function () {
       
       // if applicable - accumulate the feature value to a specific location whithin the entry
       if (feature.accumulate !== undefined) {
-        var oldVal = ccLib.getJsonValue(entry, feature.accumulate);
-        var newVal = entry.values[fid];
-        if (typeof fnValue !== undefined)
-          ccLib.setJsonValue(entry, feature.accumulate, fnValue(oldVal, newVal));
-        else if (!$.isArray(oldVal))
-          ccLib.setJsonValue(entry, feature.accumulate, oldVal + newVal);
-        else
-          oldVal.push(newVal);
+        var accArr = feature.accumulate;
+        if (!$.isArray(accArr))
+          accArr = [accArr];
+        
+        for (var v = 0; v < accArr.length; ++v){
+          var oldVal = ccLib.getJsonValue(entry, accArr[v]);
+          var newVal = entry.values[fid];
+          if (typeof fnValue !== undefined)
+            ccLib.setJsonValue(entry, accArr[v], fnValue(oldVal, newVal));
+          else if (!$.isArray(oldVal))
+            ccLib.setJsonValue(entry, accArr[v], oldVal + newVal);
+          else
+            oldVal.push(newVal);
+        }
       }
     }
     
