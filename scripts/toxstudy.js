@@ -153,7 +153,6 @@ var jToxStudy = (function () {
         // some value formatting functions
         var formatLoHigh = function (data, type) {
           var out = "";
-          data = data.result;
           if (data.loValue !== undefined && data.upValue !== undefined) {
             out += (data.loQualifier == ">=") ? "[" : "(";
             out += data.loValue + ", " + data.upValue;
@@ -182,18 +181,30 @@ var jToxStudy = (function () {
           if (study.effects[0].conditions[p] !== undefined  || study.effects[0].conditions[p + " unit"] !== undefined)
             return undefined;
           
-          var rFn = study.parameters[p].loValue === undefined ? 
-            function (data, type, full) { return formatUnits(data, full[p + " unit"]); } : 
-            function (data, type, full) { return formatLoHigh(data, type); };
-          return  { 
+          var col = {
             "sClass" : "center middle", 
-            "mData" : "parameters." + p, 
-            "mRender" : rFn
+            "mData" : "parameters." + p,
+            "sDefaultContent": "-"
           };
+          
+          if (study.parameters[p] !== undefined && study.parameters[p] != null){
+            col["mRender"] = study.parameters[p].loValue === undefined ?
+              function (data, type, full) { return formatUnits(data, full[p + " unit"]); } : 
+              function (data, type, full) { return formatLoHigh(data.parameters[p], type); };
+          }
+          
+          return col;
         });
         // .. and conditions
         parCount += putAGroup(study.effects[0].conditions, function(c){
-          var rnFn = study.effects[0].conditions[c].loValue === undefined ? function(data, type) { return formatUnits(data.conditions[c],  data.conditions[c + " unit"]); } : formatLoHigh;
+          var rnFn = null;
+          if (study.effects[0].conditions[c] !== undefined && study.effects[0].conditions[c] != null)
+            rnFn = study.effects[0].conditions[c].loValue === undefined ? 
+              function(data, type) { return formatUnits(data.conditions[c],  data.conditions[c + " unit"]); } : 
+              function(data, type) { return formatLoHigh(data.conditions[c], type); }
+          else
+            rnFn = function(data, type) { return "-"; }
+            
           return study.effects[0].conditions[c + " unit"] === undefined ?
           { "sClass" : "center middle jtox-multi", 
             "mData" : "effects", 
@@ -211,7 +222,7 @@ var jToxStudy = (function () {
         // add also the "default" effects columns
         colDefs.push(
           { "sClass": "center middle jtox-multi", "sWidth": "15%", "mData": "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, "endpoint");  } },   // Effects columns
-          { "sClass": "center middle jtox-multi", "sWidth": "15%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, formatLoHigh) } }
+          { "sClass": "center middle jtox-multi", "sWidth": "15%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, function (data, type) { return formatLoHigh(data.result, type) }) } }
         );
   
         // jump over those two - they are already in the DOM      
