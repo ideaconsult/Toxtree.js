@@ -110,6 +110,15 @@ var ccLib = {
     return format;
   },
   
+  trim: function(obj) {
+    if (obj === undefined || obj == null)
+      return obj;
+    if (typeof obj == "string")
+      return obj.trim();
+    else
+      return obj;
+  },
+  
   copyToClipboard: function(text, prompt) {
     if (!prompt) {
       prompt = "Press Ctrl-C (Command-C) to copy and then Enter.";
@@ -543,7 +552,7 @@ var jToxStudy = (function () {
     ensureTable: function (tab, study) {
       var self = this;
   
-      var theTable = $('.' + study.protocol.category.code + ' .jtox-study-table')[0];
+      var theTable = $('.' + study.protocol.category.code + ' .jtox-study-table', tab)[0];
       if (!$(theTable).hasClass('dataTable')) {
   
         var colDefs = [
@@ -558,7 +567,12 @@ var jToxStudy = (function () {
         // this function takes care to add as columns all elements from given array
         var putAGroup = function(group, fProcess) {
           var count = 0;
+          var skip = [];
           for (var p in group) {
+            if (skip.indexOf(p) > -1)
+              continue;
+            if (group[p + " unit"] !== undefined)
+              skip.push(p + " unit");
             var val = fProcess(p);
             if (val === undefined)
               continue;
@@ -576,7 +590,9 @@ var jToxStudy = (function () {
         // some value formatting functions
         var formatLoHigh = function (data, type) {
           var out = "";
-          if (data.loValue !== undefined && data.upValue !== undefined) {
+          data.loValue = ccLib.trim(data.loValue);
+          data.upValue = ccLib.trim(data.upValue);
+          if (!!data.loValue && !!data.upValue) {
             out += (data.loQualifier == ">=") ? "[" : "(";
             out += data.loValue + ", " + data.upValue;
             out += (data.upQualifier == "<=") ? "]" : ") ";
@@ -584,19 +600,22 @@ var jToxStudy = (function () {
           else // either of them is non-undefined
           {
             var fnFormat = function (q, v) {
-              return ((q !== undefined) ? q : "=") + " " + v;
+              return (!!q ? q : "=") + " " + v;
             };
             
-            out += (data.loValue !== undefined) ? fnFormat(data.loQualifier, data.loValue) : fnFormat(data.upQualifier, data.upValue);
+            out += !!data.loValue ? fnFormat(data.loQualifier, data.loValue) : fnFormat(data.upQualifier, data.upValue);
           }
           
+          data.unit = ccLib.trim(data.unit);
           if (!!data.unit)
             out += data.unit;
           return out.replace(/ /g, "&nbsp;");
         };
         
         var formatUnits = function(data, unit) {
-          return data !== undefined ? (data + ((unit !== undefined) ? "&nbsp;" + unit : "")) : "-";
+          data = ccLib.trim(data);
+          unit = ccLib.trim(unit);
+          return !!data ? (data + (!!unit ? "&nbsp;" + unit : "")) : "-";
         };
 
         // use it to put parameters...
@@ -628,11 +647,11 @@ var jToxStudy = (function () {
           else
             rnFn = function(data, type) { return "-"; }
             
-          return study.effects[0].conditions[c + " unit"] === undefined ?
-          { "sClass" : "center middle jtox-multi", 
+          return { 
+            "sClass" : "center middle jtox-multi", 
             "mData" : "effects", 
             "mRender" : function(data, type, full) { return self.renderMulti(data, type, full, rnFn); } 
-          } : undefined;
+          };
         });
         
         // now fix the colspan of 'Conditions' preheader cell
@@ -676,7 +695,6 @@ var jToxStudy = (function () {
           "bProcessing": true,
           "bLengthChange": false,
   				"bAutoWidth": false,
-  //        "sPaginationType": "full_numbers",
           "sDom" : "rt<Fip>",
           "aoColumns": colDefs,
           "fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {

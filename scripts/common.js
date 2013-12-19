@@ -110,6 +110,15 @@ var ccLib = {
     return format;
   },
   
+  trim: function(obj) {
+    if (obj === undefined || obj == null)
+      return obj;
+    if (typeof obj == "string")
+      return obj.trim();
+    else
+      return obj;
+  },
+  
   copyToClipboard: function(text, prompt) {
     if (!prompt) {
       prompt = "Press Ctrl-C (Command-C) to copy and then Enter.";
