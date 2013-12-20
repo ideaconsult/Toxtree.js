@@ -252,7 +252,7 @@ var jToxStudy = (function () {
         
         // finally put the protocol entries
         colDefs.push(
-          { "sClass": "center", "sWidth": "15%", "mData": "protocol.guidance", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
+          { "sClass": "center", "sWidth": "15%", "mData": "protocol.guideline", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
           { "sClass": "center", "sWidth": "50px", "mData": "owner.company.name", "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>'; }  }, 
           { "sClass": "center", "sWidth": "50px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div><span class="ui-icon ui-icon-copy" title="Press to copy the UUID in the clipboard" data-uuid="' + data + '"></span>'; } }
         );
@@ -386,7 +386,14 @@ var jToxStudy = (function () {
           continue;
   
         ccLib.fillTree(aStudy, {title: onec[0].protocol.category.title + " (0)"});
-        var theTable = self.ensureTable(tab, onec[0]);
+        
+        // now swipe through all studyies to build a "representative" one with all fields.
+        var study = {};
+        for (var i = 0, cl = onec.length; i < cl; ++i) {
+          $.extend(true, study, onec[i]);
+        }
+
+        var theTable = self.ensureTable(tab, study);
         $(theTable).dataTable().fnAddData(onec);
       }
       
