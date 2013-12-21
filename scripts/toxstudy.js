@@ -391,6 +391,8 @@ var jToxStudy = (function () {
         var study = {};
         for (var i = 0, cl = onec.length; i < cl; ++i) {
           $.extend(true, study, onec[i]);
+          if (!$.isEmptyObject(study.parameters) && !$.isEmptyObject(study.effects[0].conditions))
+            break;
         }
 
         var theTable = self.ensureTable(tab, study);
@@ -426,7 +428,7 @@ var jToxStudy = (function () {
   				"bPaginate" : true,
           "sDom" : "rt<Fip>",
 /*   				"sDom" : '<"help remove-bottom"i><"help"p>Trt<"help"lf>', */
-  /* 				"sPaginationType": "full_numbers", */
+/* 				  "sPaginationType": "full_numbers", */
   				"sPaginate" : ".dataTables_paginate _paging",
   				"bAutoWidth": false,
   				"oLanguage": {
