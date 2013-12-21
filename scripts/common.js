@@ -38,6 +38,23 @@ var ccLib = {
     else
       obj.innerHTML = value;      
   },
+
+  isNull: function(obj) {
+    return obj === undefined || obj == null;
+  },
+  
+  isEmpty: function(obj) {
+    var empty = true;
+    if (obj !== undefined || obj != null){
+      for (var i in obj) {
+        if (obj[i] != null) {
+          empty = false;
+          break;
+        }
+      } 
+    }
+    return empty;
+  },
   
   setJsonValue: function (json, field, val) {
     if (field !== undefined){
