@@ -102,7 +102,7 @@ var ccLib = {
   	if ($(root).hasClass(filter))
   		processFn(root, json);
   
-    $('.' + filter, root).each(function (i) { processFn($(this)[0], json); } );
+    $(root.getElementsByClassName(filter)).each(function (i) { processFn($(this)[0], json); } );
   
     if (prefix && json.id !== undefined) {
       root.id = prefix + json.id;

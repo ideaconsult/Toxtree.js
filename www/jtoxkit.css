@@ -220,6 +220,10 @@ td.jtox-multi table {
   border-bottom: 0px !important;
 }
 
+.jtox-toolkit .paddingless {
+  padding: 0px !important;
+}
+
 
 /* Make table helper elements, like paging, filter, etc. in one line...
 */

@@ -5,7 +5,25 @@
 **/
 
 var jToxDataset = (function () {
-  var defaultSettings = { };    // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
+  var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
+    "groups": {
+      "Identifiers" : function(name, features) { return [
+        "http://www.opentox.org/api/1.1#Diagram", 
+        "http://www.opentox.org/api/1.1#CASRN", 
+        "http://www.opentox.org/api/1.1#EINECS",
+        "http://www.opentox.org/api/1.1#ChemicalName",
+        "http://www.opentox.org/api/1.1#SMILES",
+        "http://www.opentox.org/api/1.1#InChI",
+        "http://www.opentox.org/api/1.1#REACHRegistrationDate"
+      ];},
+      
+      "Names": function (name, features) { return [
+        "http://www.opentox.org/api/1.1#ChemicalName",
+        "http://www.opentox.org/api/1.1#TradeName",
+        "http://www.opentox.org/api/1.1#IUPACName"      
+      ];}
+    }
+  };    
   var instanceCount = 0;
 
   /* define the standard features-synonymes, working with 'sameAs' property. Beside the title we define the 'accumulate' property
@@ -32,18 +50,14 @@ var jToxDataset = (function () {
   	"http://www.opentox.org/api/dblinks#Pubchem": {title: "Public Chem"},
   	"http://www.opentox.org/api/dblinks#ChemSpider": {title: "Chem Spider"},
   	"http://www.opentox.org/api/dblinks#ChEMBL": {title: "ChEMBL"},
-  	"http://www.opentox.org/api/dblinks#ToxbankWiki": {title: "Toxban Wiki"}
+  	"http://www.opentox.org/api/dblinks#ToxbankWiki": {title: "Toxban Wiki"},
+  	// and one for unified way of processing diagram
+  	"http://www.opentox.org/api/1.1#Diagram": {title: "Diagram", accumulate: "compound.URI"}
   };
 
   var commonFeatures = {
 /*     "IUCLID5_UUID": {"sameAs": "i5uuid"} */
-    "diagram": {"column": 0, "title": "Diagram", "group": "Common", "dataLocation": "compound.URI"},
-    "cas": {"column": 1, "title": "CAS", "group": "Common", "dataLocation": "compound.cas"},
-    "einecs": {"colun": 2, "title": "EINECS", "group": "Common", "dataLocation": "compound.einecs"},
-    "name": {"column": 3, "title": "Name", "group": "Common", "dataLocation": "compound.name"},
-    "SMILES": {"column": 4, "title": "Smiles", "units": "", "group": "Common", "dataLocation": "compound.smiles"},
-    "InChI": {"column": 5, "title": "InChI", "units": "", "group": "Common", "dataLocation": "compound.inchi"},
-    "reachdate": {"column": 6, "title": "REACHRegistration", "units": "", "group": "Common", "dataLocation": "compound.reachdate"}
+    
   };
   
   // constructor
@@ -51,17 +65,19 @@ var jToxDataset = (function () {
     var self = this;
     self.rootElement = root;
     self.settings = $.extend({}, defaultSettings, jToxKit.settings, settings); // i.e. defaults from jToxDataset
-    self.features = null; // almost exactly as downloaded form server - just a group member is added based on sameAs
-    self.featureGroups = {"Common": []};
-    self.featureOrder = ["Common"];
-
+    self.features = null; // features, as downloaded from server, after being processed.
+    self.groups = null; // computed groups, i.e. 'groupName' -> array of feature list, prepared.
+    
+    root.appendChild(jToxKit.getTemplate('#jtox-dataset'));
     instanceCount++;
   };
   
   // now follow the prototypes of the instance functions.
   cls.prototype = {
-    // make a tab-based widget with features and grouped on tabs. If entry is provided the widget is filled with values
-    prepareTabs: function (root, entry) {
+    /* make a tab-based widget with features and grouped on tabs. It relies on filled and processed 'self.features' as well
+    as created 'self.groups'.
+    */
+    prepareTabs: function (root, nodeFn) {
       var self = this;
       
       var fr = document.createDocumentFragment();
@@ -71,7 +87,7 @@ var jToxDataset = (function () {
       all.appendChild(ulEl);
 
       var featNames = {};
-      for (var gr in self.featureGroups) {
+      for (var gr in self.groups) {
         var grId = "jtox-ds-" + gr + "-" + instanceCount;
         
         var liEl = document.createElement('li');
@@ -81,95 +97,117 @@ var jToxDataset = (function () {
         aEl.innerHTML = gr.replace(/_/g, " ");
         liEl.appendChild(aEl);
         
-        // now prepare the content.
+        // now prepare the content...
         var divEl = document.createElement('div');
         divEl.id = grId;
-        for (var i = 0;i < self.featureGroups[gr].length; ++i) {
-          var feat = self.featureGroups[gr][i];
-          var fEl = jToxKit.getTemplate('#jtox-ds-feature');
-          featNames[feat] = self.features[feat].title;
-          fEl.setAttribute('data-feature', feat);
-          divEl.appendChild(fEl);
+        // ... and fill it.
+        for (var i = 0, glen = self.groups[gr].length;i < glen; ++i) {
+          var fId = self.groups[gr][i];
+          divEl.appendChild(nodeFn(fId, self.features[fId].title));
         }
         
         all.appendChild(divEl);
       }
       
+      // now append the prepared document fragment and prepare the tabs.
       root.appendChild(fr);
-      // fill, the already prepared names for each checkbox-ed item.
-      $('.jtox-ds-feature', all).each(function() {
-        var fId = $(this).data('feature');
-        $('.jtox-title', this).html(featNames[fId]);
-      });
       return $(all).tabs();
     },
     
     prepareTables: function() {
+      var self = this;
       var fixedCols = [];
       var varCols = [];
       
-      for (var i = 0, glen = self.featureOrder.length; i < glen; ++i) {
-        var grp = self.featureOrder[i];
-        var gfull = self.featureGroups[grp];
-        
-        for (var j = 0, flen = gfull.length; j < flen; ++j){
-          var f = gfull[j];
-          var ffull = self.features[f];
+      var colList = fixedCols;
+      // enter the first column - the number.
+      fixedCols.push({
+            "sDefaultContent": "-"
+      });
+      
+      // now proceed to enter all other columns
+      for (var gr in self.groups){
+        for (var i = 0, glen = self.groups[gr].length; i < glen; ++i) {
+          var fId = self.groups[gr][i];
+          var feature = self.features[fId];
           var col = {
-            "sTitle": ffull.title + ffull.units,
-            "sDefaultContent": "?",
-            "mData": ffull.dataLocation !== undefined ? ffull.dataLocation : "values"
+            "sTitle": feature.title + (ccLib.isNull(feature.units) ? "" : feature.units),
+            "sDefaultContent": "-",
+            "mData": feature.accumulate !== undefined ? feature.accumulate : "values." + fId
           };
           
-          if (ffull.dataLocation === undefined){
-            col["mRender"] = (function (fid) { 
-              return function (data, type, full) {
-                return data[fid];
-              };
-            })(f);
+          // some special cases, like diagram
+          if (cls.shortFeatureId(fId) == "Diagram") {
+            col["mRender"] = function(data, type, full) {
+              return (type != "display") ? "-" : '<img src="' + full.compound.URI + '?media=image/png" class="jtox-ds-smalldiagram"/>';  
+            }
+            col["sClass"] = "paddingless";
+            col["sWidth"] = "125px";
           }
-          
-          if (grp == "common")
-            fixedCols.push(col);
-          else
-            varCols.push(col);
+/*
+          else if (fId == "") {
+            
+          }
+*/
+          colList.push(col);
         }
+        
+        // after the first one we switch to variable table's columns.
+        colList = varCols;
       }
       
-      // now - create the tables.
-      var fixTable = null;
-      var varTable = null;
+      // now - create the tables - they have common options, except the aoColumns (i.e. column definitions), which are added later.
+      $(".jtox-ds-fixed table", self.rootElement).dataTable({
+        "bPaginate": true,
+        "bProcessing": true,
+        "bLengthChange": false,
+				"bAutoWidth": true,
+        "sDom" : "rt<Fip>",
+        "aoColumns": fixedCols,
+        "bServerSide": true,
+        "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
+          var info = {};
+          for (var i = 0, dl = aoData.length; i < dl; ++i)
+            info[aoData[i].name] = aoData[i].value;
+
+          var page = info.iDisplayStart / info.iDisplayLength;
+/*
+          theForm.Order = tableCols[info.iSortCol_0].mData;
+          theForm.Direction = info.sSortDir_0;
+*/
+          var qUri = self.datasetUri + (self.datasetUri.indexOf('?') > 0 ? '&' : '?') + "page=" + page + "&pagesize=" + info.iDisplayLength;
+          jToxKit.call(self, qUri, function(dataset){
+            if (!!dataset){
+              fnCallback({
+                "sEcho": info.sEcho,
+                "iTotalRecords": dataset.query.total,
+                "iTotalDisplayRecords": dataset.dataEntry.length,
+                "aaData": dataset.dataEntry
+              });          
+            }
+          });
+        }
+      });
+      
+      $(".jtox-ds-variable table", self.rootElement).dataTable({
+        "bPaginate": false,
+        "bProcessing": false,
+        "bLengthChange": false,
+				"bAutoWidth": true,
+        "sDom" : "rt",
+        "aoColumns": varCols
+      });
     },
 
     /* Process features as reported in the dataset. Works on result of standalone calls to <datasetUri>/feature
     */
-    groupFeatures: function (features) {
+    prepareGroups: function () {
       var self = this;
       
-      self.features = features;
-      if (!!features) {
-        for (var f in features) {
-          
-          var fullf = features[f];
-          var gr = cls.fixSameAs(fullf.sameAs);
-          if (commonFeatures[gr] === undefined) {
-            gr = gr.replace(/\s/g, '_');
-            if (self.featureGroups[gr] === undefined){ // add new one
-              self.featureOrder.push(gr);
-              self.featureGroups[gr] = [];
-            }
-            
-            self.featureGroups[gr].push(f);
-          }
-
-          fullf.group = gr;
-        }
-       
-        // finally - append our, custom groups at the end, so that they appear as usual groups
-        for (var f in commonFeatures)
-          self.featureGroups["Common"].push(f);
-        
-        $.extend(self.features, commonFeatures);
+      var grps = self.settings.groups;
+      self.groups = {};
+      for (var i in grps){
+        self.groups[i] = (grps[i])(i, self.features);
       }
     },
     
@@ -179,26 +217,26 @@ var jToxDataset = (function () {
       var self = this;
     },
     
-    /* Makes a query to the server for particular dataset. If 'grouping' is null, a call for dataset's features is made first
+    /* Makes a query to the server for particular dataset, asking for feature list first, so that the table(s) can be 
+    prepared.
     */
     queryDataset: function (datasetUri) {
       var self = this;
       
       self.clearDataset();
+      self.datasetUri = datasetUri;
       jToxKit.call(self, datasetUri + '/feature', function (feature) {
         if (!!feature) {
-          self.groupFeatures(feature.feature);
-          self.prepareTabs($('.jtox-ds-features', self.rootElement)[0]);
-          self.prepareTables();
-      
-          // finally - make a call for the dataset and fill up the tables.
-          jToxKit.call(self, datasetUri, function(dataset){
-            if (!!dataset){
-              cls.processDataset(dataset);
-              $('.jtox-ds-fixed table', self.rootElement).dataTable().fnAddData(dataset.dataEntry);
-              $('.jtox-ds-variable table', self.rootElement).dataTable().fnAddData(dataset.dataEntry);
-            }
+          self.features = feature.feature;
+          cls.processFeatures(self.features);
+          self.prepareGroups();
+          self.prepareTabs($('.jtox-ds-features', self.rootElement)[0], function (id, name){
+            var fEl = jToxKit.getTemplate('#jtox-ds-feature');
+            ccLib.fillTree(fEl, {title: name});
+            $(fEl).data('feature-id', id);
+            return fEl;
           });
+          self.prepareTables(); // prepare and add the tables - they will make certain queries to fill up with data.
         }
       });
     },
@@ -206,6 +244,10 @@ var jToxDataset = (function () {
   }; // end of prototype
   
   // some public, static methods
+  cls.shortFeatureId = function(fId) {
+    return fId.substr(fId.indexOf('#') + 1); // a small trick - 'not-found' returns -1, and adding 1 results in exactly what we want: 0, i.e. - start, i.e. - no change.
+  };
+  
   cls.processEntry = function (entry, features, fnValue) {
     for (var fid in entry.values) {
       var feature = features[fid];

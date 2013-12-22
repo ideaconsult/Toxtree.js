@@ -1,9 +1,10 @@
 TODO:
 
 - Make "main" feature tabs hidable.
+- Fill up the first column.
 - Make dataset / compound processing universal
-- Use it in study reference substance visuzalization
 - Make table initialization
+- Preprocess compound.URI in dataset to remove the conformer...
 - Column hiding removal / editing;
 - Detailed information row
 - make toxtree part of jToxKit

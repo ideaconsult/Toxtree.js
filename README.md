@@ -101,6 +101,14 @@ The `substanceUri` is the same as in previous function, but this one takes care 
 
 The `substanceUri` is the same as in previous function. This one queries for a summary of all studies available for the given substance. It fills up the numbers in the studies' tabs and prepares the tables for particular queries later on, which are executes upon each tab's activation.
 
+### jToxDataset kit
+
+A general dataset-aware kit.
+
+- `groups` options set - name and function
+- global function not to be missed
+- dsf
+
 
 ### jToxTree kit
 
@@ -224,7 +232,6 @@ Default is like: build.sh --html .. --out ../www --css ../styles --js ../script 
 ```
 
 The result of this script can be directly used. There is a test page for proper result, which should not produce errors when opened in the browser [test.html](www/test.html).
-
 
 
 
