@@ -122,7 +122,7 @@ var jToxDataset = (function () {
       var colList = fixedCols;
       // enter the first column - the number.
       fixedCols.push({
-            "sDefaultContent": "-"
+            "mData": "index"
       });
       
       // now proceed to enter all other columns
@@ -139,7 +139,7 @@ var jToxDataset = (function () {
           // some special cases, like diagram
           if (cls.shortFeatureId(fId) == "Diagram") {
             col["mRender"] = function(data, type, full) {
-              return (type != "display") ? "-" : '<img src="' + full.compound.URI + '?media=image/png" class="jtox-ds-smalldiagram"/>';  
+              return (type != "display") ? "-" : '<img src="' + full.compound.diagramUri + '" class="jtox-ds-smalldiagram"/>';  
             }
             col["sClass"] = "paddingless";
             col["sWidth"] = "125px";
@@ -178,6 +178,7 @@ var jToxDataset = (function () {
           var qUri = self.datasetUri + (self.datasetUri.indexOf('?') > 0 ? '&' : '?') + "page=" + page + "&pagesize=" + info.iDisplayLength;
           jToxKit.call(self, qUri, function(dataset){
             if (!!dataset){
+              cls.processDataset(dataset, null, self.features);
               fnCallback({
                 "sEcho": info.sEcho,
                 "iTotalRecords": dataset.query.total,
@@ -261,7 +262,7 @@ var jToxDataset = (function () {
         for (var v = 0; v < accArr.length; ++v){
           var oldVal = ccLib.getJsonValue(entry, accArr[v]);
           var newVal = entry.values[fid];
-          if (typeof fnValue !== undefined)
+          if (typeof fnValue === "function")
             ccLib.setJsonValue(entry, accArr[v], fnValue(oldVal, newVal));
           else if (!$.isArray(oldVal))
             ccLib.setJsonValue(entry, accArr[v], oldVal + newVal);
@@ -302,11 +303,18 @@ var jToxDataset = (function () {
     return features;
   };
   
-  cls.processDataset = function(dataset, fnValue) {
-    cls.processFeatures(dataset.feature);
+  cls.processDataset = function(dataset, fnValue, features) {
+    if (!!features) {
+      cls.processFeatures(dataset.feature);
+      features = dataset.feature;
+    }
     
     for (var i = 0, dl = dataset.dataEntry.length; i < dl; ++i) {
-      cls.processEntry(dataset.dataEntry[i], dataset.feature, fnValue);
+      cls.processEntry(dataset.dataEntry[i], features, fnValue);
+      dataset.dataEntry[i].index = i + 1;
+      var uri = dataset.dataEntry[i].compound.URI;
+      uri = uri.replace(/(.+)(\/conformer.*)/, "$1");
+      dataset.dataEntry[i].compound.diagramUri = uri + "?media=image/png";
     }
   };
   

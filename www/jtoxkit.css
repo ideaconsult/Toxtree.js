@@ -5,7 +5,6 @@
   border: 1px solid black;
 }
 
-
 .jtox-ds-fixed,
 .jtox-ds-variable {
   border: 0px;
@@ -19,7 +18,20 @@
   border: 0px;
   padding: 2px;
   margin: 0px 15px 0px 0px;
-}/* toxtstudy.css - Styling for toxstudy engine
+}
+
+.jtox-ds-tables .jtox-inline,
+.jtox-ds-tables td {
+  vertical-align: top;
+}
+
+.jtox-ds-smalldiagram {
+  width: 125px;
+  height: 125px;
+  border: 0px;
+}
+
+.jtox-toolkit/* toxtstudy.css - Styling for toxstudy engine
 */
 
 div.jtox-study,
@@ -218,10 +230,6 @@ td.jtox-multi table {
 .jtox-toolkit .borderless-bottom,
 .jtox-toolkit .borderless-bottom * {
   border-bottom: 0px !important;
-}
-
-.jtox-toolkit .paddingless {
-  padding: 0px !important;
 }
 
 
