@@ -388,7 +388,13 @@ var jToxDataset = (function () {
           var qUri = self.datasetUri + (self.datasetUri.indexOf('?') > 0 ? '&' : '?') + "page=" + page + "&pagesize=" + info.iDisplayLength;
           jToxKit.call(self, qUri, function(dataset){
             if (!!dataset){
-              cls.processDataset(dataset, null, self.features);
+              cls.processDataset(dataset, self.features, function(oldVal, newVal) {
+                if (ccLib.isNull(oldVal) || newVal.toLowerCase().indexOf(oldVal.toLowerCase()) >= 0)
+                  return newVal;
+                if (oldVal.toLowerCase().indexOf(newVal.toLowerCase()) >= 0)
+                  return oldVal;
+                return oldVal + ", " + newVal;
+              });
               $(varTable).dataTable().fnClearTable();
               $(varTable).dataTable().fnAddData(dataset.dataEntry);
               
@@ -399,6 +405,7 @@ var jToxDataset = (function () {
                 "aaData": dataset.dataEntry
               });
               
+              ccLib.equalizeHeights(fixTable.tHead, varTable.tHead);
               ccLib.equalizeHeights(fixTable.tBodies[0], varTable.tBodies[0]);
             }
           });
@@ -473,7 +480,7 @@ var jToxDataset = (function () {
           if (typeof fnValue === "function")
             ccLib.setJsonValue(entry, accArr[v], fnValue(oldVal, newVal));
           else if (!$.isArray(oldVal))
-            ccLib.setJsonValue(entry, accArr[v], oldVal + newVal);
+            ccLib.setJsonValue(entry, accArr[v], ccLib.isNull(oldVal) ? newVal : oldVal + newVal);
           else
             oldVal.push(newVal);
         }
@@ -511,8 +518,8 @@ var jToxDataset = (function () {
     return features;
   };
   
-  cls.processDataset = function(dataset, fnValue, features) {
-    if (!!features) {
+  cls.processDataset = function(dataset, features, fnValue) {
+    if (ccLib.isNull(features)) {
       cls.processFeatures(dataset.feature);
       features = dataset.feature;
     }
@@ -1095,7 +1102,7 @@ var jToxStudy = (function () {
            // go and query for the reference query
            jToxKit.call(self, substance.referenceSubstance.uri, function (dataset){
              if (!!dataset) {
-              jToxDataset.processDataset(dataset, fnDatasetValue);
+              jToxDataset.processDataset(dataset, null, fnDatasetValue);
               ccLib.fillTree(rootTab, dataset.dataEntry[0]);
              }
            });

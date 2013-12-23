@@ -565,7 +565,7 @@ var jToxStudy = (function () {
            // go and query for the reference query
            jToxKit.call(self, substance.referenceSubstance.uri, function (dataset){
              if (!!dataset) {
-              jToxDataset.processDataset(dataset, fnDatasetValue);
+              jToxDataset.processDataset(dataset, null, fnDatasetValue);
               ccLib.fillTree(rootTab, dataset.dataEntry[0]);
              }
            });
