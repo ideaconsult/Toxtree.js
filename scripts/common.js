@@ -143,6 +143,30 @@ var ccLib = {
     window.prompt(prompt, text);
   },
   
+  equalizeHeights: function() {
+    var tabs = [];
+    for (var i = 0;i < arguments.length; ++i) {
+      tabs[i] = arguments[i].firstElementChild;
+    }    
+    
+    for (;;) {
+      var height = 0;
+      for (i = 0;i < tabs.length ; ++i) {
+        if (tabs[i] != null && tabs[i].offsetHeight > height)
+          height = tabs[i].offsetHeight;
+      }
+      
+      if (height == 0)
+        break;
+        
+      for (i = 0;i < tabs.length ; ++i) {
+        if (tabs[i] != null && tabs[i].offsetHeight < height)
+          tabs[i].style.height = height + "px";
+        tabs[i] = tabs[i].nextElementSibling;
+      }
+    }
+  },
+  
   parseURL: function(url) {
     var a =  document.createElement('a');
     a.href = url;

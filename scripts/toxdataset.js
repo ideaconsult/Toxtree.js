@@ -157,11 +157,20 @@ var jToxDataset = (function () {
       }
       
       // now - create the tables - they have common options, except the aoColumns (i.e. column definitions), which are added later.
-      $(".jtox-ds-fixed table", self.rootElement).dataTable({
+      var varTable = ($(".jtox-ds-variable table", self.rootElement).dataTable({
+        "bPaginate": false,
+        "bProcessing": false,
+        "bLengthChange": false,
+				"bAutoWidth": true,
+        "sDom" : "rt",
+        "aoColumns": varCols
+      }))[0];
+      
+      var fixTable = ($(".jtox-ds-fixed table", self.rootElement).dataTable({
         "bPaginate": true,
         "bProcessing": true,
         "bLengthChange": false,
-				"bAutoWidth": true,
+				"bAutoWidth": false,
         "sDom" : "rt<Fip>",
         "aoColumns": fixedCols,
         "bServerSide": true,
@@ -179,25 +188,23 @@ var jToxDataset = (function () {
           jToxKit.call(self, qUri, function(dataset){
             if (!!dataset){
               cls.processDataset(dataset, null, self.features);
+              $(varTable).dataTable().fnClearTable();
+              $(varTable).dataTable().fnAddData(dataset.dataEntry);
+              
               fnCallback({
                 "sEcho": info.sEcho,
                 "iTotalRecords": dataset.query.total,
                 "iTotalDisplayRecords": dataset.dataEntry.length,
                 "aaData": dataset.dataEntry
-              });          
+              });
+              
+              ccLib.equalizeHeights(fixTable.tBodies[0], varTable.tBodies[0]);
             }
           });
         }
-      });
+      }))[0];
       
-      $(".jtox-ds-variable table", self.rootElement).dataTable({
-        "bPaginate": false,
-        "bProcessing": false,
-        "bLengthChange": false,
-				"bAutoWidth": true,
-        "sDom" : "rt",
-        "aoColumns": varCols
-      });
+      ccLib.equalizeHeights(fixTable.tHead, varTable.tHead);
     },
 
     /* Process features as reported in the dataset. Works on result of standalone calls to <datasetUri>/feature

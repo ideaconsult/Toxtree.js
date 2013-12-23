@@ -10,6 +10,11 @@
   border: 0px;
   padding: 0px;
   margin: 0px;
+  display: inline-block;
+  width: 50%;
+  vertical-align: top;
+  overflow-x: scroll;
+  overflow-y: hidden;
 }
 
 .jtox-ds-feature {
@@ -30,5 +35,3 @@
   height: 125px;
   border: 0px;
 }
-
-.jtox-toolkit
