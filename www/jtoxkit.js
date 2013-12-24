@@ -212,17 +212,16 @@ var jToxDataset = (function () {
       "Identifiers" : function(name, features) { return [
         "http://www.opentox.org/api/1.1#Diagram", 
         "http://www.opentox.org/api/1.1#CASRN", 
-        "http://www.opentox.org/api/1.1#EINECS",
-        "http://www.opentox.org/api/1.1#ChemicalName",
-        "http://www.opentox.org/api/1.1#SMILES",
-        "http://www.opentox.org/api/1.1#InChI",
-        "http://www.opentox.org/api/1.1#REACHRegistrationDate"
+        "http://www.opentox.org/api/1.1#EINECS"
       ];},
       
       "Names": function (name, features) { return [
         "http://www.opentox.org/api/1.1#ChemicalName",
         "http://www.opentox.org/api/1.1#TradeName",
-        "http://www.opentox.org/api/1.1#IUPACName"      
+        "http://www.opentox.org/api/1.1#IUPACName",
+        "http://www.opentox.org/api/1.1#SMILES",
+        "http://www.opentox.org/api/1.1#InChI",
+        "http://www.opentox.org/api/1.1#REACHRegistrationDate"
       ];},
       
       "Calculated": function (name, features) {
@@ -282,6 +281,7 @@ var jToxDataset = (function () {
     self.settings = $.extend({}, defaultSettings, jToxKit.settings, settings); // i.e. defaults from jToxDataset
     self.features = null; // features, as downloaded from server, after being processed.
     self.groups = null; // computed groups, i.e. 'groupName' -> array of feature list, prepared.
+    self.fixTable = self.varTable = null; // the two tables - to be initialized in prepareTables.
     
     root.appendChild(jToxKit.getTemplate('#jtox-dataset'));
     instanceCount++;
@@ -347,7 +347,6 @@ var jToxDataset = (function () {
       var self = this;
       var fixedCols = [];
       var varCols = [];
-      var varTable, fixTable;
       
       var colList = fixedCols;
       // enter the first column - the number.
@@ -360,11 +359,17 @@ var jToxDataset = (function () {
       var fnShowColumn = function(sel, idx) {
         return function() {
           $(sel + ' table', self.rootElement).dataTable().fnSetColumnVis(idx, this.checked);
+          ccLib.equalizeHeights(self.fixTable.tHead, self.varTable.tHead);
+          ccLib.equalizeHeights(self.fixTable.tBodies[0], self.varTable.tBodies[0]);
         }
       };
-      // now proceed to enter all other columns
+      
+      // make a query for all checkboxes in the main tab, so they can be traversed in parallel with the features and 
+      // a change handler added.
       var checkList = $('.jtox-ds-features .jtox-checkbox', self.rootElement);
       var checkIdx = 0;
+      
+      // now proceed to enter all other columns
       for (var gr in self.groups){
         for (var i = 0, glen = self.groups[gr].length; i < glen; ++i) {
           var fId = self.groups[gr][i];
@@ -383,11 +388,7 @@ var jToxDataset = (function () {
             col["sClass"] = "paddingless";
             col["sWidth"] = "125px";
           }
-/*
-          else if (fId == "") {
-            
-          }
-*/
+          
           // finally - assign column switching to the checkbox of main tab.
           $(checkList[checkIdx++]).on('change', fnShowColumn(colList == fixedCols ? '.jtox-ds-fixed' : '.jtox-ds-variable', colList.length))
           
@@ -400,16 +401,17 @@ var jToxDataset = (function () {
       }
       
       // now - create the tables - they have common options, except the aoColumns (i.e. column definitions), which are added later.
-      varTable = ($(".jtox-ds-variable table", self.rootElement).dataTable({
+      self.varTable = ($(".jtox-ds-variable table", self.rootElement).dataTable({
         "bPaginate": false,
         "bProcessing": false,
         "bLengthChange": false,
 				"bAutoWidth": true,
         "sDom" : "rt",
+        "bSort": false,
         "aoColumns": varCols
       }))[0];
       
-      fixTable = ($(".jtox-ds-fixed table", self.rootElement).dataTable({
+      self.fixTable = ($(".jtox-ds-fixed table", self.rootElement).dataTable({
         "bPaginate": true,
         "bProcessing": true,
         "bLengthChange": false,
@@ -417,6 +419,7 @@ var jToxDataset = (function () {
         "sDom" : "rt<Fip>",
         "aoColumns": fixedCols,
         "bServerSide": true,
+        "bSort": false,
         "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
           var info = {};
           for (var i = 0, dl = aoData.length; i < dl; ++i)
@@ -437,8 +440,8 @@ var jToxDataset = (function () {
                   return oldVal;
                 return oldVal + ", " + newVal;
               });
-              $(varTable).dataTable().fnClearTable();
-              $(varTable).dataTable().fnAddData(dataset.dataEntry);
+              $(self.varTable).dataTable().fnClearTable();
+              $(self.varTable).dataTable().fnAddData(dataset.dataEntry);
               
               fnCallback({
                 "sEcho": info.sEcho,
@@ -447,14 +450,14 @@ var jToxDataset = (function () {
                 "aaData": dataset.dataEntry
               });
               
-              ccLib.equalizeHeights(fixTable.tHead, varTable.tHead);
-              ccLib.equalizeHeights(fixTable.tBodies[0], varTable.tBodies[0]);
+              ccLib.equalizeHeights(self.fixTable.tHead, self.varTable.tHead);
+              ccLib.equalizeHeights(self.fixTable.tBodies[0], self.varTable.tBodies[0]);
             }
           });
         }
       }))[0];
       
-      ccLib.equalizeHeights(fixTable.tHead, varTable.tHead);
+      ccLib.equalizeHeights(self.fixTable.tHead, self.varTable.tHead);
     },
 
     /* Process features as reported in the dataset. Works on result of standalone calls to <datasetUri>/feature

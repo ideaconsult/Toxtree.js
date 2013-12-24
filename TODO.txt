@@ -1,5 +1,6 @@
 TODO:
 
+- table sorting problems;
 - Export tab: fill it with content (link)
 - Detailed information row
 - make toxtree part of jToxKit

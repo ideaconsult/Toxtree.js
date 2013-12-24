@@ -11,10 +11,18 @@
   padding: 0px;
   margin: 0px;
   display: inline-block;
-  width: 50%;
   vertical-align: top;
   overflow-x: scroll;
   overflow-y: hidden;
+}
+
+.jtox-ds-fixed {
+  width: 25%;
+  
+}
+
+.jtox-ds-variable {
+  width: 75%;
 }
 
 .jtox-ds-feature {
