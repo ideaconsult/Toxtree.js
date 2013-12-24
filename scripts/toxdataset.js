@@ -6,6 +6,7 @@
 
 var jToxDataset = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
+    "showExport": true,
     "groups": {
       "Identifiers" : function(name, features) { return [
         "http://www.opentox.org/api/1.1#Diagram", 
@@ -21,9 +22,27 @@ var jToxDataset = (function () {
         "http://www.opentox.org/api/1.1#ChemicalName",
         "http://www.opentox.org/api/1.1#TradeName",
         "http://www.opentox.org/api/1.1#IUPACName"      
-      ];}
+      ];},
+      
+      "Calculated": function (name, features) {
+        var arr = [];
+        for (var f in features) {
+          if (!ccLib.isNull(features[f].source) && !ccLib.isNull(features[f].source.type) && !features[f].source.type.toLowerCase() == "algorithm")
+            arr.push(f);
+        }
+        return arr;
+      },
+      
+      "Other": function (name, features) {
+        var arr = [];
+        for (var f in features) {
+          if (!features[f].used)
+            arr.push(f);
+        }
+        return arr;
+      }
     }
-  };    
+  };
   var instanceCount = 0;
 
   /* define the standard features-synonymes, working with 'sameAs' property. Beside the title we define the 'accumulate' property
@@ -31,35 +50,30 @@ var jToxDataset = (function () {
   'accumulate' can be an array, which results in adding value to several places.
   */
   var baseFeatures = {
-    "http://www.opentox.org/api/1.1#REACHRegistrationDate" : { title: "REACH Date", accumulate: "compound.reachdate"},
-    "http://www.opentox.org/api/1.1#CASRN" : { title: "CAS", accumulate: "compound.cas"},
-  	"http://www.opentox.org/api/1.1#ChemicalName" : { title: "Name", accumulate: "compound.name"},
-  	"http://www.opentox.org/api/1.1#TradeName" : {title: "Trade Name", accumulate: "compound.tradename"},
-  	"http://www.opentox.org/api/1.1#IUPACName": {title: "IUPAC Name", accumulate: ["compound.name", "compound.iupac"]},
-  	"http://www.opentox.org/api/1.1#EINECS": {title: "EINECS", accumulate: "compound.einecs"},
-    "http://www.opentox.org/api/1.1#InChI": {title: "InChI", accumulate: "compound.inchi"},
-  	"http://www.opentox.org/api/1.1#InChI_std": {title: "InChI", accumulate: "compound.inchi"},
-    "http://www.opentox.org/api/1.1#InChIKey": {title: "InChI Key", accumulate: "compound.inchikey"},
-  	"http://www.opentox.org/api/1.1#InChIKey_std": {title: "InChI Key", accumulate: "compound.inchikey"},
-    "http://www.opentox.org/api/1.1#InChI_AuxInfo": {title: "InChI Aux", accumulate: "compound.inchi"},
-  	"http://www.opentox.org/api/1.1#InChI_AuxInfo_std": {title: "InChI Aux", accumulate: "compound.inchi"},
-  	"http://www.opentox.org/api/1.1#IUCLID5_UUID": {title: "IUCLID5 UUID", accumulate: "compound.i5uuid"},
-  	"http://www.opentox.org/api/1.1#SMILES": {title: "SMILES", accumulate: "compound.smiles"},
-  	"http://www.opentox.org/api/dblinks#CMS": {title: "CMS"},
-  	"http://www.opentox.org/api/dblinks#ChEBI": {title: "ChEBI"},
-  	"http://www.opentox.org/api/dblinks#Pubchem": {title: "Public Chem"},
-  	"http://www.opentox.org/api/dblinks#ChemSpider": {title: "Chem Spider"},
-  	"http://www.opentox.org/api/dblinks#ChEMBL": {title: "ChEMBL"},
-  	"http://www.opentox.org/api/dblinks#ToxbankWiki": {title: "Toxban Wiki"},
+    "http://www.opentox.org/api/1.1#REACHRegistrationDate" : { title: "REACH Date", accumulate: "compound.reachdate", used: true},
+    "http://www.opentox.org/api/1.1#CASRN" : { title: "CAS", accumulate: "compound.cas", used: true},
+  	"http://www.opentox.org/api/1.1#ChemicalName" : { title: "Name", accumulate: "compound.name", used: true},
+  	"http://www.opentox.org/api/1.1#TradeName" : {title: "Trade Name", accumulate: "compound.tradename", used: true},
+  	"http://www.opentox.org/api/1.1#IUPACName": {title: "IUPAC Name", accumulate: ["compound.name", "compound.iupac"], used: true},
+  	"http://www.opentox.org/api/1.1#EINECS": {title: "EINECS", accumulate: "compound.einecs", used: true},
+    "http://www.opentox.org/api/1.1#InChI": {title: "InChI", accumulate: "compound.inchi", used: true},
+  	"http://www.opentox.org/api/1.1#InChI_std": {title: "InChI", accumulate: "compound.inchi", used: true},
+    "http://www.opentox.org/api/1.1#InChIKey": {title: "InChI Key", accumulate: "compound.inchikey", used: true},
+  	"http://www.opentox.org/api/1.1#InChIKey_std": {title: "InChI Key", accumulate: "compound.inchikey", used: true},
+    "http://www.opentox.org/api/1.1#InChI_AuxInfo": {title: "InChI Aux", accumulate: "compound.inchi", used: true},
+  	"http://www.opentox.org/api/1.1#InChI_AuxInfo_std": {title: "InChI Aux", accumulate: "compound.inchi", used: true},
+  	"http://www.opentox.org/api/1.1#IUCLID5_UUID": {title: "IUCLID5 UUID", accumulate: "compound.i5uuid", used: true},
+  	"http://www.opentox.org/api/1.1#SMILES": {title: "SMILES", accumulate: "compound.smiles", used: true},
+  	"http://www.opentox.org/api/dblinks#CMS": {title: "CMS", used: true},
+  	"http://www.opentox.org/api/dblinks#ChEBI": {title: "ChEBI", used: true},
+  	"http://www.opentox.org/api/dblinks#Pubchem": {title: "Public Chem", used: true},
+  	"http://www.opentox.org/api/dblinks#ChemSpider": {title: "Chem Spider", used: true},
+  	"http://www.opentox.org/api/dblinks#ChEMBL": {title: "ChEMBL", used: true},
+  	"http://www.opentox.org/api/dblinks#ToxbankWiki": {title: "Toxban Wiki", used: true},
   	// and one for unified way of processing diagram
-  	"http://www.opentox.org/api/1.1#Diagram": {title: "Diagram", accumulate: "compound.URI"}
+  	"http://www.opentox.org/api/1.1#Diagram": {title: "Diagram", accumulate: "compound.URI", used: true}
   };
 
-  var commonFeatures = {
-/*     "IUCLID5_UUID": {"sameAs": "i5uuid"} */
-    
-  };
-  
   // constructor
   var cls = function (root, settings) {
     var self = this;
@@ -77,7 +91,7 @@ var jToxDataset = (function () {
     /* make a tab-based widget with features and grouped on tabs. It relies on filled and processed 'self.features' as well
     as created 'self.groups'.
     */
-    prepareTabs: function (root, nodeFn) {
+    prepareTabs: function (root, isMain, nodeFn) {
       var self = this;
       
       var fr = document.createDocumentFragment();
@@ -87,15 +101,19 @@ var jToxDataset = (function () {
       all.appendChild(ulEl);
 
       var featNames = {};
-      for (var gr in self.groups) {
-        var grId = "jtox-ds-" + gr + "-" + instanceCount;
-        
+      var createATab = function(grId, name) {
         var liEl = document.createElement('li');
         ulEl.appendChild(liEl);
         var aEl = document.createElement('a');
         aEl.href = "#" + grId;
-        aEl.innerHTML = gr.replace(/_/g, " ");
+        aEl.innerHTML = name;
         liEl.appendChild(aEl);
+        return liEl;
+      };
+      
+      for (var gr in self.groups) {
+        var grId = "jtox-ds-" + gr + "-" + instanceCount;
+        createATab(grId, gr.replace(/_/g, " "));
         
         // now prepare the content...
         var divEl = document.createElement('div');
@@ -104,28 +122,48 @@ var jToxDataset = (function () {
         for (var i = 0, glen = self.groups[gr].length;i < glen; ++i) {
           var fId = self.groups[gr][i];
           divEl.appendChild(nodeFn(fId, self.features[fId].title));
+          self.features[fId].used = true;
         }
         
         all.appendChild(divEl);
       }
       
+      if (isMain && self.settings.showExport) {
+        var tabId = "jtox-ds-export-" + instanceCount;
+        var liEl = createATab(tabId, "Export");
+        $(liEl).addClass('jtox-ds-export');
+        var divEl = jToxKit.getTemplate('#jtox-ds-export');
+        divEl.id = tabId;
+        all.appendChild(divEl);
+      }
+      
       // now append the prepared document fragment and prepare the tabs.
       root.appendChild(fr);
-      return $(all).tabs();
+      return $(all).tabs({ collapsible: isMain });
     },
     
     prepareTables: function() {
       var self = this;
       var fixedCols = [];
       var varCols = [];
+      var varTable, fixTable;
       
       var colList = fixedCols;
       // enter the first column - the number.
       fixedCols.push({
-            "mData": "index"
+            "mData": "index",
+            "sClass": "middle"
       });
-      
+
+      // prepare the function for column switching...      
+      var fnShowColumn = function(sel, idx) {
+        return function() {
+          $(sel + ' table', self.rootElement).dataTable().fnSetColumnVis(idx, this.checked);
+        }
+      };
       // now proceed to enter all other columns
+      var checkList = $('.jtox-ds-features .jtox-checkbox', self.rootElement);
+      var checkIdx = 0;
       for (var gr in self.groups){
         for (var i = 0, glen = self.groups[gr].length; i < glen; ++i) {
           var fId = self.groups[gr][i];
@@ -149,6 +187,10 @@ var jToxDataset = (function () {
             
           }
 */
+          // finally - assign column switching to the checkbox of main tab.
+          $(checkList[checkIdx++]).on('change', fnShowColumn(colList == fixedCols ? '.jtox-ds-fixed' : '.jtox-ds-variable', colList.length))
+          
+          // and push it into the proper list.
           colList.push(col);
         }
         
@@ -157,7 +199,7 @@ var jToxDataset = (function () {
       }
       
       // now - create the tables - they have common options, except the aoColumns (i.e. column definitions), which are added later.
-      var varTable = ($(".jtox-ds-variable table", self.rootElement).dataTable({
+      varTable = ($(".jtox-ds-variable table", self.rootElement).dataTable({
         "bPaginate": false,
         "bProcessing": false,
         "bLengthChange": false,
@@ -166,7 +208,7 @@ var jToxDataset = (function () {
         "aoColumns": varCols
       }))[0];
       
-      var fixTable = ($(".jtox-ds-fixed table", self.rootElement).dataTable({
+      fixTable = ($(".jtox-ds-fixed table", self.rootElement).dataTable({
         "bPaginate": true,
         "bProcessing": true,
         "bLengthChange": false,
@@ -245,7 +287,7 @@ var jToxDataset = (function () {
           self.features = feature.feature;
           cls.processFeatures(self.features);
           self.prepareGroups();
-          self.prepareTabs($('.jtox-ds-features', self.rootElement)[0], function (id, name){
+          self.prepareTabs($('.jtox-ds-features', self.rootElement)[0], true, function (id, name){
             var fEl = jToxKit.getTemplate('#jtox-ds-feature');
             ccLib.fillTree(fEl, {title: name});
             $(fEl).data('feature-id', id);

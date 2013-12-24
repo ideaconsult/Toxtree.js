@@ -48,11 +48,11 @@
 }
 
 .middle {
-  vertical-align: middle;  
+  vertical-align: middle !important;
 }
 
 .right {
-  text-align: right;
+  text-align: right !important;
 }
 
 .jtox-font-small {

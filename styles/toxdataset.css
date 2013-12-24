@@ -35,3 +35,7 @@
   height: 125px;
   border: 0px;
 }
+
+.jtox-ds-export {
+  float: right !important;
+}

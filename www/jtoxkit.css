@@ -35,7 +35,10 @@
   height: 125px;
   border: 0px;
 }
-/* toxtstudy.css - Styling for toxstudy engine
+
+.jtox-ds-export {
+  float: right !important;
+}/* toxtstudy.css - Styling for toxstudy engine
 */
 
 div.jtox-study,
@@ -211,11 +214,11 @@ td.jtox-multi table {
 }
 
 .middle {
-  vertical-align: middle;  
+  vertical-align: middle !important;
 }
 
 .right {
-  text-align: right;
+  text-align: right !important;
 }
 
 .jtox-font-small {
