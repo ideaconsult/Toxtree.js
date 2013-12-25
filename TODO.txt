@@ -1,8 +1,15 @@
 TODO:
 
+- Detailed information row:
+-- Click handler on first column (instead of number)
+-- Filling the '#jtox-ds-details' row
+-- Making tabs in the '.tablist' div
+-- return null on feature-item creating routine ability - for skipping diagram
+
 - table sorting problems;
-- Export tab: fill it with content (link)
-- Detailed information row
+-- keep the two tables in sync?
+-- filtering - separate, making calls to the tables
+-- pagination - again, in sync?
 - make toxtree part of jToxKit
 - 
 

@@ -1410,6 +1410,13 @@ jToxKit.templates['dataset-export']  =
 "    </div>" +
 ""; // end of #jtox-ds-feature 
 
+jToxKit.templates['dataset-export']  = 
+"    <div id=\"jtox-ds-details\">" +
+"      <div class=\"jtox-inline\"><img class=\"data-field borderless\" data-field=\"diagram\"/></div>" +
+"      <div class=\"jtox-inline tablist\"></div>" +
+"    </div>" +
+""; // end of #jtox-ds-feature 
+
 jToxKit.templates['all-studies']  = 
 "	  <div id=\"jtox-studies\">" +
 "	    <ul>" +
