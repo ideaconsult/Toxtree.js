@@ -45,13 +45,21 @@ var ccLib = {
   
   isEmpty: function(obj) {
     var empty = true;
-    if (obj !== undefined || obj != null){
-      for (var i in obj) {
-        if (obj[i] != null) {
-          empty = false;
-          break;
-        }
-      } 
+    if (obj !== undefined || obj != null) {
+      if (typeof obj == 'object') {
+        for (var i in obj) {
+          if (obj[i] != null) {
+            empty = false;
+            break;
+          }
+        } 
+      }
+      else if (typeof obj == 'string')
+        empty = obj.trim().length == 0;
+      else if ($.isArray(obj))
+        empty = obj.length == 0;
+      else
+        empty = false;
     }
     return empty;
   },
@@ -167,6 +175,10 @@ var ccLib = {
     }
   },
   
+  addParameter: function (url, param) {
+    return url + (url.indexOf('?') > 0 ? "&" : "?") + param;
+  },
+  
   parseURL: function(url) {
     var a =  document.createElement('a');
     a.href = url;
@@ -241,7 +253,21 @@ var jToxDataset = (function () {
         }
         return arr;
       }
-    }
+    },
+    "exports": [
+      {type: "chemical/x-mdl-sdfile", icon: "images/sdf.jpg"},
+      {type: "chemical/x-cml", icon: "images/cml.jpg"},
+      {type: "chemical/x-daylight-smiles", icon: "images/smi.png"},
+      {type: "chemical/x-inchi", icon: "images/inchi.png"},
+      {type: "text/uri-list", icon: "images/link.png"},
+      {type: "application/pdf", icon: "images/pdf.png"},
+      {type: "text/csv", icon: "images/excel.png"},
+      {type: "text/plain", icon: "images/excel.png"},
+      {type: "text/x-arff", icon: "images/weka.png"},
+      {type: "text/x-arff-3col", icon: "images/weka.png"},
+      {type: "application/rdf+xml", icon: "images/rdf.gif"},
+      {type: "application/json", icon: "images/json.png"}
+    ]
   };
   var instanceCount = 0;
 
@@ -333,9 +359,22 @@ var jToxDataset = (function () {
         var tabId = "jtox-ds-export-" + instanceCount;
         var liEl = createATab(tabId, "Export");
         $(liEl).addClass('jtox-ds-export');
-        var divEl = jToxKit.getTemplate('#jtox-ds-export');
+        var divEl = jToxKit.getTemplate('#jtox-ds-export')
         divEl.id = tabId;
         all.appendChild(divEl);
+        divEl = divEl.getElementsByClassName('jtox-exportlist')[0];
+        
+        var base = jToxKit.grabBaseUrl(self.datasetUri, "dataset");
+        for (var i = 0, elen = self.settings.exports.length; i < elen; ++i) {
+          var expo = self.settings.exports[i];
+          var el = jToxKit.getTemplate('#jtox-ds-download');
+          divEl.appendChild(el);
+          
+          el.getElementsByTagName('a')[0].href = ccLib.addParameter(self.datasetUri, "media=" + expo.type);
+          var img = el.getElementsByTagName('img')[0];
+          img.alt = img.title = expo.type;
+          img.src = base + expo.icon;
+        }
       }
       
       // now append the prepared document fragment and prepare the tabs.
@@ -430,7 +469,7 @@ var jToxDataset = (function () {
           theForm.Order = tableCols[info.iSortCol_0].mData;
           theForm.Direction = info.sSortDir_0;
 */
-          var qUri = self.datasetUri + (self.datasetUri.indexOf('?') > 0 ? '&' : '?') + "page=" + page + "&pagesize=" + info.iDisplayLength;
+          var qUri = ccLib.addParameter(self.datasetUri, "page=" + page + "&pagesize=" + info.iDisplayLength);
           jToxKit.call(self, qUri, function(dataset){
             if (!!dataset){
               cls.processDataset(dataset, self.features, function(oldVal, newVal) {
@@ -742,7 +781,7 @@ var jToxStudy = (function () {
           var out = "";
           data.loValue = ccLib.trim(data.loValue);
           data.upValue = ccLib.trim(data.upValue);
-          if (!ccLib.isNull(data.loValue) && !ccLib.isNull(data.upValue)) {
+          if (!ccLib.isEmpty(data.loValue) && !ccLib.isEmpty(data.upValue)) {
             out += (data.loQualifier == ">=") ? "[" : "(";
             out += data.loValue + ", " + data.upValue;
             out += (data.upQualifier == "<=") ? "]" : ") ";
@@ -753,9 +792,9 @@ var jToxStudy = (function () {
               return (!!q ? q : "=") + " " + v;
             };
             
-            if (!ccLib.isNull(data.loValue))
+            if (!ccLib.isEmpty(data.loValue))
               out += fnFormat(data.loQualifier, data.loValue);
-            else if (!ccLib.isNull(data.upValue))
+            else if (!ccLib.isEmpty(data.upValue))
               out += fnFormat(data.upQualifier, data.upValue);
             else
               out += '-';
@@ -1358,10 +1397,16 @@ jToxKit.templates['dataset-one-feature']  =
 "    <div id=\"jtox-ds-feature\" class=\"jtox-ds-feature\"><input type=\"checkbox\" checked=\"yes\" class=\"jtox-checkbox\" /><span class=\"data-field jtox-title\" data-field=\"title\"> ? </span></div>" +
 ""; // end of #jtox-ds-feature 
 
-jToxKit.templates['dataset-export-tab']  = 
+jToxKit.templates['dataset-export']  = 
+"    <div id=\"jtox-ds-download\" class=\"jtox-inline\">" +
+"      <a target=\"_blank\"><img class=\"borderless\"/></a>" +
+"    </div>" +
+""; // end of #jtox-ds-feature 
+
+jToxKit.templates['dataset-export']  = 
 "    <div id=\"jtox-ds-export\">" +
-"      <div class=\"jtox-inline\">Excel</div>" +
-"      <div class=\"jtox-inline\">PDF</div>" +
+"      <div class=\"jtox-inline\">Download dataset as: </div>" +
+"      <div class=\"jtox-inline jtox-exportlist\"></div>" +
 "    </div>" +
 ""; // end of #jtox-ds-feature 
 

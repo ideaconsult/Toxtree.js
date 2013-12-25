@@ -160,7 +160,7 @@ var jToxStudy = (function () {
           var out = "";
           data.loValue = ccLib.trim(data.loValue);
           data.upValue = ccLib.trim(data.upValue);
-          if (!ccLib.isNull(data.loValue) && !ccLib.isNull(data.upValue)) {
+          if (!ccLib.isEmpty(data.loValue) && !ccLib.isEmpty(data.upValue)) {
             out += (data.loQualifier == ">=") ? "[" : "(";
             out += data.loValue + ", " + data.upValue;
             out += (data.upQualifier == "<=") ? "]" : ") ";
@@ -171,9 +171,9 @@ var jToxStudy = (function () {
               return (!!q ? q : "=") + " " + v;
             };
             
-            if (!ccLib.isNull(data.loValue))
+            if (!ccLib.isEmpty(data.loValue))
               out += fnFormat(data.loQualifier, data.loValue);
-            else if (!ccLib.isNull(data.upValue))
+            else if (!ccLib.isEmpty(data.upValue))
               out += fnFormat(data.upQualifier, data.upValue);
             else
               out += '-';

@@ -45,13 +45,21 @@ var ccLib = {
   
   isEmpty: function(obj) {
     var empty = true;
-    if (obj !== undefined || obj != null){
-      for (var i in obj) {
-        if (obj[i] != null) {
-          empty = false;
-          break;
-        }
-      } 
+    if (obj !== undefined || obj != null) {
+      if (typeof obj == 'object') {
+        for (var i in obj) {
+          if (obj[i] != null) {
+            empty = false;
+            break;
+          }
+        } 
+      }
+      else if (typeof obj == 'string')
+        empty = obj.trim().length == 0;
+      else if ($.isArray(obj))
+        empty = obj.length == 0;
+      else
+        empty = false;
     }
     return empty;
   },
@@ -165,6 +173,10 @@ var ccLib = {
         tabs[i] = tabs[i].nextElementSibling;
       }
     }
+  },
+  
+  addParameter: function (url, param) {
+    return url + (url.indexOf('?') > 0 ? "&" : "?") + param;
   },
   
   parseURL: function(url) {

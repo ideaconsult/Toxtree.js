@@ -40,7 +40,21 @@ var jToxDataset = (function () {
         }
         return arr;
       }
-    }
+    },
+    "exports": [
+      {type: "chemical/x-mdl-sdfile", icon: "images/sdf.jpg"},
+      {type: "chemical/x-cml", icon: "images/cml.jpg"},
+      {type: "chemical/x-daylight-smiles", icon: "images/smi.png"},
+      {type: "chemical/x-inchi", icon: "images/inchi.png"},
+      {type: "text/uri-list", icon: "images/link.png"},
+      {type: "application/pdf", icon: "images/pdf.png"},
+      {type: "text/csv", icon: "images/excel.png"},
+      {type: "text/plain", icon: "images/excel.png"},
+      {type: "text/x-arff", icon: "images/weka.png"},
+      {type: "text/x-arff-3col", icon: "images/weka.png"},
+      {type: "application/rdf+xml", icon: "images/rdf.gif"},
+      {type: "application/json", icon: "images/json.png"}
+    ]
   };
   var instanceCount = 0;
 
@@ -132,9 +146,22 @@ var jToxDataset = (function () {
         var tabId = "jtox-ds-export-" + instanceCount;
         var liEl = createATab(tabId, "Export");
         $(liEl).addClass('jtox-ds-export');
-        var divEl = jToxKit.getTemplate('#jtox-ds-export');
+        var divEl = jToxKit.getTemplate('#jtox-ds-export')
         divEl.id = tabId;
         all.appendChild(divEl);
+        divEl = divEl.getElementsByClassName('jtox-exportlist')[0];
+        
+        var base = jToxKit.grabBaseUrl(self.datasetUri, "dataset");
+        for (var i = 0, elen = self.settings.exports.length; i < elen; ++i) {
+          var expo = self.settings.exports[i];
+          var el = jToxKit.getTemplate('#jtox-ds-download');
+          divEl.appendChild(el);
+          
+          el.getElementsByTagName('a')[0].href = ccLib.addParameter(self.datasetUri, "media=" + expo.type);
+          var img = el.getElementsByTagName('img')[0];
+          img.alt = img.title = expo.type;
+          img.src = base + expo.icon;
+        }
       }
       
       // now append the prepared document fragment and prepare the tabs.
@@ -229,7 +256,7 @@ var jToxDataset = (function () {
           theForm.Order = tableCols[info.iSortCol_0].mData;
           theForm.Direction = info.sSortDir_0;
 */
-          var qUri = self.datasetUri + (self.datasetUri.indexOf('?') > 0 ? '&' : '?') + "page=" + page + "&pagesize=" + info.iDisplayLength;
+          var qUri = ccLib.addParameter(self.datasetUri, "page=" + page + "&pagesize=" + info.iDisplayLength);
           jToxKit.call(self, qUri, function(dataset){
             if (!!dataset){
               cls.processDataset(dataset, self.features, function(oldVal, newVal) {
