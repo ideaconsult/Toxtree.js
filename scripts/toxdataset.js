@@ -11,7 +11,8 @@ var jToxDataset = (function () {
       "Identifiers" : function(name, features) { return [
         "http://www.opentox.org/api/1.1#Diagram", 
         "http://www.opentox.org/api/1.1#CASRN", 
-        "http://www.opentox.org/api/1.1#EINECS"
+        "http://www.opentox.org/api/1.1#EINECS",
+        "http://www.opentox.org/api/1.1#IUCLID5_UUID"
       ];},
       
       "Names": function (name, features) { return [
@@ -174,6 +175,8 @@ var jToxDataset = (function () {
       var fixedCols = [];
       var varCols = [];
       
+      var fnShowDetails = function ()
+
       var colList = fixedCols;
       // enter the first column - the number.
       fixedCols.push({
@@ -189,6 +192,7 @@ var jToxDataset = (function () {
           ccLib.equalizeHeights(self.fixTable.tBodies[0], self.varTable.tBodies[0]);
         }
       };
+      
       
       // make a query for all checkboxes in the main tab, so they can be traversed in parallel with the features and 
       // a change handler added.
