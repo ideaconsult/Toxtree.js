@@ -29,6 +29,9 @@ window.jToxKit = {
   	
   	self.initTemplates();
 
+    // make this handler for UUID copying. Once here - it's live, so it works for all tables in the future
+    $(document).on('click', '.jtox-toolkit span.ui-icon-copy', function (e) { ccLib.copyToClipboard($(this).data('uuid'), "Press Ctrl-C (Command-C) to copy UUID:"); return false;});
+  
     // scan the query parameter for settings
 		var url = ccLib.parseURL(document.location);
 		var queryParams = url.params;
@@ -86,6 +89,22 @@ window.jToxKit = {
       el.id = id;
       $(this).attr('href', '#' + id);
     })  
+  },
+  
+  shortenedDiv: function (data, message, deflen) {
+    var res = '';
+    
+    if (ccLib.isNull(deflen))
+      deflen = 5;
+    if (data.toString().length <= deflen) {
+      res += data;
+    }
+    else {
+      res += '<div class="shortened">' + data + '</div>';
+      if (message != null)
+        res += '<span class="ui-icon ui-icon-copy" title="' + message + '" data-uuid="' + data + '"></span>';
+    }
+    return res;
   },
 		
 	/* Poll a given taskId and calls the callback when a result from the server comes - 

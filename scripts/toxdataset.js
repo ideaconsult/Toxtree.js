@@ -20,6 +20,7 @@ var jToxDataset = (function () {
         "http://www.opentox.org/api/1.1#TradeName",
         "http://www.opentox.org/api/1.1#IUPACName",
         "http://www.opentox.org/api/1.1#SMILES",
+        "http://www.opentox.org/api/1.1#InChIKey",
         "http://www.opentox.org/api/1.1#InChI",
         "http://www.opentox.org/api/1.1#REACHRegistrationDate"
       ];},
@@ -70,14 +71,14 @@ var jToxDataset = (function () {
   	"http://www.opentox.org/api/1.1#TradeName" : {title: "Trade Name", accumulate: "compound.tradename", used: true},
   	"http://www.opentox.org/api/1.1#IUPACName": {title: "IUPAC Name", accumulate: ["compound.name", "compound.iupac"], used: true},
   	"http://www.opentox.org/api/1.1#EINECS": {title: "EINECS", accumulate: "compound.einecs", used: true},
-    "http://www.opentox.org/api/1.1#InChI": {title: "InChI", accumulate: "compound.inchi", used: true},
-  	"http://www.opentox.org/api/1.1#InChI_std": {title: "InChI", accumulate: "compound.inchi", used: true},
+    "http://www.opentox.org/api/1.1#InChI": {title: "InChI", accumulate: "compound.inchi", used: true, shorten: true},
+  	"http://www.opentox.org/api/1.1#InChI_std": {title: "InChI", accumulate: "compound.inchi", used: true, shorten: true},
     "http://www.opentox.org/api/1.1#InChIKey": {title: "InChI Key", accumulate: "compound.inchikey", used: true},
   	"http://www.opentox.org/api/1.1#InChIKey_std": {title: "InChI Key", accumulate: "compound.inchikey", used: true},
     "http://www.opentox.org/api/1.1#InChI_AuxInfo": {title: "InChI Aux", accumulate: "compound.inchi", used: true},
   	"http://www.opentox.org/api/1.1#InChI_AuxInfo_std": {title: "InChI Aux", accumulate: "compound.inchi", used: true},
-  	"http://www.opentox.org/api/1.1#IUCLID5_UUID": {title: "IUCLID5 UUID", accumulate: "compound.i5uuid", used: true},
-  	"http://www.opentox.org/api/1.1#SMILES": {title: "SMILES", accumulate: "compound.smiles", used: true},
+  	"http://www.opentox.org/api/1.1#IUCLID5_UUID": {title: "IUCLID5 UUID", accumulate: "compound.i5uuid", used: true, shorten: true},
+  	"http://www.opentox.org/api/1.1#SMILES": {title: "SMILES", accumulate: "compound.smiles", used: true, shorten: true},
   	"http://www.opentox.org/api/dblinks#CMS": {title: "CMS", used: true},
   	"http://www.opentox.org/api/dblinks#ChEBI": {title: "ChEBI", used: true},
   	"http://www.opentox.org/api/dblinks#Pubchem": {title: "Public Chem", used: true},
@@ -94,6 +95,7 @@ var jToxDataset = (function () {
     self.rootElement = root;
     self.settings = $.extend({}, defaultSettings, jToxKit.settings, settings); // i.e. defaults from jToxDataset
     self.features = null; // features, as downloaded from server, after being processed.
+    self.dataset = null; // the last-downloaded dataset.
     self.groups = null; // computed groups, i.e. 'groupName' -> array of feature list, prepared.
     self.fixTable = self.varTable = null; // the two tables - to be initialized in prepareTables.
     
@@ -172,14 +174,12 @@ var jToxDataset = (function () {
     
     prepareTables: function() {
       var self = this;
-      var fixedCols = [];
       var varCols = [];
+      var fixCols = [];
       
-      var fnShowDetails = function ()
-
-      var colList = fixedCols;
+      var colList = fixCols;
       // enter the first column - the number.
-      fixedCols.push({
+      fixCols.push({
             "mData": "index",
             "sClass": "middle"
       });
@@ -214,13 +214,18 @@ var jToxDataset = (function () {
           if (cls.shortFeatureId(fId) == "Diagram") {
             col["mRender"] = function(data, type, full) {
               return (type != "display") ? "-" : '<img src="' + full.compound.diagramUri + '" class="jtox-ds-smalldiagram"/>';  
-            }
+            };
             col["sClass"] = "paddingless";
             col["sWidth"] = "125px";
           }
+          else if (!!feature.shorten) {
+            col["mRender"] = function(data, type, full) {
+              return (type != "display") ? '' + data : jToxKit.shortenedDiv(data, "Press to copy the value in the clipboard");
+            };
+          }
           
           // finally - assign column switching to the checkbox of main tab.
-          $(checkList[checkIdx++]).on('change', fnShowColumn(colList == fixedCols ? '.jtox-ds-fixed' : '.jtox-ds-variable', colList.length))
+          $(checkList[checkIdx++]).on('change', fnShowColumn(colList == fixCols ? '.jtox-ds-fixed' : '.jtox-ds-variable', colList.length))
           
           // and push it into the proper list.
           colList.push(col);
@@ -230,6 +235,41 @@ var jToxDataset = (function () {
         colList = varCols;
       }
       
+      var fixSortInfo = [];
+      var varSortInfo = [];
+      var fnQueryInfo = function(aoData) {
+          var info = {};
+          for (var i = 0, dl = aoData.length; i < dl; ++i)
+            info[aoData[i].name] = aoData[i].value;
+          return info;
+      };
+      
+      // some helpers
+      var fnSortDataset = function(info) {
+        var data = [];
+        for (var i = 0;i < info['iSortingCols']; ++i)
+          data.push(info["mDataProp_" + info['iSortCol_' + i]]);
+          
+        if (data.length > 0){
+          self.dataset.dataEntry.sort(function(a, b){
+            for (var i = 0, dl = data.length; i < dl; ++i) {
+              var val1 = ccLib.getJsonValue(a, data[i]);
+              var val2 = ccLib.getJsonValue(b, data[i]);
+              if (val1 < val2)
+                return -1;
+              else if (val1 > val2)
+                return 1;
+            }
+            
+            return 0;
+          });
+        }
+      };
+      
+      var fnSearchDataset = function(needle) {
+        
+      };
+      
       // now - create the tables - they have common options, except the aoColumns (i.e. column definitions), which are added later.
       self.varTable = ($(".jtox-ds-variable table", self.rootElement).dataTable({
         "bPaginate": false,
@@ -237,8 +277,29 @@ var jToxDataset = (function () {
         "bLengthChange": false,
 				"bAutoWidth": true,
         "sDom" : "rt",
-        "bSort": false,
-        "aoColumns": varCols
+        "bSort": true,
+        "aoColumns": varCols,
+        "bServerSide": false,
+        "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
+          if (ccLib.isNull(self.dataset))
+            return;
+          var dataset = self.dataset;
+          var info = fnQueryInfo(aoData);
+//          fnSortDataset(info);
+          
+          $(self.fixTable).dataTable().fnClearTable();
+          $(self.fixTable).dataTable().fnAddData(dataset.dataEntry);
+          
+          fnCallback({
+            "sEcho": info.sEcho,
+            "iTotalRecords": dataset.query.total,
+            "iTotalDisplayRecords": dataset.dataEntry.length,
+            "aaData": dataset.dataEntry
+          });
+          
+          ccLib.equalizeHeights(self.fixTable.tHead, self.varTable.tHead);
+          ccLib.equalizeHeights(self.fixTable.tBodies[0], self.varTable.tBodies[0]);
+        }
       }))[0];
       
       self.fixTable = ($(".jtox-ds-fixed table", self.rootElement).dataTable({
@@ -247,13 +308,12 @@ var jToxDataset = (function () {
         "bLengthChange": false,
 				"bAutoWidth": false,
         "sDom" : "rt<Fip>",
-        "aoColumns": fixedCols,
-        "bServerSide": true,
+        "aoColumns": fixCols,
         "bSort": false,
+        "bServerSide": true,
         "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
-          var info = {};
-          for (var i = 0, dl = aoData.length; i < dl; ++i)
-            info[aoData[i].name] = aoData[i].value;
+          var info = fnQueryInfo(aoData);
+          console.log("Server request with info = " + JSON.stringify(info));
 
           var page = info.iDisplayStart / info.iDisplayLength;
 /*
@@ -263,13 +323,15 @@ var jToxDataset = (function () {
           var qUri = ccLib.addParameter(self.datasetUri, "page=" + page + "&pagesize=" + info.iDisplayLength);
           jToxKit.call(self, qUri, function(dataset){
             if (!!dataset){
-              cls.processDataset(dataset, self.features, function(oldVal, newVal) {
+              self.dataset = cls.processDataset(dataset, self.features, function(oldVal, newVal) {
                 if (ccLib.isNull(oldVal) || newVal.toLowerCase().indexOf(oldVal.toLowerCase()) >= 0)
                   return newVal;
                 if (oldVal.toLowerCase().indexOf(newVal.toLowerCase()) >= 0)
                   return oldVal;
                 return oldVal + ", " + newVal;
               });
+              
+              fnSortDataset(info);
               $(self.varTable).dataTable().fnClearTable();
               $(self.varTable).dataTable().fnAddData(dataset.dataEntry);
               
@@ -406,6 +468,8 @@ var jToxDataset = (function () {
       uri = uri.replace(/(.+)(\/conformer.*)/, "$1");
       dataset.dataEntry[i].compound.diagramUri = uri + "?media=image/png";
     }
+    
+    return dataset;
   };
   
   return cls;

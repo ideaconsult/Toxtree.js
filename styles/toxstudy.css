@@ -94,14 +94,6 @@ div.jtox-study-tab .dataTables_wrapper {
   text-transform: capitalize;
 }
 
-.jtox-toolkit table.dataTable td .shortened {
-  width: 75px;
-  max-height: 20px;
-  overflow: hidden;
-  text-overflow: ellipsis;  
-  white-space: nowrap;
-}
-
 .jtox-toolkit table.dataTable td.jtox-multi {
   padding: 0px;
 }

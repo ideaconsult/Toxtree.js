@@ -1,5 +1,7 @@
 TODO:
 
+- InChi - може да се показва само InChi_Key - като може да се копира цели
+
 - Detailed information row:
 -- Click handler on first column (instead of number)
 -- Filling the '#jtox-ds-details' row

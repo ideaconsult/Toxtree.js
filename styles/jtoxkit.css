@@ -82,3 +82,11 @@
   display: inline-block;
   width: auto;  
 }
+
+.jtox-toolkit table.dataTable td .shortened {
+  width: 75px;
+  max-height: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;  
+  white-space: nowrap;
+}

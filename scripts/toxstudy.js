@@ -8,9 +8,6 @@ var jToxStudy = (function () {
   var defaultSettings = { };    // all settings, specific for the kit, with their default. These got merged with general (jToxKit) ones.
   var instanceCount = 0;
   
-  // make this handler for UUID copying. Once here - it's live, so it works for all tables in the future
-  $(document).on('click', '.jtox-toolkit span.ui-icon-copy', function (e) { ccLib.copyToClipboard($(this).data('uuid'), "Press Ctrl-C (Command-C) to copy UUID:"); return false;});
-  
   var fnDatasetValue = function (old, value){
 		return ccLib.extendArray(old, value != null ? value.trim().toLowerCase().split("|") : [value]).filter(ccNonEmptyFilter);
   };
@@ -258,8 +255,8 @@ var jToxStudy = (function () {
         // finally put the protocol entries
         colDefs.push(
           { "sClass": "center", "sWidth": "15%", "mData": "protocol.guideline", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
-          { "sClass": "center", "sWidth": "50px", "mData": "owner.company.name", "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div>'; }  }, 
-          { "sClass": "center", "sWidth": "50px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : '<div class="shortened">' + data + '</div><span class="ui-icon ui-icon-copy" title="Press to copy the UUID in the clipboard" data-uuid="' + data + '"></span>'; } }
+          { "sClass": "center", "sWidth": "50px", "mData": "owner.company.name", "mRender" : function(data, type, full) { return type != "display" ? '' + data : jToxKit.shortenedDiv(data); }  }, 
+          { "sClass": "center", "sWidth": "50px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : jToxKit.shortenedDiv(data, "Press to copy the UUID in the clipboard"); } }
         );
         
         // READYY! Go and prepare THE table.
