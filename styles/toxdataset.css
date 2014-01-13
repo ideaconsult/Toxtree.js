@@ -43,3 +43,14 @@
 .jtox-ds-export {
   float: right !important;
 }
+
+.jtox-ds-download {
+  padding:0px 5px 0px 5px;
+}
+
+.jtox-ds-details div {
+  float: left;
+  z-index: 10;
+  width: 500px;
+  background-color: #cfcfcf;
+}

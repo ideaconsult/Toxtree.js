@@ -13,13 +13,13 @@ window.jToxKit = {
 	/* SETTINGS. The following parametes can be passed in settings object to jToxKit.init(), or as data-XXX - with the same names. Values set here are the defaults.
 	*/
 	settings: {
-  	jsonp: false,					// whether to use JSONP approach, instead of JSON.
-  	baseUrl: null,					// the server actually used for connecting. Part of settings. If not set - attempts to get 'baseUrl' parameter of the query, if not - get's current server.
-  	timeout: 15000,				// the timeout an call to the server should be wait before the attempt is considered error.
-  	pollDelay: 200,				// after how many milliseconds a new attempt should be made during task polling.
-  	onConnect: function(s){ },		    // function (service): called when a server request is started - for proper visualization. Part of settings.
-  	onSuccess: function(c, m) { },		// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
-  	onError: function (c, m) { },			// function (code, mess): called on server reques error. Part of settings.
+  	jsonp: false,                   // whether to use JSONP approach, instead of JSON.
+  	baseUrl: null,					        // the server actually used for connecting. Part of settings. If not set - attempts to get 'baseUrl' parameter of the query, if not - get's current server.
+  	timeout: 15000,                 // the timeout an call to the server should be wait before the attempt is considered error.
+  	pollDelay: 200,                 // after how many milliseconds a new attempt should be made during task polling.
+  	onConnect: function(s){ },		  // function (service): called when a server request is started - for proper visualization. Part of settings.
+  	onSuccess: function(c, m) { },	// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
+  	onError: function (c, m) { },		// function (code, mess): called on server reques error. Part of settings.
   },
 	
 	// some handler functions that can be configured from outside with the settings parameter.
@@ -30,7 +30,7 @@ window.jToxKit = {
   	self.initTemplates();
 
     // make this handler for UUID copying. Once here - it's live, so it works for all tables in the future
-    $(document).on('click', '.jtox-toolkit span.ui-icon-copy', function (e) { ccLib.copyToClipboard($(this).data('uuid'), "Press Ctrl-C (Command-C) to copy UUID:"); return false;});
+    $(document).on('click', '.jtox-toolkit span.ui-icon-copy', function (e) { ccLib.copyToClipboard($(this).data('uuid')); return false;});
   
     // scan the query parameter for settings
 		var url = ccLib.parseURL(document.location);

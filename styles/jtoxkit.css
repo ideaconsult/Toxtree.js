@@ -90,3 +90,7 @@
   text-overflow: ellipsis;  
   white-space: nowrap;
 }
+
+.jtox-hidden {
+  display: none !important;
+}

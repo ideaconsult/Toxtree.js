@@ -160,7 +160,12 @@ var ccLib = {
     for (;;) {
       var height = 0;
       for (i = 0;i < tabs.length ; ++i) {
-        if (tabs[i] != null && tabs[i].offsetHeight > height)
+        if (tabs[i] == null)
+          continue;
+          
+        if (!$(tabs[i]).hasClass('lock-height') && tabs[i].style.height != '')
+          tabs[i].style.height = "auto";
+        if (tabs[i].offsetHeight > height)
           height = tabs[i].offsetHeight;
       }
       
@@ -168,9 +173,11 @@ var ccLib = {
         break;
         
       for (i = 0;i < tabs.length ; ++i) {
-        if (tabs[i] != null && tabs[i].offsetHeight < height)
-          tabs[i].style.height = height + "px";
-        tabs[i] = tabs[i].nextElementSibling;
+        if (tabs[i] != null) {
+          if (tabs[i].offsetHeight < height)
+            tabs[i].style.height = height + "px";
+          tabs[i] = tabs[i].nextElementSibling;
+        }
       }
     }
   },
