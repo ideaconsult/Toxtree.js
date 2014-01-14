@@ -155,30 +155,32 @@ var jToxStudy = (function () {
         // some value formatting functions
         var formatLoHigh = function (data, type) {
           var out = "";
-          data.loValue = ccLib.trim(data.loValue);
-          data.upValue = ccLib.trim(data.upValue);
-          if (!ccLib.isEmpty(data.loValue) && !ccLib.isEmpty(data.upValue)) {
-            out += (data.loQualifier == ">=") ? "[" : "(";
-            out += data.loValue + ", " + data.upValue;
-            out += (data.upQualifier == "<=") ? "]" : ") ";
-          }
-          else // either of them is non-undefined
-          {
-            var fnFormat = function (q, v) {
-              return (!!q ? q : "=") + " " + v;
-            };
+          if (!ccLib.isNull(data)) {
+            data.loValue = ccLib.trim(data.loValue);
+            data.upValue = ccLib.trim(data.upValue);
+            if (!ccLib.isEmpty(data.loValue) && !ccLib.isEmpty(data.upValue)) {
+              out += (data.loQualifier == ">=") ? "[" : "(";
+              out += data.loValue + ", " + data.upValue;
+              out += (data.upQualifier == "<=") ? "]" : ") ";
+            }
+            else // either of them is non-undefined
+            {
+              var fnFormat = function (q, v) {
+                return (!!q ? q : "=") + " " + v;
+              };
+              
+              if (!ccLib.isEmpty(data.loValue))
+                out += fnFormat(data.loQualifier, data.loValue);
+              else if (!ccLib.isEmpty(data.upValue))
+                out += fnFormat(data.upQualifier, data.upValue);
+              else
+                out += '-';
+            }
             
-            if (!ccLib.isEmpty(data.loValue))
-              out += fnFormat(data.loQualifier, data.loValue);
-            else if (!ccLib.isEmpty(data.upValue))
-              out += fnFormat(data.upQualifier, data.upValue);
-            else
-              out += '-';
+            data.unit = ccLib.trim(data.unit);
+            if (!!data.unit)
+              out += data.unit;
           }
-          
-          data.unit = ccLib.trim(data.unit);
-          if (!!data.unit)
-            out += data.unit;
           return out.replace(/ /g, "&nbsp;");
         };
         
