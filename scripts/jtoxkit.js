@@ -19,7 +19,7 @@ window.jToxKit = {
   	pollDelay: 200,                 // after how many milliseconds a new attempt should be made during task polling.
   	onConnect: function(s){ },		  // function (service): called when a server request is started - for proper visualization. Part of settings.
   	onSuccess: function(c, m) { },	// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
-  	onError: function (c, m) { },		// function (code, mess): called on server reques error. Part of settings.
+  	onError: function (c, m) { console.log("jToxKit call error (" + c + "): " + m); },		// function (code, mess): called on server reques error. Part of settings.
   },
 	
 	// some handler functions that can be configured from outside with the settings parameter.
@@ -38,17 +38,33 @@ window.jToxKit = {
 		queryParams.host = url.host;
 	
     self.settings = $.extend(self.settings, queryParams); // merge with defaults
-	  
+    
 		if (!self.settings.baseUrl)
 		  self.settings.baseUrl = self.settings.host;
+	  
+	  // initializes the kit, based on the passed kit name
+	  var initKit = function(element, params) {
+    	if (params.kit == "study")
+    	  new jToxStudy(element, params);
+      if (params.kit == "dataset")
+        new jToxDataset(element, params);
+	  };
 	  
   	// now scan all insertion divs
   	$('.jtox-toolkit').each(function(i) {
     	var dataParams = $(this).data();
     	if (!dataParams.manualInit){
-    	  // initializes the kit, based on the passed kit name
-      	if (dataParams.kit == "study")
-      	  new jToxStudy(this, dataParams);
+    	  var el = this;
+    	  // first, get the configuration, if such is passed
+    	  if (!ccLib.isNull(dataParams.configFile)) {
+      	  self.call(null, ccLib.makeURL(dataParams.configFile), function(config){
+        	  if (!!config)
+        	    dataParams['configuration'] = config;
+            initKit(el, dataParams);
+      	  });
+    	  }
+    	  else
+    	    initKit(el, dataParams);
       }
   	});
 	},
@@ -147,13 +163,18 @@ window.jToxKit = {
 	/* Makes a server call with the provided method. If none is given - the internally stored one is used
 	*/
 	call: function (kit, service, callback, adata){
-		if (kit == null)
+	  var settings = {};
+		if (kit == null) {
 		  kit = this;
-		  
-		ccLib.fireCallback(kit.settings.onConnect, kit, service);
+		  settings = this.settings;
+		}
+		else 
+  		settings = $.extend(true, settings, this.settings, kit.settings);
+
+		ccLib.fireCallback(settings.onConnect, kit, service);
 		  
 		var method = 'GET';
-		var accType = kit.settings.jsonp ? "application/x-javascript" : "application/json";	
+		var accType = settings.jsonp ? "application/x-javascript" : "application/json";
 		
 		if (adata !== undefined){
 			method = 'POST';
@@ -165,23 +186,23 @@ window.jToxKit = {
 
 		// on some queries, like tasks, we DO have baseUrl at the beginning
 		if (service.indexOf("http") != 0)
-			service = (!!kit.settings.baseUrl ? kit.settings.baseUrl : this.settings.baseUrl) + service;
+			service = settings.baseUrl + service;
 			
 		// now make the actual call
 		$.ajax(service, {
-			dataType: kit.settings.jsonp ? 'jsonp' : 'json',
+			dataType: settings.jsonp ? 'jsonp' : 'json',
 			headers: { Accept: accType },
 			crossDomain: true,
-			timeout: kit.settings.timeout,
+			timeout: settings.timeout,
 			type: method,
 			data: adata,
-			jsonp: kit.settings.jsonp ? 'callback' : false,
+			jsonp: settings.jsonp ? 'callback' : false,
 			error: function(jhr, status, error){
-			  ccLib.fireCallback(kit.settings.onError, kit, status, error);
+			  ccLib.fireCallback(settings.onError, kit, status, error);
 				callback(null);
 			},
 			success: function(data, status, jhr){
-			  ccLib.fireCallback(kit.settings.onSuccess, kit, status, jhr.statusText);
+			  ccLib.fireCallback(settings.onSuccess, kit, status, jhr.statusText);
 				callback(data);
 			}
 		});

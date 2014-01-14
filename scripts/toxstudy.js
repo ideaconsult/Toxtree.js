@@ -6,7 +6,16 @@
 
 var jToxStudy = (function () {
   var defaultSettings = { 
-    configuration: {columns: { } }
+    configuration: { 
+      columns: { 
+    		"main" : { },
+    		"parameters": { },
+    		"conditions": { },
+    		"effects": { },
+    		"protocol": { },
+    		"interpretation": { }
+    	}
+    }
   };    // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
   var instanceCount = 0;
   
@@ -23,12 +32,6 @@ var jToxStudy = (function () {
     self.settings = $.extend({}, defaultSettings, jToxKit.settings, settings); // i.e. defaults from jToxStudy
     // now we have our, local copy of settings.
     
-    if (!ccLib.isEmpty(self.settings.config)) {
-      jToxKit.call(self, self.settings.config, function (config) {
-        self.settings.configuration = $.extend(true, self.settings.configuration, config);
-      });
-    }
-
     // get the main template, add it (so that jQuery traversal works) and THEN change the ids.
     // There should be no overlap, because already-added instances will have their IDs changed already...
     var tree = jToxKit.getTemplate('#jtox-studies');
@@ -41,10 +44,11 @@ var jToxStudy = (function () {
         $('.jtox-study.unloaded', panel).each(function(i){
           var table = this;
           jToxKit.call(self, $(table).data('jtox-uri'), function(study){
-            $(table).removeClass('unloaded folded');  
-            $(table).addClass('loaded');
-            self.processStudies(panel, study.study, false);
-            $('.dataTable', table).dataTable().fnAdjustColumnSizing();
+            if (!!study) {
+              $(table).removeClass('unloaded folded');  
+              $(table).addClass('loaded');
+              self.processStudies(panel, study.study, false);
+            }
           });  
         });
       }
@@ -131,7 +135,7 @@ var jToxStudy = (function () {
         { "sTitle": "Guideline", "sClass": "center middle", "sWidth": "15%", "mData": "protocol.guideline", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
         { "sTitle": "Owner", "sClass": "center middle", "sWidth": "50px", "mData": "owner.company.name", "mRender" : function(data, type, full) { return type != "display" ? '' + data : jToxKit.shortenedDiv(data); }  }, 
         { "sTitle": "UUID", "sClass": "center middle", "sWidth": "50px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : jToxKit.shortenedDiv(data, "Press to copy the UUID in the clipboard"); } }
-      ]
+      ];
   
       var theTable = $('.' + study.protocol.category.code + ' .jtox-study-table', tab)[0];
       if (!$(theTable).hasClass('dataTable')) {
@@ -141,15 +145,16 @@ var jToxStudy = (function () {
         // start filling it
         var parCount = 0;
   
-        var modifyTitle = function(name, category) {
-          var newCol = self.settings.configuration.columns[name];
+        var modifyColumn = function(col, category) {
+          var newCol = self.settings.configuration.columns[!ccLib.isNull(category) ? category : 'main'];
           if (ccLib.isNull(newCol))
-            return name;
-          if (!ccLib.isNull(category))
-            newCol = newCol[category];
+            return col;
+            
+          newCol = newCol[col.sTitle.toLowerCase()];
           if (ccLib.isNull(newCol))
-            return name;
-          return !newCol.visible ? null : (ccLib.isNull(newCol.name) ? name : newCol.name);
+            return col;
+            
+          return ccLib.isNull(newCol.bVisible) || newCol.visible ? $.extend(col, newCol) : null;
         };
   
         // this function takes care to add as columns all elements from given array
@@ -171,11 +176,11 @@ var jToxStudy = (function () {
           return count;
         }
         
-        var putDefaults = function(start, len) {
+        var putDefaults = function(start, len, category) {
           for (var i = 0;i < len; ++i) {
-            var col = defaultColumns[i + start];
-            col.sTitle = modifyTitle(col.sTitle);
-            if (!ccLib.isNull(col.sTitle))
+            var col = $.extend({}, defaultColumns[i + start]);
+            col = modifyColumn(col, category);
+            if (col != null)
               colDefs.push(col);
           }
         };
@@ -216,23 +221,23 @@ var jToxStudy = (function () {
           return !ccLib.isNull(data) ? (data + (!!unit ? "&nbsp;" + unit : "")) : "-";
         };
 
-        putDefaults(0, 1);
+        putDefaults(0, 1, "main");
         
         // use it to put parameters...
         parCount += putAGroup(study.parameters, function(p) {
           if (study.effects[0].conditions[p] !== undefined  || study.effects[0].conditions[p + " unit"] !== undefined)
             return undefined;
-          
-          var name = modifyTitle(p, "parameters");
-          if (ccLib.isNull(name))
-            return null;
 
           var col = {
-            "sTitle" : name,
+            "sTitle" : p,
             "sClass" : "center middle", 
             "mData" : "parameters." + p,
             "sDefaultContent": "-"
           };
+          
+          col = modifyColumn(col, "parameters");
+          if (col == null)
+            return null;
           
           if (study.parameters[p] !== undefined && study.parameters[p] != null){
             col["mRender"] = study.parameters[p].loValue === undefined ?
@@ -244,11 +249,17 @@ var jToxStudy = (function () {
         });
         // .. and conditions
         parCount += putAGroup(study.effects[0].conditions, function(c){
-          var rnFn = null;
-          var name = modifyTitle(c, "conditions");
-          if (ccLib.isNull(name))
+          var col = { 
+            "sTitle" : c,
+            "sClass" : "center middle jtox-multi", 
+            "mData" : "effects"
+          };
+          
+          col = modifyColumn(col, "conditions");
+          if (col == null)
             return null;
           
+          var rnFn = null;
           if (study.effects[0].conditions[c] !== undefined && study.effects[0].conditions[c] != null)
             rnFn = study.effects[0].conditions[c].loValue === undefined ? 
               function(data, type) { return formatUnits(data.conditions[c],  data.conditions[c + " unit"]); } : 
@@ -256,28 +267,21 @@ var jToxStudy = (function () {
           else
             rnFn = function(data, type) { return "-"; }
             
-          return { 
-            "sTitle" : name,
-            "sClass" : "center middle jtox-multi", 
-            "mData" : "effects", 
-            "mRender" : function(data, type, full) { return self.renderMulti(data, type, full, rnFn); } 
-          };
+          col["mRender"] = function(data, type, full) { return self.renderMulti(data, type, full, rnFn); };
+          return col;
         });
         
         // add also the "default" effects columns
-        putDefaults(1, 2);
+        putDefaults(1, 2, "effects");
   
         // now is time to put interpretation columns..
         parCount = putAGroup(study.interpretation, function(i){
-          var name = modifyTitle(i, "interpretation");
-          if (ccLib.isNull(name))
-            return null;
-        
-          return { "sTitle": name, "sClass" : "center middle jtox-multi", "mData" : "interpretation." + i, "sDefaultContent": "-"};
+          var col = { "sTitle": i, "sClass" : "center middle jtox-multi", "mData" : "interpretation." + i, "sDefaultContent": "-"};
+          return modifyColumn(col, "interpretation");
         });
         
         // finally put the protocol entries
-        putDefaults(3, 3);
+        putDefaults(3, 3, "protocol");
         
         // READYY! Go and prepare THE table.
         $(theTable).dataTable( {
