@@ -137,7 +137,7 @@ var ccLib = {
   
   trim: function(obj) {
     if (obj === undefined || obj == null)
-      return obj;
+      return '';
     if (typeof obj == "string")
       return obj.trim();
     else
@@ -772,7 +772,7 @@ var jToxDataset = (function () {
 **/
 
 var jToxStudy = (function () {
-  var defaultSettings = { };    // all settings, specific for the kit, with their default. These got merged with general (jToxKit) ones.
+  var defaultSettings = { };    // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
   var instanceCount = 0;
   
   var fnDatasetValue = function (old, value){
@@ -880,20 +880,23 @@ var jToxStudy = (function () {
       return str.replace(/(.+)\s\(([0-9]+)\)/, "$1 (" + count + ")");
     },
     
-    
     ensureTable: function (tab, study) {
       var self = this;
+      var defaultColumns = [
+        { "sTitle": "Name", "sClass": "center middle", "sWidth": "20%", "mData": "protocol.endpoint" }, // The name (endpoint)
+        { "sTitle": "Endpoint", "sClass": "center middle jtox-multi", "sWidth": "15%", "mData": "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, "endpoint");  } },   // Effects columns
+        { "sTitle": "Result", "sClass": "center middle jtox-multi", "sWidth": "15%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, function (data, type) { return formatLoHigh(data.result, type) }) } },
+        { "sTitle": "Guideline", "sClass": "center middle", "sWidth": "15%", "mData": "protocol.guideline", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
+        { "sTitle": "Owner", "sClass": "center middle", "sWidth": "50px", "mData": "owner.company.name", "mRender" : function(data, type, full) { return type != "display" ? '' + data : jToxKit.shortenedDiv(data); }  }, 
+        { "sTitle": "UUID", "sClass": "center middle", "sWidth": "50px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : jToxKit.shortenedDiv(data, "Press to copy the UUID in the clipboard"); } }
+      ]
   
       var theTable = $('.' + study.protocol.category.code + ' .jtox-study-table', tab)[0];
       if (!$(theTable).hasClass('dataTable')) {
   
-        var colDefs = [
-          { "sClass": "center", "sWidth": "20%", "mData": "protocol.endpoint" } // The name (endpoint)
-        ];
+        var colDefs = [];
         
         // start filling it
-        var headerRow = theTable.getElementsByClassName('jtox-header')[0];
-        var before = headerRow.firstElementChild;
         var parCount = 0;
   
         // this function takes care to add as columns all elements from given array
@@ -908,17 +911,18 @@ var jToxStudy = (function () {
             var val = fProcess(p);
             if (val === undefined)
               continue;
+              
             colDefs.push(val);
-            
-            var th = document.createElement('th');
-            th.innerHTML = p;
-            headerRow.insertBefore(th, before);
-            before = th.nextElementSibling;
             count++;
           }
           return count;
         }
-  
+        
+        var putDefaults = function(start, len) {
+          for (var i = 0;i < len; ++i)
+            colDefs.push(defaultColumns[i + start]);  
+        };
+        
         // some value formatting functions
         var formatLoHigh = function (data, type) {
           var out = "";
@@ -944,9 +948,7 @@ var jToxStudy = (function () {
                 out += '-';
             }
             
-            data.unit = ccLib.trim(data.unit);
-            if (!!data.unit)
-              out += data.unit;
+            out += (data.unit = ccLib.trim(data.unit));
           }
           return out.replace(/ /g, "&nbsp;");
         };
@@ -957,12 +959,15 @@ var jToxStudy = (function () {
           return !ccLib.isNull(data) ? (data + (!!unit ? "&nbsp;" + unit : "")) : "-";
         };
 
+        putDefaults(0, 1);
+        
         // use it to put parameters...
         parCount += putAGroup(study.parameters, function(p) {
           if (study.effects[0].conditions[p] !== undefined  || study.effects[0].conditions[p + " unit"] !== undefined)
             return undefined;
           
           var col = {
+            "sTitle" : p,
             "sClass" : "center middle", 
             "mData" : "parameters." + p,
             "sDefaultContent": "-"
@@ -987,46 +992,24 @@ var jToxStudy = (function () {
             rnFn = function(data, type) { return "-"; }
             
           return { 
+            "sTitle" : c,
             "sClass" : "center middle jtox-multi", 
             "mData" : "effects", 
             "mRender" : function(data, type, full) { return self.renderMulti(data, type, full, rnFn); } 
           };
         });
         
-        // now fix the colspan of 'Conditions' preheader cell
-        var preheaderCell = theTable.getElementsByClassName('jtox-preheader')[0].firstElementChild.nextElementSibling;
-        if (parCount > 0)
-          preheaderCell.setAttribute('colspan', parCount);
-        else
-          preheaderCell.parentNode.removeChild(preheaderCell);
         
         // add also the "default" effects columns
-        colDefs.push(
-          { "sClass": "center middle jtox-multi", "sWidth": "15%", "mData": "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, "endpoint");  } },   // Effects columns
-          { "sClass": "center middle jtox-multi", "sWidth": "15%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, function (data, type) { return formatLoHigh(data.result, type) }) } }
-        );
+        putDefaults(1, 2);
   
-        // jump over those two - they are already in the DOM      
-        before = before.nextElementSibling.nextElementSibling;
-        
         // now is time to put interpretation columns..
         parCount = putAGroup(study.interpretation, function(i){
-          return { "sClass" : "center middle jtox-multi", "mData" : "interpretation." + i, "sDefaultContent": "-"};
+          return { "sTitle": "Interpretation", "sClass" : "center middle jtox-multi", "mData" : "interpretation." + i, "sDefaultContent": "-"};
         });
-  
-        // jump over Effects preheader-column      
-        preheaderCell = preheaderCell.nextElementSibling.nextElementSibling;
-        if (parCount > 0)
-          preheaderCell.setAttribute('colspan', parCount);
-        else
-          preheaderCell.parentNode.removeChild(preheaderCell);
         
         // finally put the protocol entries
-        colDefs.push(
-          { "sClass": "center", "sWidth": "15%", "mData": "protocol.guideline", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
-          { "sClass": "center", "sWidth": "50px", "mData": "owner.company.name", "mRender" : function(data, type, full) { return type != "display" ? '' + data : jToxKit.shortenedDiv(data); }  }, 
-          { "sClass": "center", "sWidth": "50px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : jToxKit.shortenedDiv(data, "Press to copy the UUID in the clipboard"); } }
-        );
+        putDefaults(3, 3);
         
         // READYY! Go and prepare THE table.
         $(theTable).dataTable( {
@@ -1687,25 +1670,7 @@ jToxKit.templates['composition-block']  =
 jToxKit.templates['one-study']  = 
 "    <div id=\"jtox-study\" class=\"jtox-study jtox-foldable folded unloaded\">" +
 "      <div class=\"jtox-study-title\"><p class=\"data-field\" data-field=\"title\">? (0)</p></div>" +
-"      <table class=\"jtox-study-table\">" +
-"        <thead>" +
-"          <tr class=\"jtox-preheader\">" +
-"            <th class=\"middle\" rowspan=\"2\">Name</th>" +
-"            <th>Conditions</th>" +
-"            <th colspan=\"2\">Effects</th>" +
-"            <th>Interpretation</th>" +
-"            <th colspan=\"3\">Protocol</th>" +
-"          </tr>" +
-"          <tr class=\"jtox-header\">" +
-"            <th class=\"middle\">Endpoint</th>" +
-"            <th class=\"middle\">Result</th>" +
-"            <th class=\"middle\">Guideline</th>" +
-"            <th class=\"middle\">Owner</th>" +
-"            <th class=\"middle\">UUID</th>" +
-"          </tr>" +
-"        </thead>" +
-"        <tbody></tbody>" +
-"      </table>" +
+"      <table class=\"jtox-study-table\"></table>" +
 "    </div>" +
 ""; // end of #jtox-study 
 

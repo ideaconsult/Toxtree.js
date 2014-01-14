@@ -137,7 +137,7 @@ var ccLib = {
   
   trim: function(obj) {
     if (obj === undefined || obj == null)
-      return obj;
+      return '';
     if (typeof obj == "string")
       return obj.trim();
     else
