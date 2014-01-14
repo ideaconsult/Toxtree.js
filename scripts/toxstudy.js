@@ -543,7 +543,7 @@ var jToxStudy = (function () {
       jToxKit.call(self, substanceURI, function(substance){
          if (!!substance && !!substance.substance && substance.substance.length > 0){
            substance = substance.substance[0];
-           ccLib.fillTree(rootTab, substance);
+           ccLib.fillTree(self.rootElement, substance);
            // go and query for the reference query
            jToxKit.call(self, substance.referenceSubstance.uri, function (dataset){
              if (!!dataset) {
