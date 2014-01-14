@@ -284,8 +284,8 @@ var jToxStudy = (function () {
           "bPaginate": true,
           "bProcessing": true,
           "bLengthChange": false,
-  				"bAutoWidth": true,
-          "sDom" : "zrt<Fip>",
+  				"bAutoWidth": false,
+          "sDom" : "rt<Fip>",
           "aoColumns": colDefs,
           "fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
             var el = $('.jtox-study-title .data-field', $(this).parents('.jtox-study'))[0];
@@ -419,6 +419,7 @@ var jToxStudy = (function () {
 
         var theTable = self.ensureTable(tab, study);
         $(theTable).dataTable().fnAddData(onec);
+        $(theTable).colResizable();
       }
       
       // we need to fix columns height's because of multi-cells
