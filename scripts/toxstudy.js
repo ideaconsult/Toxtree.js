@@ -5,7 +5,9 @@
 **/
 
 var jToxStudy = (function () {
-  var defaultSettings = { };    // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
+  var defaultSettings = { 
+    configuration: {columns: { } }
+  };    // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
   var instanceCount = 0;
   
   var fnDatasetValue = function (old, value){
@@ -20,6 +22,12 @@ var jToxStudy = (function () {
     
     self.settings = $.extend({}, defaultSettings, jToxKit.settings, settings); // i.e. defaults from jToxStudy
     // now we have our, local copy of settings.
+    
+    if (!ccLib.isEmpty(self.settings.config)) {
+      jToxKit.call(self, self.settings.config, function (config) {
+        self.settings.configuration = $.extend(true, self.settings.configuration, config);
+      });
+    }
 
     // get the main template, add it (so that jQuery traversal works) and THEN change the ids.
     // There should be no overlap, because already-added instances will have their IDs changed already...
@@ -113,6 +121,7 @@ var jToxStudy = (function () {
       return str.replace(/(.+)\s\(([0-9]+)\)/, "$1 (" + count + ")");
     },
     
+    // modifies the column title, according to configuration and returns "null" if it is marked as "invisible".
     ensureTable: function (tab, study) {
       var self = this;
       var defaultColumns = [
@@ -132,6 +141,17 @@ var jToxStudy = (function () {
         // start filling it
         var parCount = 0;
   
+        var modifyTitle = function(name, category) {
+          var newCol = self.settings.configuration.columns[name];
+          if (ccLib.isNull(newCol))
+            return name;
+          if (!ccLib.isNull(category))
+            newCol = newCol[category];
+          if (ccLib.isNull(newCol))
+            return name;
+          return !newCol.visible ? null : (ccLib.isNull(newCol.name) ? name : newCol.name);
+        };
+  
         // this function takes care to add as columns all elements from given array
         var putAGroup = function(group, fProcess) {
           var count = 0;
@@ -142,7 +162,7 @@ var jToxStudy = (function () {
             if (group[p + " unit"] !== undefined)
               skip.push(p + " unit");
             var val = fProcess(p);
-            if (val === undefined)
+            if (ccLib.isNull(val))
               continue;
               
             colDefs.push(val);
@@ -152,8 +172,12 @@ var jToxStudy = (function () {
         }
         
         var putDefaults = function(start, len) {
-          for (var i = 0;i < len; ++i)
-            colDefs.push(defaultColumns[i + start]);  
+          for (var i = 0;i < len; ++i) {
+            var col = defaultColumns[i + start];
+            col.sTitle = modifyTitle(col.sTitle);
+            if (!ccLib.isNull(col.sTitle))
+              colDefs.push(col);
+          }
         };
         
         // some value formatting functions
@@ -199,8 +223,12 @@ var jToxStudy = (function () {
           if (study.effects[0].conditions[p] !== undefined  || study.effects[0].conditions[p + " unit"] !== undefined)
             return undefined;
           
+          var name = modifyTitle(p, "parameters");
+          if (ccLib.isNull(name))
+            return null;
+
           var col = {
-            "sTitle" : p,
+            "sTitle" : name,
             "sClass" : "center middle", 
             "mData" : "parameters." + p,
             "sDefaultContent": "-"
@@ -217,6 +245,10 @@ var jToxStudy = (function () {
         // .. and conditions
         parCount += putAGroup(study.effects[0].conditions, function(c){
           var rnFn = null;
+          var name = modifyTitle(c, "conditions");
+          if (ccLib.isNull(name))
+            return null;
+          
           if (study.effects[0].conditions[c] !== undefined && study.effects[0].conditions[c] != null)
             rnFn = study.effects[0].conditions[c].loValue === undefined ? 
               function(data, type) { return formatUnits(data.conditions[c],  data.conditions[c + " unit"]); } : 
@@ -225,20 +257,23 @@ var jToxStudy = (function () {
             rnFn = function(data, type) { return "-"; }
             
           return { 
-            "sTitle" : c,
+            "sTitle" : name,
             "sClass" : "center middle jtox-multi", 
             "mData" : "effects", 
             "mRender" : function(data, type, full) { return self.renderMulti(data, type, full, rnFn); } 
           };
         });
         
-        
         // add also the "default" effects columns
         putDefaults(1, 2);
   
         // now is time to put interpretation columns..
         parCount = putAGroup(study.interpretation, function(i){
-          return { "sTitle": "Interpretation", "sClass" : "center middle jtox-multi", "mData" : "interpretation." + i, "sDefaultContent": "-"};
+          var name = modifyTitle(i, "interpretation");
+          if (ccLib.isNull(name))
+            return null;
+        
+          return { "sTitle": name, "sClass" : "center middle jtox-multi", "mData" : "interpretation." + i, "sDefaultContent": "-"};
         });
         
         // finally put the protocol entries
