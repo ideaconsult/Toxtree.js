@@ -579,6 +579,11 @@ var jToxStudy = (function () {
       jToxKit.call(self, substanceURI, function(substance){
          if (!!substance && !!substance.substance && substance.substance.length > 0){
            substance = substance.substance[0];
+           
+           substance["showname"] = substance.publicname;
+           if (ccLib.isEmpty(substance.showname))
+            substance.showname = substance.name;
+            
            ccLib.fillTree(self.rootElement, substance);
            // go and query for the reference query
            jToxKit.call(self, substance.referenceSubstance.uri, function (dataset){
