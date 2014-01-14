@@ -224,7 +224,7 @@ var jToxStudy = (function () {
         putDefaults(0, 1, "main");
         
         // use it to put parameters...
-        parCount += putAGroup(study.parameters, function(p) {
+        putAGroup(study.parameters, function(p) {
           if (study.effects[0].conditions[p] !== undefined  || study.effects[0].conditions[p + " unit"] !== undefined)
             return undefined;
 
@@ -248,7 +248,7 @@ var jToxStudy = (function () {
           return col;
         });
         // .. and conditions
-        parCount += putAGroup(study.effects[0].conditions, function(c){
+        putAGroup(study.effects[0].conditions, function(c){
           var col = { 
             "sTitle" : c,
             "sClass" : "center middle jtox-multi", 
@@ -275,13 +275,20 @@ var jToxStudy = (function () {
         putDefaults(1, 2, "effects");
   
         // now is time to put interpretation columns..
-        parCount = putAGroup(study.interpretation, function(i){
+        putAGroup(study.interpretation, function(i){
           var col = { "sTitle": i, "sClass" : "center middle jtox-multi", "mData" : "interpretation." + i, "sDefaultContent": "-"};
           return modifyColumn(col, "interpretation");
         });
         
         // finally put the protocol entries
         putDefaults(3, 3, "protocol");
+        
+        // but before given it up - make a small sorting..
+        colDefs.sort(function(a, b) {
+          var valA = ccLib.isNull(a.iOrder) ? 0 : a.iOrder;
+          var valB = ccLib.isNull(b.iOrder) ? 0 : b.iOrder;
+          return valA - valB;
+        });
         
         // READYY! Go and prepare THE table.
         $(theTable).dataTable( {
