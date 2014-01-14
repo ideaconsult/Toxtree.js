@@ -284,8 +284,8 @@ var jToxStudy = (function () {
           "bPaginate": true,
           "bProcessing": true,
           "bLengthChange": false,
-  				"bAutoWidth": false,
-          "sDom" : "rt<Fip>",
+  				"bAutoWidth": true,
+          "sDom" : "zrt<Fip>",
           "aoColumns": colDefs,
           "fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
             var el = $('.jtox-study-title .data-field', $(this).parents('.jtox-study'))[0];

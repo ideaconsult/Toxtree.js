@@ -13,6 +13,7 @@ TODO:
 - make appropriate message when there is no internet
 - 
 
+- DOCS: explain the configuration mechanism
 - InChi - може да се показва само InChi_Key - като може да се копира цели
 - Make empty tabs "disabled";
 - Invisible details column right next to the diagram - expanding to the right (animated);
