@@ -152,15 +152,9 @@ var ccLib = {
   },
   
   equalizeHeights: function() {
-    var startArg = 0;
-    var iterate = true;
-    if (typeof arguments[0] == "boolean" || arguments[0] == false) {
-      iterate = false;
-      startArg = 1;
-    }
     var tabs = [];
-    for (var i = startArg;i < arguments.length; ++i) {
-      tabs.push(arguments[i].firstElementChild);
+    for (var i = 0;i < arguments.length; ++i) {
+      tabs[i] = arguments[i].firstElementChild;
     }    
     
     for (;;) {
@@ -185,9 +179,6 @@ var ccLib = {
           tabs[i] = tabs[i].nextElementSibling;
         }
       }
-      
-      if (!iterate)
-        break;
     }
   },
   
