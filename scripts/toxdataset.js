@@ -9,7 +9,7 @@ var jToxDataset = (function () {
     "showTabs": true,         // should we show tabs with groups, or not
     "showExport": true,       // should we add export tab up there
     "showControls": true,     // should we show the pagination/navigation controls.
-    "pageSize": 50,           // what is the default (startint) page size.
+    "pageSize": 10,           // what is the default (startint) page size.
     "pageStart": 0,           // what is the default startint point for entries retrieval
     "configuration": {
       "groups": {
@@ -105,7 +105,6 @@ var jToxDataset = (function () {
     self.groups = null; // computed groups, i.e. 'groupName' -> array of feature list, prepared.
     self.fixTable = self.varTable = null; // the two tables - to be initialized in prepareTables.
     self.instanceNo = instanceCount++;
-    
     self.entriesCount = null;
     
     root.appendChild(jToxKit.getTemplate('#jtox-dataset'));
@@ -365,22 +364,7 @@ var jToxDataset = (function () {
         colList = varCols;
       }
       
-      // now - create the tables - they have common options, except the aoColumns (i.e. column definitions), which are added later.
-      self.varTable = ($(".jtox-ds-variable table", self.rootElement).dataTable({
-        "bPaginate": false,
-        "bProcessing": false,
-        "bLengthChange": false,
-				"bAutoWidth": false,
-        "sDom" : "rt",
-        "bSort": true,
-        "aoColumns": varCols,
-        "bScrollCollapse": true,
-        "fnCreatedRow": function( nRow, aData, iDataIndex ) {
-          nRow.id = 'jtox-var-' + self.instanceNo + '-' + iDataIndex;
-        },
-        "fnDrawCallback": function(oSettings) { self.equalizeTables(); }
-      }))[0];
-      
+      // now - create the tables...
       self.fixTable = ($(".jtox-ds-fixed table", self.rootElement).dataTable({
         "bPaginate": false,
         "bProcessing": true,
@@ -389,28 +373,57 @@ var jToxDataset = (function () {
         "sDom" : "rt",
         "aoColumns": fixCols,
         "bSort": false,
-        "fnDrawCallback": function(oSettings) { self.equalizeTables(); },
         "fnCreatedRow": function( nRow, aData, iDataIndex ) {
           // attach the click handling      
           $('.jtox-details-open', nRow).on('click', function(e) {  fnShowDetails(nRow); });
           $(nRow).data('jtox-index', iDataIndex);
         },
       }))[0];
+
+      self.varTable = ($(".jtox-ds-variable table", self.rootElement).dataTable({
+        "bPaginate": false,
+        "bLengthChange": false,
+				"bAutoWidth": false,
+        "sDom" : "rt",
+        "bSort": true,
+        "aoColumns": varCols,
+        "bScrollCollapse": true,
+        "fnCreatedRow": function( nRow, aData, iDataIndex ) {
+          nRow.id = 'jtox-var-' + self.instanceNo + '-' + iDataIndex;
+          $(nRow).data('jtox-index', iDataIndex);
+          $(nRow).addClass('jtox-row');
+        },
+        "fnDrawCallback": function(oSettings) {
+          var sorted = $('.jtox-row', this);
+          var rlen = sorted.length;
+          if (rlen == 0)
+            return;
+          
+          var dataFeed = [];  
+          for (var i = 0;i < rlen; ++i)
+            dataFeed.push(self.dataset.dataEntry[$(sorted[i]).data('jtox-index')]);
+
+          $(self.fixTable).dataTable().fnClearTable();
+          $(self.fixTable).dataTable().fnAddData(dataFeed);
+          self.equalizeTables();
+          
+          if (self.settings.showTabs){
+            $('.jtox-ds-features .jtox-checkbox', self.rootElement).trigger('change');     
+          }
+        }
+      }))[0];
     },
 
-    updateTables: function(master) {
+    updateTables: function() {
       var self = this;
       // some helpers
+      
       var fnSearchDataset = function(needle) {
         
       };
       
-      var theSet = self.dataset.dataEntry;
-      
       $(self.varTable).dataTable().fnClearTable();
-      $(self.fixTable).dataTable().fnClearTable();
-      $(self.varTable).dataTable().fnAddData(theSet);
-      $(self.fixTable).dataTable().fnAddData(theSet);
+      $(self.varTable).dataTable().fnAddData(self.dataset.dataEntry);
     },
     /* Process features as reported in the dataset. Works on result of standalone calls to <datasetUri>/feature
     */
