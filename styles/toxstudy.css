@@ -84,17 +84,6 @@ div.jtox-study-tab .dataTables_wrapper {
 }
 
 /* Start of table-related classes */
-.jtox-toolkit table.dataTable td,
-.jtox-toolkit table.dataTable th {
-  border:1px solid #ccc;
-  overflow: hidden;
-}
-
-.jtox-toolkit table.dataTable th {
-  text-transform: capitalize;
-  border-right: 3px !important;
-}
-
 .jtox-toolkit table.dataTable td.jtox-multi {
   padding: 0px;
 }
