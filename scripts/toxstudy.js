@@ -528,12 +528,19 @@ var jToxStudy = (function () {
     					"mData" : "proportion.real",
     					"mRender" : function(val, type, full) { return type != 'display' ? '' + val.lowerValue : self.formatConcentration(val.lowerPrecision, val.lowerValue, val.unit); }
     				},
-    				{ //7
+    				{ //7,8
     					"sClass" : "center",
     					"sWidth" : "15%",
     					"mData" : "proportion.real",
     					"mRender" : function(val, type, full) { return type != 'display' ? '' + val.upperValue : self.formatConcentration(val.upperPrecision, val.upperValue, val.unit); }
-    				}
+    				},
+            { //9
+    					"sClass" : "center",
+    					"mData" : "component.compound.URI",
+    					"mRender" : function(val, type, full) {
+    					  return !val ? '' : '<a href="' + self.baseUrl + 'substance?type=related&compound_uri=' + encodeURIComponent(val) + '" target="_blank">Also contained in...</span></a>';
+  					}
+	    		}    				
   		    ]
   		  });
 
