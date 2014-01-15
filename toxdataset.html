@@ -39,6 +39,18 @@
 <!--[[ jToxKit.templates['all-dataset'] -->
 	  <div id="jtox-dataset">
 	    <div class="jtox-ds-features"></div>
+	    <div class="jtox-ds-control">
+	      Showing from <span class="data-field from-field" data-field="pagestart"> ? </span> to <span class="data-field" data-field="pageend"> ? </span> in pages of <select class="data-field" data-field="pagesize">
+          <option value="10" selected="yes">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+          <option value="200">200</option>
+          <option value="500">500</option>
+        </select> entries
+	      <a class="paginate_disabled_previous prev-field" tabindex="0" role="button">Previous</a><a class="paginate_enabled_next next-field" tabindex="0" role="button">Next</a>
+	      <input type="text" id="filterbox" placeholder="Filter..." />
+	    </div>
 	    <div class="jtox-ds-tables">
 	      <div class="jtox-ds-fixed">
 	        <table></table>
