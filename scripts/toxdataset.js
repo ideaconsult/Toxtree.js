@@ -8,14 +8,14 @@ var jToxDataset = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     "showExport": true,
     "groups": {
-      "Identifiers" : function(name, features) { return [
+      "Identifiers" : [
         "http://www.opentox.org/api/1.1#Diagram", 
         "http://www.opentox.org/api/1.1#CASRN", 
         "http://www.opentox.org/api/1.1#EINECS",
         "http://www.opentox.org/api/1.1#IUCLID5_UUID"
-      ];},
+      ],
       
-      "Names": function (name, features) { return [
+      "Names": [
         "http://www.opentox.org/api/1.1#ChemicalName",
         "http://www.opentox.org/api/1.1#TradeName",
         "http://www.opentox.org/api/1.1#IUPACName",
@@ -23,7 +23,7 @@ var jToxDataset = (function () {
         "http://www.opentox.org/api/1.1#InChIKey",
         "http://www.opentox.org/api/1.1#InChI",
         "http://www.opentox.org/api/1.1#REACHRegistrationDate"
-      ];},
+      ],
       
       "Calculated": function (name, features) {
         var arr = [];
@@ -117,7 +117,6 @@ var jToxDataset = (function () {
       ulEl = document.createElement('ul');
       all.appendChild(ulEl);
 
-      var featNames = {};
       var createATab = function(grId, name) {
         var liEl = document.createElement('li');
         ulEl.appendChild(liEl);
@@ -463,7 +462,8 @@ var jToxDataset = (function () {
       var grps = self.settings.groups;
       self.groups = {};
       for (var i in grps){
-        self.groups[i] = (grps[i])(i, self.features);
+        var grp = grps[i];
+        self.groups[i] = (typeof grp == "function") ? grp(i, self.features) : grp;
       }
     },
     

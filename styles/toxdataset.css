@@ -34,6 +34,10 @@
   vertical-align: top;
 }
 
+.jtox-ds-tables td .shortened {
+  max-width: 75px;  
+}
+
 .jtox-ds-smalldiagram {
   width: 125px;
   height: 125px;
