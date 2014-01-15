@@ -331,6 +331,8 @@ var jToxStudy = (function () {
               '</select> studies.'
           }
         });
+        
+        $(theTable).dataTable().fnAdjustColumnSizing();
       }
       else
         $(theTable).dataTable().fnClearTable();
