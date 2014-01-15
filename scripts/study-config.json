@@ -1,19 +1,19 @@
 {
-  "columns": { 
-		"main": { 
-		  "name": { "bVisible": false } 
-		},
-		"parameters": { 
-		},
-		"conditions": { 
-		},
-		"effects": {
-			"endpoint": { "sTitle": "Type", "iOrder": -2 },
-			"result": { "sTitle": "Value", "iOrder": -1 }
-		},
-		"protocol": { 
-		},
-		"interpretation": { 
-		}
-	}
+  "columns": {
+    "_": { 
+  		"main": { 
+  		  "name": { "bVisible": false } 
+  		},
+  		"effects": {
+  			"endpoint": { "sTitle": "Type", "iOrder": -2 },
+  			"result": { "sTitle": "Value", "iOrder": -1 }
+  		}
+  	},
+  	"PC_PARTITION_SECTION": {
+  		"effects": {
+  			"endpoint": { "iOrder": 0 },
+  			"result": { "iOrder": 0 }
+  		}
+  	}
+  }
 }

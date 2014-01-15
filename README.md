@@ -5,7 +5,8 @@ A kit of front-ends for accessing toxicological web services, based on [AMBIT](h
 approach for using any or all of available front ends in third-party web pages.
 Each different front-end is referred as _kit_. Currently available are:
 
-- `study` - IUCTL
+- `study` - IUCTL studies visuzalizer.
+- `dataset` - viewer for dataset query results.
 - `tree` - a Web front end to OpenTox services. Currently developed as standalone web front-end and soon-to-be integrated in the kit. Described [below](#Toxtree.js).
 
 The toolkit is intended to be used by non-programmers, and thus it's integration process is rather simple - referring two files and marking a placeholder in HTML of where all the structure to be inserted. However, it relies that certain external libraries like [jQuery](http://www.jquery.com) and some of [jQueryUI](http://www.jqueryui.com) widgets are already included in the page.
@@ -52,6 +53,7 @@ Although different kits can have different configuration parameters, these are c
 - `onConnect` (attr. `data-on-connect`), _optional_: a function name, or function to be called just before any AJAX call.
 - `onSuccess` (attr. `data-on-success`), _optional_: a function name, or function to be called upon successful complete of a AJAX call.
 - `onError` (attr. `data-on-error`), _optional_: a function name, or function to be called when there's an error on AJAX call. The passed _callback_ to `jToxKit.call()` is still called, but with _null_ result.
+- `configuration` (attr. `data-config-file`), _optional_: a way to provide kit-specific configuration, like coulmns visibility and/or ordering for _study_ kit. When provided as `data-config-file` parameter, the configuration file is downloaded and passed as configuration parameter to kit initialization routine.
 
 As, can be seen, the later three callbacks can be local for each kit, so it is possible to report connection statuses in the most appropriate for the kit's way. This is also true for Url's, which means that not all kits, needs to communicate with one and the same server.
 
@@ -61,11 +63,13 @@ This kit gives front-end to AMBIT services, which provide import of IUCTL genera
 
 ##### Dependencies
 
-From [jQueryUI](http://www.jqueryui.com) Version 1.8+, based library *jQueryUI tabs* and jQuery based [DataTables](http:/www.datatables.net) Version 1.9+:
+From [jQueryUI](http://www.jqueryui.com) Version 1.8+, based library *jQueryUI tabs* and jQuery based [DataTables](http:/www.datatables.net) Version 1.9+. For column resizing we also depend on [colResizable](http://quocity.com/colresizable/), which in turn needs [jQuery migrate plugin](http://jquery.com/upgrade-guide/1.9/#jquery-migrate-plugin) for its reference of `$.explorer` - feel free not to include the latest, if you don't have such error from _colResizable_ (they might update not to use it, some day).
 
 ```
 	<link rel="stylesheet" href="jquery.ui.tabs.css"/>
 	<link rel="stylesheet" href="jquery.dataTables.css"/>
+	<script src="jquery-migrate-1.2.1.min.js"></script>
+	<script src="colResizable-1.3.min.js"></script>
 	<script src="jquery.ui.widget.js"></script>
 	<script src="jquery.ui.tabs.js"></script>
 	<script src="jquery.dataTables.js"></script>
@@ -78,6 +82,53 @@ These are needed in the same page in order for _jToxStudy_ to work. It has some 
 Not quite a lot yet, though:
 
 - `substanceUri` (attr. `data-substance-uri`), _optional_: This is the URL of the substance in question. If it is passed during _jToxStudy_ initialization a call to `jToxStudy.querySubstance(uri)` is made. In either case upon successful substance info retrieval automatic calls to `jToxStudy.querySummary(uri)` and `jToxStudy.queryComposition(uri)` are made.
+
+##### Configuration
+
+The configuration structure as passed to the kit initialization or references with `data-config-file` is used to give column visibility and re-naming possibilities. An example of valid configuration objest / json is this:
+
+```
+{
+	"columns": {
+		"_": { 
+			"main": { 
+				"name": { "bVisible": false } 
+			},
+			"effects": {
+				"endpoint": { "sTitle": "Type", "iOrder": -2 },
+				"result": { "sTitle": "Value", "iOrder": -1 }
+			}
+		},
+		"PC_PARTITION_SECTION": {
+			"effects": {
+				"endpoint": { "iOrder": 0 },
+				"result": { "iOrder": 0 }
+			}
+		}
+	}
+}
+```
+
+All column redefinitions are following _dataTables_ syntax, but only parameters that need to be changed are given. Additional `iOrder` is used to make reordering of the column in the table. The rule is:
+
+- If `iOrder` is missing in column definition it is considered **0**.
+- Columns are sorted on `iOrder` attribute before being passed to _dataTable_ initialization routine.
+
+The standard `bVisible` parameter can be present (usually only for hiding) which makes the column absent from column definitions at all.
+
+Each column (re)definitions are grouped on several levels:
+
+- (_low_) The semantic meaning: `parameters`, `conditions`, `effects`, `protocol`, `interpretation` and `main`.
+- (_high_) Per study category definitions are possible, so different categories can have different naming, ordering and visibility. The `_` category is the default.
+
+So the actual column re-definition goes like this:
+
+- First, the normal definition of column is taken, either from defaults or from study parsing;
+- Second, if present, the column (re)definition from default category (`_`) for this column title is merge with it, overwriting existing attributes.
+- Finally, if present, the column (re)definition for category-specific section, again idetified with column title (the original one) is merge/overwrited.
+- If this, final, column definition has `bVisible` to be present and false - the column is extracted from further processing and addition.
+
+The array of so built columns is then sorted on `iOrder` and passed to _dataTables_ initialization.
 
 
 ##### Methods
