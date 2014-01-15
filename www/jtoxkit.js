@@ -910,7 +910,8 @@ var jToxStudy = (function () {
         { "sTitle": "UUID", "sClass": "center middle", "sWidth": "50px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : jToxKit.shortenedDiv(data, "Press to copy the UUID in the clipboard"); } }
       ];
   
-      var theTable = $('.' + study.protocol.category.code + ' .jtox-study-table', tab)[0];
+      var category = study.protocol.category.code;
+      var theTable = $('.' + category + ' .jtox-study-table', tab)[0];
       if (!$(theTable).hasClass('dataTable')) {
   
         var colDefs = [];
@@ -918,16 +919,28 @@ var jToxStudy = (function () {
         // start filling it
         var parCount = 0;
   
-        var modifyColumn = function(col, category) {
-          var newCol = self.settings.configuration.columns[!ccLib.isNull(category) ? category : 'main'];
-          if (ccLib.isNull(newCol))
-            return col;
-            
-          newCol = newCol[col.sTitle.toLowerCase()];
-          if (ccLib.isNull(newCol))
-            return col;
-            
-          return ccLib.isNull(newCol.bVisible) || newCol.visible ? $.extend(col, newCol) : null;
+        var modifyColumn = function(col, group) {
+          if (group == null)
+            group = "main";
+          var name = col.sTitle.toLowerCase();
+          
+          // helper function for retrieving col definition, if exists. Returns empty object, if no.          
+          var getColDef = function (cat) {
+            var catCol = self.settings.configuration.columns[cat];
+            if (!ccLib.isNull(catCol)) {
+              catCol = catCol[group];
+              if (!ccLib.isNull(catCol))
+                catCol = catCol[name];
+            }
+
+            if (ccLib.isNull(catCol))
+              catCol = {};
+            return catCol;
+          };
+          // now form the default column, if existing and the category-specific one...
+          // extract column redefinitions and merge them all.
+          col = $.extend(col, getColDef('_'), getColDef(category));
+          return ccLib.isNull(col.bVisible) || col.bVisible ? col : null;
         };
   
         // this function takes care to add as columns all elements from given array
@@ -949,10 +962,10 @@ var jToxStudy = (function () {
           return count;
         }
         
-        var putDefaults = function(start, len, category) {
+        var putDefaults = function(start, len, group) {
           for (var i = 0;i < len; ++i) {
             var col = $.extend({}, defaultColumns[i + start]);
-            col = modifyColumn(col, category);
+            col = modifyColumn(col, group);
             if (col != null)
               colDefs.push(col);
           }
