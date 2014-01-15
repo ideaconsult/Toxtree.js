@@ -92,7 +92,7 @@ var jToxDataset = (function () {
   	"http://www.opentox.org/api/dblinks#ChEMBL": {title: "ChEMBL", used: true},
   	"http://www.opentox.org/api/dblinks#ToxbankWiki": {title: "Toxban Wiki", used: true},
   	// and one for unified way of processing diagram
-  	"http://www.opentox.org/api/1.1#Diagram": {title: "Diagram", accumulate: "compound.URI", used: true},
+  	"http://www.opentox.org/api/1.1#Diagram": {title: "Diagram", accumulate: "compound.URI", search: false, used: true},
   };
 
   // constructor
@@ -106,6 +106,7 @@ var jToxDataset = (function () {
     self.fixTable = self.varTable = null; // the two tables - to be initialized in prepareTables.
     self.instanceNo = instanceCount++;
     self.entriesCount = null;
+    self.suspendEqualization = false;
     
     root.appendChild(jToxKit.getTemplate('#jtox-dataset'));
     
@@ -116,6 +117,14 @@ var jToxDataset = (function () {
       $('.next-field', pane).on('click', function() { self.nextPage(); });
       $('.prev-field', pane).on('click', function() { self.prevPage(); });
       $('select', pane).on('change', function() { self.settings.pageSize = parseInt($(this).val()); self.queryEntries(self.settings.pageStart); })
+      var pressTimeout = null;
+      $('input', pane).on('keydown', function() { 
+        if (pressTimeout != null)
+          clearTimeout(pressTimeout);
+        pressTimeout = setTimeout(function(){
+          self.updateTables();
+        }, 350);
+      });
     }
     else // ok - hide me
       pane.style.display = "none";
@@ -205,7 +214,7 @@ var jToxDataset = (function () {
     
     equalizeTables: function () {
       var self = this;
-      if (self.fixTable != null && self.varTable != null) {
+      if (!self.suspendEqualization && self.fixTable != null && self.varTable != null) {
         ccLib.equalizeHeights(self.fixTable.tHead, self.varTable.tHead);
         ccLib.equalizeHeights(self.fixTable.tBodies[0], self.varTable.tBodies[0]);
       }
@@ -405,27 +414,56 @@ var jToxDataset = (function () {
 
           $(self.fixTable).dataTable().fnClearTable();
           $(self.fixTable).dataTable().fnAddData(dataFeed);
-          self.equalizeTables();
           
+          self.suspendEqualization = true;
           if (self.settings.showTabs){
             $('.jtox-ds-features .jtox-checkbox', self.rootElement).trigger('change');     
           }
+          
+          // finally
+          self.suspendEqualization = false;
+          self.equalizeTables();
         }
       }))[0];
     },
 
     updateTables: function() {
       var self = this;
-      // some helpers
       
-      var fnSearchDataset = function(needle) {
+      var fnFilterDataset = function(needle) {
+        if (ccLib.isNull(self.originalDataset))
+          self.originalDataset = self.dataset.dataEntry;
         
+        var dataFeed = [];
+        for (var i = 0, slen = self.originalDataset.length;i < slen; ++i){
+          var entry = self.originalDataset[i];
+          var match = self.enumerateFeatures(function(fId, gr){
+            var feat = self.features[fId];
+            if (feat.search !== undefined && !feat.search)
+              return false;
+            var val = self.featureValue(fId, entry);
+            return !ccLib.isNull(val) && val.toString().indexOf(needle) >= 0;
+          });
+          
+          if (match)
+            dataFeed.push(entry);
+        }
+        
+        console.log('Filtered to: ' + dataFeed.length + ' entries');
+        self.dataset.dataEntry = dataFeed;
       };
       
+      var needle = $('.jtox-ds-control input', self.rootElement).val();
+      if (!ccLib.isEmpty(needle))
+        fnFilterDataset(needle);
+      else if (!ccLib.isNull(self.originalDataset))
+        self.dataset.dataEntry = self.originalDataset;
+        
       $(self.varTable).dataTable().fnClearTable();
       $(self.varTable).dataTable().fnAddData(self.dataset.dataEntry);
     },
-    /* Process features as reported in the dataset. Works on result of standalone calls to <datasetUri>/feature
+    
+    /* Prepare the groups and the features.
     */
     prepareGroups: function () {
       var self = this;
@@ -436,6 +474,25 @@ var jToxDataset = (function () {
         var grp = grps[i];
         self.groups[i] = (typeof grp == "function") ? grp(i, self.features) : grp;
       }
+    },
+    
+    /* Enumerate all recofnized features, caling fnMatch(featureId, groupId) for each of it. 
+    Return true from the function to stop enumeration, which in turn will return true if it was stopped.
+    */
+    enumerateFeatures: function(fnMatch) {
+      var self = this;
+      var stopped = false;
+      for (var gr in self.groups) {
+        for (var i = 0, glen = self.groups[gr].length;i < glen; ++i) {
+          if (stopped = fnMatch(self.groups[gr][i], gr))
+            break;
+        }
+        
+        if (stopped)
+          break;
+      }
+      
+      return stopped;
     },
     
     /* Clears the page from any dataset fillings, so a new call can be made.
@@ -484,6 +541,7 @@ var jToxDataset = (function () {
           // time to call the supplied function, if any, and update the tables.
           if (typeof fnComplete == 'function')
             fnComplete();
+          self.originalDataset = null;
           self.updateTables();
 
           // finally - go and update controls if they are visible

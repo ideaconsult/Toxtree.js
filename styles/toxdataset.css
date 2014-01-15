@@ -63,14 +63,20 @@
 }
 
 .jtox-details-table th {
-  border: 0px !important;
+  border-left: 0px !important;
+  border-top: 0px !important;
+  border-right: 0px !important;
   padding-right: 5px;
   font-weight:bold;
-  width: 125px;  
+  width: 125px;
+  vertical-align: bottom;
 }
 
 .jtox-details-table td {
-  border: 0px !important;
+  border-left: 0px !important;
+  border-top: 0px !important;
+  border-right: 0px !important;
+  padding-left: 10px;
 }
 
 .jtox-ds-control {
