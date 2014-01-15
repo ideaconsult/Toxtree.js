@@ -107,7 +107,11 @@ window.jToxKit = {
     })  
   },
   
-  shortenedDiv: function (data, message, deflen) {
+  copySpan: function (data, message) {
+    return ;
+  },
+  
+  shortenedData: function (data, message, deflen) {
     var res = '';
     
     if (ccLib.isNull(deflen))

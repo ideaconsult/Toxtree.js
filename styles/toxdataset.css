@@ -48,9 +48,23 @@
   padding:0px 5px 0px 5px;
 }
 
-.jtox-ds-details div {
-  float: left;
-  z-index: 10;
-  width: 500px;
-  background-color: #cfcfcf;
+.jtox-ds-details * {
+  font-size: small;
+}
+
+.jtox-details-table {
+  width: 100%;
+  height: auto;  
+  vertical-align: baseline;
+}
+
+.jtox-details-table th {
+  border: 0px !important;
+  padding-right: 5px;
+  font-weight:bold;
+  width: 125px;  
+}
+
+.jtox-details-table td {
+  border: 0px !important;
 }
