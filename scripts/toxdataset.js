@@ -193,7 +193,7 @@ var jToxDataset = (function () {
         var divEl = jToxKit.getTemplate('#jtox-ds-export')
         divEl.id = tabId;
         all.appendChild(divEl);
-        divEl = divEl.getElementsByClassName('jtox-exportlist')[0];
+        divEl = $('.jtox-exportlist', divEl)[0];
         
         var base = jToxKit.grabBaseUrl(self.datasetUri, "dataset");
         for (var i = 0, elen = self.settings.configuration.exports.length; i < elen; ++i) {

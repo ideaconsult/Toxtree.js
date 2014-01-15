@@ -72,7 +72,7 @@ window.jToxKit = {
 	initTemplates: function() {
 	  var self = this;
 
-    var root = document.getElementsByClassName('jtox-template')[0];
+    var root = $('.jtox-template')[0];
     if (root === undefined) {
   	  var html = '';
     	for (var t in self.templates) {

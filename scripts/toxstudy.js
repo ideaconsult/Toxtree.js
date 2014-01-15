@@ -345,7 +345,7 @@ var jToxStudy = (function () {
       var typeSummary = [];
       
       // first - clear all existing tabs
-      var catList = self.rootElement.getElementsByClassName('jtox-study');
+      var catList = $('.jtox-study', self.rootElement);
       while(catList.length > 0) {
         catList[0].parentNode.removeChild(catList[0]);
       }
@@ -389,16 +389,16 @@ var jToxStudy = (function () {
         var tab = $(this).parents('.jtox-study-tab')[0];
         
         filterTimeout = setTimeout(function() {
-          var tabList = tab.getElementsByClassName('jtox-study-table');
+          var tabList = $('.jtox-study-table', tab);
           for (var t = 0, tlen = tabList.length; t < tlen; ++t) {
             $(tabList[t]).dataTable().fnFilter(field.value);
           }
         }, 300);
       };
       
-      var tabList = document.getElementsByClassName('jtox-study-tab');
+      var tabList = $('.jtox-study-tab');
       for (var t = 0, tlen = tabList.length;t < tlen; t++){
-        var filterEl = tabList[t].getElementsByClassName('jtox-study-filter')[0].onkeydown = fFilter;
+        var filterEl = $('.jtox-study-filter', tabList[t])[0].onkeydown = fFilter;
       }
     },
     
