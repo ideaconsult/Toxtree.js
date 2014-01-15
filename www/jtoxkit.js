@@ -1341,6 +1341,7 @@ var jToxStudy = (function () {
     				},
             { //9
     					"sClass" : "center",
+    					"bSortable": false,
     					"mData" : "component.compound.URI",
     					"mRender" : function(val, type, full) {
     					  return !val ? '' : '<a href="' + self.baseUrl + 'substance?type=related&compound_uri=' + encodeURIComponent(val) + '" target="_blank">Also contained in...</span></a>';
