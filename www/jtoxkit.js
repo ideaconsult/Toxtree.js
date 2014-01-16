@@ -1564,6 +1564,7 @@ window.jToxKit = {
 	*/
 	settings: {
   	jsonp: false,                   // whether to use JSONP approach, instead of JSON.
+  	crossDomain: false,             // should it expect cross-domain capabilities for the queries.
   	baseUrl: null,					        // the server actually used for connecting. Part of settings. If not set - attempts to get 'baseUrl' parameter of the query, if not - get's current server.
   	timeout: 15000,                 // the timeout an call to the server should be wait before the attempt is considered error.
   	pollDelay: 200,                 // after how many milliseconds a new attempt should be made during task polling.
@@ -1746,7 +1747,7 @@ window.jToxKit = {
 		$.ajax(service, {
 			dataType: settings.jsonp ? 'jsonp' : 'json',
 			headers: { Accept: accType },
-			crossDomain: true,
+			crossDomain: settings.crossDomain || settings.jsonp,
 			timeout: settings.timeout,
 			type: method,
 			data: adata,
