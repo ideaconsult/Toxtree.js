@@ -186,6 +186,8 @@ window.jToxKit = {
 			if (typeof adata == "boolean")
 				adata = {};
 		}
+		else if (settings.jsonp)
+		  adata = { media: accType };
 		else
 			adata = { };
 
