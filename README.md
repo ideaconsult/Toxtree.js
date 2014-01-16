@@ -7,7 +7,7 @@ Each different front-end is referred as _kit_. Currently available are:
 
 - `study` - IUCTL studies visuzalizer.
 - `dataset` - viewer for dataset query results.
-- `tree` - a Web front end to OpenTox services. Currently developed as standalone web front-end and soon-to-be integrated in the kit. Described [below](#Toxtree.js).
+- `tree` - a Web front end to OpenTox services. Currently developed as standalone web front-end and soon-to-be integrated in the kit. Described [below](#jtoxtree).
 
 The toolkit is intended to be used by non-programmers, and thus it's integration process is rather simple - referring two files and marking a placeholder in HTML of where all the structure to be inserted. However, it relies that certain external libraries like [jQuery](http://www.jquery.com) and some of [jQueryUI](http://www.jqueryui.com) widgets are already included in the page.
 
@@ -47,7 +47,8 @@ Although different kits can have different configuration parameters, these are c
 
 - `kit`  (attr. `data-kit`), _required_: specifies the exact type of front-end to be inserted. Only one type is allowed (of course!) - currently available kits are explained in the beginning.
 - `server` (attr. `data-server`), _optional_: the default server to be used on AJAX requests, if the server is not specified on the call itself.
-- `jsonp` (attr. `data-jsonp`), _optional_: whether to use _JSONP_ style queries to the server, instead of asynchronous ones. Mind that _JSONP_ setting does not influence _POST_ requests. Default is *false*.
+- `crossDomain` (attr. `data-cross-domain`), _optional_: informs jToxKit to send requests with cross-domain headers. It is fine to be _true_ even for same-server requests, except when Internet Explorer is used. That's why it defaults to *false*.
+- `jsonp` (attr. `data-jsonp`), _optional_: whether to use _JSONP_ style queries to the server, instead of asynchronous ones. Mind that _JSONP_ setting does not influence _POST_ requests. If this one is specified `crossDomain=true` is implied. Default is *false*.
 - `timeout` (attr. `data-timeout`), _optional_: the timeout for AJAX requests, in milliseconds. Default is 5000.
 - `pollDelay` (attr. `data-poll-delay`), _optional_: certain services involve creating a task on the server and waiting for it to finish - this is the time between poll request, while waiting it to finish. In milliseconds. Default is 200.
 - `onConnect` (attr. `data-on-connect`), _optional_: a function name, or function to be called just before any AJAX call.
@@ -57,7 +58,7 @@ Although different kits can have different configuration parameters, these are c
 
 As, can be seen, the later three callbacks can be local for each kit, so it is possible to report connection statuses in the most appropriate for the kit's way. This is also true for Url's, which means that not all kits, needs to communicate with one and the same server.
 
-### jToxStudy kit
+###<a name="jtoxstudy"></a> jToxStudy kit
 
 This kit gives front-end to AMBIT services, which provide import of IUCTL generated and maintained data for toxicological studies (experiments). The kit name is `study` (for use in `data-kit` initialization attribute). First, there are several additional
 
@@ -135,34 +136,198 @@ The array of so built columns is then sorted on `iOrder` and passed to _dataTabl
 
 _jToxStudy_ methods that can be invoked from outside are quite few, actually:
 
-`new jToxStudy(root, settings)`
 
+```
+new jToxStudy(root, settings)
+```
 It is called either internally from _jToxKit_ upon initialization, or later from the user. The first parameter is an _HTMLElement_ which will be used for base for populating necessary DOM tree. It returns a new instance of jToxStudy, referred as `<jToxStudy>` that can later be queried with methods, described below:
 
 
-`<jToxStudy>.querySubstance(substanceUri)`
-
+```
+<jToxStudy>.querySubstance(substanceUri)
+```
 If `substanceUri` parameter is not provided during initialization, this is the way to ask for studies for particular substance. Fill's up the fist tab and queries for _composition_ and _studies summary_.
 
-`<jToxStudy>.queryComposition(substanceUri)`
 
+```
+<jToxStudy>.queryComposition(substanceUri)
+```
 The `substanceUri` is the same as in previous function, but this one takes care only for _Composition_ tab. Usually called automatically from previous function, when it successfully retrieved substance information.
 
-`<jToxStudy>.querySummary(substanceUri)`
 
+```
+<jToxStudy>.querySummary(substanceUri)
+```
 The `substanceUri` is the same as in previous function. This one queries for a summary of all studies available for the given substance. It fills up the numbers in the studies' tabs and prepares the tables for particular queries later on, which are executes upon each tab's activation.
 
-### jToxDataset kit
+###<a name="jtoxdataset"></a> jToxDataset kit
 
-A general dataset-aware kit.
+An OpenTox dataset management and visualization tool. Since _dataset_ is very basic term in OpenTox hierarchy it is used in other places like [jToxQuery](#jtoxquery) and [jToxTree kit](#jtoxtree). It is vital that the scope of this kit it _not_ to provide complete, versatile interface for making queries, linking between them, etc. - it aims at visualizing and providing basic navigation within _one_ particular query. It is designed to be easily configurable - up to the point of being only one table, and easily driven with API calls, which are explained below.
 
-- `groups` options set - name and function
-- global function not to be missed
-- dsf
+As a consequence of this perspective, all functionality as filtering and ordering, is applied to the currently downloaded dataset entries, i.e. - one "page" of the dataset. This is due to the fact that for many datasets it is impossible to have general procedures applied to them, thus the scope of this kit is limited to local visuzalization functions only.
+
+##### Dependencies
+
+It has less dependencies, compare to jToxStudy, namely they are:
+
+```
+	<link rel="stylesheet" href="jquery.ui.tabs.css"/>
+	<link rel="stylesheet" href="jquery.dataTables.css"/>
+	<script src="jquery.ui.widget.js"></script>
+	<script src="jquery.ui.tabs.js"></script>
+	<script src="jquery.dataTables.js"></script>
+```
+
+##### Parameters
+
+Parameters that can be passed either with data-XXX attributes or when initialized manually with JavaScript are:
+
+- `datasetUri` (attr. `data-dataset-uri`), _optional_: This is the main URL of the dataset, that later is used for feautres query, pagination, etc. If not passed initially, a later call to `queryDataset(datasetUri)` has the same effect. 
+- `showTabs` (attr. `data-show-tabs`), _optional_: Determines if the feature enabling / disabling tabs should be visible, or not. Default: *true*.
+- `showExport` (attr. `data-show-export`), _optional_: Determines if the **Export** tab should be added to the right of feature-tabs, filled with possible export parameters. If `showTabs` is false, this has not effect, of course. Default: *true*.
+- `showControls` (attr. `data-show-controls`), _optional_: Determines whether to show the block with filter and pagination controls, which include: information for current view items, dropdown menu for choosing the page size, next and previous page and filtering box. Default: *true*.
+- `pageStart` (attr. `data-page-start`), _optional_: From which item the referenced dataset should be visualized. Counted from 0. Default: *0*.
+- `pageSize` (attr. `data-page-size`), _optional_: initial page size for queries - can later be changed either with `queryEntries()` call, or with dropdown menu, if visible. Default: *20*.
 
 
-### jToxTree kit
+##### Configuration
 
+Feature enabling-disabling functions and dataset entry detailed visuzalization rely pretty much on proper grouping of the features. There is a predefined dafult grouping, but it can be changed via `configuration` parameter. It is find in `group` member of it, which has the following syntax:
+
+```
+"groups" : {
+	"<group name>": <array> | <function>,
+	...
+}
+```
+The `<array>` option, means an array of feature IDs, the `<function>` option is a function with following syntax: `function (groupName, processedFeatures)` which should return (again) an array of feature IDs that are part of that group. The second parameter `processedFeatures` is the array of features, as jToxDataset has pre-processed them.
+
+Another aspect that can be configured from there is the list of possible exports, it has the following format:
+
+```
+"exports": [
+	{type: "<MIME type for export>", icon: "<icon location, relative to current page>"},
+	...
+]
+```
+
+Here is the full configuration, which is used by default:
+
+```
+{
+      "groups": {
+        "Identifiers" : [
+          "http://www.opentox.org/api/1.1#Diagram", 
+          "http://www.opentox.org/api/1.1#CASRN", 
+          "http://www.opentox.org/api/1.1#EINECS",
+          "http://www.opentox.org/api/1.1#IUCLID5_UUID"
+        ],
+        
+        "Names": [
+          "http://www.opentox.org/api/1.1#ChemicalName",
+          "http://www.opentox.org/api/1.1#TradeName",
+          "http://www.opentox.org/api/1.1#IUPACName",
+          "http://www.opentox.org/api/1.1#SMILES",
+          "http://www.opentox.org/api/1.1#InChIKey",
+          "http://www.opentox.org/api/1.1#InChI",
+          "http://www.opentox.org/api/1.1#REACHRegistrationDate"
+        ],
+        
+        "Calculated": function (name, features) {
+          var arr = [];
+          for (var f in features) {
+            if (!ccLib.isNull(features[f].source) && !ccLib.isNull(features[f].source.type) && !features[f].source.type.toLowerCase() == "algorithm")
+              arr.push(f);
+          }
+          return arr;
+        },
+        
+        "Other": function (name, features) {
+          var arr = [];
+          for (var f in features) {
+            if (!features[f].used)
+              arr.push(f);
+          }
+          return arr;
+        }
+      },
+      "exports": [
+        {type: "chemical/x-mdl-sdfile", icon: "images/sdf.jpg"},
+        {type: "chemical/x-cml", icon: "images/cml.jpg"},
+        {type: "chemical/x-daylight-smiles", icon: "images/smi.png"},
+        {type: "chemical/x-inchi", icon: "images/inchi.png"},
+        {type: "text/uri-list", icon: "images/link.png"},
+        {type: "application/pdf", icon: "images/pdf.png"},
+        {type: "text/csv", icon: "images/excel.png"},
+        {type: "text/plain", icon: "images/excel.png"},
+        {type: "text/x-arff", icon: "images/weka.png"},
+        {type: "text/x-arff-3col", icon: "images/weka.png"},
+        {type: "application/rdf+xml", icon: "images/rdf.gif"},
+        {type: "application/json", icon: "images/json.png"}
+      ]
+    }
+```
+
+
+##### Methods
+
+_jToxDataset_ has several methods to drive visuzalization, as well as several "static" ones, which makes it possible for other kits to use its functionality. Let's start whith these:
+
+
+```
+jToxDataset.processDataset(dataset, features, fnValue, startIdx)
+```
+Only the first parameter `dataset` is required and it is the downloaded dataset, as is from the OpenTox server. If features are already preprocessed (see below) they can be passed here as second parameter - `features`. The third - `fnValue` is a user-provided function that takes part during each entry's preprocessing, it is explained in details in a second. The last parameter `startIdx` is the starting index within the dataset, if a call is made for some other part of the dataset. Remember - this is a static call and it does _not_ preserve context information like page size, index, etc.
+
+
+```
+jToxDataset.processFeatures(features)
+```
+Very important function in unified feature processing. It traverses all reported features, merging those that mean one and the same thing, as reported by their `sameAs` parameter, also takes care of predefined features that can instruct it to "accumulate" certain feature value inside the dataset entry, itself. This is called internally by `processDataset()` or should be called if `features` parameter is passed to the later.
+
+
+```
+jToxDataset.processEntry(entry, features, fnValue)
+```
+Used extensively during dataset preprocessing. When traversing the dataset, each `entry` is passed with already preprocessed `features` so that features that need to have their values extracted and set separately _are_ processed here. Also, if several features are setup to accumulate their values in same entry's property - it is also done here. `fnValue` function (the same passed to `processDataset()`) can participate in the process, it has the following definition: `fnValue(oldValue, newValue)`.
+
+```
+jToxDataset.shortFeatureId(featureId)
+```
+A small helper which returns the part of the feature id, which is _after_ # sign.
+
+Now is time to review a bit more on instance methods of jToxDatset:
+
+```
+<jToxDataset>.queryDataset(datasetUri)
+```
+The starting point of dataset visualization. This function makes a separate call for feature-retrieving, preprocesses them (as described above), prepares the visuzalization table, showing or hiding, whatever is needed and calls `processEntries` for actual dataset entries' retrieval. Cannot be called several times within same instance.
+
+```
+<jToxDataset>.queryEntries(start, size, fnComplete)
+```
+The actual dataset entries retrieving function. It makes call to get entries from the already set up dataset, starting from `start`-th one and asking for `size` of them. `fnComplete` is called after all information is processed and the visuzalzation table is feeded. All pagination UI elements are updated, if not hidden.
+
+```
+<jToxDataset>.nextPage()
+<jToxDataset>.prevPage()
+```
+These two are shortcuts for the previous function, taking into account the current page size and also taking care not to query for something outside of the known limits of the dataset.
+
+```
+<jToxDataset>.filterEntries(needle)
+```
+Filter the presented entries with the given needle, finding substring match on each features, not marked with `search: false` in their definition.
+
+
+###<a name="jtoxquery"></a> jToxQuery kit
+
+A kit on top of the others for cross queries, running predictions, etc.
+
+
+###<a name="jtoxtree"></a> jToxTree kit
+
+A special usage of jToxQuery for ToxTree purposes along with decision tree visualziation.
 **IMPORTANT!:** Not yet implemented as part of *jToxKit*.
 
 

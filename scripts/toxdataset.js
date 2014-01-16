@@ -129,6 +129,11 @@ var jToxDataset = (function () {
     }
     else // ok - hide me
       pane.style.display = "none";
+
+    // finally make the query, if Uri is provided      
+    if (self.settings['datasetUri'] !== undefined){
+      self.queryDataset(self.settings['datasetUri']);
+    }
   };
   
   // now follow the prototypes of the instance functions.
@@ -419,47 +424,7 @@ var jToxDataset = (function () {
 
     updateTables: function() {
       var self = this;
-      
-      var fnFilterData = function() {
-        var needle = $('.jtox-ds-control input', self.rootElement).val();
-        if (needle == '')
-          return self.dataset.dataEntry;
-        
-        var dataFeed = [];
-        
-        for (var i = 0, slen = self.dataset.dataEntry.length;i < slen; ++i){
-          var entry = self.dataset.dataEntry[i];
-
-          var match = self.enumerateFeatures(function(fId, gr){
-            var feat = self.features[fId];
-            if (feat.search !== undefined && !feat.search)
-              return false;
-            var val = self.featureValue(fId, entry);
-            return !ccLib.isNull(val) && val.toString().indexOf(needle) >= 0;
-          });
-          
-            
-          if (match)
-            dataFeed.push(entry);
-        }
-        
-        return dataFeed;
-      };
-      
-      var dataFeed = fnFilterData();
-      $(self.fixTable).dataTable().fnClearTable();
-      $(self.varTable).dataTable().fnClearTable();
-      $(self.fixTable).dataTable().fnAddData(dataFeed);
-      $(self.varTable).dataTable().fnAddData(dataFeed);
-  
-      if (self.settings.showTabs){
-        self.suspendEqualization = true;
-        $('.jtox-ds-features .jtox-checkbox', self.rootElement).trigger('change');     
-        self.suspendEqualization = false;
-      }
-      
-      // finally
-      self.equalizeTables();
+      self.filterEntries($('.jtox-ds-control input', self.rootElement).val());
     },
     
     /* Prepare the groups and the features.
@@ -494,10 +459,49 @@ var jToxDataset = (function () {
       return stopped;
     },
     
-    /* Clears the page from any dataset fillings, so a new call can be made.
-    */
-    clearDataset: function () {
+    filterEntries: function(needle) {
       var self = this;
+      
+      if (ccLib.isNull(needle))
+        needle = '';
+      else
+        needle = needle.toLowerCase();
+        
+      var dataFeed = [];
+      if (needle != '') {
+        for (var i = 0, slen = self.dataset.dataEntry.length;i < slen; ++i){
+          var entry = self.dataset.dataEntry[i];
+  
+          var match = self.enumerateFeatures(function(fId, gr){
+            var feat = self.features[fId];
+            if (feat.search !== undefined && !feat.search)
+              return false;
+            var val = self.featureValue(fId, entry);
+            return !ccLib.isNull(val) && val.toString().toLowerCase().indexOf(needle) >= 0;
+          });
+          
+            
+          if (match)
+            dataFeed.push(entry);
+        }
+      }
+      else {
+        dataFeed = self.dataset.dataEntry;
+      }
+      
+      $(self.fixTable).dataTable().fnClearTable();
+      $(self.varTable).dataTable().fnClearTable();
+      $(self.fixTable).dataTable().fnAddData(dataFeed);
+      $(self.varTable).dataTable().fnAddData(dataFeed);
+  
+      if (self.settings.showTabs){
+        self.suspendEqualization = true;
+        $('.jtox-ds-features .jtox-checkbox', self.rootElement).trigger('change');     
+        self.suspendEqualization = false;
+      }
+      
+      // finally
+      self.equalizeTables();
     },
     
     // These two are shortcuts for calling the queryEntries routine
@@ -518,6 +522,9 @@ var jToxDataset = (function () {
       var self = this;
       if (from < 0)
         from = 0;
+      if (size == null)
+        size = self.settings.pageSize;
+        
       // setup the size, as well
       $('.jtox-ds-control select', self.rootElement).val(size);
       self.settings.pageSize = size;
@@ -541,12 +548,9 @@ var jToxDataset = (function () {
             return oldVal + ", " + newVal;
           }, self.settings.pageStart);
 
-          // time to call the supplied function, if any, and update the tables.
-          if (typeof fnComplete == 'function')
-            fnComplete();
-            
+          // ok - go and update the table, filtering the entries, if needed            
           self.updateTables();
-            
+
           // finally - go and update controls if they are visible
           if (self.settings.showControls){
             var pane = $('.jtox-ds-control', self.rootElement)[0];
@@ -567,6 +571,10 @@ var jToxDataset = (function () {
             else
               $(prevBut).addClass('paginate_disabled_previous').removeClass('paginate_enabled_previous');
           }
+
+          // time to call the supplied function, if any.
+          if (typeof fnComplete == 'function')
+            fnComplete();
         }
       });
     },
@@ -577,7 +585,6 @@ var jToxDataset = (function () {
     queryDataset: function (datasetUri) {
       var self = this;
       
-      self.clearDataset();
       self.datasetUri = datasetUri;
       jToxKit.call(self, datasetUri + '/feature', function (feature) {
         if (!!feature) {
