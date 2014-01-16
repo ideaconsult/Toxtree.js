@@ -19,7 +19,7 @@ window.jToxKit = {
   	pollDelay: 200,                 // after how many milliseconds a new attempt should be made during task polling.
   	onConnect: function(s){ },		  // function (service): called when a server request is started - for proper visualization. Part of settings.
   	onSuccess: function(c, m) { },	// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
-  	onError: function (c, m) { console.log("jToxKit call error (" + c + "): " + m); },		// function (code, mess): called on server reques error. Part of settings.
+  	onError: function (c, m) { if (!!console && !!console.log) console.log("jToxKit call error (" + c + "): " + m); },		// function (code, mess): called on server reques error. Part of settings.
   },
 	
 	// some handler functions that can be configured from outside with the settings parameter.

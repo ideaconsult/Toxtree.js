@@ -5,7 +5,7 @@
 **/
 
 var jToxStudy = (function () {
-  var defaultSettings = { 
+  var defaultSettings = {
     configuration: { 
       columns: { 
     		"main" : { },
