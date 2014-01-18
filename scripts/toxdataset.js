@@ -391,6 +391,9 @@ var jToxDataset = (function () {
           $('.jtox-details-open', nRow).on('click', function(e) {  fnShowDetails(nRow); });
           $(nRow).data('jtox-index', iDataIndex);
         },
+        "oLanguage" : {
+          "sEmptyTable" : '<span id="jtox-ds-message-' + self.instanceNo + '">Loading data...</span>',
+        }
       }))[0];
 
       self.varTable = ($(".jtox-ds-variable table", self.rootElement).dataTable({
@@ -415,7 +418,8 @@ var jToxDataset = (function () {
           
           if (rlen > 0)
             $(self.fixTable).dataTable().fnSort([[1, "asc"]]);
-        }
+        },
+        "oLanguage" : { "sEmptyTable" : " - " }
       }))[0];
     },
 
@@ -493,7 +497,8 @@ var jToxDataset = (function () {
       $(self.varTable).dataTable().fnClearTable();
       $(self.fixTable).dataTable().fnAddData(dataFeed);
       $(self.varTable).dataTable().fnAddData(dataFeed);
-  
+      $('#jtox-ds-message-' + self.instanceNo).html('No records matching the filter.');
+      
       if (self.settings.showTabs){
         self.suspendEqualization = true;
         $('.jtox-ds-features .jtox-checkbox', self.rootElement).trigger('change');     
@@ -531,6 +536,7 @@ var jToxDataset = (function () {
       
       var qStart = Math.floor(from / size);
       var qUri = ccLib.addParameter(self.datasetUri, "page=" + qStart + "&pagesize=" + size);
+
       jToxKit.call(self, qUri, function(dataset){
         if (!!dataset){
           // first initialize the counters.

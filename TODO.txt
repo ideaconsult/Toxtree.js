@@ -1,10 +1,7 @@
 TODO:
 
-- test with mutiple instances of dataset.
-
 - make appropriate message when there is no internet
 - make appropriate loading waiting cursor.
-
 
 - (global) extractFeature(dataset, featureId) - return an array of values of that feature for each entry in the dataset. (Can be used for diagram)
 - make toxtree part of jToxKit
