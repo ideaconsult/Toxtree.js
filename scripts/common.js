@@ -165,6 +165,7 @@ var ccLib = {
           
         if (!$(tabs[i]).hasClass('lock-height') && tabs[i].style.height != '')
           tabs[i].style.height = "auto";
+
         if (tabs[i].offsetHeight > height)
           height = tabs[i].offsetHeight;
       }
@@ -175,7 +176,8 @@ var ccLib = {
       for (i = 0;i < tabs.length ; ++i) {
         if (tabs[i] != null) {
           if (tabs[i].offsetHeight < height)
-            tabs[i].style.height = height + "px";
+            $(tabs[i]).height(height);
+            
           tabs[i] = tabs[i].nextElementSibling;
         }
       }

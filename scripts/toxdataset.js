@@ -144,9 +144,9 @@ var jToxDataset = (function () {
     prepareTabs: function (root, isMain, nodeFn, divFn) {
       var self = this;
       
-      var fr = document.createDocumentFragment();
       var all = document.createElement('div');
-      fr.appendChild(all);
+      all.style.display = "none"; // we suppress the re-layouting engine this way, we'll show it at the end.
+      root.appendChild(all);
       ulEl = document.createElement('ul');
       all.appendChild(ulEl);
 
@@ -179,13 +179,10 @@ var jToxDataset = (function () {
         for (var i = 0, glen = self.groups[gr].length;i < glen; ++i) {
           var fId = self.groups[gr][i];
           if (!ccLib.isNull(self.features[fId].title)) {
-            var el = nodeFn(fId, self.features[fId].title);
-            if (!ccLib.isNull(el))
-              divEl.appendChild(el);
-            self.features[fId].used = true;
+            nodeFn(fId, self.features[fId].title, divEl);
           }
         }
-        
+
         if (glen == 0)
           emptyList.push(idx);
         ++idx;
@@ -206,15 +203,15 @@ var jToxDataset = (function () {
           var el = jToxKit.getTemplate('#jtox-ds-download');
           divEl.appendChild(el);
           
-          el.getElementsByTagName('a')[0].href = ccLib.addParameter(self.datasetUri, "media=" + expo.type);
+          $('a', el)[0].href = ccLib.addParameter(self.datasetUri, "media=" + expo.type);
           var img = el.getElementsByTagName('img')[0];
           img.alt = img.title = expo.type;
           img.src = base + expo.icon;
         }
       }
       
-      // now append the prepared document fragment and prepare the tabs.
-      root.appendChild(fr);
+      // now show the whole stuff and mark the disabled tabs
+      all.style.display = "block";
       return $(all).tabs({ collapsible: isMain, disabled: emptyList});
     },
     
@@ -254,10 +251,10 @@ var jToxDataset = (function () {
             }
         },
         { "sClass": "jtox-hidden", "mData": "index", "sDefaultContent": "-", "bSortable": true, "mRender": function(data, type, full) { return ccLib.isNull(self.orderList) ? 0 : self.orderList[data]; } }, // column used for ordering
-        { "sClass": "jtox-hidden jtox-ds-details", "mData": "index", "sDefaultContent": "-", "mRender": function(data, type, full) { return ''; } } // details column
+        { "sClass": "jtox-hidden jtox-ds-details paddingless", "mData": "index", "sDefaultContent": "-", "mRender": function(data, type, full) { return ''; } } // details column
       );
       
-      varCols.push({ "sClass": "jtox-hidden jtox-ds-details borderless paddingless", "mData": "index", "mRender": function(data, type, full) { return ''; }  });
+      varCols.push({ "sClass": "jtox-hidden jtox-ds-details paddingless", "mData": "index", "mRender": function(data, type, full) { return ''; }  });
 
       // prepare the function for column switching...      
       var fnShowColumn = function(sel, idx) {
@@ -304,12 +301,13 @@ var jToxDataset = (function () {
           var detDiv = document.createElement('div');
           varCell.appendChild(detDiv);
           var tabList = self.prepareTabs(detDiv, false, 
-            function (id, name) {
-              if (cls.shortFeatureId(id) == "Diagram")
-                return null;
-                
-              var fEl = jToxKit.getTemplate('#jtox-one-detail');
-              ccLib.fillTree(fEl, {title: name, value: self.featureValue(id, full)});
+            function (id, name, parent) {
+              var fEl = null;
+              if (cls.shortFeatureId(id) != "Diagram") {
+                fEl = jToxKit.getTemplate('#jtox-one-detail');
+                parent.appendChild(fEl);
+                ccLib.fillTree(fEl, {title: name, value: self.featureValue(id, full)});
+              }
               return fEl;
             },
             function (id, parent) {
@@ -322,8 +320,7 @@ var jToxDataset = (function () {
           var img = new Image();
           img.onload = function(e) {
             self.equalizeTables();
-            $(detDiv).height(varCell.parentNode.clientHeight)
-            // $(detDiv).width(self.varTable.parentNode.clientWidth); // enable this if you want the table to be the width of the visible part.
+            $(detDiv).height(varCell.parentNode.clientHeight - 1);
             $(tabList).tabs( "option", "heightStyle", "fill" );
           };
           img.src = full.compound.diagramUri;
@@ -436,7 +433,10 @@ var jToxDataset = (function () {
       self.groups = {};
       for (var i in grps){
         var grp = grps[i];
-        self.groups[i] = (typeof grp == "function") ? grp(i, self.features) : grp;
+        var grpArr = (typeof grp == "function") ? grp(i, self.features) : grp;
+        self.groups[i] = grpArr;
+        for (var i = 0, glen = self.groups; i < glen; ++i)
+          grpArr[i].used = true;
       }
     },
     
@@ -592,8 +592,9 @@ var jToxDataset = (function () {
           cls.processFeatures(self.features);
           self.prepareGroups();
           if (self.settings.showTabs) {
-            self.prepareTabs($('.jtox-ds-features', self.rootElement)[0], true, function (id, name){
+            self.prepareTabs($('.jtox-ds-features', self.rootElement)[0], true, function (id, name, parent){
               var fEl = jToxKit.getTemplate('#jtox-ds-feature');
+              parent.appendChild(fEl);
               ccLib.fillTree(fEl, {title: name});
               $(fEl).data('feature-id', id);
               return fEl;
