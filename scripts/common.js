@@ -188,6 +188,10 @@ var ccLib = {
     return url + (url.indexOf('?') > 0 ? "&" : "?") + param;
   },
   
+  removeParameter: function (url, param) {
+    return url.replace(new RegExp('(.*\?.*)(' + param + '=[^\&\s$]*\&?)(.*)'), '$1$3');
+  },
+
   makeURL: function(path) {
     var a =  document.createElement('a');
     a.href = path;
@@ -205,12 +209,21 @@ var ccLib = {
       query: a.search,
       params: (function(){
         var ret = {},
-          seg = a.search.replace(/^\?/,'').split('&'),
-          len = seg.length, i = 0, s;
+        seg = a.search.replace(/^\?/,'').split('&'),
+        len = seg.length, i = 0, s, v, arr;
         for (;i<len;i++) {
           if (!seg[i]) { continue; }
           s = seg[i].split('=');
-          ret[s[0]] = (s.length>1)?decodeURIComponent(s[1].replace(/\+/g,  " ")):'';
+          v = (s.length>1)?decodeURIComponent(s[1].replace(/\+/g,  " ")):'';
+          if (s[0].indexOf('[]') == s[0].length - 2) {
+            arr = ret[s[0].slice(0, -2)];
+            if (arr === undefined)
+              ret[s[0].slice(0, -2)] = [v];
+            else
+              arr.push(v);
+          }
+          else
+            ret[s[0]] = v;
         }
         return ret;
       })(),

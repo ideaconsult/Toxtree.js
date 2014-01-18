@@ -247,7 +247,7 @@ var jToxDataset = (function () {
               return (type != "display") ?
                 '' + data : 
                 "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;<br/>" + 
-                  '<span class="jtox-details-open ui-icon ui-icon-circle-triangle-s" title="Press to open/close detailed info for the entry"></span>';
+                  '<span class="jtox-details-open ui-icon ui-icon-circle-triangle-e" title="Press to open/close detailed info for the entry"></span>';
             }
         },
         { "sClass": "jtox-hidden", "mData": "index", "sDefaultContent": "-", "bSortable": true, "mRender": function(data, type, full) { return ccLib.isNull(self.orderList) ? 0 : self.orderList[data]; } }, // column used for ordering
@@ -291,8 +291,8 @@ var jToxDataset = (function () {
         fnExpandCell(varCell, toShow);
         
         var iconCell = $('.jtox-details-open', row);
-        $(iconCell).toggleClass('ui-icon-circle-triangle-s');
-        $(iconCell).toggleClass('ui-icon-circle-triangle-n');
+        $(iconCell).toggleClass('ui-icon-circle-triangle-e');
+        $(iconCell).toggleClass('ui-icon-circle-triangle-w');
 
         if (toShow) {
           // i.e. we need to show it - put the full sized diagram in the fixed part and the tabs in the variable one...
@@ -585,10 +585,26 @@ var jToxDataset = (function () {
     queryDataset: function (datasetUri) {
       var self = this;
       
+      // we want to take into account the passed page & pagesize, but remove them, afterwards.
+      var urlObj = ccLib.parseURL(datasetUri);
+      if (urlObj.params['pagesize'] !== undefined) {
+        var sz = parseInt(urlObj.params['pagesize']);
+        if (sz > 0)
+          self.settings.pageSize = sz;
+          datasetUri = ccLib.removeParameter(datasetUri, 'pagesize');
+      }
+      if (urlObj.params['page'] !== undefined) {
+        var beg = parseInt(urlObj.params['page']);
+        if (beg >= 0)
+          self.settings.pageStart = beg * self.settings.pageSize;
+        datasetUri = ccLib.removeParameter(datasetUri, 'page');
+      }
+      
+      // remember the _original_ datasetUri and make a call with one size length to retrieve all features...
       self.datasetUri = datasetUri;
-      jToxKit.call(self, datasetUri + '/feature', function (feature) {
-        if (!!feature) {
-          self.features = feature.feature;
+      jToxKit.call(self, ccLib.addParameter(datasetUri, "page=0&pagesize=1"), function (dataset) {
+        if (!!dataset) {
+          self.features = dataset.feature;
           cls.processFeatures(self.features);
           self.prepareGroups();
           if (self.settings.showTabs) {

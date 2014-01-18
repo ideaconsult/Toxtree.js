@@ -188,6 +188,10 @@ var ccLib = {
     return url + (url.indexOf('?') > 0 ? "&" : "?") + param;
   },
   
+  removeParameter: function (url, param) {
+    return url.replace(new RegExp('(.*\?.*)(' + param + '=[^\&\s$]*\&?)(.*)'), '$1$3');
+  },
+
   makeURL: function(path) {
     var a =  document.createElement('a');
     a.href = path;
@@ -205,12 +209,21 @@ var ccLib = {
       query: a.search,
       params: (function(){
         var ret = {},
-          seg = a.search.replace(/^\?/,'').split('&'),
-          len = seg.length, i = 0, s;
+        seg = a.search.replace(/^\?/,'').split('&'),
+        len = seg.length, i = 0, s, v, arr;
         for (;i<len;i++) {
           if (!seg[i]) { continue; }
           s = seg[i].split('=');
-          ret[s[0]] = (s.length>1)?decodeURIComponent(s[1].replace(/\+/g,  " ")):'';
+          v = (s.length>1)?decodeURIComponent(s[1].replace(/\+/g,  " ")):'';
+          if (s[0].indexOf('[]') == s[0].length - 2) {
+            arr = ret[s[0].slice(0, -2)];
+            if (arr === undefined)
+              ret[s[0].slice(0, -2)] = [v];
+            else
+              arr.push(v);
+          }
+          else
+            ret[s[0]] = v;
         }
         return ret;
       })(),
@@ -475,7 +488,7 @@ var jToxDataset = (function () {
               return (type != "display") ?
                 '' + data : 
                 "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;<br/>" + 
-                  '<span class="jtox-details-open ui-icon ui-icon-circle-triangle-s" title="Press to open/close detailed info for the entry"></span>';
+                  '<span class="jtox-details-open ui-icon ui-icon-circle-triangle-e" title="Press to open/close detailed info for the entry"></span>';
             }
         },
         { "sClass": "jtox-hidden", "mData": "index", "sDefaultContent": "-", "bSortable": true, "mRender": function(data, type, full) { return ccLib.isNull(self.orderList) ? 0 : self.orderList[data]; } }, // column used for ordering
@@ -519,8 +532,8 @@ var jToxDataset = (function () {
         fnExpandCell(varCell, toShow);
         
         var iconCell = $('.jtox-details-open', row);
-        $(iconCell).toggleClass('ui-icon-circle-triangle-s');
-        $(iconCell).toggleClass('ui-icon-circle-triangle-n');
+        $(iconCell).toggleClass('ui-icon-circle-triangle-e');
+        $(iconCell).toggleClass('ui-icon-circle-triangle-w');
 
         if (toShow) {
           // i.e. we need to show it - put the full sized diagram in the fixed part and the tabs in the variable one...
@@ -813,10 +826,26 @@ var jToxDataset = (function () {
     queryDataset: function (datasetUri) {
       var self = this;
       
+      // we want to take into account the passed page & pagesize, but remove them, afterwards.
+      var urlObj = ccLib.parseURL(datasetUri);
+      if (urlObj.params['pagesize'] !== undefined) {
+        var sz = parseInt(urlObj.params['pagesize']);
+        if (sz > 0)
+          self.settings.pageSize = sz;
+          datasetUri = ccLib.removeParameter(datasetUri, 'pagesize');
+      }
+      if (urlObj.params['page'] !== undefined) {
+        var beg = parseInt(urlObj.params['page']);
+        if (beg >= 0)
+          self.settings.pageStart = beg * self.settings.pageSize;
+        datasetUri = ccLib.removeParameter(datasetUri, 'page');
+      }
+      
+      // remember the _original_ datasetUri and make a call with one size length to retrieve all features...
       self.datasetUri = datasetUri;
-      jToxKit.call(self, datasetUri + '/feature', function (feature) {
-        if (!!feature) {
-          self.features = feature.feature;
+      jToxKit.call(self, ccLib.addParameter(datasetUri, "page=0&pagesize=1"), function (dataset) {
+        if (!!dataset) {
+          self.features = dataset.feature;
           cls.processFeatures(self.features);
           self.prepareGroups();
           if (self.settings.showTabs) {
