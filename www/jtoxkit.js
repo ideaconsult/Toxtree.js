@@ -281,8 +281,10 @@ var jToxDataset = (function () {
             var feat = miniset.features[f];
             if (ccLib.isNull(feat.source) || ccLib.isNull(feat.source.type))
               continue;
-            else if (feat.source.type.toLowerCase() == "algorithm" || feat.source.type.toLowerCase() == "model")
+            else if (feat.source.type.toLowerCase() == "algorithm" || feat.source.type.toLowerCase() == "model") {
+              feat.used = true;
               arr.push(f);
+            }
           }
           return arr;
         },

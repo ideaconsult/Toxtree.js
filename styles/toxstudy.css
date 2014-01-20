@@ -78,12 +78,12 @@ div.jtox-study-tab.ui-tabs-panel {
 }
 
 div.jtox-study-tab .dataTables_wrapper {
-/*
-  overflow-x: scroll;
-  overflow-y: visible;
-*/
   overflow: hidden;  
   width: 100%;
+}
+
+div.jtox-study-tab table.dataTable th {
+  text-transform: capitalize;
 }
 
 /* Start of table-related classes */

@@ -96,10 +96,6 @@
   overflow: hidden;
 }
 
-.jtox-toolkit table.dataTable th {
-  text-transform: capitalize;
-}
-
 .jtox-toolkit .shortened {
   max-height: 25px;
   overflow: hidden;
