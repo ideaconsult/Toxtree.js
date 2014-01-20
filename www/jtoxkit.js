@@ -192,12 +192,6 @@ var ccLib = {
     return url.replace(new RegExp('(.*\?.*)(' + param + '=[^\&\s$]*\&?)(.*)'), '$1$3');
   },
 
-  makeURL: function(path) {
-    var a =  document.createElement('a');
-    a.href = path;
-    return a.protocol + "//" + a.hostname + (a.port.length > 0 ? ":" + a.port : '') + '/' + a.pathname.replace(/^([^\/])/,'/$1');
-  },
-  
   parseURL: function(url) {
     var a =  document.createElement('a');
     a.href = url;
@@ -1628,7 +1622,6 @@ window.jToxKit = {
 	settings: {
   	jsonp: false,                   // whether to use JSONP approach, instead of JSON.
   	crossDomain: false,             // should it expect cross-domain capabilities for the queries.
-  	baseUrl: null,					        // the server actually used for connecting. Part of settings. If not set - attempts to get 'baseUrl' parameter of the query.
   	host: null,                     // same as above, but for the calling server, i.e. - the one that loaded the page.        
   	timeout: 15000,                 // the timeout an call to the server should be wait before the attempt is considered error.
   	pollDelay: 200,                 // after how many milliseconds a new attempt should be made during task polling.
@@ -1668,12 +1661,14 @@ window.jToxKit = {
 	  
   	// now scan all insertion divs
   	$('.jtox-toolkit').each(function(i) {
-    	var dataParams = $(this).data();
+    	var dataParams = $.extend(true, $(this).data(), self.settings);
     	if (!dataParams.manualInit){
     	  var el = this;
     	  // first, get the configuration, if such is passed
     	  if (!ccLib.isNull(dataParams.configFile)) {
-      	  self.call(null, ccLib.makeURL(dataParams.configFile), function(config){
+    	    // we'll use a trick here so the baseUrl parameters set so far to take account... thus passing 'fake' kit instance
+    	    // as the first parameter of jToxKit.call();
+      	  self.call({ settings: dataParams}, dataParams.configFile, function(config){
         	  if (!!config)
         	    dataParams['configuration'] = config;
             initKit(el, dataParams);
