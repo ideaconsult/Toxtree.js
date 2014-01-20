@@ -607,7 +607,7 @@ var jToxStudy = (function () {
       var self = this;
       
       // re-initialize us on each of these calls.
-      self.baseUrl = jToxKit.grabBaseUrl(substanceURI, 'substance');
+      self.baseUrl = ccLib.isNull(self.settings.baseUrl) ? jToxKit.grabBaseUrl(substanceURI) : self.settings.baseUrl;
       
       var rootTab = $('.jtox-substance', self.rootElement)[0];
       jToxKit.call(self, substanceURI, function(substance){

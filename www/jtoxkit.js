@@ -195,7 +195,7 @@ var ccLib = {
   makeURL: function(path) {
     var a =  document.createElement('a');
     a.href = path;
-    return a.protocol + "//" + a.hostname + (a.port.length > 0 ? ":" : '') + a.port + a.pathname.replace(/^([^\/])/,'/$1');
+    return a.protocol + "//" + a.hostname + (a.port.length > 0 ? ":" + a.port : '') + '/' + a.pathname.replace(/^([^\/])/,'/$1');
   },
   
   parseURL: function(url) {
@@ -448,7 +448,6 @@ var jToxDataset = (function () {
         all.appendChild(divEl);
         divEl = $('.jtox-exportlist', divEl)[0];
         
-        var base = jToxKit.grabBaseUrl(self.datasetUri, "dataset");
         for (var i = 0, elen = self.settings.configuration.exports.length; i < elen; ++i) {
           var expo = self.settings.configuration.exports[i];
           var el = jToxKit.getTemplate('#jtox-ds-download');
@@ -457,7 +456,7 @@ var jToxDataset = (function () {
           $('a', el)[0].href = ccLib.addParameter(self.datasetUri, "media=" + expo.type);
           var img = el.getElementsByTagName('img')[0];
           img.alt = img.title = expo.type;
-          img.src = base + expo.icon;
+          img.src = self.baseUrl + expo.icon;
         }
       }
       
@@ -862,6 +861,8 @@ var jToxDataset = (function () {
           self.settings.pageStart = beg * self.settings.pageSize;
         datasetUri = ccLib.removeParameter(datasetUri, 'page');
       }
+      
+      self.baseUrl = ccLib.isNull(self.settings.baseUrl) ? jToxKit.grabBaseUrl(datasetUri) : self.settings.baseUrl;
       
       // remember the _original_ datasetUri and make a call with one size length to retrieve all features...
       self.datasetUri = datasetUri;
@@ -1580,7 +1581,7 @@ var jToxStudy = (function () {
       var self = this;
       
       // re-initialize us on each of these calls.
-      self.baseUrl = jToxKit.grabBaseUrl(substanceURI, 'substance');
+      self.baseUrl = ccLib.isNull(self.settings.baseUrl) ? jToxKit.grabBaseUrl(substanceURI) : self.settings.baseUrl;
       
       var rootTab = $('.jtox-substance', self.rootElement)[0];
       jToxKit.call(self, substanceURI, function(substance){
@@ -1627,7 +1628,8 @@ window.jToxKit = {
 	settings: {
   	jsonp: false,                   // whether to use JSONP approach, instead of JSON.
   	crossDomain: false,             // should it expect cross-domain capabilities for the queries.
-  	baseUrl: null,					        // the server actually used for connecting. Part of settings. If not set - attempts to get 'baseUrl' parameter of the query, if not - get's current server.
+  	baseUrl: null,					        // the server actually used for connecting. Part of settings. If not set - attempts to get 'baseUrl' parameter of the query.
+  	host: null,                     // same as above, but for the calling server, i.e. - the one that loaded the page.        
   	timeout: 15000,                 // the timeout an call to the server should be wait before the attempt is considered error.
   	pollDelay: 200,                 // after how many milliseconds a new attempt should be made during task polling.
   	onConnect: function(s){ },		  // function (service): called when a server request is started - for proper visualization. Part of settings.
@@ -1635,8 +1637,12 @@ window.jToxKit = {
   	onError: function (s, c, m) { if (!!console && !!console.log) console.log("jToxKit call error (" + c + "): " + m + " from request: [" + s + "]"); },		// function (code, mess): called on server reques error. Part of settings.
   },
 	
-	// some handler functions that can be configured from outside with the settings parameter.
+	// form the "default" baseUrl if no other is supplied
+	formBaseUrl: function(url) {
+    return url.protocol + "://" + url.host + (url.port.length > 0 ? ":" + url.port : '') + '/' + url.segments[0] + '/';	
+	},
     
+  // the jToxKit initialization routine, which scans all elements, marked as 'jtox-toolkit' and initializes them
 	init: function() {
   	var self = this;
   	
@@ -1648,13 +1654,10 @@ window.jToxKit = {
     // scan the query parameter for settings
 		var url = ccLib.parseURL(document.location);
 		var queryParams = url.params;
-		queryParams.host = url.host;
+		queryParams.host = self.formBaseUrl(url);
 	
     self.settings = $.extend(self.settings, queryParams); // merge with defaults
     
-		if (!self.settings.baseUrl)
-		  self.settings.baseUrl = self.settings.host;
-	  
 	  // initializes the kit, based on the passed kit name
 	  var initKit = function(element, params) {
     	if (params.kit == "study")
@@ -1768,25 +1771,21 @@ window.jToxKit = {
 	/* Deduce the baseUrl from a given Url - either if it is full url, of fallback to jToxKit's if it is local
 	Passed is the first "non-base" component of the path...
 	*/
-	grabBaseUrl: function(url, main){
-    if (url !== undefined && url != null && url.indexOf('http') == 0) {
-      var re = new RegExp("(.+\/)" + main + ".*");
-      return url.replace(re, "$1");
-    }
+	grabBaseUrl: function(url){
+    if (!ccLib.isNull(url) && url.indexOf('http') == 0)
+      return this.formBaseUrl(ccLib.parseURL(url));
     else
-      return this.settings.baseUrl;
+      return this.settings.host;
 	},
 	
 	/* Makes a server call with the provided method. If none is given - the internally stored one is used
 	*/
 	call: function (kit, service, callback, adata){
-	  var settings = {};
-		if (kit == null) {
+	  var settings = $.extend({"baseUrl" : this.settings.host}, this.settings);
+		if (kit == null)
 		  kit = this;
-		  settings = this.settings;
-		}
 		else 
-  		settings = $.extend(true, settings, this.settings, kit.settings);
+  		settings = $.extend(true, settings, kit.settings);
 
 		ccLib.fireCallback(settings.onConnect, kit, service);
 		  

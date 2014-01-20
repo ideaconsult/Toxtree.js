@@ -207,7 +207,6 @@ var jToxDataset = (function () {
         all.appendChild(divEl);
         divEl = $('.jtox-exportlist', divEl)[0];
         
-        var base = jToxKit.grabBaseUrl(self.datasetUri, "dataset");
         for (var i = 0, elen = self.settings.configuration.exports.length; i < elen; ++i) {
           var expo = self.settings.configuration.exports[i];
           var el = jToxKit.getTemplate('#jtox-ds-download');
@@ -216,7 +215,7 @@ var jToxDataset = (function () {
           $('a', el)[0].href = ccLib.addParameter(self.datasetUri, "media=" + expo.type);
           var img = el.getElementsByTagName('img')[0];
           img.alt = img.title = expo.type;
-          img.src = base + expo.icon;
+          img.src = self.baseUrl + expo.icon;
         }
       }
       
@@ -621,6 +620,8 @@ var jToxDataset = (function () {
           self.settings.pageStart = beg * self.settings.pageSize;
         datasetUri = ccLib.removeParameter(datasetUri, 'page');
       }
+      
+      self.baseUrl = ccLib.isNull(self.settings.baseUrl) ? jToxKit.grabBaseUrl(datasetUri) : self.settings.baseUrl;
       
       // remember the _original_ datasetUri and make a call with one size length to retrieve all features...
       self.datasetUri = datasetUri;

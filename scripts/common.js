@@ -195,7 +195,7 @@ var ccLib = {
   makeURL: function(path) {
     var a =  document.createElement('a');
     a.href = path;
-    return a.protocol + "//" + a.hostname + (a.port.length > 0 ? ":" : '') + a.port + a.pathname.replace(/^([^\/])/,'/$1');
+    return a.protocol + "//" + a.hostname + (a.port.length > 0 ? ":" + a.port : '') + '/' + a.pathname.replace(/^([^\/])/,'/$1');
   },
   
   parseURL: function(url) {
