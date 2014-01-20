@@ -64,6 +64,16 @@ var ccLib = {
     return empty;
   },
   
+  enumObject: function(obj, fn, idx, level) {
+    if (level == null)
+      level = 0;
+    if (typeof obj != "object")
+      fn(obj, idx, level);
+    else
+      for (var i in obj)
+        this.enumObject(obj[i], fn, i, level + 1);
+  },
+  
   setJsonValue: function (json, field, val) {
     if (field !== undefined){
       try {

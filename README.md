@@ -203,6 +203,29 @@ Feature enabling-disabling functions and dataset entry detailed visuzalization r
 ```
 The `<array>` option, means an array of feature IDs, the `<function>` option is a function with following syntax: `function (groupName, miniDataset)` which should return (again) an array of feature IDs that are part of that group. It can either be function object itself, or function-name, if configuration is passed via external _json_.
 The first parameter (`groupName`) is the name of the group being filled, and the second parameter - `miniDataset` is the 1-sized dataset that _jToxStudy_ queried to obtain the available features, with `features` property pre-processed. The context in which the function is called is the _jToxKit_ instance (i.e. `this` parameter).
+A special case is when one (or more) of the member of the array is (are) objects and not string. This is used when certain bunch of features need to be grouped in one checkbox. The format of the object should be:
+
+```
+{ "name": "Group name", "features": [ ... <array of features> ] };
+```
+This can be part of the array. For example the default _Names_ group can look like this:
+
+```
+    "Names": [
+      "http://www.opentox.org/api/1.1#ChemicalName",
+      "http://www.opentox.org/api/1.1#TradeName",
+      "http://www.opentox.org/api/1.1#IUPACName",
+      { "name": "Formulas",
+        "features": [
+          "http://www.opentox.org/api/1.1#SMILES",
+          "http://www.opentox.org/api/1.1#InChIKey",
+          "http://www.opentox.org/api/1.1#InChI",
+        ]
+      },
+      "http://www.opentox.org/api/1.1#REACHRegistrationDate"
+    ],
+```
+Which will result in all formula-related features to be grouped in one, named _Formulas_ and thus, turning on and off can be done from single checkbox.
 
 Another aspect that can be configured from there is the list of possible exports, it has the following format:
 
@@ -296,6 +319,38 @@ In the full configuration, shown below example of using last two can be seen for
         {type: "application/rdf+xml", icon: "images/rdf.gif"},
         {type: "application/json", icon: "images/json.png"}
       ]
+      "exports": [
+        {type: "chemical/x-mdl-sdfile", icon: "images/sdf.jpg"},
+        {type: "chemical/x-cml", icon: "images/cml.jpg"},
+        {type: "chemical/x-daylight-smiles", icon: "images/smi.png"},
+        {type: "chemical/x-inchi", icon: "images/inchi.png"},
+        {type: "text/uri-list", icon: "images/link.png"},
+        {type: "application/pdf", icon: "images/pdf.png"},
+        {type: "text/csv", icon: "images/excel.png"},
+        {type: "text/plain", icon: "images/excel.png"},
+        {type: "text/x-arff", icon: "images/weka.png"},
+        {type: "text/x-arff-3col", icon: "images/weka.png"},
+        {type: "application/rdf+xml", icon: "images/rdf.gif"},
+        {type: "application/json", icon: "images/json.png"}
+      ],
+
+      "baseFeatures": {
+      	"http://www.opentox.org/api/1.1#Similarity": {title: "Similarity", accumulate: "compound.metric", search: true, used: true},
+      	"http://www.opentox.org/api/1.1#Diagram": {title: "Diagram", search: false, used: true, 
+      	  process: function(entry) {
+            entry.compound.diagramUri = entry.compound.URI.replace(/(.+)(\/conformer.*)/, "$1") + "?media=image/png";
+      	  },
+      	  render: function(col){
+      	    col["mData"] = "compound.diagramUri";
+            col["mRender"] = function(data, type, full) {
+              return (type != "display") ? "-" : '<img src="' + data + '" class="jtox-ds-smalldiagram jtox-details-open"/>';  
+            };
+            col["sClass"] = "paddingless";
+            col["sWidth"] = "125px";
+            return col;
+        	}
+      	},
+      }
     }
 ```
 
