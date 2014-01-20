@@ -201,7 +201,8 @@ Feature enabling-disabling functions and dataset entry detailed visuzalization r
 	...
 }
 ```
-The `<array>` option, means an array of feature IDs, the `<function>` option is a function with following syntax: `function (groupName, processedFeatures)` which should return (again) an array of feature IDs that are part of that group. The second parameter `processedFeatures` is the array of features, as jToxDataset has pre-processed them.
+The `<array>` option, means an array of feature IDs, the `<function>` option is a function with following syntax: `function (groupName, miniDataset)` which should return (again) an array of feature IDs that are part of that group. It can either be function object itself, or function-name, if configuration is passed via external _json_.
+The first parameter (`groupName`) is the name of the group being filled, and the second parameter - `miniDataset` is the 1-sized dataset that _jToxStudy_ queried to obtain the available features, with `features` property pre-processed. The context in which the function is called is the _jToxKit_ instance (i.e. `this` parameter).
 
 Another aspect that can be configured from there is the list of possible exports, it has the following format:
 
@@ -212,7 +213,36 @@ Another aspect that can be configured from there is the list of possible exports
 ]
 ```
 
-Here is the full configuration, which is used by default:
+And, finally - another key aspect that can be reconfigured is default features definitions. Something like diagram:
+
+```
+"baseFeatures": {
+	"<featureId": {
+		title: "<readable title>", 
+		accumulate: "<location in data entry to store accumulated values during processing>",
+		search: "true | false", // is this feature searchable
+		used: "true | false", // put true if you want to make sure it won't show up on Other tab
+		process: "function name | definition to be called during feature preparation",
+		render: "<function name | definition to be called when dataTables columns are created>",
+	},
+	...
+}
+```
+
+The only two that need more explanation are _accumulate_, _process_ and _render_. The first one is used to determine where in the data entry the value for this feature is stored and/or should be accumulated. For example in those two:
+
+```
+"http://www.opentox.org/api/1.1#CASRN" : { title: "CAS", accumulate: "compound.cas"},
+"http://www.opentox.org/api/1.1#TradeName" : {title: "Trade Name", accumulate: "compound.tradename"}
+```
+
+this property shows that all features that are _sameAs_ **CASRN** (or **TradeName**) should accumulate their values in `compound.cas`. This is the place that later the values will be searched too.
+
+The second property - `process` is used during dataset pre-processing and is of form `function process(entry, featureId)` and is called for each 
+
+The third property - `render` gives wider possibilities while preparing the table - it identifies a function of the following format: `function render(column)`, where _column_ is the column definition for this feature built so far (most probably - _sTitle_ put, etc.). This is dataTable column definition, that can be altered in any desired way, includin it's _mRender_ property. 
+
+In the full configuration, shown below example of using last two can be seen for _Diagram_ property.
 
 ```
 {
