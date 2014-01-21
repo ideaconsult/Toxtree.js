@@ -82,7 +82,7 @@ var jToxDataset = (function () {
       	  render: function(col){
       	    col["mData"] = "compound.diagramUri";
             col["mRender"] = function(data, type, full) {
-              return (type != "display") ? "-" : '<img src="' + data + '" class="jtox-ds-smalldiagram jtox-details-open"/>';  
+              return (type != "display") ? "-" : '<a target="_blank" href="' + full.compound.URI + '"><img src="' + data + '" class="jtox-ds-smalldiagram"/></a>';
             };
             col["sClass"] = "paddingless";
             col["sWidth"] = "125px";
