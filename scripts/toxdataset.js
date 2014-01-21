@@ -247,7 +247,7 @@ var jToxDataset = (function () {
       
       // now show the whole stuff and mark the disabled tabs
       all.style.display = "block";
-      return $(all).tabs({ collapsible: isMain, disabled: emptyList});
+      return $(all).tabs({ collapsible: isMain, disabled: emptyList, heightStyle: isMain ? "content" : "fill" });
     },
     
     equalizeTables: function () {
@@ -335,28 +335,27 @@ var jToxDataset = (function () {
           
           var detDiv = document.createElement('div');
           varCell.appendChild(detDiv);
-          var tabList = self.prepareTabs(detDiv, false, 
-            function (id, name, parent) {
-              var fEl = null;
-              if (id != null && cls.shortFeatureId(id) != "Diagram") {
-                fEl = jToxKit.getTemplate('#jtox-one-detail');
-                parent.appendChild(fEl);
-                ccLib.fillTree(fEl, {title: name, value: self.featureValue(id, full)});
-              }
-              return fEl;
-            },
-            function (id, parent) {
-              var tabTable = jToxKit.getTemplate('#jtox-details-table');
-              parent.appendChild(tabTable);
-              return tabTable;  
-            }
-          );
           
           var img = new Image();
           img.onload = function(e) {
             self.equalizeTables();
             $(detDiv).height(varCell.parentNode.clientHeight - 1);
-            $(tabList).tabs( "option", "heightStyle", "fill" );
+            self.prepareTabs(detDiv, false, 
+              function (id, name, parent) {
+                var fEl = null;
+                if (id != null && cls.shortFeatureId(id) != "Diagram") {
+                  fEl = jToxKit.getTemplate('#jtox-one-detail');
+                  parent.appendChild(fEl);
+                  ccLib.fillTree(fEl, {title: name, value: self.featureValue(id, full)});
+                }
+                return fEl;
+              },
+              function (id, parent) {
+                var tabTable = jToxKit.getTemplate('#jtox-details-table');
+                parent.appendChild(tabTable);
+                return tabTable;  
+              }
+            );
           };
           img.src = full.compound.diagramUri;
           cell.appendChild(img);
