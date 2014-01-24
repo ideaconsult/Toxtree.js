@@ -267,6 +267,12 @@ var jToxDataset = (function () {
         return data.values[fId];
     },
     
+    featureUri: function (fId) {
+      var self = this;
+      var origId = self.features[fId].originalId;
+      return ccLib.isNull(origId) ? fId : origId;
+    },
+    
     prepareTables: function() {
       var self = this;
       var varCols = [];
@@ -276,14 +282,14 @@ var jToxDataset = (function () {
       // enter the first column - the number.
       
       fixCols.push({
-            "mData": "number",
-            "sClass": "middle",
-            "mRender": function (data, type, full) { 
-              return (type != "display") ?
-                '' + data : 
-                "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;<br/>" + 
-                  '<span class="jtox-details-open ui-icon ui-icon-circle-triangle-e" title="Press to open/close detailed info for the entry"></span>';
-            }
+          "mData": "number",
+          "sClass": "middle",
+          "mRender": function (data, type, full) { 
+            return (type != "display") ?
+              '' + data : 
+              "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;<br/>" + 
+                '<span class="jtox-details-open ui-icon ui-icon-circle-triangle-e" title="Press to open/close detailed info for the entry"></span>';
+          }
         },
         { "sClass": "jtox-hidden", "mData": "index", "sDefaultContent": "-", "bSortable": true, "mRender": function(data, type, full) { return ccLib.isNull(self.orderList) ? 0 : self.orderList[data]; } }, // column used for ordering
         { "sClass": "jtox-hidden jtox-ds-details paddingless", "mData": "index", "sDefaultContent": "-", "mRender": function(data, type, full) { return ''; } } // details column
@@ -346,7 +352,7 @@ var jToxDataset = (function () {
                 if (id != null && cls.shortFeatureId(id) != "Diagram") {
                   fEl = jToxKit.getTemplate('#jtox-one-detail');
                   parent.appendChild(fEl);
-                  ccLib.fillTree(fEl, {title: name, value: self.featureValue(id, full)});
+                  ccLib.fillTree(fEl, {title: name, value: self.featureValue(id, full), uri: self.featureUri(id)});
                 }
                 return fEl;
               },
@@ -660,7 +666,7 @@ var jToxDataset = (function () {
             self.prepareTabs($('.jtox-ds-features', self.rootElement)[0], true, function (id, name, parent){
               var fEl = jToxKit.getTemplate('#jtox-ds-feature');
               parent.appendChild(fEl);
-              ccLib.fillTree(fEl, {title: name.replace(/_/g, ' ')});
+              ccLib.fillTree(fEl, {title: name.replace(/_/g, ' '), uri: self.featureUri(id)});
               return fEl;
             });
           }
@@ -720,11 +726,15 @@ var jToxDataset = (function () {
       for (;;){
         if (feature.sameAs === undefined || feature.sameAs == null || feature.sameAs == fid || fid == base + feature.sameAs)
           break;
-        if (features[feature.sameAs] !== undefined)
+        if (features[feature.sameAs] !== undefined){
           feature = features[feature.sameAs];
+          feature.originalId = fid;
+        }
         else {
-          if (features[base + feature.sameAs] !== undefined)
+          if (features[base + feature.sameAs] !== undefined) {
             feature = features[base + feature.sameAs];
+            feature.originalId = fid;
+          }
           else
             break;
         }

@@ -113,7 +113,10 @@ var ccLib = {
         if ( !!format && (typeof window[format] == 'function') ) {
           value = window[format](value, json);
         }
-        self.setObjValue(el, value);
+        if ($(el).hasClass('attribute'))
+          $(el).attr($(el).data('attribute'), value);
+        else // the 'normal' value
+          self.setObjValue(el, value);
       }
   	}
 	
