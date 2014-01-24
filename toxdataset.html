@@ -11,11 +11,11 @@
   <title>ToxDataset development page</title>
   <link rel="stylesheet" href="styles/base.css">
 	<link rel="stylesheet" href="styles/skeleton.css">
-	<link rel="stylesheet" href="styles/layout.css">
-	<link rel="stylesheet" href="styles/toxdataset.css">
-	<link rel="stylesheet" href="styles/jtoxkit.css">
+	<link rel="stylesheet" href="tests/layout-fluid.css">
 	<link rel="stylesheet" href="styles/jquery-ui.css">
 	<link rel="stylesheet" href="styles/jquery.dataTables.css">
+	<link rel="stylesheet" href="styles/toxdataset.css">
+	<link rel="stylesheet" href="styles/jtoxkit.css">
 
   <script src="scripts/jquery.js"></script>
   <script src="scripts/jquery.ui.core.js"></script>
@@ -29,7 +29,7 @@
   <script language="javascript">
     $(document).ready(function(){
       var ds = new jToxDataset($(".jtox-toolkit")[0], {crossDomain: true} );
-      ds.queryDataset("http://apps.ideaconsult.net:8080/biodeg/dataset/1");
+      ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/dataset/10");
 /*       ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/dataset/28");  */
 /*       ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/query/similarity?search=c1ccccc1O&threshold=0.5"); */
 /*       ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/compound/8666?feature_uris[]=http://apps.ideaconsult.net:8080/toxbank/model/2/predicted");  */

@@ -1695,7 +1695,7 @@ window.jToxKit = {
 	  
   	// now scan all insertion divs
   	$('.jtox-toolkit').each(function(i) {
-    	var dataParams = $.extend(true, $(this).data(), self.settings);
+    	var dataParams = $.extend(true, self.settings, $(this).data());
     	if (!dataParams.manualInit){
     	  var el = this;
     	  // first, get the configuration, if such is passed
@@ -1736,7 +1736,7 @@ window.jToxKit = {
 	getTemplate: function(selector) {
   	var el = $(selector, this.templateRoot)[0];
   	if (!!el){
-    	var el = $(selector, this.templateRoot)[0].cloneNode(true);
+    	var el = el.cloneNode(true);
       el.removeAttribute('id');
     }
     return el;
