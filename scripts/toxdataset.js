@@ -126,6 +126,8 @@ var jToxDataset = (function () {
   var cls = function (root, settings) {
     var self = this;
     self.rootElement = root;
+    $(root).addClass('jtox-toolkit'); // to make sure it is there even in manual initialization.
+    
     var newDefs = $.extend(true, { "configuration" : { "baseFeatures": baseFeatures} }, defaultSettings);
     self.settings = $.extend(true, {}, newDefs, jToxKit.settings, settings); // i.e. defaults from jToxDataset
     self.features = null; // features, as downloaded from server, after being processed.

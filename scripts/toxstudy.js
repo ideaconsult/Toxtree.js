@@ -28,6 +28,7 @@ var jToxStudy = (function () {
     var self = this;
     self.rootElement = root;
     self.suffix = '_' + instanceCount++;
+    $(root).addClass('jtox-toolkit'); // to make sure it is there even in manual initialization.
     
     self.settings = $.extend({}, defaultSettings, jToxKit.settings, settings); // i.e. defaults from jToxStudy
     // now we have our, local copy of settings.
@@ -620,7 +621,7 @@ var jToxStudy = (function () {
             
            ccLib.fillTree(self.rootElement, substance);
            // go and query for the reference query
-           jToxKit.call(self, substance.referenceSubstance.uri, function (dataset){
+            (self, substance.referenceSubstance.uri, function (dataset){
              if (!!dataset) {
               jToxDataset.processDataset(dataset, null, fnDatasetValue);
               ccLib.fillTree(rootTab, dataset.dataEntry[0]);
