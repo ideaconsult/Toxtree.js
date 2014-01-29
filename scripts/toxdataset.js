@@ -51,8 +51,11 @@ var jToxDataset = (function () {
         "Other": function (name, miniset) {
           var arr = [];
           for (var f in miniset.features) {
-            if (!miniset.features[f].used)
+            var sameAs = jToxDataset.findSameAs(f, miniset.features);
+            if (!miniset.features[f].used && !miniset.features[sameAs].used) {
               arr.push(f);
+              miniset.features[sameAs].used = true;
+            }
           }
           return arr;
         }
@@ -715,35 +718,40 @@ var jToxDataset = (function () {
     return entry;
   };
   
+  cls.findSameAs = function (fid, features) {
+    // starting from the feature itself move to 'sameAs'-referred features, until sameAs is missing or points to itself
+    // This, final feature should be considered "main" and title and others taken from it.
+    var feature = features[fid];
+    var base = fid.replace(/(http.+\/feature\/).*/g, "$1");
+    var retId = fid;
+    
+    for (;;){
+      if (feature.sameAs === undefined || feature.sameAs == null || feature.sameAs == fid || fid == base + feature.sameAs)
+        break;
+      if (features[feature.sameAs] !== undefined)
+        retId = feature.sameAs;
+      else {
+        if (features[base + feature.sameAs] !== undefined)
+          retId = base + feature.sameAs;
+        else
+          break;
+      }
+      
+      feature = features[retId];
+    }
+    
+    return retId;
+  };
+  
   cls.processFeatures = function(features, bases) {
     if (bases == null)
       base = baseFeatures;
     features = $.extend(features, bases);
     for (var fid in features) {
-      // starting from the feature itself move to 'sameAs'-referred features, until sameAs is missing or points to itself
-      // This, final feature should be considered "main" and title and others taken from it.
-      var feature = features[fid];
-      var base = fid.replace(/(http.+\/feature\/).*/g, "$1");
       
-      for (;;){
-        if (feature.sameAs === undefined || feature.sameAs == null || feature.sameAs == fid || fid == base + feature.sameAs)
-          break;
-        if (features[feature.sameAs] !== undefined){
-          feature = features[feature.sameAs];
-          feature.originalId = fid;
-        }
-        else {
-          if (features[base + feature.sameAs] !== undefined) {
-            feature = features[base + feature.sameAs];
-            feature.originalId = fid;
-          }
-          else
-            break;
-        }
-      }
-
+      var sameAs = cls.findSameAs(fid, features);
       // now merge with this one... it copies everything that we've added, if we've reached to it. Including 'accumulate'
-      features[fid] = $.extend(features[fid], feature);
+      features[fid] = $.extend(features[fid], features[sameAs], { originalId: fid });
     }
     
     return features;

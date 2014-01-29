@@ -297,8 +297,11 @@ var jToxDataset = (function () {
         "Other": function (name, miniset) {
           var arr = [];
           for (var f in miniset.features) {
-            if (!miniset.features[f].used)
+            var sameAs = jToxDataset.findSameAs(f, miniset.features);
+            if (!miniset.features[f].used && !miniset.features[sameAs].used) {
               arr.push(f);
+              miniset.features[sameAs].used = true;
+            }
           }
           return arr;
         }
@@ -372,6 +375,8 @@ var jToxDataset = (function () {
   var cls = function (root, settings) {
     var self = this;
     self.rootElement = root;
+    $(root).addClass('jtox-toolkit'); // to make sure it is there even in manual initialization.
+    
     var newDefs = $.extend(true, { "configuration" : { "baseFeatures": baseFeatures} }, defaultSettings);
     self.settings = $.extend(true, {}, newDefs, jToxKit.settings, settings); // i.e. defaults from jToxDataset
     self.features = null; // features, as downloaded from server, after being processed.
@@ -959,35 +964,40 @@ var jToxDataset = (function () {
     return entry;
   };
   
+  cls.findSameAs = function (fid, features) {
+    // starting from the feature itself move to 'sameAs'-referred features, until sameAs is missing or points to itself
+    // This, final feature should be considered "main" and title and others taken from it.
+    var feature = features[fid];
+    var base = fid.replace(/(http.+\/feature\/).*/g, "$1");
+    var retId = fid;
+    
+    for (;;){
+      if (feature.sameAs === undefined || feature.sameAs == null || feature.sameAs == fid || fid == base + feature.sameAs)
+        break;
+      if (features[feature.sameAs] !== undefined)
+        retId = feature.sameAs;
+      else {
+        if (features[base + feature.sameAs] !== undefined)
+          retId = base + feature.sameAs;
+        else
+          break;
+      }
+      
+      feature = features[retId];
+    }
+    
+    return retId;
+  };
+  
   cls.processFeatures = function(features, bases) {
     if (bases == null)
       base = baseFeatures;
     features = $.extend(features, bases);
     for (var fid in features) {
-      // starting from the feature itself move to 'sameAs'-referred features, until sameAs is missing or points to itself
-      // This, final feature should be considered "main" and title and others taken from it.
-      var feature = features[fid];
-      var base = fid.replace(/(http.+\/feature\/).*/g, "$1");
       
-      for (;;){
-        if (feature.sameAs === undefined || feature.sameAs == null || feature.sameAs == fid || fid == base + feature.sameAs)
-          break;
-        if (features[feature.sameAs] !== undefined){
-          feature = features[feature.sameAs];
-          feature.originalId = fid;
-        }
-        else {
-          if (features[base + feature.sameAs] !== undefined) {
-            feature = features[base + feature.sameAs];
-            feature.originalId = fid;
-          }
-          else
-            break;
-        }
-      }
-
+      var sameAs = cls.findSameAs(fid, features);
       // now merge with this one... it copies everything that we've added, if we've reached to it. Including 'accumulate'
-      features[fid] = $.extend(features[fid], feature);
+      features[fid] = $.extend(features[fid], features[sameAs], { originalId: fid });
     }
     
     return features;
@@ -1043,6 +1053,7 @@ var jToxStudy = (function () {
     var self = this;
     self.rootElement = root;
     self.suffix = '_' + instanceCount++;
+    $(root).addClass('jtox-toolkit'); // to make sure it is there even in manual initialization.
     
     self.settings = $.extend({}, defaultSettings, jToxKit.settings, settings); // i.e. defaults from jToxStudy
     // now we have our, local copy of settings.
@@ -1635,7 +1646,7 @@ var jToxStudy = (function () {
             
            ccLib.fillTree(self.rootElement, substance);
            // go and query for the reference query
-           jToxKit.call(self, substance.referenceSubstance.uri, function (dataset){
+            (self, substance.referenceSubstance.uri, function (dataset){
              if (!!dataset) {
               jToxDataset.processDataset(dataset, null, fnDatasetValue);
               ccLib.fillTree(rootTab, dataset.dataEntry[0]);
