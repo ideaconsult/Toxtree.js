@@ -442,7 +442,7 @@ var jToxDataset = (function () {
       var emptyList = [];
       var idx = 0;
       for (var gr in self.groups) {
-        var grId = "jtox-ds-" + gr + "-" + self.instanceNo;
+        var grId = "jtox-ds-" + gr.replace(/\s/g, "_") + "-" + self.instanceNo;
         createATab(grId, gr.replace(/_/g, " "));
         
         // now prepare the content...
