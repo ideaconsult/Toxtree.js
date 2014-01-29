@@ -364,10 +364,10 @@ var jToxDataset = (function () {
   	"http://www.opentox.org/api/1.1#SMILES": {title: "SMILES", accumulate: "compound.smiles", used: true, shorten: true},
   	"http://www.opentox.org/api/dblinks#CMS": {title: "CMS", used: true},
   	"http://www.opentox.org/api/dblinks#ChEBI": {title: "ChEBI", used: true},
-  	"http://www.opentox.org/api/dblinks#Pubchem": {title: "Public Chem", used: true},
-  	"http://www.opentox.org/api/dblinks#ChemSpider": {title: "Chem Spider", used: true},
+  	"http://www.opentox.org/api/dblinks#Pubchem": {title: "PubChem", used: true},
+  	"http://www.opentox.org/api/dblinks#ChemSpider": {title: "ChemSpider", used: true},
   	"http://www.opentox.org/api/dblinks#ChEMBL": {title: "ChEMBL", used: true},
-  	"http://www.opentox.org/api/dblinks#ToxbankWiki": {title: "Toxban Wiki", used: true},
+  	"http://www.opentox.org/api/dblinks#ToxbankWiki": {title: "Toxbank Wiki", used: true},
   };
   var instanceCount = 0;
 
