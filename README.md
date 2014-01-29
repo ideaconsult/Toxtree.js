@@ -187,6 +187,7 @@ Parameters that can be passed either with data-XXX attributes or when initialize
 - `showExport` (attr. `data-show-export`), _optional_: Determines if the **Export** tab should be added to the right of feature-tabs, filled with possible export parameters. If `showTabs` is false, this has not effect, of course. Default: *true*.
 - `showControls` (attr. `data-show-controls`), _optional_: Determines whether to show the block with filter and pagination controls, which include: information for current view items, dropdown menu for choosing the page size, next and previous page and filtering box. Default: *true*.
 - `metricFeature` (attr. `data-metric-feature`), _optional_: The ID of the feature that should be used, when 'metric' field is present in the dataset. Default: *http://www.opentox.org/api/1.1#Similarity*.
+- `fnAccumulate` (attr. `data-fn-accumulate`), _optional_: The function that should be called during dataset entries' processing, when several values need to be accumulated in the same place. The format of the function is `function fnAccumulate(featureId, oldValue, newValue)`. The default one is concatenating the passed values as comma-separated string.
 - `pageStart` (attr. `data-page-start`), _optional_: From which item the referenced dataset should be visualized. Counted from 0. Default: *0*.
 - `pageSize` (attr. `data-page-size`), _optional_: initial page size for queries - can later be changed either with `queryEntries()` call, or with dropdown menu, if visible. Default: *20*.
 

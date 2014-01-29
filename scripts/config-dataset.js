@@ -19,7 +19,40 @@ var config_dataset = {
 	        },
 		"http://www.wikipathways.org/index.php/Pathway" :  {
 			"title": "Wiki Pathways",
-			"accumulate" : "compound.wikipathway"
+			"accumulate" : "compound.wikipathway",
+			"render" : function(col) {
+				col["mRender"] = function(data, type, full) {
+					return (type != "display") ? "-" : full.compound.wikipathway;
+				};
+				return col;
+			}
+		},
+		 "http://www.opentox.org/echaEndpoints.owl#Carcinogenicity" : {
+                        "title": "Carcinogenicity",
+                        "accumulate" : "compound.carcinogenicity",
+                        "render" : function(col) {
+                                col["mRender"] = function(data, type, full) {
+                                        return (type != "display") ? "-" : (
+                                                (data=="active")?("<span style='color:red'>"+data+"</span>"):data
+                                        );
+                                };
+                                return col;
+                        }
+
+                },
+
+		"http://www.opentox.org/echaEndpoints.owl#Mutagenicity" : {
+			"title": "Mutagenicity",
+                        "accumulate" : "compound.mutagenicity",
+			"render" : function(col) {
+                                col["mRender"] = function(data, type, full) {
+                                        return (type != "display") ? "-" : (
+						(data=="active")?("<span style='color:red'>"+data+"</span>"):data
+					);
+                                };
+                                return col;
+                        }
+
 		}
 	    },
 	    "groups": {
