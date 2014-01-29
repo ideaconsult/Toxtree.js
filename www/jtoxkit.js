@@ -735,6 +735,9 @@ var jToxDataset = (function () {
       self.groups = {};
       for (var i in grps){
         var grp = grps[i];
+        if (ccLib.isNull(grp))
+          continue;
+          
         var grpArr = (typeof grp == "function" || typeof grp == "string") ? ccLib.fireCallback(grp, self, i, miniset) : grp;
         self.groups[i] = grpArr;
         ccLib.enumObject(grpArr, function(fid, idx){ if (idx != "name") self.features[fid].used = true; })
