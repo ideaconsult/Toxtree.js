@@ -513,7 +513,7 @@ var jToxDataset = (function () {
       var self = this;
       var feature = self.features[fId];
       if (feature.accumulate !== undefined)
-        return ccLib.getJsonValue(data, feature.accumulate)
+        return ccLib.getJsonValue(data, $.isArray(feature.accumulate) ? feature.accumulate[0] : feature.accumulate);
       else
         return data.values[fId];
     },
