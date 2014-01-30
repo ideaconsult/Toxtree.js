@@ -14,6 +14,7 @@
     <script type='text/javascript' src='http://apps.ideaconsult.net:8080/ambit2/jquery/jquery-1.7.1.min.js'></script>
 	<script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js'></script>
 	<script type='text/javascript' charset='utf8' src='http://apps.ideaconsult.net:8080/ambit2/jquery/jquery.dataTables-1.9.4.min.js'></script>
+<script type='text/javascript' src='http://apps.ideaconsult.net:8080/ambit2/jquery/purl.js'></script>
 
   <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/black-tie/jquery-ui.min.css" type="text/css">
 	<link rel="stylesheet" href="http://apps.ideaconsult.net:8080/ambit2/style/jquery.dataTables.css" type="text/css">
@@ -28,7 +29,10 @@
 <script type='text/javascript'>
 
 	$(document).ready(function() {
-      		var dataset_uri = "http://apps.ideaconsult.net:8080/ambit2/dataset/1967115";
+	var purl = $.url();
+	var dataset_uri = purl.param('dataset_uri')===undefined?'http://apps.ideaconsult.net:8080/ambit2/dataset/1967255':purl.param('dataset_uri');
+
+      		//var dataset_uri = "http://apps.ideaconsult.net:8080/ambit2/dataset/1967255";
 	  	var ds = new jToxDataset($(".jtox-toolkit")[0],config_dataset);
         	ds.queryDataset(dataset_uri);
 	});
@@ -121,7 +125,8 @@ var config_dataset = {
 						);
 			},				
 			"render" : function(col) {
-				var root = "http://apps.ideaconsult.net:8080/ambit2/ui/_dataset?dataset_uri=";
+				//var root = "http://apps.ideaconsult.net:8080/ambit2/ui/_dataset?dataset_uri=";
+				var root = "http://ideaconsult.github.io/Toxtree.js?dataset_uri=";
 				col["mData"] = "compound.wikipathway";
 				col["mRender"] = function(data, type, full) {
 	
@@ -133,7 +138,7 @@ var config_dataset = {
 
 						var q =  'http://apps.ideaconsult.net:8080/ambit2/query/compound/search/all?search='+
 							encodeURIComponent(fvalue.value) + 
-							"&feature_uris[]=http://apps.ideaconsult.net:8080/ambit2/dataset/1967115/feature";
+							"&feature_uris[]=http://apps.ideaconsult.net:8080/ambit2/dataset/1967255/feature";
 						sOut += '<a href="'+ root + encodeURIComponent(q)+'" title="Structures participating in this pathway">'+
 							'<span class="ui-icon ui-icon-search" style="float: right; margin-right: .3em;"></span>'+
 							'</a>';
