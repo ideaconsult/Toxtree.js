@@ -5,21 +5,21 @@
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>Toxtree.js by ideaconsult</title>
 
-<!--
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    -->
+	<link rel="stylesheet" href="http://apps.ideaconsult.net:8080/ambit2/style/skeleton/base.css" type="text/css">
+	<link rel="stylesheet" href="http://apps.ideaconsult.net:8080/ambit2/style/skeleton/skeleton-fluid.css" type="text/css">
+	<link rel="stylesheet" href="http://apps.ideaconsult.net:8080/ambit2/style/skeleton/layout.css" type="text/css">
+
+    
+    
     <script type='text/javascript' src='http://apps.ideaconsult.net:8080/ambit2/jquery/jquery-1.7.1.min.js'></script>
-	<script type='text/javascript' src='http://apps.ideaconsult.net:8080/ambit2/jquery/jquery-ui-1.8.18.custom.min.js'></script>
+	<script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js'></script>
 	<script type='text/javascript' charset='utf8' src='http://apps.ideaconsult.net:8080/ambit2/jquery/jquery.dataTables-1.9.4.min.js'></script>
 
-  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/pepper-grinder/jquery-ui.min.css" type="text/css">
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/black-tie/jquery-ui.min.css" type="text/css">
 	<link rel="stylesheet" href="http://apps.ideaconsult.net:8080/ambit2/style/jquery.dataTables.css" type="text/css">
 
   <link rel="shortcut icon" href="http://apps.ideaconsult.net:8080/ambit2/images/favicon.ico">
     
- <script type='text/javascript' src='http://apps.ideaconsult.net:8080/ambit2/scripts/config-dataset.js'></script>
  <script type='text/javascript' src='http://apps.ideaconsult.net:8080/ambit2/scripts/jtoxkit.js'></script>
     
 
@@ -41,6 +41,21 @@
   <body>
 
 
+<div class="container" style="margin:0;padding:0;">
+
+<div class="row half-bottom" style="margin-left:10px;margin-right:20px;padding:ppx;">
+	<div class="one column">&nbsp;</div>
+	<div class="fourteen columns">
+	<h3>Demo</h3>
+	</div>
+	<div class="one column">&nbsp;</div>
+</div>	
+<div class="row" style="margin-left:10px;margin-right:20px;padding:ppx;">
+
+<div class="one column">&nbsp;</div>
+
+<div class="fourteen columns ">
+
 <div class="jtox-toolkit" data-kit="dataset" 
 	data-manual-init="yes" 
 	data-show-features="yes" 
@@ -48,8 +63,14 @@
 	data-show-export="yes" 
 	data-jsonp="true"></div>
 
+<div class="one column">&nbsp;</div>
 
+</div>
 
+<!--container -->
+</div>
+
+</div>
 
     <script src="javascripts/scale.fix.js"></script>
               <script type="text/javascript">
@@ -62,6 +83,86 @@
             pageTracker._trackPageview();
             } catch(err) {}
           </script>
+
+<script>
+var config_dataset = {
+	
+	"configuration": {
+	   "baseFeatures": {
+	        "http://www.opentox.org/api/1.1#Diagram": {
+	            "title" : "Structure diagram",
+	            "render" : function(col) {
+	          	    col["mData"] = "compound.diagramUri";
+	                col["mRender"] = function(data, type, full) {
+	                  return (type != "display") ? "-" :
+	                	  (
+	                	  //'<input type="checkbox" name="cmp" value="'+full.compound.URI+'"> '+
+	                	  '<a target="_blank" href="' + full.compound.URI + '"><img src="' + data + '" class="jtox-ds-smalldiagram"/></a>'
+	                	  //'<a target="_blank" href="' + full.compound.URI + '"><img src="http://localhost:8080/ambit2/model/3?media=image/png&dataset_uri=' + full.compound.URI + '" class="jtox-ds-smalldiagram"/></a>'
+	                	  );
+	                };
+	                col["sClass"] = "paddingless";
+	                return col;
+	            }
+	        },
+    
+		"http://www.wikipathways.org/index.php/Pathway" :  {
+			"title": "Wiki Pathways",
+			"accumulate" : "compound.wikipathway",
+			"process" : function(entry, featureId, features) {
+				if (ccLib.isNull(entry.compound.wikipathway)) entry.compound.wikipathway = [];
+				if ( entry.values[featureId]!= undefined)
+					entry.compound.wikipathway.push(
+						{
+						"uri"	: featureId,
+						"title" : features[featureId].originalTitle,	
+						"value" : entry.values[featureId]	
+						}
+						);
+			},				
+			"render" : function(col) {
+				var root = "http://apps.ideaconsult.net:8080/ambit2/ui/_dataset?dataset_uri=";
+				col["mData"] = "compound.wikipathway";
+				col["mRender"] = function(data, type, full) {
+	
+					if (type != "display") return "-";
+					var sOut = "<ul>";
+					$.each(data,function(index,fvalue) {
+						sOut += '<li><a href="'+fvalue.title+ '" title="'+fvalue.title+'" target="wp">' 
+						+ fvalue.value + '</a> ';
+
+						var q =  'http://apps.ideaconsult.net:8080/ambit2/query/compound/search/all?search='+
+							encodeURIComponent(fvalue.value) + 
+							"&feature_uris[]=http://apps.ideaconsult.net:8080/ambit2/dataset/1967115/feature";
+						sOut += '<a href="'+ root + encodeURIComponent(q)+'" title="Structures participating in this pathway">'+
+							'<span class="ui-icon ui-icon-search" style="float: right; margin-right: .3em;"></span>'+
+							'</a>';
+						sOut += "</li>";
+					});
+					sOut += "</ul>";	
+	                	return sOut;
+	        	        };
+		            return col;    
+			}	
+		}
+	    },
+	    "groups": {
+	          "Identifiers": [
+	    				  "http://www.opentox.org/api/1.1#Diagram" ,
+	    				  "http://www.opentox.org/api/1.1#ChemicalName"
+	          ],
+	          "Names" : null,
+	          "InChI" : [
+	             "http://www.opentox.org/api/1.1#InChIKey",
+	             "http://www.opentox.org/api/1.1#InChI"	  		    				  	          	          
+	          ],
+	          "Calculated" : [
+	          ]	
+	          
+        }
+	}    
+}	
+</script>
 
   </body>
 </html>
