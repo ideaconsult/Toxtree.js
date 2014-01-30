@@ -187,7 +187,7 @@ Parameters that can be passed either with data-XXX attributes or when initialize
 - `showExport` (attr. `data-show-export`), _optional_: Determines if the **Export** tab should be added to the right of feature-tabs, filled with possible export parameters. If `showTabs` is false, this has not effect, of course. Default: *true*.
 - `showControls` (attr. `data-show-controls`), _optional_: Determines whether to show the block with filter and pagination controls, which include: information for current view items, dropdown menu for choosing the page size, next and previous page and filtering box. Default: *true*.
 - `metricFeature` (attr. `data-metric-feature`), _optional_: The ID of the feature that should be used, when 'metric' field is present in the dataset. Default: *http://www.opentox.org/api/1.1#Similarity*.
-- `fnAccumulate` (attr. `data-fn-accumulate`), _optional_: The function that should be called during dataset entries' processing, when several values need to be accumulated in the same place. The format of the function is `function fnAccumulate(featureId, oldValue, newValue)`. The default one is concatenating the passed values as comma-separated string.
+- `fnAccumulate` (attr. `data-fn-accumulate`), _optional_: The function that should be called during dataset entries' processing, when several values need to be accumulated in the same place. The format of the function is `function fnlocation(featureId, oldValue, newValue, features)`. The default one is concatenating the passed values as comma-separated string.
 - `pageStart` (attr. `data-page-start`), _optional_: From which item the referenced dataset should be visualized. Counted from 0. Default: *0*.
 - `pageSize` (attr. `data-page-size`), _optional_: initial page size for queries - can later be changed either with `queryEntries()` call, or with dropdown menu, if visible. Default: *20*.
 
@@ -243,9 +243,10 @@ And, finally - another key aspect that can be reconfigured is default features d
 "baseFeatures": {
 	"<featureId": {
 		title: "<readable title>", 
-		accumulate: "<location in data entry to store accumulated values during processing>",
-		search: "true | false", // is this feature searchable
-		used: "true | false", // put true if you want to make sure it won't show up on Other tab
+		location: "<location in data entry to store locationd values during processing>",
+		accumulate: true | false, // whether value of this feature need to be accumulated
+		search: true | false, // is this feature searchable
+		used: true | false, // put true if you want to make sure it won't show up on Other tab
 		process: "function name | definition to be called during feature preparation",
 		render: "<function name | definition to be called when dataTables columns are created>",
 	},
@@ -253,18 +254,18 @@ And, finally - another key aspect that can be reconfigured is default features d
 }
 ```
 
-The only two that need more explanation are _accumulate_, _process_ and _render_. The first one is used to determine where in the data entry the value for this feature is stored and/or should be accumulated. For example in those two:
+The only properties that need more explanation are _location_, _accumulate_, _process_ and _render_. The first one is used to determine where in the data entry the value for this feature is stored and/or should be written. For example in those two:
 
 ```
-"http://www.opentox.org/api/1.1#CASRN" : { title: "CAS", accumulate: "compound.cas"},
-"http://www.opentox.org/api/1.1#TradeName" : {title: "Trade Name", accumulate: "compound.tradename"}
+"http://www.opentox.org/api/1.1#CASRN" : { title: "CAS", location: "compound.cas"},
+"http://www.opentox.org/api/1.1#TradeName" : {title: "Trade Name", location: "compound.tradename"}
 ```
 
-this property shows that all features that are _sameAs_ **CASRN** (or **TradeName**) should accumulate their values in `compound.cas`. This is the place that later the values will be searched too.
+this property shows that all features that are _sameAs_ **CASRN** (or **TradeName**) should location their values in `compound.cas`. This is the place that later the values will be searched too. The second property - `accumulate` determines whether such accumulation (via `fnAccumulate` function) should happen at all, or just the rendering engine will search for the value in the specified location.
 
-The second property - `process` is used during dataset pre-processing and is of form `function process(entry, featureId)` and is called for each 
+The third property - `process` is used during dataset pre-processing and is of form `function process(entry, featureId, features)` and is called for each feature in the set.
 
-The third property - `render` gives wider possibilities while preparing the table - it identifies a function of the following format: `function render(column)`, where _column_ is the column definition for this feature built so far (most probably - _sTitle_ put, etc.). This is dataTable column definition, that can be altered in any desired way, includin it's _mRender_ property. 
+The last property - `render` gives wider possibilities while preparing the table - it identifies a function of the following format: `function render(column, featureId)`, where _column_ is the column definition for this feature built so far (most probably - _sTitle_ put, etc.). This is dataTable column definition, that can be altered in any desired way, includin it's _mRender_ property. 
 
 In the full configuration, shown below example of using last two can be seen for _Diagram_ property.
 
@@ -336,7 +337,7 @@ In the full configuration, shown below example of using last two can be seen for
       ],
 
       "baseFeatures": {
-      	"http://www.opentox.org/api/1.1#Similarity": {title: "Similarity", accumulate: "compound.metric", search: true, used: true},
+      	"http://www.opentox.org/api/1.1#Similarity": {title: "Similarity", location: "compound.metric", search: true, used: true},
       	"http://www.opentox.org/api/1.1#Diagram": {title: "Diagram", search: false, used: true, 
       	  process: function(entry) {
             entry.compound.diagramUri = entry.compound.URI.replace(/(.+)(\/conformer.*)/, "$1") + "?media=image/png";
@@ -370,13 +371,13 @@ Only the first parameter `dataset` is required and it is the downloaded dataset,
 ```
 jToxDataset.processFeatures(features)
 ```
-Very important function in unified feature processing. It traverses all reported features, merging those that mean one and the same thing, as reported by their `sameAs` parameter, also takes care of predefined features that can instruct it to "accumulate" certain feature value inside the dataset entry, itself. This is called internally by `processDataset()` or should be called if `features` parameter is passed to the later.
+Very important function in unified feature processing. It traverses all reported features, merging those that mean one and the same thing, as reported by their `sameAs` parameter, also takes care of predefined features that can instruct it to "location" certain feature value inside the dataset entry, itself. This is called internally by `processDataset()` or should be called if `features` parameter is passed to the later.
 
 
 ```
 jToxDataset.processEntry(entry, features, fnValue)
 ```
-Used extensively during dataset preprocessing. When traversing the dataset, each `entry` is passed with already preprocessed `features` so that features that need to have their values extracted and set separately _are_ processed here. Also, if several features are setup to accumulate their values in same entry's property - it is also done here. `fnValue` function (the same passed to `processDataset()`) can participate in the process, it has the following definition: `fnValue(oldValue, newValue)`.
+Used extensively during dataset preprocessing. When traversing the dataset, each `entry` is passed with already preprocessed `features` so that features that need to have their values extracted and set separately _are_ processed here. Also, if several features are setup to location their values in same entry's property - it is also done here. `fnValue` function (the same passed to `processDataset()`) can participate in the process, it has the following definition: `fnValue(oldValue, newValue)`.
 
 ```
 jToxDataset.shortFeatureId(featureId)

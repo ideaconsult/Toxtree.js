@@ -19,7 +19,8 @@ var config_dataset = {
 	        },
 		"http://www.wikipathways.org/index.php/Pathway" :  {
 			"title": "Wiki Pathways",
-			"accumulate" : "compound.wikipathway",
+			"location" : "compound.wikipathway",
+			"accumulate": true,
 			"render" : function(col) {
 				col["mRender"] = function(data, type, full) {
 					return (type != "display") ? "-" : full.compound.wikipathway;
@@ -29,7 +30,8 @@ var config_dataset = {
 		},
 		 "http://www.opentox.org/echaEndpoints.owl#Carcinogenicity" : {
                         "title": "Carcinogenicity",
-                        "accumulate" : "compound.carcinogenicity",
+                        "location" : "compound.carcinogenicity",
+                        "accumulate": true,
                         "render" : function(col) {
                                 col["mRender"] = function(data, type, full) {
                                         return (type != "display") ? "-" : (
@@ -43,7 +45,8 @@ var config_dataset = {
 
 		"http://www.opentox.org/echaEndpoints.owl#Mutagenicity" : {
 			"title": "Mutagenicity",
-                        "accumulate" : "compound.mutagenicity",
+      "location" : "compound.mutagenicity",
+			"accumulate": true,
 			"render" : function(col) {
                                 col["mRender"] = function(data, type, full) {
                                         return (type != "display") ? "-" : (

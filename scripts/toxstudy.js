@@ -19,7 +19,7 @@ var jToxStudy = (function () {
   };    // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
   var instanceCount = 0;
   
-  var fnDatasetValue = function (old, value){
+  var fnDatasetValue = function (fid, old, value, features){
 		return ccLib.extendArray(old, value != null ? value.trim().toLowerCase().split("|") : [value]).filter(ccNonEmptyFilter);
   };
   
@@ -621,7 +621,7 @@ var jToxStudy = (function () {
             
            ccLib.fillTree(self.rootElement, substance);
            // go and query for the reference query
-            (self, substance.referenceSubstance.uri, function (dataset){
+           jToxKit.call(self, substance.referenceSubstance.uri, function (dataset){
              if (!!dataset) {
               jToxDataset.processDataset(dataset, null, fnDatasetValue);
               ccLib.fillTree(rootTab, dataset.dataEntry[0]);

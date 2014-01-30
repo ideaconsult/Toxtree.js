@@ -12,7 +12,7 @@ var jToxDataset = (function () {
     "pageSize": 20,           // what is the default (startint) page size.
     "pageStart": 0,           // what is the default startint point for entries retrieval
     "metricFeature": "http://www.opentox.org/api/1.1#Similarity",   // This is the default metric feature, if no other is specified
-    "fnAccumulate": function(fId, oldVal, newVal) {
+    "fnAccumulate": function(fId, oldVal, newVal, features) {
       if (ccLib.isNull(newVal))
         return oldVal;
       newVal = newVal.toString();
@@ -92,7 +92,7 @@ var jToxDataset = (function () {
       	  process: function(entry) {
             entry.compound.diagramUri = entry.compound.URI.replace(/(.+)(\/conformer.*)/, "$1") + "?media=image/png";
       	  },
-      	  render: function(col){
+      	  render: function(col, fId){
       	    col["mData"] = "compound.diagramUri";
             col["mRender"] = function(data, type, full) {
               return (type != "display") ? "-" : '<a target="_blank" href="' + full.compound.URI + '"><img src="' + data + '" class="jtox-ds-smalldiagram"/></a>';
@@ -102,36 +102,36 @@ var jToxDataset = (function () {
             return col;
         	}
       	},
-      	"http://www.opentox.org/api/1.1#Similarity": {title: "Similarity", accumulate: "compound.metric", search: true, used: true},
+      	"http://www.opentox.org/api/1.1#Similarity": {title: "Similarity", location: "compound.metric", search: true, used: true},
       }
     }
   };
 
-  /* define the standard features-synonymes, working with 'sameAs' property. Beside the title we define the 'accumulate' property
-  as well which is used in processEntry() to accumulate value(s) from given (synonym) properties into specific property of the compound entry itself.
-  'accumulate' can be an array, which results in adding value to several places.
+  /* define the standard features-synonymes, working with 'sameAs' property. Beside the title we define the 'location' property
+  as well which is used in processEntry() to location value(s) from given (synonym) properties into specific property of the compound entry itself.
+  'location' can be an array, which results in adding value to several places.
   */
   var baseFeatures = {
-    "http://www.opentox.org/api/1.1#REACHRegistrationDate" : { title: "REACH Date", accumulate: "compound.reachdate", used: true},
-    "http://www.opentox.org/api/1.1#CASRN" : { title: "CAS", accumulate: "compound.cas", used: true},
-  	"http://www.opentox.org/api/1.1#ChemicalName" : { title: "Name", accumulate: "compound.name", used: true},
-  	"http://www.opentox.org/api/1.1#TradeName" : {title: "Trade Name", accumulate: "compound.tradename", used: true},
-  	"http://www.opentox.org/api/1.1#IUPACName": {title: "IUPAC Name", accumulate: ["compound.name", "compound.iupac"], used: true},
-  	"http://www.opentox.org/api/1.1#EINECS": {title: "EINECS", accumulate: "compound.einecs", used: true},
-    "http://www.opentox.org/api/1.1#InChI": {title: "InChI", accumulate: "compound.inchi", used: true, shorten: true},
-  	"http://www.opentox.org/api/1.1#InChI_std": {title: "InChI", accumulate: "compound.inchi", used: true, shorten: true},
-    "http://www.opentox.org/api/1.1#InChIKey": {title: "InChI Key", accumulate: "compound.inchikey", used: true},
-  	"http://www.opentox.org/api/1.1#InChIKey_std": {title: "InChI Key", accumulate: "compound.inchikey", used: true},
-    "http://www.opentox.org/api/1.1#InChI_AuxInfo": {title: "InChI Aux", accumulate: "compound.inchi", used: true},
-  	"http://www.opentox.org/api/1.1#InChI_AuxInfo_std": {title: "InChI Aux", accumulate: "compound.inchi", used: true},
-  	"http://www.opentox.org/api/1.1#IUCLID5_UUID": {title: "IUCLID5 UUID", accumulate: "compound.i5uuid", used: true, shorten: true},
-  	"http://www.opentox.org/api/1.1#SMILES": {title: "SMILES", accumulate: "compound.smiles", used: true, shorten: true},
-  	"http://www.opentox.org/api/dblinks#CMS": {title: "CMS", used: true},
-  	"http://www.opentox.org/api/dblinks#ChEBI": {title: "ChEBI", used: true},
-  	"http://www.opentox.org/api/dblinks#Pubchem": {title: "PubChem", used: true},
-  	"http://www.opentox.org/api/dblinks#ChemSpider": {title: "ChemSpider", used: true},
-  	"http://www.opentox.org/api/dblinks#ChEMBL": {title: "ChEMBL", used: true},
-  	"http://www.opentox.org/api/dblinks#ToxbankWiki": {title: "Toxbank Wiki", used: true},
+    "http://www.opentox.org/api/1.1#REACHRegistrationDate" : { title: "REACH Date", location: "compound.reachdate", used: true, accumulate: true},
+    "http://www.opentox.org/api/1.1#CASRN" : { title: "CAS", location: "compound.cas", used: true, accumulate: true},
+  	"http://www.opentox.org/api/1.1#ChemicalName" : { title: "Name", location: "compound.name", used: true, accumulate: true},
+  	"http://www.opentox.org/api/1.1#TradeName" : {title: "Trade Name", location: "compound.tradename", used: true, accumulate: true},
+  	"http://www.opentox.org/api/1.1#IUPACName": {title: "IUPAC Name", location: ["compound.name", "compound.iupac"], used: true, accumulate: true},
+  	"http://www.opentox.org/api/1.1#EINECS": {title: "EINECS", location: "compound.einecs", used: true, accumulate: true},
+    "http://www.opentox.org/api/1.1#InChI": {title: "InChI", location: "compound.inchi", used: true, shorten: true, accumulate: true},
+  	"http://www.opentox.org/api/1.1#InChI_std": {title: "InChI", location: "compound.inchi", used: true, shorten: true, accumulate: true},
+    "http://www.opentox.org/api/1.1#InChIKey": {title: "InChI Key", location: "compound.inchikey", used: true, accumulate: true},
+  	"http://www.opentox.org/api/1.1#InChIKey_std": {title: "InChI Key", location: "compound.inchikey", used: true, accumulate: true},
+    "http://www.opentox.org/api/1.1#InChI_AuxInfo": {title: "InChI Aux", location: "compound.inchi", used: true, accumulate: true},
+  	"http://www.opentox.org/api/1.1#InChI_AuxInfo_std": {title: "InChI Aux", location: "compound.inchi", used: true, accumulate: true},
+  	"http://www.opentox.org/api/1.1#IUCLID5_UUID": {title: "IUCLID5 UUID", location: "compound.i5uuid", used: true, shorten: true, accumulate: true},
+  	"http://www.opentox.org/api/1.1#SMILES": {title: "SMILES", location: "compound.smiles", used: true, shorten: true, accumulate: true},
+  	"http://www.opentox.org/api/dblinks#CMS": {title: "CMS", used: true, accumulate: true},
+  	"http://www.opentox.org/api/dblinks#ChEBI": {title: "ChEBI", used: true, accumulate: true},
+  	"http://www.opentox.org/api/dblinks#Pubchem": {title: "PubChem", used: true, accumulate: true},
+  	"http://www.opentox.org/api/dblinks#ChemSpider": {title: "ChemSpider", used: true, accumulate: true},
+  	"http://www.opentox.org/api/dblinks#ChEMBL": {title: "ChEMBL", used: true, accumulate: true},
+  	"http://www.opentox.org/api/dblinks#ToxbankWiki": {title: "Toxbank Wiki", used: true, accumulate: true},
   };
   var instanceCount = 0;
 
@@ -276,8 +276,8 @@ var jToxDataset = (function () {
     featureValue: function (fId, data) {
       var self = this;
       var feature = self.features[fId];
-      if (feature.accumulate !== undefined)
-        return ccLib.getJsonValue(data, $.isArray(feature.accumulate) ? feature.accumulate[0] : feature.accumulate);
+      if (feature.location !== undefined)
+        return ccLib.getJsonValue(data, $.isArray(feature.location) ? feature.location[0] : feature.location);
       else
         return data.values[fId];
     },
@@ -408,8 +408,8 @@ var jToxDataset = (function () {
             "sDefaultContent": "-",
           };
           
-          if (feature.accumulate !== undefined)
-            col["mData"] = feature.accumulate;
+          if (feature.location !== undefined)
+            col["mData"] = feature.location;
           else {
             col["mData"] = 'values';
             col["mRender"] = (function(featureId) { return function(data, type, full) { var val = data[featureId]; return ccLib.isEmpty(val) ? '-' : val }; })(fId);
@@ -417,7 +417,7 @@ var jToxDataset = (function () {
           
           // some special cases, like diagram
           if (feature.render !== undefined) 
-            col = ccLib.fireCallback(feature.render, self, col);
+            col = ccLib.fireCallback(feature.render, self, col, fId);
           
           if (!!feature.shorten) {
             col["mRender"] = function(data, type, full) {
@@ -699,27 +699,21 @@ var jToxDataset = (function () {
   cls.processEntry = function (entry, features, fnValue) {
     for (var fid in features) {
       var feature = features[fid];
+      var newVal = entry.values[fid];
       
-      // if applicable - accumulate the feature value to a specific location whithin the entry
-      if (entry.values[fid] !== undefined && feature.accumulate !== undefined) {
-        var accArr = feature.accumulate;
+      
+      // if applicable - location the feature value to a specific location whithin the entry
+      if (!!feature.accumulate && newVal !== undefined && feature.location !== undefined) {
+        var accArr = feature.location;
         if (!$.isArray(accArr))
           accArr = [accArr];
         
-        for (var v = 0; v < accArr.length; ++v){
-          var oldVal = ccLib.getJsonValue(entry, accArr[v]);
-          var newVal = entry.values[fid];
-          if (!ccLib.isNull(fnValue))
-            ccLib.setJsonValue(entry, accArr[v], ccLib.fireCallback(fnValue, null, fid, oldVal, newVal));
-          else if (!$.isArray(oldVal))
-            ccLib.setJsonValue(entry, accArr[v], ccLib.isNull(oldVal) ? newVal : oldVal + newVal);
-          else
-            oldVal.push(newVal);
-        }
+        for (var v = 0; v < accArr.length; ++v)
+          ccLib.setJsonValue(entry, accArr[v], ccLib.fireCallback(fnValue, this, fid,  /* oldVal */ ccLib.getJsonValue(entry, accArr[v]), newVal, features));
       }
       
       if (feature.process !== undefined)
-        ccLib.fireCallback(feature.process, self, entry, fid);
+        ccLib.fireCallback(feature.process, this, entry, fid, features);
     }
     
     return entry;
@@ -752,12 +746,12 @@ var jToxDataset = (function () {
   
   cls.processFeatures = function(features, bases) {
     if (bases == null)
-      base = baseFeatures;
+      bases = baseFeatures;
     features = $.extend(features, bases);
     for (var fid in features) {
       
       var sameAs = cls.findSameAs(fid, features);
-      // now merge with this one... it copies everything that we've added, if we've reached to it. Including 'accumulate'
+      // now merge with this one... it copies everything that we've added, if we've reached to it. Including 'location'
       features[fid] = $.extend(features[fid], features[sameAs], { originalId: fid });
     }
     
@@ -769,6 +763,9 @@ var jToxDataset = (function () {
       cls.processFeatures(dataset.feature);
       features = dataset.feature;
     }
+
+    if (ccLib.isNull(fnValue))
+      fnValue = cls.defaultSettings.fnAccumuate;
     
     if (!startIdx)
       startIdx = 0;
