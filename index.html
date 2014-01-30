@@ -25,15 +25,13 @@
 <link rel="stylesheet" href="http://apps.ideaconsult.net:8080/ambit2/style/jtoxkit.css"/>
 
 <script type='text/javascript'>
-	var purl = $.url();
-	var dataset_uri = purl.param('dataset_uri')===undefined?'http://apps.ideaconsult.net:8080/ambit2/query/similarity?search=c1ccccc1':purl.param('dataset_uri');
-			
+
 	$(document).ready(function() {
-      var dataset_uri = "http://apps.ideaconsult.net:8080/ambit2/dataset/1967115";
+      		var dataset_uri = "http://apps.ideaconsult.net:8080/ambit2/dataset/1967115";
 	  	var ds = new jToxDataset($(".jtox-toolkit")[0],config_dataset);
-        ds.queryDataset(dataset_uri);
+        	ds.queryDataset(dataset_uri);
 	});
-	</script>
+</script>
 
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
