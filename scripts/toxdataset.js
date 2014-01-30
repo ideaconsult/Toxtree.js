@@ -85,7 +85,7 @@ var jToxDataset = (function () {
       "baseFeatures": {
       	// and one for unified way of processing diagram
       	"http://www.opentox.org/api/1.1#Diagram": {title: "Diagram", search: false,
-      	  process: function(entry) {
+      	  process: function(entry, fId, features) {
             entry.compound.diagramUri = entry.compound.URI.replace(/(.+)(\/conformer.*)/, "$1") + "?media=image/png";
       	  },
       	  render: function(col, fId){
@@ -703,7 +703,6 @@ var jToxDataset = (function () {
       var feature = features[fid];
       var newVal = entry.values[fid];
       
-      
       // if applicable - location the feature value to a specific location whithin the entry
       if (!!feature.accumulate && newVal !== undefined && feature.location !== undefined) {
         var accArr = feature.location;
@@ -754,7 +753,7 @@ var jToxDataset = (function () {
       
       var sameAs = cls.findSameAs(fid, features);
       // now merge with this one... it copies everything that we've added, if we've reached to it. Including 'location'
-      features[fid] = $.extend(features[fid], features[sameAs], { originalId: fid });
+      features[fid] = $.extend(features[fid], features[sameAs], { originalId: fid, originalTitle: features[fid].title });
     }
     
     return features;
