@@ -31,7 +31,7 @@
   <script language="javascript">
     $(document).ready(function(){
       var ds = new jToxDataset($(".jtox-toolkit")[0], {crossDomain: true, configuration: config_dataset } );
-      ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/dataset/10");
+      ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/dataset/18?feature_uris[]=http://apps.ideaconsult.net:8080/toxbank/model/6/predicted");
 /*       ds.queryDataset("http://apps.ideaconsult.net:8080/ambit2/dataset/1945542");  */
 /*       ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/query/similarity?search=c1ccccc1O&threshold=0.5"); */
 /*       ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/compound/8666?feature_uris[]=http://apps.ideaconsult.net:8080/toxbank/model/2/predicted");  */

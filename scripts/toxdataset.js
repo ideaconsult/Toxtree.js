@@ -48,10 +48,9 @@ var jToxDataset = (function () {
 
           for (var f in miniset.features) {
             var feat = miniset.features[f];
-            if (ccLib.isNull(feat.source) || ccLib.isNull(feat.source.type))
+            if (ccLib.isNull(feat.source) || ccLib.isNull(feat.source.type) || !!feat.basic)
               continue;
             else if (feat.source.type.toLowerCase() == "algorithm" || feat.source.type.toLowerCase() == "model") {
-              feat.used = true;
               arr.push(f);
             }
           }
@@ -61,11 +60,8 @@ var jToxDataset = (function () {
         "Other": function (name, miniset) {
           var arr = [];
           for (var f in miniset.features) {
-            var sameAs = jToxDataset.findSameAs(f, miniset.features);
-            if (!miniset.features[f].used && !miniset.features[sameAs].used) {
+            if (!miniset.features[f].used && !miniset.features[f].basic)
               arr.push(f);
-              miniset.features[sameAs].used = true;
-            }
           }
           return arr;
         }
@@ -88,7 +84,7 @@ var jToxDataset = (function () {
       // These are instance-wide pre-definitions of default baseFeatures as described below.
       "baseFeatures": {
       	// and one for unified way of processing diagram
-      	"http://www.opentox.org/api/1.1#Diagram": {title: "Diagram", search: false, used: true, 
+      	"http://www.opentox.org/api/1.1#Diagram": {title: "Diagram", search: false,
       	  process: function(entry) {
             entry.compound.diagramUri = entry.compound.URI.replace(/(.+)(\/conformer.*)/, "$1") + "?media=image/png";
       	  },
@@ -112,26 +108,26 @@ var jToxDataset = (function () {
   'location' can be an array, which results in adding value to several places.
   */
   var baseFeatures = {
-    "http://www.opentox.org/api/1.1#REACHRegistrationDate" : { title: "REACH Date", location: "compound.reachdate", used: true, accumulate: true},
-    "http://www.opentox.org/api/1.1#CASRN" : { title: "CAS", location: "compound.cas", used: true, accumulate: true},
-  	"http://www.opentox.org/api/1.1#ChemicalName" : { title: "Name", location: "compound.name", used: true, accumulate: true},
-  	"http://www.opentox.org/api/1.1#TradeName" : {title: "Trade Name", location: "compound.tradename", used: true, accumulate: true},
-  	"http://www.opentox.org/api/1.1#IUPACName": {title: "IUPAC Name", location: ["compound.name", "compound.iupac"], used: true, accumulate: true},
-  	"http://www.opentox.org/api/1.1#EINECS": {title: "EINECS", location: "compound.einecs", used: true, accumulate: true},
-    "http://www.opentox.org/api/1.1#InChI": {title: "InChI", location: "compound.inchi", used: true, shorten: true, accumulate: true},
-  	"http://www.opentox.org/api/1.1#InChI_std": {title: "InChI", location: "compound.inchi", used: true, shorten: true, accumulate: true},
-    "http://www.opentox.org/api/1.1#InChIKey": {title: "InChI Key", location: "compound.inchikey", used: true, accumulate: true},
-  	"http://www.opentox.org/api/1.1#InChIKey_std": {title: "InChI Key", location: "compound.inchikey", used: true, accumulate: true},
-    "http://www.opentox.org/api/1.1#InChI_AuxInfo": {title: "InChI Aux", location: "compound.inchi", used: true, accumulate: true},
-  	"http://www.opentox.org/api/1.1#InChI_AuxInfo_std": {title: "InChI Aux", location: "compound.inchi", used: true, accumulate: true},
-  	"http://www.opentox.org/api/1.1#IUCLID5_UUID": {title: "IUCLID5 UUID", location: "compound.i5uuid", used: true, shorten: true, accumulate: true},
-  	"http://www.opentox.org/api/1.1#SMILES": {title: "SMILES", location: "compound.smiles", used: true, shorten: true, accumulate: true},
-  	"http://www.opentox.org/api/dblinks#CMS": {title: "CMS", used: true, accumulate: true},
-  	"http://www.opentox.org/api/dblinks#ChEBI": {title: "ChEBI", used: true, accumulate: true},
-  	"http://www.opentox.org/api/dblinks#Pubchem": {title: "PubChem", used: true, accumulate: true},
-  	"http://www.opentox.org/api/dblinks#ChemSpider": {title: "ChemSpider", used: true, accumulate: true},
-  	"http://www.opentox.org/api/dblinks#ChEMBL": {title: "ChEMBL", used: true, accumulate: true},
-  	"http://www.opentox.org/api/dblinks#ToxbankWiki": {title: "Toxbank Wiki", used: true, accumulate: true},
+    "http://www.opentox.org/api/1.1#REACHRegistrationDate" : { title: "REACH Date", location: "compound.reachdate", accumulate: true, basic: true},
+    "http://www.opentox.org/api/1.1#CASRN" : { title: "CAS", location: "compound.cas", accumulate: true, basic: true},
+  	"http://www.opentox.org/api/1.1#ChemicalName" : { title: "Name", location: "compound.name", accumulate: true, basic: true},
+  	"http://www.opentox.org/api/1.1#TradeName" : {title: "Trade Name", location: "compound.tradename", accumulate: true, basic: true},
+  	"http://www.opentox.org/api/1.1#IUPACName": {title: "IUPAC Name", location: ["compound.name", "compound.iupac"], accumulate: true, basic: true},
+  	"http://www.opentox.org/api/1.1#EINECS": {title: "EINECS", location: "compound.einecs", accumulate: true, basic: true},
+    "http://www.opentox.org/api/1.1#InChI": {title: "InChI", location: "compound.inchi", shorten: true, accumulate: true, basic: true},
+  	"http://www.opentox.org/api/1.1#InChI_std": {title: "InChI", location: "compound.inchi", shorten: true, accumulate: true, used: true, basic: true},
+    "http://www.opentox.org/api/1.1#InChIKey": {title: "InChI Key", location: "compound.inchikey", accumulate: true, basic: true},
+  	"http://www.opentox.org/api/1.1#InChIKey_std": {title: "InChI Key", location: "compound.inchikey", accumulate: true, used: true, basic: true},
+    "http://www.opentox.org/api/1.1#InChI_AuxInfo": {title: "InChI Aux", location: "compound.inchi", accumulate: true, used: true, basic: true},
+  	"http://www.opentox.org/api/1.1#InChI_AuxInfo_std": {title: "InChI Aux", location: "compound.inchi", accumulate: true, used:true, basic: true},
+  	"http://www.opentox.org/api/1.1#IUCLID5_UUID": {title: "IUCLID5 UUID", location: "compound.i5uuid", shorten: true, accumulate: true, basic: true},
+  	"http://www.opentox.org/api/1.1#SMILES": {title: "SMILES", location: "compound.smiles", shorten: true, accumulate: true, basic: true},
+  	"http://www.opentox.org/api/dblinks#CMS": {title: "CMS", accumulate: true, basic: true},
+  	"http://www.opentox.org/api/dblinks#ChEBI": {title: "ChEBI", accumulate: true, basic: true},
+  	"http://www.opentox.org/api/dblinks#Pubchem": {title: "PubChem", accumulate: true, basic: true},
+  	"http://www.opentox.org/api/dblinks#ChemSpider": {title: "ChemSpider", accumulate: true, basic: true},
+  	"http://www.opentox.org/api/dblinks#ChEMBL": {title: "ChEMBL", accumulate: true, basic: true},
+  	"http://www.opentox.org/api/dblinks#ToxbankWiki": {title: "Toxbank Wiki", accumulate: true, basic: true},
   };
   var instanceCount = 0;
 
@@ -503,8 +499,14 @@ var jToxDataset = (function () {
           continue;
           
         var grpArr = (typeof grp == "function" || typeof grp == "string") ? ccLib.fireCallback(grp, self, i, miniset) : grp;
-        self.groups[i] = grpArr;
-        ccLib.enumObject(grpArr, function(fid, idx){ if (idx != "name") self.features[fid].used = true; })
+        self.groups[i] = [];
+        ccLib.enumObject(grpArr, function(fid, idx) { 
+          var sameAs = cls.findSameAs(fid, self.features);
+          if (!self.features[sameAs].used && !self.features[fid].used)
+            self.groups[i].push(fid);
+          if (idx != "name")
+            self.features[fid].used = self.features[sameAs].used = true;
+        });
       }
     },
     
