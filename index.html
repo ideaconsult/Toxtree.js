@@ -8,6 +8,33 @@
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    
+  <script type='text/javascript' src='http://apps.ideaconsult.net:8080/ambit2/jquery/jquery-1.7.1.min.js'></script>
+	<script type='text/javascript' src='http://apps.ideaconsult.net:8080/ambit2/jquery/jquery-ui-1.8.18.custom.min.js'></script>
+	<script type='text/javascript' charset='utf8' src='http://apps.ideaconsult.net:8080/ambit2/jquery/jquery.dataTables-1.9.4.min.js'></script>
+
+  <link rel="stylesheet" href="http://apps.ideaconsult.net:8080/ambit2/style/jquery-ui-1.8.18.custom.css" type="text/css">
+	<link rel="stylesheet" href="http://apps.ideaconsult.net:8080/ambit2/style/jquery.dataTables.css" type="text/css">
+
+  <link rel="shortcut icon" href="http://apps.ideaconsult.net:8080/ambit2/images/favicon.ico">
+    
+ <script type='text/javascript' src='http://apps.ideaconsult.net:8080/ambit2/scripts/config-dataset.js'></script>
+ <script type='text/javascript' src='http://apps.ideaconsult.net:8080/ambit2/scripts/jtoxkit.js'></script>
+    
+
+<link rel="stylesheet" href="http://apps.ideaconsult.net:8080/ambit2/style/jtoxkit.css"/>
+
+<script type='text/javascript'>
+	var purl = $.url();
+	var dataset_uri = purl.param('dataset_uri')===undefined?'http://apps.ideaconsult.net:8080/ambit2/query/similarity?search=c1ccccc1':purl.param('dataset_uri');
+			
+	$(document).ready(function() {
+      var dataset_uri = "http://apps.ideaconsult.net:8080/ambit2/dataset/1967115";
+	  	var ds = new jToxDataset($(".jtox-toolkit")[0],config_dataset);
+        ds.queryDataset(dataset_uri);
+	});
+	</script>
+
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
@@ -29,9 +56,22 @@
       </header>
       <section>
         <h3>
-<a name="welcome-to-toxtreejs" class="anchor" href="#welcome-to-toxtreejs"><span class="octicon octicon-link"></span></a>Welcome to Toxtree.js</h3>
+
+<a name="welcome-to-toxtreejs" class="anchor" href="#welcome-to-toxtreejs"><span class="octicon octicon-link"></span></a>Welcome to Toxtree.js
+  
+</h3>
 
 <p><a href="https://github.com/ideaconsult/Toxtree.js/">https://github.com/ideaconsult/Toxtree.js/</a></p>
+
+
+
+<div class="jtox-toolkit" data-kit="dataset" 
+	data-manual-init="yes" 
+	data-show-features="yes" 
+	data-cross-domain="false"	
+	data-show-export="yes" 
+	data-jsonp="false"></div>
+
 
 <h3>
 <a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
