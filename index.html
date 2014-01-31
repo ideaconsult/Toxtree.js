@@ -112,7 +112,28 @@ var config_dataset = {
 	                return col;
 	            }
 	        },
-    
+			    "http://www.opentox.org/api/1.1#EINECS" : {
+			    	"used" : true,	
+						"render" : function(col) {
+				          	    col["bVisible"] = false;
+				                return col;
+				            }    		
+			    },
+				   "http://www.opentox.org/api/1.1#IUCLID5_UUID" : {
+				   	"used" : true,	
+						"render" : function(col) {
+				          	    col["bVisible"] = false;
+				                return col;
+				            }    		
+			    },    
+
+				   "WPM" : {
+				   	"used" : true,	
+						"render" : function(col) {
+				          	    col["bVisible"] = false;
+				                return col;
+				            }    		
+			    },      
 		"http://www.wikipathways.org/index.php/Pathway" :  {
 			"title": "Wiki Pathways",
 			"accumulate" : "compound.wikipathway",
