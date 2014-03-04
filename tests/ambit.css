@@ -1,0 +1,480 @@
+div.row span.left {
+  float: left;
+  text-align: left;
+  font-weight: bold;
+  background-color: #344049;
+  color: #99CC00;
+  FONT-FAMILY: Trebuchet MS, Verdana, Arial;
+  width: 50%;
+  }
+
+div.row span.right {
+  float: right;
+  text-align: right;
+  font-weight: bold;
+  background-color: #344049;
+  color: #729203;
+  FONT-FAMILY: Trebuchet MS, Verdana, Arial;
+  width: 50%;
+  }
+  
+div.rowwhite span.left {
+  float: left;
+  text-align: left;
+  font-weight: bold;
+  background-color: #FFFFFF;
+  color: #99CC00;
+  FONT-FAMILY: Trebuchet MS, Verdana, Arial;
+  width: 10%;
+  }
+
+div.rowwhite span.center {
+  float: left;
+  text-align: left;
+  font-weight: bold;
+  background-color: #FFFFFF;
+  color: #729203;
+  FONT-FAMILY: Trebuchet MS, Verdana, Arial;
+  width: 90%;
+  }  
+  
+div.rowwhite span.right {
+  float: right;
+  text-align: left;
+  font-weight: bold;
+  background-color: #FFFFFF;
+  color: #729203;
+  FONT-FAMILY: Trebuchet MS, Verdana, Arial;
+  width: 20%;
+  }  
+  
+div.footer span.right {
+  MARGIN-TOP: 50px;
+  margin-right: 7px;
+  float: right;
+  text-align: right;
+  FONT-SIZE: 8pt;
+  background-color: #FFFFFF;
+  color: #344049;
+  FONT-FAMILY: Trebuchet MS, Verdana, Arial;
+  width: 100%;
+  }
+  
+div.actions span.center {
+  MARGIN-TOP: 50px;
+  margin-right: 7px;
+  margin-left: 7px;
+  float: left;
+  text-align: center;
+  FONT-SIZE: 10pt;
+  background-color: #FFFFFF;
+  color: #344049;
+  FONT-FAMILY: Trebuchet MS, Verdana, Arial;
+  width: 100%;
+  font-weight: bold;  
+  }
+
+body { 
+  margin: 1em auto 4em auto;
+}
+
+body > p, li > p {
+  line-height: 1.5em;
+}
+
+body > blockquote {
+  width: 640px;
+}
+
+body > pre {
+  border-left: solid 2px #ccc;
+  padding-left: 18px;
+  margin: 2em 0 2em -20px;
+}
+
+table
+{
+	COLOR: #344049;
+    FONT-SIZE: 10pt;
+    MARGIN-TOP: 7px;
+    MARGIN-LEFT: 7px;
+    MARGIN-RIGHT: 7px;
+    FONT-FAMILY: Trebuchet MS, Verdana, Arial;
+    TEXT-ALIGN: justify
+}
+
+p
+{
+    COLOR: #344049;
+    FONT-SIZE: 10pt;
+    MARGIN-TOP: 7px;
+    MARGIN-LEFT: 7px;
+    MARGIN-RIGHT: 7px;
+    FONT-FAMILY: Trebuchet MS, Verdana, Arial;
+    TEXT-ALIGN: justify
+    
+}
+ul
+{
+    COLOR: #344049;
+    FONT-SIZE: 10pt;
+    MARGIN-TOP: 7px;
+    MARGIN-LEFT: 7px;
+    MARGIN-RIGHT: 7px;
+    FONT-FAMILY: Trebuchet MS, Verdana, Arial;
+    TEXT-ALIGN: justify
+    
+}
+br
+{
+    COLOR: #344049;
+    FONT-SIZE: 10pt;
+    MARGIN-TOP: 7px;
+    MARGIN-LEFT: 7px;
+    MARGIN-RIGHT: 7px;
+    FONT-FAMILY: Trebuchet MS, Verdana, Arial;
+    TEXT-ALIGN: justify
+    
+}
+
+h2
+{
+    FONT-SIZE: 14pt;
+    COLOR: #344049;
+    FONT-WEIGHT: bolder;
+    font-weight: bold;  
+    FONT-FAMILY: Trebuchet MS, Verdana, Arial
+}
+
+h3
+{
+    FONT-SIZE: 12pt;
+    COLOR: #729203;
+    FONT-WEIGHT: bolder;
+    font-weight: bold;  
+    FONT-FAMILY: Trebuchet MS, Verdana, Arial
+}
+
+h4
+{
+    FONT-SIZE: 11pt;
+    COLOR: #729203;
+    FONT-WEIGHT: bolder;
+    font-weight: bold;  
+    FONT-FAMILY: Trebuchet MS, Verdana, Arial
+}
+
+A:link
+{
+    FONT-SIZE: 10pt;
+    COLOR: #344049;
+    FONT-WEIGHT: bolder;
+    font-weight: bold;  
+    FONT-FAMILY: Trebuchet MS, Verdana, Arial
+}
+A:visited
+{
+    FONT-SIZE: 10pt;
+    COLOR: #344049;
+    FONT-WEIGHT: bolder;
+    font-weight: bold;  
+    FONT-FAMILY: Trebuchet MS, Verdana, Arial
+}
+A:active
+{
+    FONT-SIZE: 10pt;
+    COLOR: #344049;
+    FONT-WEIGHT: bolder;
+    font-weight: bold;  
+    FONT-FAMILY: Trebuchet MS, Verdana, Arial
+}
+A:hover
+{
+    FONT-SIZE: 10pt;
+    COLOR: #99CC00;
+    FONT-WEIGHT: bolder;
+    font-weight: bold;  
+    FONT-FAMILY: Trebuchet MS, Verdana, Arial
+}
+#div-1a {
+ float:left;
+ width:320px;
+ z-index:99;
+}
+
+#div-1 {
+ position:relative;
+ top:0px;
+ left:10px;
+ width:100%;
+ FONT-FAMILY: Trebuchet MS, Verdana, Arial;	
+}
+
+#div-1b1 {
+	 float:left;
+	 width:30px;
+	 height: 350px;
+	 FONT-SIZE: 10pt;
+	FONT-FAMILY: Trebuchet MS, Verdana, Arial;	
+}
+
+#div-1d {
+	position:relative;
+	width:250px;
+	padding: 10px;
+  	color: #344049;
+  	FONT-SIZE: 10pt;
+	FONT-FAMILY: Trebuchet MS, Verdana, Arial;	
+}
+
+CAPTION.results
+  {
+     background-color:#FFFFFF;
+     color:#729203;
+     border-width:0;
+     border-color:#729203;
+     text-align:left;
+  }
+
+TABLE.results
+  { 
+     font-family: Trebuchet MS, Verdana, Arial;
+     font-size:10pt;
+     background-color:#F4F2EB;
+     width:90%;
+     border-collapse:collapse;
+     border-style:ridge;
+     border-color:#FFFFFF;
+     border-width:2px;
+     
+  }
+
+TH.results
+  {
+  	 font-family: Trebuchet MS, Verdana, Arial;
+     font-size:10pt;
+     background-color:#9FD500;
+     color:#344049;
+     border-style:solid;
+     border-width:1px;
+     border-color:#FFFFFF;
+     text-align:center;
+     border-collapse:collapse;
+  }
+  
+TH.results_odd
+  {
+  	 font-family: Trebuchet MS, Verdana, Arial;
+     font-size:10pt;
+     background-color:#white;
+     color:#344049;
+     border-color:#FFFFFF;
+     text-align:center;
+     border-collapse:collapse;
+     border: 1px solid #FFF;
+  }  
+
+
+TR.results
+  { 
+     vertical-align:middle;
+     border-collapse:collapse;
+  }
+  
+TR.results_even
+  { 
+  	 border-collapse:collapse;
+     vertical-align:middle;
+     font-size:10pt;
+    background-color:#ECE8DA;
+     color:#344049;
+     border-width:0px;
+     border-color:#FFFFFF;
+     text-align:left;     
+  }  
+  
+TR.results_odd
+  { 
+  	 border-collapse:collapse;
+     vertical-align:middle;
+     font-size:10pt;
+      background-color:#F5F2EB;
+     color:#344049;
+     border-width:0px;
+     
+     border-color:#E9ECDD;
+     text-align:left;     
+  }   
+
+TD.results_col
+  {  
+  	 border-collapse:collapse;
+     vertical-align:middle;
+     font-size:10pt;
+    background-color:#F1F3F5;
+     color:#344049;
+     border-width:0px;
+     border-color:#FFFFFF;
+     text-align:left;   
+  }
+
+TD.results
+  {  
+     font-size:10pt;
+     background-color:#F9FFE6;
+     color:#344049;
+     border-width:0px;
+     border-color:#F9FFE6;
+     text-align:left;
+  }
+  
+.depictBox { 
+	min-height: 250px;
+	min-width: 200px; 
+}
+
+.tabs {
+	background: transparent;
+	border: none;
+	padding: 0px;
+	margin: 0px;
+}
+.tabs .ui-widget-header {
+	background: transparent;
+	border: none;
+	border-bottom: 1px solid #c0c0c0;
+	border-radius: 0px;
+	-moz-border-radius: 0px;
+	-webkit-border-radius: 0px;
+	padding: 0;
+	margin: 0;
+}
+.tabs .ui-state-default {
+	background: transparent;
+	border: none;
+}
+.tabs .ui-state-active {
+	background: transparent url(img/uiTabsArrow.png) no-repeat bottom center;
+	border: none;
+}
+.tabs .ui-state-default a {
+	color: #516473;	
+}
+.tabs .ui-state-active a {
+	color: #627a3f;
+	font-weight: bold;
+	border: 1px solid #bcf903; 
+}
+
+.ui-tabs .ui-tabs-nav 
+{ 
+	padding-left: 0px; 
+    padding-bottom: 0px; 
+    padding-top: 5px; 
+    margin-bottom: -5px; 
+    margin-left: -5px; 
+}
+
+.structureright {
+	float: right;
+	width: 153px;
+	margin: 0 0 10px 10px;
+	background-color: #fff;
+	padding: 10px;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	
+}
+
+.summary {
+	margin: 0;
+	padding: 0px;
+	height: 100%;
+	background-color: #ffffff;
+	FONT-FAMILY: Trebuchet MS, Verdana, Arial;
+	COLOR: #99CC00;
+	FONT-SIZE: 9pt;
+}
+
+.tag_no {
+	COLOR: blue;
+	font-weight: bold;
+}
+
+.tag_yes {
+	font-weight: bold;
+}
+
+.tag_active {
+	COLOR: red;
+	font-weight: bold;
+}
+
+.tag_inactive {
+	COLOR: green;
+	font-weight: bold;
+}
+
+.tag_yes {
+	COLOR: green;
+	font-weight: bold;
+}
+
+
+svg {
+  font: 10px sans-serif;
+  FONT-FAMILY: Trebuchet MS, Verdana, Arial;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+  
+}
+
+.x.axis line {
+  stroke: #fff;
+}
+
+.x.axis .minor {
+  stroke-opacity: .5;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.y.axis line, .y.axis path {
+  fill: none;
+  stroke: #000;
+}
+
+sup, sub {
+  line-height: 0;
+}
+
+text.active {
+  fill: red;
+}
+
+
+.background {
+  fill: #eee;
+}
+
+line {
+  stroke: #fff;
+}
+
+code {
+  line-height: 1em;
+}
+
+.bar rect {
+  fill: #344049;
+  shape-rendering: crispEdges;
+  stroke: gray;
+}

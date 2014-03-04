@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+
+  <title>ToxStudy development page</title>
+  <link rel="stylesheet" href="styles/base.css">
+	<link rel="stylesheet" href="styles/skeleton.css">
+	<link rel="stylesheet" href="styles/layout.css">
+	<link rel="stylesheet" href="styles/toxstudy.css">
+	<link rel="stylesheet" href="styles/jtoxkit.css">
+	<link rel="stylesheet" href="styles/jquery-ui.css">
+	<link rel="stylesheet" href="styles/jquery.dataTables.css">
+
+  <script src="scripts/jquery.js"></script>
+  <script src="scripts/jquery-migrate-1.2.1.min.js"></script>
+  <script src="scripts/colResizable-1.3.min.js"></script>
+  <script src="scripts/jquery.ui.core.js"></script>
+  <script src="scripts/jquery.ui.widget.js"></script>
+  <script src="scripts/jquery.ui.tabs.js"></script>
+  <script src="scripts/jquery.dataTables.js"></script>
+
+  <script src="scripts/common.js"></script>
+  <script src="scripts/jtoxkit.js"></script>
+  <script src="scripts/toxdataset.js"></script>
+  <script src="scripts/toxstudy.js"></script>
+
+  <script language="javascript">
+    var studyConfig = {
+      "columns": {
+        "_": { 
+      		"main": { 
+      		  "name": { "bVisible": false } 
+      		},
+      		"effects": {
+      			"endpoint": { "sTitle": "Type", "iOrder": -2 },
+      			"result": { "sTitle": "Value", "iOrder": -1 }
+      		}
+      	},
+      	"PC_PARTITION_SECTION": {
+      		"effects": {
+      			"endpoint": { "iOrder": 0 },
+      			"result": { "iOrder": 0 }
+      		}
+      	}
+      }
+    };
+    $(document).ready(function(){
+      var st = new jToxStudy($(".jtox-toolkit")[0], {  configuration: studyConfig });
+      
+/*       st.querySubstance("http://apps.ideaconsult.net:8080/biodeg/substance/IUC5-410e026d-f182-4e36-b14f-28013022f906"); */
+      st.querySubstance("http://apps.ideaconsult.net:8080/biodeg/substance/IUC4-efdb21bb-e79f-3286-a988-b6f6944d3734");
+/*       st.querySubstance("http://apps.ideaconsult.net:8080/toxbank/substance/IUC5-410e026d-f182-4e36-b14f-28013022f906");       */
+    });
+  </script>
+</head>
+<body>
+	<div class="jtox-toolkit" data-kit="study" data-manual-init="yes"></div>
+	<div class="jtox-template">
+<!--[[ jToxKit.templates['all-studies'] -->
+	  <div id="jtox-studies">
+	    <ul>
+	      <li><a href="#jtox-substance">IUC Substance</a></li>
+	      <li><a href="#jtox-composition">Composition</a></li>
+	      <li><a href="#jtox-pchem" data-type="P-CHEM">P-Chem (0)</a></li>
+	      <li><a href="#jtox-envfate" data-type="ENV_FATE">Env Fate (0)</a></li>
+	      <li><a href="#jtox-ecotox" data-type="ECOTOX">Eco Tox (0)</a></li>
+	      <li><a href="#jtox-tox" data-type="TOX">Tox (0)</a></li>
+	    </ul>
+	    <div id="jtox-substance" class="jtox-substance">
+	      <table class="dataTable">
+	        <thead>
+	          <tr>
+	            <th class="right jtox-size-third">IUC Substance name:</th>
+	            <td class="data-field camelCase" data-field="name"> ? </td>
+	          </tr>
+	          <tr>
+	            <th class="right">IUC Substance UUID:</th>
+	            <td class="data-field" data-field="i5uuid"> ? </td>
+	          </tr>
+	          <tr>
+	            <th class="right">IUC Public name:</th>
+	            <td class="data-field camelCase" data-field="publicname"> ? </td>
+	          </tr>
+	          <tr>
+	            <th class="right">Legal entity:</th>
+	            <td class="data-field" data-field="ownerName"> ? </td>
+	          </tr>
+	          <tr>
+	            <th class="right">Legal entity UUID:</th>
+	            <td class="data-field" data-field="ownerUUID"> ? </td>
+	          </tr>
+	          <tr>
+	            <th class="right">Type substance composition:</th>
+	            <td class="data-field" data-field="substanceType"> ? </td>
+	          </tr>
+	          <tr class="borderless-bottom">
+	            <th class="right">IUC Substance Reference Identifier</th>
+	            <td></td>
+	          </tr>
+	          <tr class="borderless-top borderless-bottom">
+	            <td class="right">CAS:</td>
+	            <td class="data-field" data-field="compound.cas"> ? </td>
+	          </tr>
+	          <tr class="borderless-top borderless-bottom">
+	            <td class="right">EC:</td>
+	            <td class="data-field" data-field="compound.einecs"> ? </td>
+	          </tr>
+	          <tr class="borderless-top borderless-bottom">
+	            <td class="right">Chemical name:</td>
+	            <td class="data-field" data-field="compound.name"> ? </td>
+	          </tr>
+	          <tr class="borderless-top borderless-bottom">
+	            <td class="right">IUPAC name:</td>
+	            <td class="data-field" data-field="compound.iupac"> ? </td>
+	          </tr>
+	          <tr class="borderless-top borderless-bottom">
+	            <td class="right">UUID:</td>
+	            <td class="data-field" data-field="referenceSubstance.i5uuid"> ? </td>
+	          </tr>
+	          <tr class="borderless-top">
+	            <td class="right">IUC Subst. identifier used by Legal entity:</td>
+	            <td class="data-field" data-field="compound.tradename"> ? </td>
+	          </tr>
+	        </thead>
+	      </table>
+	    </div>
+	    <div id="jtox-composition" class="jtox-composition unloaded"></div>
+	    <div id="jtox-pchem" class="jtox-study-tab P-CHEM">
+	      <p><input type="text" class="jtox-study-filter ui-input" placeholder="Filter..." /></p>
+	      <h4 class="data-field camelCase" data-field="showname"> ? </h4>
+      </div>
+	    <div id="jtox-envfate" class="jtox-study-tab ENV_FATE">
+	      <p><input type="text" class="jtox-study-filter ui-input" placeholder="Filter..." /></p>
+	      <h4 class="data-field camelCase" data-field="showname"> ? </h4>
+	    </div>
+	    <div id="jtox-ecotox" class="jtox-study-tab ECOTOX">
+	      <p><input type="text" class="jtox-study-filter ui-input" placeholder="Filter..." /></p>
+	      <h4 class="data-field camelCase" data-field="showname"> ? </h4>
+	    </div>
+	    <div id="jtox-tox" class="jtox-study-tab TOX">
+	      <p><input type="text" class="jtox-study-filter ui-input" placeholder="Filter..." /></p>
+	      <h4 class="data-field camelCase" data-field="showname"> ? </h4>
+	    </div>
+	  </div>
+<!-- // end of #jtox-studies ]]-->
+<!--[[ jToxKit.templates['composition-block'] -->
+    <div id="jtox-compoblock" class="jtox-compoblock">
+      <table class="dataTable composition-info jtox-font-small">
+        <thead>
+          <tr><th>Composition name:</th><td class="data-field camelCase" data-field="name"> ? </td></tr>
+          <tr><th>Composition UUID:</th><td class="data-field" data-field="uuid"> ? </td></tr>
+          <tr><th>Purity of IUC Substance:</th><td class="data-field" data-field="purity"> ? </td></tr>
+        </thead>
+      </table>
+      <table class="substances-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Name</th>
+            <th>EC No.</th>
+            <th>CAS No.</th>
+            <th>Typical concentration</th>
+            <th colspan="2">Concentration ranges</th>
+            <th></th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+<!-- // end of #jtox-compoblock ]]-->
+<!--[[ jToxKit.templates['one-study'] -->
+    <div id="jtox-study" class="jtox-study jtox-foldable folded unloaded">
+      <div class="jtox-study-title"><p class="data-field" data-field="title">? (0)</p></div>
+      <table class="jtox-study-table"></table>
+    </div>
+<!-- // end of #jtox-study ]]-->
+	</div>
+</body>
+</html>
