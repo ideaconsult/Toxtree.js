@@ -1647,8 +1647,11 @@ var jToxStudy = (function () {
            
           substance["showname"] = substance.publicname || substance.name;
           var flags = '';
-          for (var i = 0, iLen = substance.externalIdentifiers.length; i < iLen; ++i)
+          for (var i = 0, iLen = substance.externalIdentifiers.length; i < iLen; ++i) {
+            if (i > 0)
+              flags += ', ';
             flags += substance.externalIdentifiers[i].id || '';
+          }
           substance["IUCFlags"] = flags;
             
           ccLib.fillTree(self.rootElement, substance);
