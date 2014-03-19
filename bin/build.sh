@@ -6,6 +6,7 @@ jsdir='../scripts'
 cssdir='../styles'
 htmldir='..'
 target='toxstudy'
+libs=''
 append=0
 
 # test the parameters first
@@ -19,7 +20,9 @@ while (( "$#" )); do
 		--output)
 			append=0
 			shift
-			outdir=$1
+			pushd $1 > /dev/null
+			outdir=`pwd`
+			popd > /dev/null
 			;;
 		--css)
 			append=0
@@ -41,7 +44,8 @@ while (( "$#" )); do
 			;;
 		--lib|-l)
 			shift;
-			
+			libs+=($1)
+			echo "Lib: $1"
 			;;
 		--help|-h)
 			echo "Usage: build.sh [options]"
@@ -53,7 +57,7 @@ while (( "$#" )); do
 			echo "    [-css <styles dir>]    : the directory where styling files live. Default is [../styles]."
 			echo "    [--js <js dir>]        : the directory where script files live. Default is [../scripts]."
 			echo "    [--target <kit list>]  : list of kits to be included. Omit jtoxkit. Default [toxstudy]."
-			echo "    [--lib | -l <filename>]: A html file name, referring to some external library."
+			echo "    [--lib | -l <filename>]: html file name, referring to some external library."
 			echo "    [--help | -h]          : this help."
 			echo 
 			echo "Default is like: build.sh --html .. --out ../www --css ../styles --js ../script --target jtoxkit toxstudy"
@@ -75,6 +79,18 @@ echo "Clearing old files..."
 rm -f $outJS
 rm -f $outCSS
 
+# First prepare the libraries, if any
+curdir=`pwd`
+for l in "${libs[*]}"; do
+	base=$(basename $l)
+	name="${base%.*}"
+	echo "Backing library [$base]..."
+	pushd $(dirname $l) > /dev/null
+	"$curdir/htmlextract.pl" --css <"$base" >"$outdir/$name.css"
+	"$curdir/htmlextract.pl" --js <"$base" >"$outdir/$name.js"
+	"$curdir/html2js.pl" --body-var "jToxKit.templates['$base']" <"$base" >>"$outdir/$name.js"
+	popd > /dev/null
+done
 # form the final target list
 target="common toxdataset $target jtoxkit"
 
@@ -87,10 +103,10 @@ for t in ${target[@]}; do
 	fi
 done
 
-echo "Adding html2js transformed ones from [$htmldir]..."
+echo "Adding html->js transformed ones from [$htmldir]..."
 for t in ${target[@]}; do
 	if [ -e "$htmldir/$t.html" ]; then
-		./html2js.pl "$htmldir/$t.html" >> $outJS
+		./html2js.pl < "$htmldir/$t.html" >> $outJS
 	fi
 done
 
