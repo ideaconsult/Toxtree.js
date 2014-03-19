@@ -20,9 +20,7 @@ while (( "$#" )); do
 		--output)
 			append=0
 			shift
-			pushd $1 > /dev/null
-			outdir=`pwd`
-			popd > /dev/null
+			outdir=$1			
 			;;
 		--css)
 			append=0
@@ -72,23 +70,28 @@ while (( "$#" )); do
 	shift
 done
 
+pushd $outdir > /dev/null
+outdir=`pwd`
+popd > /dev/null
+
 outJS="$outdir/jtoxkit.js"
 outCSS="$outdir/jtoxkit.css"
 
 echo "Clearing old files..."
-rm -f $outJS
-rm -f $outCSS
+rm -f "$outdir/*.js"
+rm -f "$outdir/*.css"
 
 # First prepare the libraries, if any
 curdir=`pwd`
 for l in "${libs[*]}"; do
 	base=$(basename $l)
 	name="${base%.*}"
-	echo "Backing library [$base]..."
+	
+	echo "Backing library [$name]..."
 	pushd $(dirname $l) > /dev/null
-	"$curdir/htmlextract.pl" --css <"$base" >"$outdir/$name.css"
-	"$curdir/htmlextract.pl" --js <"$base" >"$outdir/$name.js"
-	"$curdir/html2js.pl" --body-var "jToxKit.templates['$base']" <"$base" >>"$outdir/$name.js"
+	"$curdir/htmlextract.pl" --css <$base >"$outdir/$name.css"
+	"$curdir/htmlextract.pl" --js <$base >"$outdir/$name.js"
+	"$curdir/html2js.pl" --body-var --trim "jToxKit.templates['$name']" <$base >>"$outdir/$name.js"
 	popd > /dev/null
 done
 # form the final target list
