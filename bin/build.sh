@@ -39,6 +39,10 @@ while (( "$#" )); do
 			target=''
 			append=1
 			;;
+		--lib|-l)
+			shift;
+			
+			;;
 		--help|-h)
 			echo "Usage: build.sh [options]"
 			echo "Options can be one or more from the following:"
@@ -49,6 +53,7 @@ while (( "$#" )); do
 			echo "    [-css <styles dir>]    : the directory where styling files live. Default is [../styles]."
 			echo "    [--js <js dir>]        : the directory where script files live. Default is [../scripts]."
 			echo "    [--target <kit list>]  : list of kits to be included. Omit jtoxkit. Default [toxstudy]."
+			echo "    [--lib | -l <filename>]: A html file name, referring to some external library."
 			echo "    [--help | -h]          : this help."
 			echo 
 			echo "Default is like: build.sh --html .. --out ../www --css ../styles --js ../script --target jtoxkit toxstudy"
