@@ -1708,8 +1708,6 @@ window.jT = window.jToxKit = {
 	init: function() {
   	var self = this;
   	
-  	self.$ = jQuery.noConflict();
-  	
   	self.initTemplates();
 
     // make this handler for UUID copying. Once here - it's live, so it works for all tables in the future
@@ -1900,7 +1898,11 @@ window.jT = window.jToxKit = {
 	}
 };
 
-jQuery(document).ready(function(){
+// we need to do this here - because other tools/libraries could have scheduled themselves on 'ready',
+// so it'll be too late to make this assignment then. Also - we can use jT.$ from now on :-)
+jT.$ = jQuery.noConflict();
+  	
+jT.$(document).ready(function(){
   jT.init();
 });
 jT.templates['all-dataset']  = 
