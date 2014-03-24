@@ -9,6 +9,7 @@ window.jToxKit = {
 	},
 	
 	templates: { },        // html2js routine will fill up this variable
+	tools: { },        // additional, external tools added with html2js
 
 	/* SETTINGS. The following parametes can be passed in settings object to jToxKit.init(), or as data-XXX - with the same names. Values set here are the defaults.
 	*/
@@ -99,6 +100,13 @@ window.jToxKit = {
       el.removeAttribute('id');
     }
     return el;
+	},
+	
+	insertTool: function (name, root) {
+	  var html = this.tools[name];
+	  if (!this.isNull(html))
+  	  root.innerHTML = html;
+  	 return root;
 	},
 		
   changeTabsIds: function (root, suffix) {
