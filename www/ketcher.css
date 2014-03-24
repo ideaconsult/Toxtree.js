@@ -1,9 +1,14 @@
-body
+div.ketcher_root
 {
     margin: 0;
+    vertical-align: top;
 }
 
-body > div:first-child
+div.ketcher_root * {
+  vertical-align: inherit;
+}
+
+div.ketcher_root > div:first-child
 {
     position: absolute;
     width: 100%;
