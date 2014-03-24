@@ -1,14 +1,30 @@
 #!/usr/bin/perl -w
 
-open (IN, "< $ARGV[0]") || die "Can't open the input file: " . $ARGV[0] . "!";
+my $autoBody = 0;
+my $varName = '';
+my $doTrim = 0;
+
+while (my $arg = shift) {
+	if ($arg eq '--body-var') {
+		$varName = shift;
+		$autoBody++;
+	} elsif ($arg eq '--trim') {
+		$doTrim++;
+	} else {
+		die ("Unknown parameter: " . $arg);
+	}
+}
 
 my @variables = ();
 my $lastVar = '';
 
-foreach my $line (<IN>) {
+foreach my $line (<STDIN>) {
 	chomp $line;
 	
-	if (($newVar) = ($line =~ m/^<!--\[\[\s*(.+)\s*-->/)) {
+	if (($newVar) = ($line =~ m/^<!--\[\[\s*(.*)\s*-->/) or ($line =~ m/^\s*<body.*>/ and $autoBody)) {
+		if ($line =~ m/^\s*<body.*>/) {
+			$newVar = $varName;
+		}
 		push @variables, ($newVar);
 		if ($lastVar ne '') {
 			print STDOUT '"";', "\n","\n";
@@ -16,8 +32,12 @@ foreach my $line (<IN>) {
 		$lastVar = $newVar;
 		print STDOUT $lastVar, " = ", "\n";
 	}
-	elsif (($newVar) = ($line =~ m/^<!--(.*)\]\]-->/)) {
-		print STDOUT '"";', $newVar, "\n", "\n";
+	elsif (($text) = ($line =~ m/^<!--(.*)\]\]-->/) or ($line =~ m/^\s*<\/body>/ and $autoBody)) {
+		if ($line =~ m/^\s*<\/body>/) {
+			$text = '';
+		}
+	
+		print STDOUT '"";', $text, "\n", "\n";
 		pop @variables;
 		if ($#variables >= 0){
 			$lastVar = $variables[$#variables];
@@ -25,12 +45,12 @@ foreach my $line (<IN>) {
 		} else {
 			$lastVar = '';
 		}
-			
 	}
 	elsif ($lastVar ne '') {
 		$line =~ s/"/\\"/g;
+		if ($doTrim) {
+			$line =~ s/^\s+|\s+$//g;
+		}
 		print STDOUT '"' . $line . '" +', "\n";
 	}
 }
-
-close(IN);

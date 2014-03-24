@@ -1,4 +1,4 @@
-window.jToxKit = {
+window.jT = window.jToxKit = {
 	templateRoot: null,
 
 	/* A single place to hold all necessary queries. Parameters are marked with <XX> and formatString() (common.js) is used
@@ -9,8 +9,9 @@ window.jToxKit = {
 	},
 	
 	templates: { },        // html2js routine will fill up this variable
+	tools: { },        // additional, external tools added with html2js
 
-	/* SETTINGS. The following parametes can be passed in settings object to jToxKit.init(), or as data-XXX - with the same names. Values set here are the defaults.
+	/* SETTINGS. The following parametes can be passed in settings object to jT.init(), or as data-XXX - with the same names. Values set here are the defaults.
 	*/
 	settings: {
   	jsonp: false,                   // whether to use JSONP approach, instead of JSON.
@@ -35,14 +36,14 @@ window.jToxKit = {
   	self.initTemplates();
 
     // make this handler for UUID copying. Once here - it's live, so it works for all tables in the future
-    $(document).on('click', '.jtox-toolkit span.ui-icon-copy', function (e) { ccLib.copyToClipboard($(this).data('uuid')); return false;});
+    jT.$(document).on('click', '.jtox-toolkit span.ui-icon-copy', function (e) { ccLib.copyToClipboard(jT.$(this).data('uuid')); return false;});
   
     // scan the query parameter for settings
 		var url = ccLib.parseURL(document.location);
 		var queryParams = url.params;
 		queryParams.host = self.formBaseUrl(url);
 	
-    self.settings = $.extend(self.settings, queryParams); // merge with defaults
+    self.settings = jT.$.extend(self.settings, queryParams); // merge with defaults
     
 	  // initializes the kit, based on the passed kit name
 	  var initKit = function(element, params) {
@@ -53,14 +54,14 @@ window.jToxKit = {
 	  };
 	  
   	// now scan all insertion divs
-  	$('.jtox-toolkit').each(function(i) {
-    	var dataParams = $.extend(true, self.settings, $(this).data());
+  	jT.$('.jtox-toolkit').each(function(i) {
+    	var dataParams = jT.$.extend(true, self.settings, jT.$(this).data());
     	if (!dataParams.manualInit){
     	  var el = this;
     	  // first, get the configuration, if such is passed
     	  if (!ccLib.isNull(dataParams.configFile)) {
     	    // we'll use a trick here so the baseUrl parameters set so far to take account... thus passing 'fake' kit instance
-    	    // as the first parameter of jToxKit.call();
+    	    // as the first parameter of jT.call();
       	  self.call({ settings: dataParams}, dataParams.configFile, function(config){
         	  if (!!config)
         	    dataParams['configuration'] = config;
@@ -76,7 +77,7 @@ window.jToxKit = {
 	initTemplates: function() {
 	  var self = this;
 
-    var root = $('.jtox-template')[0];
+    var root = jT.$('.jtox-template')[0];
     if (root === undefined) {
   	  var html = '';
     	for (var t in self.templates) {
@@ -93,21 +94,28 @@ window.jToxKit = {
 	},
 	
 	getTemplate: function(selector) {
-  	var el = $(selector, this.templateRoot)[0];
+  	var el = jT.$(selector, this.templateRoot)[0];
   	if (!!el){
     	var el = el.cloneNode(true);
       el.removeAttribute('id');
     }
     return el;
 	},
+	
+	insertTool: function (name, root) {
+	  var html = this.tools[name];
+	  if (!ccLib.isNull(html))
+  	  root.innerHTML = html;
+  	 return root;
+	},
 		
   changeTabsIds: function (root, suffix) {
-    $('ul li a', root).each(function() {
-      var id = $(this).attr('href').substr(1);
+    jT.$('ul li a', root).each(function() {
+      var id = jT.$(this).attr('href').substr(1);
       var el = document.getElementById(id);
       id += suffix;
       el.id = id;
-      $(this).attr('href', '#' + id);
+      jT.$(this).attr('href', '#' + id);
     })  
   },
   
@@ -169,11 +177,11 @@ window.jToxKit = {
 	/* Makes a server call with the provided method. If none is given - the internally stored one is used
 	*/
 	call: function (kit, service, callback, adata){
-	  var settings = $.extend({"baseUrl" : this.settings.host}, this.settings);
+	  var settings = jT.$.extend({"baseUrl" : this.settings.host}, this.settings);
 		if (kit == null)
 		  kit = this;
 		else 
-  		settings = $.extend(true, settings, kit.settings);
+  		settings = jT.$.extend(true, settings, kit.settings);
 
 		ccLib.fireCallback(settings.onConnect, kit, service);
 		  
@@ -195,7 +203,7 @@ window.jToxKit = {
 			service = settings.baseUrl + service;
 			
 		// now make the actual call
-		$.ajax(service, {
+		jT.$.ajax(service, {
 			dataType: settings.jsonp ? 'jsonp' : 'json',
 			headers: { Accept: accType },
 			crossDomain: settings.crossDomain || settings.jsonp,
@@ -215,6 +223,10 @@ window.jToxKit = {
 	}
 };
 
-$(document).ready(function(){
-  jToxKit.init();
+// we need to do this here - because other tools/libraries could have scheduled themselves on 'ready',
+// so it'll be too late to make this assignment then. Also - we can use jT.$ from now on :-)
+jT.$ = jQuery.noConflict();
+  	
+jT.$(document).ready(function(){
+  jT.init();
 });

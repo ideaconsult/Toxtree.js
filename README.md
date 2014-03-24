@@ -16,7 +16,7 @@ Integration manual
 ------------------
 In order to use **jToxKit** in your page, you need to implement these steps:
 
-- In the header of the page add one script reference: `<script src="jtoxkit.js"></script>`. A minified version is available too: `<script src="jtoxkit.min.js"></script>`.
+- In the header of the page add one script reference: `<script src="jtoxkit.js"></script>`. A minified version is available too: `<script src="jT.min.js"></script>`.
 - In the header of the page add one stylesheet file reference: `<link rel="stylesheet" href="jtoxkit.css"/>`.
 - At the place in HTML body, where you want to have some of _jTokKit_ front-ends, add one _div_ element: `<div class="jtox-toolkit" data-kit="study"></div>`. More explanation of `data-XXX` parameters is given below. The class `jtox-toolkit` marks the insertion point for any _jToxKit_ kit.
 - Make sure third-party libs that we depend on, are included too - they can vary for different (of our) _kits_, but these are common for entire **jToxKit**:
@@ -53,7 +53,7 @@ Although different kits can have different configuration parameters, these are c
 - `pollDelay` (attr. `data-poll-delay`), _optional_: certain services involve creating a task on the server and waiting for it to finish - this is the time between poll request, while waiting it to finish. In milliseconds. Default is 200.
 - `onConnect` (attr. `data-on-connect`), _optional_: a function name, or function to be called just before any AJAX call.
 - `onSuccess` (attr. `data-on-success`), _optional_: a function name, or function to be called upon successful complete of a AJAX call.
-- `onError` (attr. `data-on-error`), _optional_: a function name, or function to be called when there's an error on AJAX call. The passed _callback_ to `jToxKit.call()` is still called, but with _null_ result.
+- `onError` (attr. `data-on-error`), _optional_: a function name, or function to be called when there's an error on AJAX call. The passed _callback_ to `jT.call()` is still called, but with _null_ result.
 - `configuration` (attr. `data-config-file`), _optional_: a way to provide kit-specific configuration, like coulmns visibility and/or ordering for _study_ kit. When provided as `data-config-file` parameter, the configuration file is downloaded and passed as configuration parameter to kit initialization routine.
 
 As, can be seen, the later three callbacks can be local for each kit, so it is possible to report connection statuses in the most appropriate for the kit's way. This is also true for Url's, which means that not all kits, needs to communicate with one and the same server.
@@ -441,7 +441,7 @@ In order to archive these there are few things that we've established
 
 Each different kit, presumably needs three files: one JS, one HTML and one CSS. They all need to have same names, built like this: `tox<kit name>.<extension>`. For example for `study` kit, the three files are:`toxstudy.html`, `toxstudy.js` and `toxstudy.css`.
 
-There is also one, general set - fot the jToxKit as a whole. It has slightly different convention: `jtoxkit.<extension>`. The key moment here is that `toxstudy.html` for example, is used during the development of jToxStudy, referring jQuery, jQeuryUI, jtoxkit.js, etc. files. In the same time - it **_is_** the source for final, production `jtoxkit.js` file.
+There is also one, general set - fot the jToxKit as a whole. It has slightly different convention: `jT.<extension>`. The key moment here is that `toxstudy.html` for example, is used during the development of jToxStudy, referring jQuery, jQeuryUI, jtoxkit.js, etc. files. In the same time - it **_is_** the source for final, production `jtoxkit.js` file.
 
 ##### Script and styling files merging
 
@@ -454,7 +454,7 @@ The order of merging is not specified, except the fact that jtoxkit.js (.css) is
 Here comes the most interesting part - how to have development-ready HTML file and source provider for the final, production, js files in the same time? It is achieved by adding _special_ tags:
 
 ```
-	<!--[[ jToxKit.templates['mytempname'] -->
+	<!--[[ jT.templates['mytempname'] -->
 	<div>…</div>
 	<!-- ]]-->
 ```
@@ -462,18 +462,18 @@ Here comes the most interesting part - how to have development-ready HTML file a
 Being an actual HTML comment it is well ignored during development. The special format of the comment, however, enables a script to convert this to following JavaScript code:
 
 ```
-	jToxKit.templates['mytempname'] =
+	jT.templates['mytempname'] =
 	"<div>…</div>" +
 	"";
 ```
-Of course, it may have more than one lines, and also it is not _necessary_ to be jToxKit.template[] entry. However, `jToxKit.template` entries are automatically processed during `jToxKit.init()`, and everything in there becomes the (HTML) content of specially added `<div class="jtox-template"></div>` element in the end of body of the target, user's page.
+Of course, it may have more than one lines, and also it is not _necessary_ to be jT.template[] entry. However, `jT.template` entries are automatically processed during `jT.init()`, and everything in there becomes the (HTML) content of specially added `<div class="jtox-template"></div>` element in the end of body of the target, user's page.
 
 They also enable nesting, i.e.:
 
 ```
-	<!--[[ jToxKit.templates['outerTemp'] -->
+	<!--[[ jT.templates['outerTemp'] -->
 	<div>Some initial lines here
-	<!--[[ jToxKit.templates['innerTemp'] -->
+	<!--[[ jT.templates['innerTemp'] -->
 	<div>More sub-template lines</div>
 	<!-- // end of inner ]]-->
 	</div>
@@ -483,14 +483,14 @@ They also enable nesting, i.e.:
 will result in the following JavaScript code:
 
 ```
-	jToxKit.templates['outerTemp'] =
+	jT.templates['outerTemp'] =
 	"<div>Some initial lines here";
 	
-	jToxKit.templates['innerTemp'] =
+	jT.templates['innerTemp'] =
 	"<div>More sub-template lines</div>" +
 	""; // end of inner
 	
-	jToxKit.templates['outerTemp'] +=
+	jT.templates['outerTemp'] +=
 	"</div>" +
 	""; // end of outer
 ```
@@ -529,7 +529,7 @@ Options can be one or more from the following:
     [--out <output dir>]   : the directory where output files should be put. Default is [../www].
     [-css <styles dir>]    : the directory where styling files live. Default is [../styles].
     [--js <js dir>]        : the directory where script files live. Default is [../scripts].
-    [--target <kit list>]  : list of kits to be included. Omit jtoxkit. Default [toxstudy].
+    [--target <kit list>]  : list of kits to be included. Omit jT. Default [toxstudy].
     [--help | -h]          : this help.
 
 Default is like: build.sh --html .. --out ../www --css ../styles --js ../script --target toxstudy

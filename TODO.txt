@@ -1,5 +1,7 @@
 TODO:
 
+- document on insertTool() and jQuery being migrated to jT.$()
+
 - make appropriate message when there is no internet
 - make appropriate loading waiting cursor.
 

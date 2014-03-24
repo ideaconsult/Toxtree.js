@@ -53,8 +53,8 @@
     $(document).ready(function(){
       var st = new jToxStudy($(".jtox-toolkit")[0], {  configuration: studyConfig });
       
-/*       st.querySubstance("http://apps.ideaconsult.net:8080/biodeg/substance/IUC5-410e026d-f182-4e36-b14f-28013022f906"); */
-      st.querySubstance("http://apps.ideaconsult.net:8080/biodeg/substance/IUC4-efdb21bb-e79f-3286-a988-b6f6944d3734");
+      st.querySubstance("http://apps.ideaconsult.net:8080/biodeg/substance/IUC5-410e026d-f182-4e36-b14f-28013022f906");
+/*       st.querySubstance("http://apps.ideaconsult.net:8080/biodeg/substance/IUC4-efdb21bb-e79f-3286-a988-b6f6944d3734"); */
 /*       st.querySubstance("http://apps.ideaconsult.net:8080/toxbank/substance/IUC5-410e026d-f182-4e36-b14f-28013022f906");       */
     });
   </script>
@@ -62,7 +62,7 @@
 <body>
 	<div class="jtox-toolkit" data-kit="study" data-manual-init="yes"></div>
 	<div class="jtox-template">
-<!--[[ jToxKit.templates['all-studies'] -->
+<!--[[ jT.templates['all-studies'] -->
 	  <div id="jtox-studies">
 	    <ul>
 	      <li><a href="#jtox-substance">IUC Substance</a></li>
@@ -149,7 +149,7 @@
 	    </div>
 	  </div>
 <!-- // end of #jtox-studies ]]-->
-<!--[[ jToxKit.templates['composition-block'] -->
+<!--[[ jT.templates['composition-block'] -->
     <div id="jtox-compoblock" class="jtox-compoblock">
       <table class="dataTable composition-info jtox-font-small">
         <thead>
@@ -173,7 +173,7 @@
       </table>
     </div>
 <!-- // end of #jtox-compoblock ]]-->
-<!--[[ jToxKit.templates['one-study'] -->
+<!--[[ jT.templates['one-study'] -->
     <div id="jtox-study" class="jtox-study jtox-foldable folded unloaded">
       <div class="jtox-study-title"><p class="data-field" data-field="title">? (0)</p></div>
       <table class="jtox-study-table"></table>
