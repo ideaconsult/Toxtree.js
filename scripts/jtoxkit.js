@@ -33,17 +33,20 @@ window.jToxKit = {
 	init: function() {
   	var self = this;
   	
+  	self.$ = jQuery.noConflict();
+  	window.jT = self;
+  	
   	self.initTemplates();
 
     // make this handler for UUID copying. Once here - it's live, so it works for all tables in the future
-    $(document).on('click', '.jtox-toolkit span.ui-icon-copy', function (e) { ccLib.copyToClipboard($(this).data('uuid')); return false;});
+    jT.$(document).on('click', '.jtox-toolkit span.ui-icon-copy', function (e) { ccLib.copyToClipboard(jT.$(this).data('uuid')); return false;});
   
     // scan the query parameter for settings
 		var url = ccLib.parseURL(document.location);
 		var queryParams = url.params;
 		queryParams.host = self.formBaseUrl(url);
 	
-    self.settings = $.extend(self.settings, queryParams); // merge with defaults
+    self.settings = jT.$.extend(self.settings, queryParams); // merge with defaults
     
 	  // initializes the kit, based on the passed kit name
 	  var initKit = function(element, params) {
@@ -54,8 +57,8 @@ window.jToxKit = {
 	  };
 	  
   	// now scan all insertion divs
-  	$('.jtox-toolkit').each(function(i) {
-    	var dataParams = $.extend(true, self.settings, $(this).data());
+  	jT.$('.jtox-toolkit').each(function(i) {
+    	var dataParams = jT.$.extend(true, self.settings, jT.$(this).data());
     	if (!dataParams.manualInit){
     	  var el = this;
     	  // first, get the configuration, if such is passed
@@ -77,7 +80,7 @@ window.jToxKit = {
 	initTemplates: function() {
 	  var self = this;
 
-    var root = $('.jtox-template')[0];
+    var root = jT.$('.jtox-template')[0];
     if (root === undefined) {
   	  var html = '';
     	for (var t in self.templates) {
@@ -94,7 +97,7 @@ window.jToxKit = {
 	},
 	
 	getTemplate: function(selector) {
-  	var el = $(selector, this.templateRoot)[0];
+  	var el = jT.$(selector, this.templateRoot)[0];
   	if (!!el){
     	var el = el.cloneNode(true);
       el.removeAttribute('id');
@@ -104,18 +107,18 @@ window.jToxKit = {
 	
 	insertTool: function (name, root) {
 	  var html = this.tools[name];
-	  if (!this.isNull(html))
+	  if (!ccLib.isNull(html))
   	  root.innerHTML = html;
   	 return root;
 	},
 		
   changeTabsIds: function (root, suffix) {
-    $('ul li a', root).each(function() {
-      var id = $(this).attr('href').substr(1);
+    jT.$('ul li a', root).each(function() {
+      var id = jT.$(this).attr('href').substr(1);
       var el = document.getElementById(id);
       id += suffix;
       el.id = id;
-      $(this).attr('href', '#' + id);
+      jT.$(this).attr('href', '#' + id);
     })  
   },
   
@@ -177,11 +180,11 @@ window.jToxKit = {
 	/* Makes a server call with the provided method. If none is given - the internally stored one is used
 	*/
 	call: function (kit, service, callback, adata){
-	  var settings = $.extend({"baseUrl" : this.settings.host}, this.settings);
+	  var settings = jT.$.extend({"baseUrl" : this.settings.host}, this.settings);
 		if (kit == null)
 		  kit = this;
 		else 
-  		settings = $.extend(true, settings, kit.settings);
+  		settings = jT.$.extend(true, settings, kit.settings);
 
 		ccLib.fireCallback(settings.onConnect, kit, service);
 		  
@@ -203,7 +206,7 @@ window.jToxKit = {
 			service = settings.baseUrl + service;
 			
 		// now make the actual call
-		$.ajax(service, {
+		jT.$.ajax(service, {
 			dataType: settings.jsonp ? 'jsonp' : 'json',
 			headers: { Accept: accType },
 			crossDomain: settings.crossDomain || settings.jsonp,
@@ -223,6 +226,6 @@ window.jToxKit = {
 	}
 };
 
-$(document).ready(function(){
+jQuery(document).ready(function(){
   jToxKit.init();
 });

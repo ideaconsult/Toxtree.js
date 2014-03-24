@@ -522,7 +522,7 @@ window.ToxMan = {
 		if (service.indexOf("http") != 0)	
 			service = self.server + service;
 		// now make the actual call
-		$.ajax(service, {
+		jQuery.ajax(service, {
 			dataType: self.jsonp ? 'jsonp' : 'json',
 			headers: { Accept: accType },
 			crossDomain: true,

@@ -3,7 +3,7 @@ var ccLib = {
     // initialize, if needed
     if (base === undefined || base == null)
       base = [];
-    else if (!$.isArray(base))
+    else if (!jQuery.isArray(base))
       base = [base];
     
     // now proceed with extending
@@ -26,15 +26,15 @@ var ccLib = {
   /* Function setObjValue(obj, value)Set a given to the given element (obj) in the most appropriate way - be it property - the necessary one, or innetHTML
   */
   setObjValue: function (obj, value){
-  	if ((value === undefined || value === null) && $(obj).data('default') !== undefined)
-  		value = $(obj).data('default');
+  	if ((value === undefined || value === null) && jQuery(obj).data('default') !== undefined)
+  		value = jQuery(obj).data('default');
   
     if (obj.nodeName == "INPUT" || obj.nodeName == "SELECT")
       obj.value = value;
     else if (obj.nodeName == "IMG")
       obj.src = value;
     else if (obj.nodeName == "BUTTON")
-  		$(obj).data('value', value);
+  		jQuery(obj).data('value', value);
     else
       obj.innerHTML = value;      
   },
@@ -56,7 +56,7 @@ var ccLib = {
       }
       else if (typeof obj == 'string')
         empty = obj.trim().length == 0;
-      else if ($.isArray(obj))
+      else if (jQuery.isArray(obj))
         empty = obj.length == 0;
       else
         empty = false;
@@ -107,23 +107,23 @@ var ccLib = {
   		filter = 'data-field';
   	
   	var processFn = function(el, json){
-  	  var value = self.getJsonValue(json, $(el).data('field'));
+  	  var value = self.getJsonValue(json, jQuery(el).data('field'));
       if (value !== undefined) {
-        var format = $(el).data('format');
+        var format = jQuery(el).data('format');
         if ( !!format && (typeof window[format] == 'function') ) {
           value = window[format](value, json);
         }
-        if ($(el).hasClass('attribute'))
-          $(el).attr($(el).data('attribute'), value);
+        if (jQuery(el).hasClass('attribute'))
+          jQuery(el).attr(jQuery(el).data('attribute'), value);
         else // the 'normal' value
           self.setObjValue(el, value);
       }
   	}
 	
-  	if ($(root).hasClass(filter))
+  	if (jQuery(root).hasClass(filter))
   		processFn(root, json);
   
-    $('.' + filter, root).each(function (i) { processFn($(this)[0], json); } );
+    jQuery('.' + filter, root).each(function (i) { processFn(jQuery(this)[0], json); } );
   
     if (prefix && json.id !== undefined) {
       root.id = prefix + json.id;
@@ -176,7 +176,7 @@ var ccLib = {
         if (tabs[i] == null)
           continue;
           
-        if (!$(tabs[i]).hasClass('lock-height') && tabs[i].style.height != '')
+        if (!jQuery(tabs[i]).hasClass('lock-height') && tabs[i].style.height != '')
           tabs[i].style.height = "auto";
 
         if (tabs[i].offsetHeight > height)
@@ -188,7 +188,7 @@ var ccLib = {
         
       for (i = 0;i < tabs.length ; ++i) {
         if (tabs[i] != null) {
-          $(tabs[i]).height(height);
+          jQuery(tabs[i]).height(height);
           tabs[i] = tabs[i].nextElementSibling;
         }
       }

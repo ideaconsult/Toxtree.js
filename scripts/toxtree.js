@@ -1,10 +1,10 @@
-$(document).ready(function(){
+jQuery(document).ready(function(){
 	// some behavioural setup
 	// now attach the handler for clicking on the line which opens / hides it.
 	var showhideInfo = function(row, force){
 		var info = row.getElementsByClassName('info')[0];
-	  $(row).toggleClass('visible', force);
-	  $(info).toggleClass('hidden', (force === undefined) ? force : !force);
+	  jQeury(row).toggleClass('visible', force);
+	  jQuery(info).toggleClass('hidden', (force === undefined) ? force : !force);
 	}
 
 	var serverEl = document.getElementById('connection-baseuri');
