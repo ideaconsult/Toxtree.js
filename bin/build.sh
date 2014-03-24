@@ -43,7 +43,6 @@ while (( "$#" )); do
 		--lib|-l)
 			shift;
 			libs+=($1)
-			echo "Lib: $1"
 			;;
 		--help|-h)
 			echo "Usage: build.sh [options]"
@@ -89,7 +88,7 @@ for l in "${libs[*]}"; do
 	pushd $(dirname $l) > /dev/null
 	"$curdir/htmlextract.pl" --css <$base >"$outdir/$name.css"
 	"$curdir/htmlextract.pl" --js <$base >"$outdir/$name.js"
-	"$curdir/html2js.pl" --trim --body-var "jToxKit.tools['$name']" <$base >>"$outdir/$name.js"
+	"$curdir/html2js.pl" --trim --body-var "jT.tools['$name']" <$base >"$outdir/${name}_html.js"
 	popd > /dev/null
 done
 # form the final target list

@@ -1,4 +1,4 @@
-window.jToxKit = {
+window.jT = window.jToxKit = {
 	templateRoot: null,
 
 	/* A single place to hold all necessary queries. Parameters are marked with <XX> and formatString() (common.js) is used
@@ -11,7 +11,7 @@ window.jToxKit = {
 	templates: { },        // html2js routine will fill up this variable
 	tools: { },        // additional, external tools added with html2js
 
-	/* SETTINGS. The following parametes can be passed in settings object to jToxKit.init(), or as data-XXX - with the same names. Values set here are the defaults.
+	/* SETTINGS. The following parametes can be passed in settings object to jT.init(), or as data-XXX - with the same names. Values set here are the defaults.
 	*/
 	settings: {
   	jsonp: false,                   // whether to use JSONP approach, instead of JSON.
@@ -34,7 +34,6 @@ window.jToxKit = {
   	var self = this;
   	
   	self.$ = jQuery.noConflict();
-  	window.jT = self;
   	
   	self.initTemplates();
 
@@ -64,7 +63,7 @@ window.jToxKit = {
     	  // first, get the configuration, if such is passed
     	  if (!ccLib.isNull(dataParams.configFile)) {
     	    // we'll use a trick here so the baseUrl parameters set so far to take account... thus passing 'fake' kit instance
-    	    // as the first parameter of jToxKit.call();
+    	    // as the first parameter of jT.call();
       	  self.call({ settings: dataParams}, dataParams.configFile, function(config){
         	  if (!!config)
         	    dataParams['configuration'] = config;
@@ -227,5 +226,5 @@ window.jToxKit = {
 };
 
 jQuery(document).ready(function(){
-  jToxKit.init();
+  jT.init();
 });

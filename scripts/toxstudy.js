@@ -1,4 +1,4 @@
-/* toxstudy.js - Study-related functions from jToxKit.
+/* toxstudy.js - Study-related functions from jT.
  *
  * Copyright 2012-2013, IDEAconsult Ltd. http://www.ideaconsult.net/
  * Created by Ivan Georgiev
@@ -30,21 +30,21 @@ var jToxStudy = (function () {
     self.suffix = '_' + instanceCount++;
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even in manual initialization.
     
-    self.settings = jT.$.extend({}, defaultSettings, jToxKit.settings, settings); // i.e. defaults from jToxStudy
+    self.settings = jT.$.extend({}, defaultSettings, jT.settings, settings); // i.e. defaults from jToxStudy
     // now we have our, local copy of settings.
     
     // get the main template, add it (so that jQuery traversal works) and THEN change the ids.
     // There should be no overlap, because already-added instances will have their IDs changed already...
-    var tree = jToxKit.getTemplate('#jtox-studies');
+    var tree = jT.getTemplate('#jtox-studies');
     root.appendChild(tree);
-    jToxKit.changeTabsIds(tree, self.suffix);
+    jT.changeTabsIds(tree, self.suffix);
     
     // keep on initializing...
     var loadPanel = function(panel){
       if (panel){
         jT.$('.jtox-study.unloaded', panel).each(function(i){
           var table = this;
-          jToxKit.call(self, jT.$(table).data('jtox-uri'), function(study){
+          jT.call(self, jT.$(table).data('jtox-uri'), function(study){
             if (!!study) {
               jT.$(table).removeClass('unloaded folded');  
               jT.$(table).addClass('loaded');
@@ -107,7 +107,7 @@ var jToxStudy = (function () {
   
       var theCat = jT.$('.' + category + '.jtox-study', tab)[0];
       if (!theCat) {
-        theCat = jToxKit.getTemplate('#jtox-study');
+        theCat = jT.getTemplate('#jtox-study');
         tab.appendChild(theCat);
         jT.$(theCat).addClass(category);
         
@@ -135,7 +135,7 @@ var jToxStudy = (function () {
         { "sTitle": "Result", "sClass": "center middle jtox-multi", "sWidth": "15%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, function (data, type) { return formatLoHigh(data.result, type) }) } },
         { "sTitle": "Guideline", "sClass": "center middle", "sWidth": "15%", "mData": "protocol.guideline", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
         { "sTitle": "Owner", "sClass": "center middle shortened", "sWidth": "50px", "mData": "citation.owner", "sDefaultContent": "?"  }, 
-        { "sTitle": "UUID", "sClass": "center middle", "sWidth": "50px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : jToxKit.shortenedData(data, "Press to copy the UUID in the clipboard"); } }
+        { "sTitle": "UUID", "sClass": "center middle", "sWidth": "50px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : jT.shortenedData(data, "Press to copy the UUID in the clipboard"); } }
       ];
   
       var category = study.protocol.category.code;
@@ -579,7 +579,7 @@ var jToxStudy = (function () {
       
       // now make the actual filling
       for (var i in substances) {
-        var panel = jToxKit.getTemplate('#jtox-compoblock');
+        var panel = jT.getTemplate('#jtox-compoblock');
         tab.appendChild(panel);
         ccLib.fillTree(jT.$('.composition-info', panel)[0], substances[i]);
         prepareFillTable(substances[i].composition, panel);
@@ -589,7 +589,7 @@ var jToxStudy = (function () {
     querySummary: function(substanceURI) {
       var self = this;
       
-      jToxKit.call(self, substanceURI + "/studysummary", function(summary) {
+      jT.call(self, substanceURI + "/studysummary", function(summary) {
         if (!!summary && !!summary.facet)
           self.processSummary(summary.facet);
       });
@@ -598,7 +598,7 @@ var jToxStudy = (function () {
     queryComposition: function(substanceURI) {
       var self = this;
       
-      jToxKit.call(self, substanceURI + "/composition", function(composition) {
+      jT.call(self, substanceURI + "/composition", function(composition) {
         if (!!composition && !!composition.composition)
           self.processComposition(composition);
         });
@@ -608,10 +608,10 @@ var jToxStudy = (function () {
       var self = this;
       
       // re-initialize us on each of these calls.
-      self.baseUrl = ccLib.isNull(self.settings.baseUrl) ? jToxKit.grabBaseUrl(substanceURI) : self.settings.baseUrl;
+      self.baseUrl = ccLib.isNull(self.settings.baseUrl) ? jT.grabBaseUrl(substanceURI) : self.settings.baseUrl;
       
       var rootTab = jT.$('.jtox-substance', self.rootElement)[0];
-      jToxKit.call(self, substanceURI, function(substance){
+      jT.call(self, substanceURI, function(substance){
         if (!!substance && !!substance.substance && substance.substance.length > 0){
           substance = substance.substance[0];
            
@@ -626,7 +626,7 @@ var jToxStudy = (function () {
             
           ccLib.fillTree(self.rootElement, substance);
           // go and query for the reference query
-          jToxKit.call(self, substance.referenceSubstance.uri, function (dataset){
+          jT.call(self, substance.referenceSubstance.uri, function (dataset){
             if (!!dataset) {
               jToxDataset.processDataset(dataset, null, fnDatasetValue);
               ccLib.fillTree(rootTab, dataset.dataEntry[0]);

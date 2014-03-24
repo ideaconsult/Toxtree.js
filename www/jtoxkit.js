@@ -384,7 +384,7 @@ var jToxDataset = (function () {
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even in manual initialization.
     
     var newDefs = jT.$.extend(true, { "configuration" : { "baseFeatures": baseFeatures} }, defaultSettings);
-    self.settings = jT.$.extend(true, {}, newDefs, jToxKit.settings, settings); // i.e. defaults from jToxDataset
+    self.settings = jT.$.extend(true, {}, newDefs, jT.settings, settings); // i.e. defaults from jToxDataset
     self.features = null; // features, as downloaded from server, after being processed.
     self.dataset = null; // the last-downloaded dataset.
     self.groups = null; // computed groups, i.e. 'groupName' -> array of feature list, prepared.
@@ -394,7 +394,7 @@ var jToxDataset = (function () {
     self.suspendEqualization = false;
     self.orderList = [];
     
-    root.appendChild(jToxKit.getTemplate('#jtox-dataset'));
+    root.appendChild(jT.getTemplate('#jtox-dataset'));
     
     // now make some action handlers - on next, prev, filter, etc.
     var pane = jT.$('.jtox-ds-control', self.rootElement)[0];
@@ -485,14 +485,14 @@ var jToxDataset = (function () {
         var tabId = "jtox-ds-export-" + self.instanceNo;
         var liEl = createATab(tabId, "Export");
         jT.$(liEl).addClass('jtox-ds-export');
-        var divEl = jToxKit.getTemplate('#jtox-ds-export')
+        var divEl = jT.getTemplate('#jtox-ds-export')
         divEl.id = tabId;
         all.appendChild(divEl);
         divEl = jT.$('.jtox-exportlist', divEl)[0];
         
         for (var i = 0, elen = self.settings.configuration.exports.length; i < elen; ++i) {
           var expo = self.settings.configuration.exports[i];
-          var el = jToxKit.getTemplate('#jtox-ds-download');
+          var el = jT.getTemplate('#jtox-ds-download');
           divEl.appendChild(el);
           
           jT.$('a', el)[0].href = ccLib.addParameter(self.datasetUri, "media=" + encodeURIComponent(expo.type));
@@ -607,14 +607,14 @@ var jToxDataset = (function () {
               function (id, name, parent) {
                 var fEl = null;
                 if (id != null && cls.shortFeatureId(id) != "Diagram") {
-                  fEl = jToxKit.getTemplate('#jtox-one-detail');
+                  fEl = jT.getTemplate('#jtox-one-detail');
                   parent.appendChild(fEl);
                   ccLib.fillTree(fEl, {title: name, value: self.featureValue(id, full), uri: self.featureUri(id)});
                 }
                 return fEl;
               },
               function (id, parent) {
-                var tabTable = jToxKit.getTemplate('#jtox-details-table');
+                var tabTable = jT.getTemplate('#jtox-details-table');
                 parent.appendChild(tabTable);
                 return tabTable;  
               }
@@ -663,7 +663,7 @@ var jToxDataset = (function () {
           
           if (!!feature.shorten) {
             col["mRender"] = function(data, type, full) {
-              return (type != "display") ? '' + data : jToxKit.shortenedData(data, "Press to copy the value in the clipboard");
+              return (type != "display") ? '' + data : jT.shortenedData(data, "Press to copy the value in the clipboard");
             };
             col["sWidth"] = "75px";
           }
@@ -849,7 +849,7 @@ var jToxDataset = (function () {
       var qStart = Math.floor(from / size);
       var qUri = ccLib.addParameter(self.datasetUri, "page=" + qStart + "&pagesize=" + size);
 
-      jToxKit.call(self, qUri, function(dataset){
+      jT.call(self, qUri, function(dataset){
         if (!!dataset){
           // first initialize the counters.
           var qSize = dataset.dataEntry.length;
@@ -912,11 +912,11 @@ var jToxDataset = (function () {
         datasetUri = ccLib.removeParameter(datasetUri, 'page');
       }
       
-      self.baseUrl = ccLib.isNull(self.settings.baseUrl) ? jToxKit.grabBaseUrl(datasetUri) : self.settings.baseUrl;
+      self.baseUrl = ccLib.isNull(self.settings.baseUrl) ? jT.grabBaseUrl(datasetUri) : self.settings.baseUrl;
       
       // remember the _original_ datasetUri and make a call with one size length to retrieve all features...
       self.datasetUri = datasetUri;
-      jToxKit.call(self, ccLib.addParameter(datasetUri, "page=0&pagesize=1"), function (dataset) {
+      jT.call(self, ccLib.addParameter(datasetUri, "page=0&pagesize=1"), function (dataset) {
         if (!!dataset) {
           self.features = dataset.feature;
           cls.processFeatures(self.features, self.settings.configuration.baseFeatures);
@@ -924,7 +924,7 @@ var jToxDataset = (function () {
           self.prepareGroups(dataset);
           if (self.settings.showTabs) {
             self.prepareTabs(jT.$('.jtox-ds-features', self.rootElement)[0], true, function (id, name, parent){
-              var fEl = jToxKit.getTemplate('#jtox-ds-feature');
+              var fEl = jT.getTemplate('#jtox-ds-feature');
               parent.appendChild(fEl);
               ccLib.fillTree(fEl, {title: name.replace(/_/g, ' '), uri: self.featureUri(id)});
               return fEl;
@@ -1028,7 +1028,7 @@ var jToxDataset = (function () {
   
   return cls;
 })();
-/* toxstudy.js - Study-related functions from jToxKit.
+/* toxstudy.js - Study-related functions from jT.
  *
  * Copyright 2012-2013, IDEAconsult Ltd. http://www.ideaconsult.net/
  * Created by Ivan Georgiev
@@ -1060,21 +1060,21 @@ var jToxStudy = (function () {
     self.suffix = '_' + instanceCount++;
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even in manual initialization.
     
-    self.settings = jT.$.extend({}, defaultSettings, jToxKit.settings, settings); // i.e. defaults from jToxStudy
+    self.settings = jT.$.extend({}, defaultSettings, jT.settings, settings); // i.e. defaults from jToxStudy
     // now we have our, local copy of settings.
     
     // get the main template, add it (so that jQuery traversal works) and THEN change the ids.
     // There should be no overlap, because already-added instances will have their IDs changed already...
-    var tree = jToxKit.getTemplate('#jtox-studies');
+    var tree = jT.getTemplate('#jtox-studies');
     root.appendChild(tree);
-    jToxKit.changeTabsIds(tree, self.suffix);
+    jT.changeTabsIds(tree, self.suffix);
     
     // keep on initializing...
     var loadPanel = function(panel){
       if (panel){
         jT.$('.jtox-study.unloaded', panel).each(function(i){
           var table = this;
-          jToxKit.call(self, jT.$(table).data('jtox-uri'), function(study){
+          jT.call(self, jT.$(table).data('jtox-uri'), function(study){
             if (!!study) {
               jT.$(table).removeClass('unloaded folded');  
               jT.$(table).addClass('loaded');
@@ -1137,7 +1137,7 @@ var jToxStudy = (function () {
   
       var theCat = jT.$('.' + category + '.jtox-study', tab)[0];
       if (!theCat) {
-        theCat = jToxKit.getTemplate('#jtox-study');
+        theCat = jT.getTemplate('#jtox-study');
         tab.appendChild(theCat);
         jT.$(theCat).addClass(category);
         
@@ -1165,7 +1165,7 @@ var jToxStudy = (function () {
         { "sTitle": "Result", "sClass": "center middle jtox-multi", "sWidth": "15%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, function (data, type) { return formatLoHigh(data.result, type) }) } },
         { "sTitle": "Guideline", "sClass": "center middle", "sWidth": "15%", "mData": "protocol.guideline", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
         { "sTitle": "Owner", "sClass": "center middle shortened", "sWidth": "50px", "mData": "citation.owner", "sDefaultContent": "?"  }, 
-        { "sTitle": "UUID", "sClass": "center middle", "sWidth": "50px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : jToxKit.shortenedData(data, "Press to copy the UUID in the clipboard"); } }
+        { "sTitle": "UUID", "sClass": "center middle", "sWidth": "50px", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : jT.shortenedData(data, "Press to copy the UUID in the clipboard"); } }
       ];
   
       var category = study.protocol.category.code;
@@ -1609,7 +1609,7 @@ var jToxStudy = (function () {
       
       // now make the actual filling
       for (var i in substances) {
-        var panel = jToxKit.getTemplate('#jtox-compoblock');
+        var panel = jT.getTemplate('#jtox-compoblock');
         tab.appendChild(panel);
         ccLib.fillTree(jT.$('.composition-info', panel)[0], substances[i]);
         prepareFillTable(substances[i].composition, panel);
@@ -1619,7 +1619,7 @@ var jToxStudy = (function () {
     querySummary: function(substanceURI) {
       var self = this;
       
-      jToxKit.call(self, substanceURI + "/studysummary", function(summary) {
+      jT.call(self, substanceURI + "/studysummary", function(summary) {
         if (!!summary && !!summary.facet)
           self.processSummary(summary.facet);
       });
@@ -1628,7 +1628,7 @@ var jToxStudy = (function () {
     queryComposition: function(substanceURI) {
       var self = this;
       
-      jToxKit.call(self, substanceURI + "/composition", function(composition) {
+      jT.call(self, substanceURI + "/composition", function(composition) {
         if (!!composition && !!composition.composition)
           self.processComposition(composition);
         });
@@ -1638,10 +1638,10 @@ var jToxStudy = (function () {
       var self = this;
       
       // re-initialize us on each of these calls.
-      self.baseUrl = ccLib.isNull(self.settings.baseUrl) ? jToxKit.grabBaseUrl(substanceURI) : self.settings.baseUrl;
+      self.baseUrl = ccLib.isNull(self.settings.baseUrl) ? jT.grabBaseUrl(substanceURI) : self.settings.baseUrl;
       
       var rootTab = jT.$('.jtox-substance', self.rootElement)[0];
-      jToxKit.call(self, substanceURI, function(substance){
+      jT.call(self, substanceURI, function(substance){
         if (!!substance && !!substance.substance && substance.substance.length > 0){
           substance = substance.substance[0];
            
@@ -1656,7 +1656,7 @@ var jToxStudy = (function () {
             
           ccLib.fillTree(self.rootElement, substance);
           // go and query for the reference query
-          jToxKit.call(self, substance.referenceSubstance.uri, function (dataset){
+          jT.call(self, substance.referenceSubstance.uri, function (dataset){
             if (!!dataset) {
               jToxDataset.processDataset(dataset, null, fnDatasetValue);
               ccLib.fillTree(rootTab, dataset.dataEntry[0]);
@@ -1673,7 +1673,7 @@ var jToxStudy = (function () {
   
   return cls;
 })();
-window.jToxKit = {
+window.jT = window.jToxKit = {
 	templateRoot: null,
 
 	/* A single place to hold all necessary queries. Parameters are marked with <XX> and formatString() (common.js) is used
@@ -1686,7 +1686,7 @@ window.jToxKit = {
 	templates: { },        // html2js routine will fill up this variable
 	tools: { },        // additional, external tools added with html2js
 
-	/* SETTINGS. The following parametes can be passed in settings object to jToxKit.init(), or as data-XXX - with the same names. Values set here are the defaults.
+	/* SETTINGS. The following parametes can be passed in settings object to jT.init(), or as data-XXX - with the same names. Values set here are the defaults.
 	*/
 	settings: {
   	jsonp: false,                   // whether to use JSONP approach, instead of JSON.
@@ -1709,7 +1709,6 @@ window.jToxKit = {
   	var self = this;
   	
   	self.$ = jQuery.noConflict();
-  	window.jT = self;
   	
   	self.initTemplates();
 
@@ -1739,7 +1738,7 @@ window.jToxKit = {
     	  // first, get the configuration, if such is passed
     	  if (!ccLib.isNull(dataParams.configFile)) {
     	    // we'll use a trick here so the baseUrl parameters set so far to take account... thus passing 'fake' kit instance
-    	    // as the first parameter of jToxKit.call();
+    	    // as the first parameter of jT.call();
       	  self.call({ settings: dataParams}, dataParams.configFile, function(config){
         	  if (!!config)
         	    dataParams['configuration'] = config;
@@ -1902,9 +1901,9 @@ window.jToxKit = {
 };
 
 jQuery(document).ready(function(){
-  jToxKit.init();
+  jT.init();
 });
-jToxKit.templates['all-dataset']  = 
+jT.templates['all-dataset']  = 
 "	  <div id=\"jtox-dataset\">" +
 "	    <div class=\"jtox-ds-features\"></div>" +
 "	    <div class=\"jtox-ds-control\">" +
@@ -1929,24 +1928,24 @@ jToxKit.templates['all-dataset']  =
 "	  </div>" +
 ""; // end of #jtox-dataset 
 
-jToxKit.templates['dataset-one-feature']  = 
+jT.templates['dataset-one-feature']  = 
 "    <div id=\"jtox-ds-feature\" class=\"jtox-ds-feature\"><input type=\"checkbox\" checked=\"yes\" class=\"jtox-checkbox\" /><span class=\"data-field jtox-title\" data-field=\"title\"> ? </span><sup><a target=\"_blank\" class=\"data-field attribute\" data-attribute=\"href\" data-field=\"uri\">?</a></sup></div>" +
 ""; // end of #jtox-ds-feature 
 
-jToxKit.templates['dataset-download']  = 
+jT.templates['dataset-download']  = 
 "    <div id=\"jtox-ds-download\" class=\"jtox-inline jtox-ds-download\">" +
 "      <a target=\"_blank\"><img class=\"borderless\"/></a>" +
 "    </div>" +
 ""; // end of #jtox-ds-download 
 
-jToxKit.templates['dataset-export']  = 
+jT.templates['dataset-export']  = 
 "    <div id=\"jtox-ds-export\">" +
 "      <div class=\"jtox-inline\">Download dataset as: </div>" +
 "      <div class=\"jtox-inline jtox-exportlist\"></div>" +
 "    </div>" +
 ""; // end of #jtox-ds-export 
 
-jToxKit.templates['dataset-one-detail']  = 
+jT.templates['dataset-one-detail']  = 
 "    <table>" +
 "      <tbody>" +
 "        <tr id=\"jtox-one-detail\">" +
@@ -1957,11 +1956,11 @@ jToxKit.templates['dataset-one-detail']  =
 "    </table>" +
 ""; // end of #jtox-one-detail 
 
-jToxKit.templates['dataset-details-table']  = 
+jT.templates['dataset-details-table']  = 
 "    <table id=\"jtox-details-table\" class=\"jtox-details-table\"></table>" +
 ""; // end of #jtox-details-table 
 
-jToxKit.templates['all-studies']  = 
+jT.templates['all-studies']  = 
 "	  <div id=\"jtox-studies\">" +
 "	    <ul>" +
 "	      <li><a href=\"#jtox-substance\">IUC Substance</a></li>" +
@@ -2049,7 +2048,7 @@ jToxKit.templates['all-studies']  =
 "	  </div>" +
 ""; // end of #jtox-studies 
 
-jToxKit.templates['composition-block']  = 
+jT.templates['composition-block']  = 
 "    <div id=\"jtox-compoblock\" class=\"jtox-compoblock\">" +
 "      <table class=\"dataTable composition-info jtox-font-small\">" +
 "        <thead>" +
@@ -2074,7 +2073,7 @@ jToxKit.templates['composition-block']  =
 "    </div>" +
 ""; // end of #jtox-compoblock 
 
-jToxKit.templates['one-study']  = 
+jT.templates['one-study']  = 
 "    <div id=\"jtox-study\" class=\"jtox-study jtox-foldable folded unloaded\">" +
 "      <div class=\"jtox-study-title\"><p class=\"data-field\" data-field=\"title\">? (0)</p></div>" +
 "      <table class=\"jtox-study-table\"></table>" +

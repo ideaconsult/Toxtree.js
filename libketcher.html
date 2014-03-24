@@ -17,15 +17,16 @@
 
 	<link rel="stylesheet" href="www/ketcher.css"/>
 
+  <script src="www/ketcher.js"></script>
   <script src="scripts/jquery.js"></script>
 
   <script src="scripts/common.js"></script>
   <script src="scripts/jtoxkit.js"></script>
-  <script src="www/ketcher.js"></script>
+  <script src="www/ketcher_html.js"></script>
 
   <script language="javascript">
-    $(document).ready(function () {
-      jToxKit.insertTool('ketcher', $('#ketcher-test')[0]);
+    jQuery(document).ready(function () {
+      jT.insertTool('ketcher', jT.$('#ketcher-test')[0]);
       ketcher.init();
     });
   </script>
