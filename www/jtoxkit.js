@@ -69,7 +69,10 @@ var ccLib = {
       level = 0;
     if (typeof obj != "object")
       fn(obj, idx, level);
-    else
+    else if (jQuery.isArray(obj)) // array
+      for (var i = 0, l = obj.length; i < l; ++i)
+        this.enumObject(obj[i], fn, i, level + 1);
+    else // normal object
       for (var i in obj)
         this.enumObject(obj[i], fn, i, level + 1);
   },
@@ -1382,8 +1385,8 @@ var jToxStudy = (function () {
       }
       
       // create the groups on the corresponding tabs
-      for (var s in summary) {
-        var sum = summary[s];
+      for (var si = 0, sl = summary.length; si < sl; ++si) {
+        var sum = summary[si];
         var top = sum.topcategory.title;
         if (!top)
           continue;

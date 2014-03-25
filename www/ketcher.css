@@ -8,15 +8,6 @@ div.ketcher_root * {
   vertical-align: inherit;
 }
 
-div.ketcher_root > div:first-child
-{
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    max-width: 900px;
-    max-height: 720px;
-}
-
 a, img
 {
     border-color: #E0E0E0;
@@ -33,7 +24,6 @@ td
 
 table#ketcher_window
 {
-    position: absolute;
     z-index: 1;
     width: 100%;
     height: auto;
@@ -42,14 +32,9 @@ table#ketcher_window
     border-color: white;
     border-style: outset;
     border-width: thin;
+    max-width: 900px;
+    max-height: 720px;
 }
-
-/*
-table#ketcher_window > tr
-{
-    height: 32px;
-}
-*/
 
 #main_toolbar
 {

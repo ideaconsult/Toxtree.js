@@ -69,7 +69,10 @@ var ccLib = {
       level = 0;
     if (typeof obj != "object")
       fn(obj, idx, level);
-    else
+    else if (jQuery.isArray(obj)) // array
+      for (var i = 0, l = obj.length; i < l; ++i)
+        this.enumObject(obj[i], fn, i, level + 1);
+    else // normal object
       for (var i in obj)
         this.enumObject(obj[i], fn, i, level + 1);
   },

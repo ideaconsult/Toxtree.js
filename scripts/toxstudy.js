@@ -352,8 +352,8 @@ var jToxStudy = (function () {
       }
       
       // create the groups on the corresponding tabs
-      for (var s in summary) {
-        var sum = summary[s];
+      for (var si = 0, sl = summary.length; si < sl; ++si) {
+        var sum = summary[si];
         var top = sum.topcategory.title;
         if (!top)
           continue;
