@@ -34,6 +34,7 @@ $(document).ready(function() {
 });
 ```
 
+**jToxKit** itself provides certain _global_ routines, which can be invoked like `jToxKit.call()`, however for ease of use, there is an alias `jT` for `jToxKit`, so `jT.call()` is also a valid reference.
 
 ### Configuration parameters
 
@@ -502,6 +503,7 @@ There are two scripts, involved in the process:
 - [html2js.pl](bin/html2js.pl) - Perl script for converting html to javascript in the specified way; 
 - [jsminify.pl](bin/jsminify.pl) - a Perl script for minification (Copyright (C) 2007 by Peter Michaux);
 - [build.sh](bin/build.sh) - a (bash) shell script for running the above, merging necessary files and writing the final, production ones.
+- [htmlextract.pl](bin/htmlextract.pl) - a Perl script which extracts referred JS or CSS files from within the input and merges them altogether in the output.
 
 
 ### Building procedure
@@ -511,7 +513,8 @@ It is as simple as running the `build.sh` script! It can, even be run without pa
 ```
 $ ./build.sh 
 Clearing old files...
-Processing targets [toxstudy jtoxkit]...
+Backing tool [ketcher]...
+Processing targets [common toxdataset toxstudy jtoxkit]...
 Merging JS files from [../scripts] ...
 Adding html2js transformed ones from [..]...
 Merging CSS files from [../styles] ...
@@ -529,13 +532,33 @@ Options can be one or more from the following:
     [--out <output dir>]   : the directory where output files should be put. Default is [../www].
     [-css <styles dir>]    : the directory where styling files live. Default is [../styles].
     [--js <js dir>]        : the directory where script files live. Default is [../scripts].
-    [--target <kit list>]  : list of kits to be included. Omit jT. Default [toxstudy].
+    [--target <kit list>]  : list of kits to be included. Omit jtoxkit. Default [toxstudy].
+    [--lib | -l <filename>]: html file name, referring to some external library (tool).
     [--help | -h]          : this help.
 
 Default is like: build.sh --html .. --out ../www --css ../styles --js ../script --target toxstudy
 ```
 
 The result of this script can be directly used. There is a test page for proper result, which should not produce errors when opened in the browser [test.html](www/test.html).
+
+##### A word on external tools / libraries
+
+You can include certain libraries to be packe during building process. Like it is done with [ketcher](http://scitouch.net/opensource/ketcher). The way it is desgined to happen is:
+
+- Download all tool's files, most probably having one _html_ file including all necessary scripts and stylesheets.
+- Refer this _html_ file in _build.sh_ call, like this: `build.sh ... -lib ../../ketcher/ketcher.html`.
+- What will happen will be that JavaScripts referred in the html will be merged together in a single JavaScript file, named after _html_ file referred. (e.g. `ketcher.js`).
+- The content of the _html_ file itself will be transformed into JS string (using `html2js.pl` tool) and added to the same JavaScript file.
+- Also all stylesheed files will be merged together in a single .css file named after the referred _html_ file (e.g. `ketcher.css`). Both will be placed in the given output directory.
+- The js-transformed html content will be added as `jToxKit.tool[]`, which means it can be inserted later into the page using this global method: `jT.insertTool(name, root)`
+
+With the given example the call is:
+
+```
+jT.insertTool('ketcher', jT.$('#ketcher-test')[0]);
+```
+
+Any additional initialization that the particular tool needs, has to be called separately.
 
 
 
