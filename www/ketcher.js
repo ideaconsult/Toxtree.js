@@ -16411,7 +16411,7 @@ ui.onMouseDown_DropdownListItem = function (event)
 
 ui.defaultSelector = 'selector_lasso';
 
-ui.init = function ()
+ui.init = function (root)
 {
     if (this.initialized)
     {
@@ -16424,6 +16424,7 @@ ui.init = function ()
         return;
     }
 
+    this.root = (!!root ? root : document);
     this.is_osx = (navigator.userAgent.indexOf('Mac OS X') != -1);
     this.is_touch = 'ontouchstart' in document;
 
@@ -16483,11 +16484,11 @@ ui.init = function ()
     }
 
     // Document events
-    document.observe('keypress', ui.onKeyPress_Ketcher);
-    document.observe('keydown', ui.onKeyDown_IE);
-    document.observe('keyup', ui.onKeyUp);
-    document.observe(EventMap['mousedown'], ui.onMouseDown_Ketcher);
-    document.observe(EventMap['mouseup'], ui.onMouseUp_Ketcher);
+    p$(this.root).observe('keypress', ui.onKeyPress_Ketcher);
+    p$(this.root).observe('keydown', ui.onKeyDown_IE);
+    p$(this.root).observe('keyup', ui.onKeyUp);
+    p$(this.root).observe(EventMap['mousedown'], ui.onMouseDown_Ketcher);
+    p$(this.root).observe(EventMap['mouseup'], ui.onMouseUp_Ketcher);
 
     // Button events
     $$('.toolButton').each(ui.initButton);
@@ -16647,7 +16648,6 @@ ui.init = function ()
             else
                 el.hide();
         });
-        document.title += ' (standalone)';
     } else
     {
         if (ui.path != '/')
@@ -20571,11 +20571,11 @@ ketcher = function () {
 
 ketcher.version = "1.0b5";
 
-ketcher.init = function ()
+ketcher.init = function (root)
 {
-    document.title += ' v' + ketcher.version;
-    ketcher.templates = {};
+  ketcher.templates = {};
 	ketcher.button_areas = {};
+	
 	var elemLabelOpts = {'fontSize':25};
 	ketcher.button_areas.atom_h = new rnd.ElementTable('atom_h', elemLabelOpts).renderSingle('H');
 	ketcher.button_areas.atom_c = new rnd.ElementTable('atom_c', elemLabelOpts).renderSingle('C');
@@ -20797,7 +20797,7 @@ ketcher.init = function ()
     ketcher.button_areas.rgroup_label = ketcher.showMolfileOpts('rgroup', tmpl.rgroup_label, 75, renderOpts);
 */
 
-    ui.init();
+    ui.init(root);
 };
 
 ketcher.getSmiles = function ()
