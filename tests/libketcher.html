@@ -26,7 +26,12 @@
   <script language="javascript">
     jT.$(document).ready(function () {
       jT.insertTool('ketcher', jT.$('#ketcher-test')[0]);
-      ketcher.init();
+      ketcher.init({ ajaxRequest: function (service, method, async, parameters, onready) {
+        if (service == "knocknock")
+          onready("You are welcome!", null);
+        else
+          jT.call(null, 'molecules/' + service, function (res, jhr) { onready(res, jhr); });
+      }});
     });
   </script>
 </head>

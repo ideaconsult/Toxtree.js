@@ -32,8 +32,8 @@ table#ketcher_window
     border-color: white;
     border-style: outset;
     border-width: thin;
-    max-width: 900px;
-    max-height: 720px;
+    min-width: 250px;
+    min-height: 120px;
 }
 
 #main_toolbar
