@@ -1088,7 +1088,7 @@ var jToxStudy = (function () {
           var table = this;
           jT.call(self, jT.$(table).data('jtox-uri'), function(study){
             if (!!study) {
-              jT.$(table).removeClass('unloaded');  
+              jT.$(table).removeClass('unloaded folded');
               jT.$(table).addClass('loaded');
               self.processStudies(panel, study.study, false);
             }
@@ -1486,7 +1486,8 @@ var jToxStudy = (function () {
 
         var theTable = self.ensureTable(tab, study);
         jT.$(theTable).dataTable().fnAddData(onec);
-/*         jT.$(theTable).colResizable(); */
+        jT.$(theTable).colResizable({ minWidth: 15, liveDrag: true });
+        jT.$(theTable).parents('.jtox-study').addClass('folded');
       }
       
       // we need to fix columns height's because of multi-cells
