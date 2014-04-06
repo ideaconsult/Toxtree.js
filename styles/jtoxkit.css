@@ -120,3 +120,7 @@
 .jtox-hidden {
   display: none !important;
 }
+
+.jtox-toolkit .float-right {
+	float: right !important;
+}

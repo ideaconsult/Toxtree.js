@@ -1,9 +1,11 @@
 TODO:
 
-- document on insertTool() and jQuery being migrated to jT.$()
-
 - make appropriate message when there is no internet
 - make appropriate loading waiting cursor.
 
 - (global) extractFeature(dataset, featureId) - return an array of values of that feature for each entry in the dataset. (Can be used for diagram)
 - make toxtree part of jToxKit
+
+Assessment:
+- Ability to re-use the built tab/features structures? Additional setting?
+- 

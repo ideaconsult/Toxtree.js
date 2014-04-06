@@ -38,6 +38,15 @@ var jToxStudy = (function () {
     var tree = jT.getTemplate('#jtox-studies');
     root.appendChild(tree);
     jT.changeTabsIds(tree, self.suffix);
+    $('div.jtox-study-tab div button', tree).on('click', function (e) {
+    	var par = $(this).parents('.jtox-study-tab')[0];
+	    if ($(this).hasClass('expand-all')) {
+		    $('.jtox-foldable', par).removeClass('folded');
+	    }
+	    else if ($(this).hasClass('collapse-all')) {
+		    $('.jtox-foldable', par).addClass('folded');
+	    }
+    });
     
     // keep on initializing...
     var loadPanel = function(panel){
@@ -46,7 +55,7 @@ var jToxStudy = (function () {
           var table = this;
           jT.call(self, jT.$(table).data('jtox-uri'), function(study){
             if (!!study) {
-              jT.$(table).removeClass('unloaded folded');  
+              jT.$(table).removeClass('unloaded');  
               jT.$(table).addClass('loaded');
               self.processStudies(panel, study.study, false);
             }

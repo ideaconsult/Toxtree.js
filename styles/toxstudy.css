@@ -77,6 +77,11 @@ div.jtox-study-tab.ui-tabs-panel {
   height: 100%;
 }
 
+div.jtox-study-tab div button {
+	font-size: 80%;
+	padding:4px 8px 4px 8px;
+}
+
 div.jtox-study-tab .dataTables_wrapper {
   overflow: hidden;  
   width: 100%;
