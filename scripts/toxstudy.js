@@ -356,9 +356,13 @@ var jToxStudy = (function () {
       var typeSummary = [];
       
       // first - clear all existing tabs
-			jT.$('.jtox-study', self.rootElement).empty();
+			jT.$('.jtox-study', self.rootElement).remove();
       
-      // create the groups on the corresponding tabs
+      // create the groups on the corresponding tabs, first sorting them alphabetically
+      summary.sort(function (a, b) {
+	      return (a.category.description || a.category.title) < (b.category.description || b.category.title) ? -1 : 1;
+      });
+      
       for (var si = 0, sl = summary.length; si < sl; ++si) {
         var sum = summary[si];
         var top = sum.topcategory.title;
