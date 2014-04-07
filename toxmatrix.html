@@ -14,7 +14,12 @@
 	<link rel="stylesheet" href="styles/layout.css">
 	<link rel="stylesheet" href="styles/jquery-ui.css">
 	<link rel="stylesheet" href="styles/jquery.dataTables.css">
-	<link rel="stylesheet" href="www/jtoxkit.css">
+
+	<link rel="stylesheet" href="styles/jtoxkit.css">
+	<link rel="stylesheet" href="styles/toxdataset.css">
+	<link rel="stylesheet" href="styles/toxstudy.css">
+
+	<link rel="stylesheet" href="styles/toxmatrix.css">
 
   <script src="scripts/jquery.js"></script>
   <script src="scripts/jquery-migrate-1.2.1.min.js"></script>
@@ -22,7 +27,11 @@
   <script src="scripts/jquery-ui.js"></script>
   <script src="scripts/jquery.dataTables.js"></script>
 
-  <script src="www/jtoxkit.js"></script>
+  <script src="scripts/common.js"></script>
+  <script src="scripts/jtoxkit.js"></script>
+  <script src="scripts/toxdataset.js"></script>
+  <script src="scripts/toxstudy.js"></script>
+
   <script src="scripts/toxmatrix.js"></script>
 
   <script language="javascript">
@@ -48,7 +57,7 @@
 	          <tr><th class="right jtox-size-third">Assessment</th><th class="data-field" data-field="id"></th></tr>
 	          <tr><td class="right jtox-size-third">Name:</td><td><input class="data-field" data-field="name"></input></td></tr>
 	          <tr><td class="right jtox-size-third">Number:</td><td><input class="data-field" data-field="number"></input></td></tr>
-	          <tr><td class="right jtox-size-third">Purpose:</td><td><input class="data-field" data-field="purpose"></input></td></tr>
+	          <tr><td class="right top jtox-size-third">Purpose:</td><td><textarea class="nomargin data-field" data-field="purpose"></textarea></td></tr>
 	          <tr><td class="right jtox-size-third">Owner:</td><td class="data-field" data-field="owner"></td></tr>
 	          <tr><td class="right jtox-size-third">Version:</td><td class="data-field" data-field="version">?.?</td></tr>
 	          <tr><td class="right jtox-size-third">Status:</td><td class="data-field" data-field="status"></td></tr>
@@ -68,7 +77,7 @@
 	          	<td>
 		          	<div class="jq-buttonset">
 								  <input type="radio" id="pub-yes" name="published"><label for="pub-yes">Yes</label>
-								  <input type="radio" id="pub-no" name="publshed" checked="checked"><label for="pub-no">No</label>
+								  <input type="radio" id="pub-no" name="published" checked="checked"><label for="pub-no">No</label>
 								</div>
 							</td>
 						</tr>
@@ -83,6 +92,12 @@
 						</tr>
 	        </thead>
 	      </table>
+	      <div>
+		      <button name="assStart">Start</button>
+		      <button name="assFinalize">Finalize</button>
+		      <button name="assDuplicate">Duplicate</button>
+		      <button name="assUpdate">Update</button>
+	      </div>
     	</form>
     </div>
     <div id="jtox-structures" class="jtox-structures"></div>
