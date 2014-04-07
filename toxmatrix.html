@@ -55,9 +55,9 @@
 	      <table class="dataTable">
 	        <thead>
 	          <tr><th class="right jtox-size-third">Assessment</th><th class="data-field" data-field="id"></th></tr>
-	          <tr><td class="right jtox-size-third">Name:</td><td><input class="data-field" data-field="name"></input></td></tr>
-	          <tr><td class="right jtox-size-third">Number:</td><td><input class="data-field" data-field="number"></input></td></tr>
-	          <tr><td class="right top jtox-size-third">Purpose:</td><td><textarea class="nomargin data-field" data-field="purpose"></textarea></td></tr>
+	          <tr><td class="right jtox-size-third">Name:</td><td><input class="data-field" data-field="name" name="name"></input></td></tr>
+	          <tr><td class="right jtox-size-third">Number:</td><td><input class="data-field" data-field="number" name="number"></input></td></tr>
+	          <tr><td class="right top jtox-size-third">Purpose:</td><td><textarea class="nomargin data-field" data-field="purpose" name="purpose"></textarea></td></tr>
 	          <tr><td class="right jtox-size-third">Owner:</td><td class="data-field" data-field="owner"></td></tr>
 	          <tr><td class="right jtox-size-third">Version:</td><td class="data-field" data-field="version">?.?</td></tr>
 	          <tr><td class="right jtox-size-third">Status:</td><td class="data-field" data-field="status"></td></tr>
@@ -67,8 +67,9 @@
 	          	<td class="right jtox-size-third">Flags:</td>
 	          	<td>
 		          	<div class="jq-buttonset">
-								  <input type="checkbox" id="confidential"><label for="confidential">Confidential</label>
-								  <input type="checkbox" id="internal"><label for="internal">Internal</label>
+		          		<input type="hidden" name="flags"/>
+								  <input type="checkbox" id="confidential" value="1"><label for="confidential">Confidential</label></input>
+								  <input type="checkbox" id="internal" value="2"><label for="internal">Internal</label></input>
 								</div>
 							</td>
 						</tr>
@@ -76,8 +77,8 @@
 	          	<td class="right jtox-size-third">Published:</td>
 	          	<td>
 		          	<div class="jq-buttonset">
-								  <input type="radio" id="pub-yes" name="published"><label for="pub-yes">Yes</label>
-								  <input type="radio" id="pub-no" name="published" checked="checked"><label for="pub-no">No</label>
+								  <input type="radio" id="pub-yes" name="published" value="true"><label for="pub-yes">Yes</label></input>
+								  <input type="radio" id="pub-no" name="published" value="false" checked="checked"><label for="pub-no">No</label></input>
 								</div>
 							</td>
 						</tr>
@@ -85,14 +86,14 @@
 	          	<td class="right jtox-size-third">Use allowed:</td>
 	          	<td>
 		          	<div class="jq-buttonset">
-								  <input type="radio" id="use-yes" name="useallowed"><label for="use-yes">Yes</label>
-								  <input type="radio" id="use-no" name="useallowed" checked="checked"><label for="use-no">No</label>
+								  <input type="radio" id="use-yes" value="true" name="useallowed"><label for="use-yes">Yes</label></input>
+								  <input type="radio" id="use-no" value="false" name="useallowed" checked="checked"><label for="use-no">No</label></input>
 								</div>
 							</td>
 						</tr>
 	        </thead>
 	      </table>
-	      <div>
+	      <div class="actions">
 		      <button name="assStart">Start</button>
 		      <button name="assFinalize">Finalize</button>
 		      <button name="assDuplicate">Duplicate</button>

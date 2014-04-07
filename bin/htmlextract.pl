@@ -1,10 +1,22 @@
 #!/usr/bin/perl -w
 
 my $what = 'js';
-if (@ARGV > 0) {
-	($what) = ($ARGV[0] =~ m/^\-+(.+)$/);
-}
 my $outIt = 0;
+my @include = ();
+my @exclude = ();
+
+while (my $arg = shift) {
+	if ($arg eq '--include') {
+		push (@include, shift);
+	} elsif ($arg eq '--exclude') {
+		push (@exclude, shift);
+	} else {
+		($what) = ($arg =~ m/^\-+(.+)$/);
+	}
+}
+
+my $incPattern = '.*(' . join('|', @include) . ').*';
+my $excPattern = '.*(' . join('|', @exclude) . ').*';
 
 foreach my $line (<STDIN>) {
 	chomp $line;
@@ -40,7 +52,13 @@ foreach my $line (<STDIN>) {
 }
 
 sub dump_file {
-	open (IN, "<" . $_[0]) || die ("Failed to open: " . $_[0]);
+	my $f = $_[0];
+	if (@include && !($f =~ /$incPattern/)) {
+		return;
+	} elsif (!@include && @exclude && $f =~ /$excPattern/) {
+		return;
+	}
+	open (IN, "<" . $f) || die ("Failed to open: " . $f . "\r\n");
 	print STDOUT <IN>;
 	close (IN);
 }

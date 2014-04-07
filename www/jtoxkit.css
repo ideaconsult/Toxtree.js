@@ -286,12 +286,20 @@ td.jtox-multi table {
   width: 100%;
 }
 
+.jtox-toolkit .top {
+  vertical-align: top !important;
+}
+
 .jtox-toolkit .middle {
   vertical-align: middle !important;
 }
 
 .jtox-toolkit .right {
   text-align: right !important;
+}
+
+.jtox-toolkit .nomargin {
+	margin: 0px !important;
 }
 
 .jtox-font-small {
