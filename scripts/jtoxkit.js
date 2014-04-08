@@ -48,6 +48,8 @@ window.jT = window.jToxKit = {
 	  // initializes the kit, based on the passed kit name
 	  var initKit = function(element, params) {
 	  	var kit = params.kit;
+	  	if (!kit)
+	  		return null;
 	  	if (kit.indexOf('jTox') != 0)
 		  	kit = 'jTox' + kit.charAt(0).toUpperCase() + kit.slice(1);
 

@@ -41,6 +41,9 @@ var jToxMatrix = {
     self.createForm.assUpdate.style.display = 'none';
     self.createForm.assDuplicate.style.display = 'none';
     
+    ccLib.prepareForm(self.createForm, function (el) {
+	    alert("An empty element: " + el);
+    });
     // finally, if provided - load the given assessmentUri
     if (!ccLib.isNull(self.settings.assessmentUri)) {
 	    self.load(self.settings.assessmentUri);
@@ -66,9 +69,9 @@ var jToxMatrix = {
 "<table class=\"dataTable\">" +
 "<thead>" +
 "<tr><th class=\"right jtox-size-third\">Assessment</th><th class=\"data-field\" data-field=\"id\"></th></tr>" +
-"<tr><td class=\"right jtox-size-third\">Name:</td><td><input class=\"data-field\" data-field=\"name\" name=\"name\"></input></td></tr>" +
-"<tr><td class=\"right jtox-size-third\">Number:</td><td><input class=\"data-field\" data-field=\"number\" name=\"number\"></input></td></tr>" +
-"<tr><td class=\"right top jtox-size-third\">Purpose:</td><td><textarea class=\"nomargin data-field\" data-field=\"purpose\" name=\"purpose\"></textarea></td></tr>" +
+"<tr><td class=\"right jtox-size-third\">Name:</td><td><input class=\"data-field first-time non-empty\" data-field=\"name\" name=\"name\"></input></td></tr>" +
+"<tr><td class=\"right jtox-size-third\">Number:</td><td><input class=\"data-field first-time non-empty\" data-field=\"number\" name=\"number\"></input></td></tr>" +
+"<tr><td class=\"right top jtox-size-third\">Purpose:</td><td><textarea class=\"non-empty nomargin data-field\" data-field=\"purpose\" name=\"purpose\"></textarea></td></tr>" +
 "<tr><td class=\"right jtox-size-third\">Owner:</td><td class=\"data-field\" data-field=\"owner\"></td></tr>" +
 "<tr><td class=\"right jtox-size-third\">Version:</td><td class=\"data-field\" data-field=\"version\">?.?</td></tr>" +
 "<tr><td class=\"right jtox-size-third\">Status:</td><td class=\"data-field\" data-field=\"status\"></td></tr>" +
@@ -79,8 +82,8 @@ var jToxMatrix = {
 "<td>" +
 "<div class=\"jq-buttonset\">" +
 "<input type=\"hidden\" name=\"flags\"/>" +
-"<input type=\"checkbox\" id=\"confidential\" value=\"1\"><label for=\"confidential\">Confidential</label></input>" +
-"<input type=\"checkbox\" id=\"internal\" value=\"2\"><label for=\"internal\">Internal</label></input>" +
+"<input type=\"checkbox\" id=\"confidential\" class=\"accumulate\" data-accumulate=\"flags\" value=\"confidential\"><label for=\"confidential\">Confidential</label></input>" +
+"<input type=\"checkbox\" id=\"internal\" class=\"accumulate\" data-accumulate=\"flags\" value=\"internal\"><label for=\"internal\">Internal</label></input>" +
 "</div>" +
 "</td>" +
 "</tr>" +
@@ -105,10 +108,10 @@ var jToxMatrix = {
 "</thead>" +
 "</table>" +
 "<div class=\"actions\">" +
-"<button name=\"assStart\">Start</button>" +
-"<button name=\"assFinalize\">Finalize</button>" +
-"<button name=\"assDuplicate\">Duplicate</button>" +
-"<button name=\"assUpdate\">Update</button>" +
+"<button name=\"assStart\" type=\"submit\">Start</button>" +
+"<button name=\"assFinalize\" type=\"submit\">Finalize</button>" +
+"<button name=\"assDuplicate\" type=\"submit\">Duplicate</button>" +
+"<button name=\"assUpdate\" type=\"submit\">Update</button>" +
 "</div>" +
 "</form>" +
 "</div>" +

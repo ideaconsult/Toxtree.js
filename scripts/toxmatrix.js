@@ -41,6 +41,9 @@ var jToxMatrix = {
     self.createForm.assUpdate.style.display = 'none';
     self.createForm.assDuplicate.style.display = 'none';
     
+    ccLib.prepareForm(self.createForm, function (el) {
+	    alert("An empty element: " + el);
+    });
     // finally, if provided - load the given assessmentUri
     if (!ccLib.isNull(self.settings.assessmentUri)) {
 	    self.load(self.settings.assessmentUri);

@@ -133,6 +133,43 @@ var ccLib = {
     }
   },
   
+  // Prepare a form so that non-empty fields are checked before submit and accumuater fields
+  // are accumulated. Call it after you've set submit behavior, etc.
+  prepareForm: function (form, callback) {
+  	var self = this;
+	  var $ = window.jQuery;
+
+		// first - attach the accumulators handler.	  
+	  $('.accumulate', form).each(function (){
+		  $(this).on('change', function (e) {
+			  var target = $(this).data('accumulate');
+			  if (!!target) {
+			  	target = this.form[target];
+			  	var val = target.value.replace(new RegExp('(' + this.value + ')'), '');
+			  	if (this.checked)
+				  	val += ',' + this.value;
+
+				  target.value = val.replace(/,,/g, ',').replace(/^,/g, '').replace(/,$/g, ''); // change double commas with one, and replaces commas at the beginning and at the end
+			  }
+				return false;
+		  })
+	  });
+	  
+	  // now fix the submitting function too.
+	  $(form).on('submit', function (e) {
+		  var empty = null;
+		  $('.non-empty', this).each(function (){
+		  	if (self.isNull(this.value) || this.value.length == 0)
+		  		empty = this;
+		  });
+		  
+		  if (!!empty) {
+			  self.fireCallback(callback, null, empty);
+			  e.preventDefault();
+			  return false;
+		  }
+	  });
+  },
   /*
   Passed a HTML DOM element - it clears all children folowwing last one. Pass null for clearing all.
   */
@@ -1721,6 +1758,8 @@ window.jT = window.jToxKit = {
 	  // initializes the kit, based on the passed kit name
 	  var initKit = function(element, params) {
 	  	var kit = params.kit;
+	  	if (!kit)
+	  		return null;
 	  	if (kit.indexOf('jTox') != 0)
 		  	kit = 'jTox' + kit.charAt(0).toUpperCase() + kit.slice(1);
 
