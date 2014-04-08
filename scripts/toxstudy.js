@@ -463,7 +463,7 @@ var jToxStudy = (function () {
 
         var theTable = self.ensureTable(tab, study);
         jT.$(theTable).dataTable().fnAddData(onec);
-        jT.$(theTable).colResizable({ minWidth: 15, liveDrag: true });
+        jT.$(theTable).colResizable({ minWidth: 30, liveDrag: true });
         jT.$(theTable).parents('.jtox-study').addClass('folded');
       }
       

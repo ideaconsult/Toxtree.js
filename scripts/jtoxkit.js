@@ -47,10 +47,12 @@ window.jT = window.jToxKit = {
     
 	  // initializes the kit, based on the passed kit name
 	  var initKit = function(element, params) {
-    	if (params.kit == "study")
-    	  new jToxStudy(element, params);
-      if (params.kit == "dataset")
-        new jToxDataset(element, params);
+	  	var kit = params.kit;
+	  	if (kit.indexOf('jTox') != 0)
+		  	kit = 'jTox' + kit.charAt(0).toUpperCase() + kit.slice(1);
+
+	  	var fn = window[kit];
+	  	return (typeof fn == 'function') ? new fn(element, params) : null;
 	  };
 	  
   	// now scan all insertion divs
@@ -142,24 +144,22 @@ window.jT = window.jToxKit = {
 	/* Poll a given taskId and calls the callback when a result from the server comes - 
 	be it "running", "completed" or "error" - the callback is always called.
 	*/
-	pollTask : function(task, callback) {
+	pollTask : function(kit, task, callback) {
 		var self = this;
 		if (task === undefined || task.task === undefined || task.task.length < 1){
-		  ccLib.fireCallback(self.settings.onError, self, '-1', localMessage.taskFailed);
+			console.log("Wrong task passed for polling: " + JSON.stringify(task));
 			return;
 		}
 		task = task.task[0];
+		ccLib.fireCallback(callback, kit, task);
 		if (task.completed == -1){ // i.e. - running
 			setTimeout(function(){
-				self.call(task.result, function(newTask){
+				self.call(kit, task.result, function(newTask){
 					self.pollTask(newTask, callback);
 				});
 			}, self.pollDelay);
 		}
-		else if (!task.error){
-			callback(task.result);
-		}
-		else { // error
+		else if (task.error){ // additionally call the error handler
 		  ccLib.fireCallback(self.settings.onError, self, '-1', task.error);
 		}
 	},
@@ -181,7 +181,7 @@ window.jT = window.jToxKit = {
 		if (kit == null)
 		  kit = this;
 		else 
-  		settings = jT.$.extend(true, settings, kit.settings);
+  		settings = jT.$.extend(settings, kit.settings);
 
 		ccLib.fireCallback(settings.onConnect, kit, service);
 		  
