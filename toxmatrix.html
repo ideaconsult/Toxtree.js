@@ -43,15 +43,14 @@
 <body>
   <div class="jtox-toolkit" id="jtox-matrix">
     <ul>
-      <li><a href="#jtox-assessment">Assessment</a></li>
-      <li><a href="#jtox-structures">Structures</a></li>
-      <li><a href="#jtox-substances">Substances</a></li>
-      <li><a href="#jtox-endpoints">Endpoints</a></li>
-      <li><a href="#jtox-datamatrix">Data Matrix</a></li>
+      <li><a href="#jtox-identifiers">Assessment identifier</a></li>
+      <li><a href="#jtox-structures">Structures used</a></li>
+      <li><a href="#jtox-endpoints">Endpoint data used</a></li>
+      <li><a href="#jtox-details">Assessment details</a></li>
       <li><a href="#jtox-report">Report</a></li>
     </ul>
-    <div id="jtox-assessment" class="jtox-assessment">
-    	<form>
+    <div id="jtox-identifiers" class="jtox-identifiers">
+	  	<form>
 	      <table class="dataTable">
 	        <thead>
 	          <tr><th class="right jtox-size-third">Assessment</th><th class="data-field" data-field="id"></th></tr>
@@ -99,12 +98,29 @@
 		      <button name="assDuplicate" type="submit">Duplicate</button>
 		      <button name="assUpdate" type="submit">Update</button>
 	      </div>
-    	</form>
+	  	</form>
+	  </div>
+    <div id="jtox-structures" class="jtox-structures">
+	  	<div class="jq-buttonset center action" data-action="onStructures">
+			  <input type="radio" id="structtarget" name="structaction" checked="checked"><label for="structtarget">Define initial target</label></input>
+			  <input type="radio" id="structallied" name="structaction"><label for="structallied">Search allied structures</label></input>
+			  <input type="radio" id="structselected" name="structaction"><label for="structselected">Selected structures</label></input>
+			</div>
     </div>
-    <div id="jtox-structures" class="jtox-structures"></div>
-    <div id="jtox-substances" class="jtox-substances"></div>
-    <div id="jtox-endpoints" class="jtox-endpoints"></div>
-    <div id="jtox-datamatrix" class="jtox-datamatrix"></div>
+    <div id="jtox-endpoints" class="jtox-endpoints">
+	  	<div class="jq-buttonset center action" data-action="onEndpoint">
+			  <input type="radio" id="endsubstance" name="endaction" checked="checked"><label for="endsubstance">Find substance(s)</label></input>
+			  <input type="radio" id="endpoints" name="endaction"><label for="endpoints">Selection of endpoints</label></input>
+			  <input type="radio" id="endmatrix" name="endaction"><label for="endmatrix">Data matrix</label></input>
+			</div>
+		</div>
+    <div id="jtox-details" class="jtox-details">
+	  	<div class="jq-buttonset center action" data-action="onDetails">
+			  <input type="radio" id="xdata" name="xaction" checked="checked"><label for="xdata">Add data</label></input>
+			  <input type="radio" id="xgap" name="xaction"><label for="xgap">Gap filling</label></input>
+			  <input type="radio" id="xoverview" name="xaction"><label for="xoverview">Final data matrix</label></input>
+			</div>
+    </div>
     <div id="jtox-report" class="jtox-report"></div>
   </div>
 </body>

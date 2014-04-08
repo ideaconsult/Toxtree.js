@@ -157,15 +157,16 @@ var ccLib = {
 	  
 	  // now fix the submitting function too.
 	  $(form).on('submit', function (e) {
-		  var empty = null;
+		  var empty = false;
 		  $('.non-empty', this).each(function (){
-		  	if (self.isNull(this.value) || this.value.length == 0)
-		  		empty = this;
+		  	if (self.isNull(this.value) || this.value.length == 0) {
+				  self.fireCallback(callback, this);
+		  		empty = true;
+		  	}
 		  });
 		  
-		  if (!!empty) {
-			  self.fireCallback(callback, null, empty);
-			  e.preventDefault();
+		  if (empty) {
+				  e.preventDefault();
 			  return false;
 		  }
 	  });

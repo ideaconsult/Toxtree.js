@@ -69,6 +69,10 @@
   vertical-align: middle !important;
 }
 
+.jtox-toolkit .center {
+  text-align: center !important;
+}
+
 .jtox-toolkit .right {
   text-align: right !important;
 }

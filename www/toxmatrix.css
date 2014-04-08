@@ -1,12 +1,12 @@
 /* toxtmatrix.css - jToxMatrix tool styles
 */
 
-.jtox-assessment form div.actions {
+.jtox-identifiers form div.actions {
 	margin-top: 15px;
 	font-size: 80%;
 }
 
-.jtox-assessment form input,
-.jtox-assessment form textarea {
+.jtox-identifiers form input,
+.jtox-identifiers form textarea {
 	width: 100%;
 }

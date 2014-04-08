@@ -17,14 +17,28 @@ var jToxMatrix = {
 		self.root = root;
     self.settings = $.extend(self.settings, jT.settings, settings);
 		
+		// the (sub)action in the panel
+		var loadAction = function () {
+			var el = this;
+			setTimeout(function () {
+	    	if (!el.checked)
+	    		return;
+		    var method = $(el).parent().data('action');
+		    if (!method)
+		    	return;
+		    ccLib.fireCallback(self[method], self, el.id);
+			}, 100);
+		};
+		
     var loadPanel = function(panel){
       if (panel){
+      	$('.jq-buttonset.action input:checked', panel).each(loadAction);
       }
     };
     
     // initialize the tab structure for several versions of dataTables.
     $(root).tabs({
-    	"disabled": [1, 2, 3, 4, 5],
+/*     	"disabled": [1, 2, 3, 4], */
       "select" : function(event, ui) {
         loadPanel(ui.panel);
       },
@@ -36,18 +50,36 @@ var jToxMatrix = {
     
     $('.jq-buttonset', root).buttonset();
     
-    self.createForm = $('.jtox-assessment form', root)[0];
+    self.createForm = $('.jtox-identifiers form', root)[0];
     self.createForm.assFinalize.style.display = 'none';
     self.createForm.assUpdate.style.display = 'none';
     self.createForm.assDuplicate.style.display = 'none';
     
     ccLib.prepareForm(self.createForm, function (el) {
-	    alert("An empty element: " + el);
+    	this.placeholder = "You need to fill this box";
     });
+
+    $('.jq-buttonset.action input', root).on('change', loadAction);
+    
     // finally, if provided - load the given assessmentUri
     if (!ccLib.isNull(self.settings.assessmentUri)) {
 	    self.load(self.settings.assessmentUri);
     }
+	},
+	
+	// called when a sub-action in assessment details tab is called
+	onDetails: function (id) {
+		console.log("Details: " + id);
+	},
+	
+	// called when a sub-action in endpoint selection tab is called
+	onEndpoint: function (id) {
+		console.log("Endpoint: " + id);
+	},
+	
+	// called when a sub-action in structures selection tab is called
+	onStructures: function (id) {
+		console.log("Structures: " + id);
 	},
 	
 	load: function(assessmentUri) {
@@ -57,14 +89,13 @@ var jToxMatrix = {
   	$(document).ready(function() {	  	jToxMatrix.init($('#jtox-matrix')[0]);  	});jT.tools['toxmatrix'] = 
 "<div class=\"jtox-toolkit\" id=\"jtox-matrix\">" +
 "<ul>" +
-"<li><a href=\"#jtox-assessment\">Assessment</a></li>" +
-"<li><a href=\"#jtox-structures\">Structures</a></li>" +
-"<li><a href=\"#jtox-substances\">Substances</a></li>" +
-"<li><a href=\"#jtox-endpoints\">Endpoints</a></li>" +
-"<li><a href=\"#jtox-datamatrix\">Data Matrix</a></li>" +
+"<li><a href=\"#jtox-identifiers\">Assessment identifier</a></li>" +
+"<li><a href=\"#jtox-structures\">Structures used</a></li>" +
+"<li><a href=\"#jtox-endpoints\">Endpoint data used</a></li>" +
+"<li><a href=\"#jtox-details\">Assessment details</a></li>" +
 "<li><a href=\"#jtox-report\">Report</a></li>" +
 "</ul>" +
-"<div id=\"jtox-assessment\" class=\"jtox-assessment\">" +
+"<div id=\"jtox-identifiers\" class=\"jtox-identifiers\">" +
 "<form>" +
 "<table class=\"dataTable\">" +
 "<thead>" +
@@ -115,10 +146,27 @@ var jToxMatrix = {
 "</div>" +
 "</form>" +
 "</div>" +
-"<div id=\"jtox-structures\" class=\"jtox-structures\"></div>" +
-"<div id=\"jtox-substances\" class=\"jtox-substances\"></div>" +
-"<div id=\"jtox-endpoints\" class=\"jtox-endpoints\"></div>" +
-"<div id=\"jtox-datamatrix\" class=\"jtox-datamatrix\"></div>" +
+"<div id=\"jtox-structures\" class=\"jtox-structures\">" +
+"<div class=\"jq-buttonset center action\" data-action=\"onStructures\">" +
+"<input type=\"radio\" id=\"structtarget\" name=\"structaction\" checked=\"checked\"><label for=\"structtarget\">Define initial target</label></input>" +
+"<input type=\"radio\" id=\"structallied\" name=\"structaction\"><label for=\"structallied\">Search allied structures</label></input>" +
+"<input type=\"radio\" id=\"structselected\" name=\"structaction\"><label for=\"structselected\">Selected structures</label></input>" +
+"</div>" +
+"</div>" +
+"<div id=\"jtox-endpoints\" class=\"jtox-endpoints\">" +
+"<div class=\"jq-buttonset center action\" data-action=\"onEndpoint\">" +
+"<input type=\"radio\" id=\"endsubstance\" name=\"endaction\" checked=\"checked\"><label for=\"endsubstance\">Find substance(s)</label></input>" +
+"<input type=\"radio\" id=\"endpoints\" name=\"endaction\"><label for=\"endpoints\">Selection of endpoints</label></input>" +
+"<input type=\"radio\" id=\"endmatrix\" name=\"endaction\"><label for=\"endmatrix\">Data matrix</label></input>" +
+"</div>" +
+"</div>" +
+"<div id=\"jtox-details\" class=\"jtox-details\">" +
+"<div class=\"jq-buttonset center action\" data-action=\"onDetails\">" +
+"<input type=\"radio\" id=\"xdata\" name=\"xaction\" checked=\"checked\"><label for=\"xdata\">Add data</label></input>" +
+"<input type=\"radio\" id=\"xgap\" name=\"xaction\"><label for=\"xgap\">Gap filling</label></input>" +
+"<input type=\"radio\" id=\"xoverview\" name=\"xaction\"><label for=\"xoverview\">Final data matrix</label></input>" +
+"</div>" +
+"</div>" +
 "<div id=\"jtox-report\" class=\"jtox-report\"></div>" +
 "</div>" +
 "";
