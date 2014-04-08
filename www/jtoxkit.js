@@ -1870,10 +1870,18 @@ window.jT = window.jToxKit = {
       return this.settings.host;
 	},
 	
-	/* Makes a server call with the provided method. If none is given - the internally stored one is used
+	/* Makes a server call for provided service, with settings form the given kit and calls 'callback' at the end - always.
+	The 'params', if passed, can have following attributes:
+		'method': the HTTP method to be used
+		'data': the data to be passed to the server with the request.
 	*/
-	call: function (kit, service, callback, adata){
-	  var settings = jT.$.extend({"baseUrl" : this.settings.host}, this.settings);
+	call: function (kit, service, params, callback){
+		if (typeof params != 'object') {
+			callback = params; // the params parameters is obviously omitted
+			params = {};
+		}
+		
+	  var settings = jT.$.extend({"baseUrl" : this.settings.host}, this.settings, params);
 		if (kit == null)
 		  kit = this;
 		else 
@@ -1881,18 +1889,18 @@ window.jT = window.jToxKit = {
 
 		ccLib.fireCallback(settings.onConnect, kit, service);
 		  
-		var method = 'GET';
 		var accType = settings.jsonp ? "application/x-javascript" : "application/json";
 		
-		if (adata !== undefined){
-			method = 'POST';
-			if (typeof adata == "boolean")
-				adata = {};
+		if (params.data === undefined){
+			params.data = {};
+			if (settings.jsonp)
+				params.data.media = accType;
+				
+			if (params.method === undefined)
+				params.method = 'GET';
 		}
-		else if (settings.jsonp)
-		  adata = { media: accType };
-		else
-			adata = { };
+		else if (params.method === undefined)
+				params.method = 'POST';
 
 		// on some queries, like tasks, we DO have baseUrl at the beginning
 		if (service.indexOf("http") != 0)
@@ -1904,8 +1912,8 @@ window.jT = window.jToxKit = {
 			headers: { Accept: accType },
 			crossDomain: settings.crossDomain || settings.jsonp,
 			timeout: settings.timeout,
-			type: method,
-			data: adata,
+			type: params.method,
+			data: params.data,
 			jsonp: settings.jsonp ? 'callback' : false,
 			error: function(jhr, status, error){
 			  ccLib.fireCallback(settings.onError, kit, service, status, error);
