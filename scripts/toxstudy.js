@@ -7,13 +7,18 @@
 var jToxStudy = (function () {
   var defaultSettings = {
     configuration: { 
-      columns: { 
-    		"main" : { },
-    		"parameters": { },
-    		"conditions": { },
-    		"effects": { },
-    		"protocol": { },
-    		"interpretation": { }
+      columns: {
+      	"_": {
+	    		"main" : { },
+	    		"parameters": { },
+	    		"conditions": { },
+	    		"effects": { },
+	    		"protocol": { },
+	    		"interpretation": { },
+	    	},
+    		"composition": { 
+	    		"main" : { }
+    		}
     	}
     }
   };    // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
@@ -78,7 +83,7 @@ var jToxStudy = (function () {
     });
     
     // when all handlers are setup - make a call, if needed.    
-    if (self.settings['substanceUri'] !== undefined){
+    if (self.settings['substanceUri'] !== undefined) {
       self.querySubstance(self.settings['substanceUri']);
     }
   };
@@ -157,30 +162,6 @@ var jToxStudy = (function () {
         // start filling it
         var parCount = 0;
   
-        var modifyColumn = function(col, group) {
-          if (group == null)
-            group = "main";
-          var name = col.sTitle.toLowerCase();
-          
-          // helper function for retrieving col definition, if exists. Returns empty object, if no.          
-          var getColDef = function (cat) {
-            var catCol = self.settings.configuration.columns[cat];
-            if (!ccLib.isNull(catCol)) {
-              catCol = catCol[group];
-              if (!ccLib.isNull(catCol))
-                catCol = catCol[name];
-            }
-
-            if (ccLib.isNull(catCol))
-              catCol = {};
-            return catCol;
-          };
-          // now form the default column, if existing and the category-specific one...
-          // extract column redefinitions and merge them all.
-          col = jT.$.extend(col, getColDef('_'), getColDef(category));
-          return ccLib.isNull(col.bVisible) || col.bVisible ? col : null;
-        };
-  
         // this function takes care to add as columns all elements from given array
         var putAGroup = function(group, fProcess) {
           var count = 0;
@@ -203,7 +184,7 @@ var jToxStudy = (function () {
         var putDefaults = function(start, len, group) {
           for (var i = 0;i < len; ++i) {
             var col = jT.$.extend({}, defaultColumns[i + start]);
-            col = modifyColumn(col, group);
+            col = jT.modifyColDef(self, col, category, group);
             if (col != null)
               colDefs.push(col);
           }
@@ -259,7 +240,7 @@ var jToxStudy = (function () {
             "sDefaultContent": "-"
           };
           
-          col = modifyColumn(col, "parameters");
+          col = jT.modifyColDef(self, col, category, "parameters");
           if (col == null)
             return null;
           
@@ -279,7 +260,7 @@ var jToxStudy = (function () {
             "mData" : "effects"
           };
           
-          col = modifyColumn(col, "conditions");
+          col = jT.modifyColDef(self, col, category, "conditions");
           if (col == null)
             return null;
           
@@ -301,18 +282,14 @@ var jToxStudy = (function () {
         // now is time to put interpretation columns..
         putAGroup(study.interpretation, function(i){
           var col = { "sTitle": i, "sClass" : "center middle jtox-multi", "mData" : "interpretation." + i, "sDefaultContent": "-"};
-          return modifyColumn(col, "interpretation");
+          return jT.modifyColDef(self, col, category, "interpretation");
         });
         
         // finally put the protocol entries
         putDefaults(3, 3, "protocol");
         
         // but before given it up - make a small sorting..
-        colDefs.sort(function(a, b) {
-          var valA = ccLib.isNull(a.iOrder) ? 0 : a.iOrder;
-          var valB = ccLib.isNull(b.iOrder) ? 0 : b.iOrder;
-          return valA - valB;
-        });
+        jT.sortColDefs(colDefs);
         
         // READYY! Go and prepare THE table.
         jT.$(theTable).dataTable( {
@@ -604,19 +581,19 @@ var jToxStudy = (function () {
       }
     },
     
-    querySummary: function(substanceURI) {
+    querySummary: function(summaryURI) {
       var self = this;
       
-      jT.call(self, substanceURI + "/studysummary", function(summary) {
+      jT.call(self, summaryURI, function(summary) {
         if (!!summary && !!summary.facet)
           self.processSummary(summary.facet);
       });
     },
     
-    queryComposition: function(substanceURI) {
+    queryComposition: function(compositionURI) {
       var self = this;
       
-      jT.call(self, substanceURI + "/composition", function(composition) {
+      jT.call(self, compositionURI, function(composition) {
         if (!!composition && !!composition.composition)
           self.processComposition(composition);
         });
@@ -652,8 +629,8 @@ var jToxStudy = (function () {
           });
            
           // query for the summary and the composition too.
-          self.querySummary(substance.URI);
-          self.queryComposition(substance.URI);
+          self.querySummary(substance.URI + "/studysummary");
+          self.queryComposition(substance.URI + "/composition");
         }
       });
     }

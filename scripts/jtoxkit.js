@@ -121,8 +121,36 @@ window.jT = window.jToxKit = {
     })  
   },
   
-  copySpan: function (data, message) {
-    return ;
+  modifyColDef: function (kit, col, category, group) {
+	  if (group == null)
+	    group = "main";
+	  var name = col.sTitle.toLowerCase();
+	  
+	  // helper function for retrieving col definition, if exists. Returns empty object, if no.          
+	  var getColDef = function (cat) {
+	    var catCol = kit.settings.configuration.columns[cat];
+	    if (!ccLib.isNull(catCol)) {
+	      catCol = catCol[group];
+	      if (!ccLib.isNull(catCol))
+	        catCol = catCol[name];
+	    }
+	
+	    if (ccLib.isNull(catCol))
+	      catCol = {};
+	    return catCol;
+	  };
+	  // now form the default column, if existing and the category-specific one...
+	  // extract column redefinitions and merge them all.
+	  col = this.$.extend(col, getColDef('_'), getColDef(category));
+	  return ccLib.isNull(col.bVisible) || col.bVisible ? col : null;
+  },
+  
+  sortColDefs: function (colDefs) {
+	  colDefs.sort(function(a, b) {
+	    var valA = ccLib.isNull(a.iOrder) ? 0 : a.iOrder;
+	    var valB = ccLib.isNull(b.iOrder) ? 0 : b.iOrder;
+	    return valA - valB;
+	  });
   },
   
   shortenedData: function (data, message, deflen) {
