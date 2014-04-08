@@ -1,11 +1,11 @@
 window.jT = window.jToxKit = {
 	templateRoot: null,
 
-	/* A single place to hold all necessary queries. Parameters are marked with <XX> and formatString() (common.js) is used
+	/* A single place to hold all necessary queries. Parameters are marked with {id} and formatString() (common.js) is used
 	to prepare the actual URLs
 	*/
 	queries: {
-		taskPoll: "/task/<1>",
+		taskPoll: { method: 'GET', service: "/task/{id}" },
 	},
 	
 	templates: { },        // html2js routine will fill up this variable
@@ -202,6 +202,20 @@ window.jT = window.jToxKit = {
       return this.formBaseUrl(ccLib.parseURL(url));
     else
       return this.settings.host;
+	},
+	
+	/* Uses a kit-defined set of queries to make an automated jToxKit.call
+	*/
+	service: function (kit, service, data, callback) {
+		var params = { };
+		if (!!kit && kit.queries[service] !== undefined) {
+			var info = kit.queries[service];
+			service = info.service;
+			params.method = info.method;
+			params.data = data;
+		}
+		
+		this.call(kit, ccLib.formatString(service, data), params, callback);
 	},
 	
 	/* Makes a server call for provided service, with settings form the given kit and calls 'callback' at the end - always.

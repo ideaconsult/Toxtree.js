@@ -23,12 +23,12 @@ window.ToxMan = {
 	to prepare the actual URLs
 	*/
 	queries: {
-		query: "/query/compound/search/all?search=<1>&page=0&pagesize=1",
+		query: "/query/compound/search/all?search={0}&page=0&pagesize=1",
 		listModels: "/algorithm?search=ToxTree",
-		taskPoll: "/task/<1>",
-		getModel: "/model?algorithm=<1>",
-		getPrediction: "/compound/<1>?feature_uris[]=<2>",
-		createModel: "/algorithm/<1>"  // used in POST requests.
+		taskPoll: "/task/{0}",
+		getModel: "/model?algorithm={0}",
+		getPrediction: "/compound/{0}?feature_uris[]={1}",
+		createModel: "/algorithm/{0}"  // used in POST requests.
 	},
 
 	featurePrefix: 'http://www.opentox.org/api/1.1#',
@@ -129,7 +129,7 @@ window.ToxMan = {
 		this.inQuery = true;
 		self.clear();
 		
-		this.call(ccLib.formatString(this.queries.query, encodeURIComponent(needle)), function(dataset){
+		this.call(ccLib.formatString(this.queries.query, [encodeURIComponent(needle)]), function(dataset){
 			// start with some clearing
 			if (!dataset || dataset.dataEntry.length < 1){
 				if (self.onerror)
@@ -244,10 +244,10 @@ window.ToxMan = {
 		
 		this.inPrediction = true;
 		// now attempts to retrieve the mode, if it exists...
-		this.call(ccLib.formatString(this.queries.getModel, encodeURIComponent(algo.uri)), function(model){
+		this.call(ccLib.formatString(this.queries.getModel, [encodeURIComponent(algo.uri)]), function(model){
 			if (self.forceCreate || !model || model.model.length < 1){ // No - doesn't exists.
 				// We need to POST a model creation and poll the received task until we have it completed 
-				self.call(ccLib.formatString(self.queries.createModel, algo.id), function(task){
+				self.call(ccLib.formatString(self.queries.createModel, [algo.id]), function(task){
 					if (!task){ // this means - error call.
 						self.inPrediction = false;
 						return; 
@@ -260,7 +260,7 @@ window.ToxMan = {
 				}, true); /// for initial POST request - to force call() function to use POST method for http request.
 			}
 			else { // OK, we have the model - attempt to get a prediction for our compound...
-				var q = ccLib.formatString(self.queries.getPrediction, encodeURIComponent(self.currentDataset.dataEntry[0].compound.id), encodeURIComponent(model.model[0].predicted));
+				var q = ccLib.formatString(self.queries.getPrediction, [encodeURIComponent(self.currentDataset.dataEntry[0].compound.id), encodeURIComponent(model.model[0].predicted)]);
 				self.call(q, function(prediction){
 					if (!prediction || !self.parsePrediction(algo, prediction)) // i.e. - it was empty
 						createPredictions(model.model[0].URI);

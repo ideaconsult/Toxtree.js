@@ -7,6 +7,20 @@
 var jToxMatrix = {
 	createForm: null,
 	root: null,
+	queries: {
+		'assess_create': { method: "POST", service: "/dataset"},
+		'assess_update': { method: "PUT", service: "/dataset/{id}/metadata"},
+		'add_compound': { method: 'PUT', service: "/dataset/{datasetId}"},
+		'del_compound': { method: 'DELETE', service: "/dataset/{datasetId}/compound?compound_uri={compoundUri}"},
+		'get_compounds': { method: 'GET', service: "/dataset/{datasetId}/compounds"},
+		'get_substances': { method: 'GET', service: "/dataset/{datasetId}/substances"},
+		'add_substance': { method: 'PUT', service: "/dataset/{datasetId}/substances"},
+		'del_substance': { method: 'DELETE', service: "/dataset/{datasetId}/substances?substance={substanceUri}"},
+		'get_endpoints': { method: 'GET', service: ""},
+		'add_endpoint': { method: 'PUT', service: "/dataset/{datasetId}/feature"},
+		'del_endpoint': { method: 'DELETE', service: "/dataset/{datasetId}/feature?feature={featureUri}"},
+	},
+	
 	settings: { // defaults settings go here
 		
 	},
@@ -49,15 +63,25 @@ var jToxMatrix = {
     });
     
     $('.jq-buttonset', root).buttonset();
+    var checkForm = function () {
+    	this.placeholder = "You need to fill this box";
+    	return this.value.length > 0;
+    };
     
     self.createForm = $('.jtox-identifiers form', root)[0];
+    self.createForm.assStart.onclick = function (e) {
+    	if (ccLib.validateForm(self.createForm, checkForm)) {
+		    jT.service(self, 'assess_create', null, function (task) {
+			    console.log("Data set created: " + JSON.stringify(task));
+		    });
+		  }
+		  return false;
+    };
     self.createForm.assFinalize.style.display = 'none';
     self.createForm.assUpdate.style.display = 'none';
     self.createForm.assDuplicate.style.display = 'none';
     
-    ccLib.prepareForm(self.createForm, function (el) {
-    	this.placeholder = "You need to fill this box";
-    });
+    ccLib.prepareForm(self.createForm);
 
     $('.jq-buttonset.action input', root).on('change', loadAction);
     

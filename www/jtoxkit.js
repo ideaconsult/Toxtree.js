@@ -135,7 +135,7 @@ var ccLib = {
   
   // Prepare a form so that non-empty fields are checked before submit and accumuater fields
   // are accumulated. Call it after you've set submit behavior, etc.
-  prepareForm: function (form, callback) {
+  prepareForm: function (form) {
   	var self = this;
 	  var $ = window.jQuery;
 
@@ -154,22 +154,18 @@ var ccLib = {
 				return false;
 		  })
 	  });
-	  
-	  // now fix the submitting function too.
-	  $(form).on('submit', function (e) {
-		  var empty = false;
-		  $('.non-empty', this).each(function (){
-		  	if (self.isNull(this.value) || this.value.length == 0) {
-				  self.fireCallback(callback, this);
-		  		empty = true;
-		  	}
-		  });
-		  
-		  if (empty) {
-				  e.preventDefault();
-			  return false;
-		  }
+	 },
+	 
+	 // Check if the form is not-empty according to non-empty fields
+	 validateForm: function (form, callback) {
+  	var self = this;
+	  var ok = true;
+	  jQuery('.validate', form).each(function () {
+		  if (!self.fireCallback(callback, this))
+		  	ok = false;
 	  });
+	  
+	  return ok;
   },
   /*
   Passed a HTML DOM element - it clears all children folowwing last one. Pass null for clearing all.
@@ -180,12 +176,11 @@ var ccLib = {
     }
   },
     
-	/* formats a string, replacing [<number>] in it with the corresponding value in the arguments
+	/* formats a string, replacing {number | property} in it with the corresponding value in the arguments
   */
-  formatString: function(format) {
-    for (var i = 1;i < arguments.length; ++i) {
-      format = format.replace('<' + i + '>', arguments[i]);
-    }
+  formatString: function(format, pars) {
+    for (var i in pars)
+      format = format.replace('{' + i + '}', pars[i]);
     return format;
   },
   
@@ -1712,11 +1707,11 @@ var jToxStudy = (function () {
 window.jT = window.jToxKit = {
 	templateRoot: null,
 
-	/* A single place to hold all necessary queries. Parameters are marked with <XX> and formatString() (common.js) is used
+	/* A single place to hold all necessary queries. Parameters are marked with {id} and formatString() (common.js) is used
 	to prepare the actual URLs
 	*/
 	queries: {
-		taskPoll: "/task/<1>",
+		taskPoll: { method: 'GET', service: "/task/{id}" },
 	},
 	
 	templates: { },        // html2js routine will fill up this variable
@@ -1913,6 +1908,20 @@ window.jT = window.jToxKit = {
       return this.formBaseUrl(ccLib.parseURL(url));
     else
       return this.settings.host;
+	},
+	
+	/* Uses a kit-defined set of queries to make an automated jToxKit.call
+	*/
+	service: function (kit, service, data, callback) {
+		var params = { };
+		if (!!kit && kit.queries[service] !== undefined) {
+			var info = kit.queries[service];
+			service = info.service;
+			params.method = info.method;
+			params.data = data;
+		}
+		
+		this.call(kit, ccLib.formatString(service, data), params, callback);
 	},
 	
 	/* Makes a server call for provided service, with settings form the given kit and calls 'callback' at the end - always.

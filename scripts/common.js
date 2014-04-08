@@ -135,7 +135,7 @@ var ccLib = {
   
   // Prepare a form so that non-empty fields are checked before submit and accumuater fields
   // are accumulated. Call it after you've set submit behavior, etc.
-  prepareForm: function (form, callback) {
+  prepareForm: function (form) {
   	var self = this;
 	  var $ = window.jQuery;
 
@@ -154,22 +154,18 @@ var ccLib = {
 				return false;
 		  })
 	  });
-	  
-	  // now fix the submitting function too.
-	  $(form).on('submit', function (e) {
-		  var empty = false;
-		  $('.non-empty', this).each(function (){
-		  	if (self.isNull(this.value) || this.value.length == 0) {
-				  self.fireCallback(callback, this);
-		  		empty = true;
-		  	}
-		  });
-		  
-		  if (empty) {
-				  e.preventDefault();
-			  return false;
-		  }
+	 },
+	 
+	 // Check if the form is not-empty according to non-empty fields
+	 validateForm: function (form, callback) {
+  	var self = this;
+	  var ok = true;
+	  jQuery('.validate', form).each(function () {
+		  if (!self.fireCallback(callback, this))
+		  	ok = false;
 	  });
+	  
+	  return ok;
   },
   /*
   Passed a HTML DOM element - it clears all children folowwing last one. Pass null for clearing all.
@@ -180,12 +176,11 @@ var ccLib = {
     }
   },
     
-	/* formats a string, replacing [<number>] in it with the corresponding value in the arguments
+	/* formats a string, replacing {number | property} in it with the corresponding value in the arguments
   */
-  formatString: function(format) {
-    for (var i = 1;i < arguments.length; ++i) {
-      format = format.replace('<' + i + '>', arguments[i]);
-    }
+  formatString: function(format, pars) {
+    for (var i in pars)
+      format = format.replace('{' + i + '}', pars[i]);
     return format;
   },
   

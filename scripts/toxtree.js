@@ -3,7 +3,7 @@ jQuery(document).ready(function(){
 	// now attach the handler for clicking on the line which opens / hides it.
 	var showhideInfo = function(row, force){
 		var info = row.getElementsByClassName('info')[0];
-	  jQeury(row).toggleClass('visible', force);
+	  jQuery(row).toggleClass('visible', force);
 	  jQuery(info).toggleClass('hidden', (force === undefined) ? force : !force);
 	}
 

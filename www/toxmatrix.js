@@ -7,6 +7,20 @@
 var jToxMatrix = {
 	createForm: null,
 	root: null,
+	queries: {
+		'assess_create': { method: "POST", service: "/dataset"},
+		'assess_update': { method: "PUT", service: "/dataset/{id}/metadata"},
+		'add_compound': { method: 'PUT', service: "/dataset/{datasetId}"},
+		'del_compound': { method: 'DELETE', service: "/dataset/{datasetId}/compound?compound_uri={compoundUri}"},
+		'get_compounds': { method: 'GET', service: "/dataset/{datasetId}/compounds"},
+		'get_substances': { method: 'GET', service: "/dataset/{datasetId}/substances"},
+		'add_substance': { method: 'PUT', service: "/dataset/{datasetId}/substances"},
+		'del_substance': { method: 'DELETE', service: "/dataset/{datasetId}/substances?substance={substanceUri}"},
+		'get_endpoints': { method: 'GET', service: ""},
+		'add_endpoint': { method: 'PUT', service: "/dataset/{datasetId}/feature"},
+		'del_endpoint': { method: 'DELETE', service: "/dataset/{datasetId}/feature?feature={featureUri}"},
+	},
+	
 	settings: { // defaults settings go here
 		
 	},
@@ -49,15 +63,25 @@ var jToxMatrix = {
     });
     
     $('.jq-buttonset', root).buttonset();
+    var checkForm = function () {
+    	this.placeholder = "You need to fill this box";
+    	return this.value.length > 0;
+    };
     
     self.createForm = $('.jtox-identifiers form', root)[0];
+    self.createForm.assStart.onclick = function (e) {
+    	if (ccLib.validateForm(self.createForm, checkForm)) {
+		    jT.service(self, 'assess_create', null, function (task) {
+			    console.log("Data set created: " + JSON.stringify(task));
+		    });
+		  }
+		  return false;
+    };
     self.createForm.assFinalize.style.display = 'none';
     self.createForm.assUpdate.style.display = 'none';
     self.createForm.assDuplicate.style.display = 'none';
     
-    ccLib.prepareForm(self.createForm, function (el) {
-    	this.placeholder = "You need to fill this box";
-    });
+    ccLib.prepareForm(self.createForm);
 
     $('.jq-buttonset.action input', root).on('change', loadAction);
     
@@ -100,9 +124,9 @@ var jToxMatrix = {
 "<table class=\"dataTable\">" +
 "<thead>" +
 "<tr><th class=\"right jtox-size-third\">Assessment</th><th class=\"data-field\" data-field=\"id\"></th></tr>" +
-"<tr><td class=\"right jtox-size-third\">Name:</td><td><input class=\"data-field first-time non-empty\" data-field=\"name\" name=\"name\"></input></td></tr>" +
-"<tr><td class=\"right jtox-size-third\">Number:</td><td><input class=\"data-field first-time non-empty\" data-field=\"number\" name=\"number\"></input></td></tr>" +
-"<tr><td class=\"right top jtox-size-third\">Purpose:</td><td><textarea class=\"non-empty nomargin data-field\" data-field=\"purpose\" name=\"purpose\"></textarea></td></tr>" +
+"<tr><td class=\"right jtox-size-third\">Name:</td><td><input class=\"data-field first-time validate\" data-field=\"name\" name=\"name\"></input></td></tr>" +
+"<tr><td class=\"right jtox-size-third\">Number:</td><td><input class=\"data-field first-time validate\" data-field=\"number\" name=\"number\"></input></td></tr>" +
+"<tr><td class=\"right top jtox-size-third\">Purpose:</td><td><textarea class=\"validate nomargin data-field\" data-field=\"purpose\" name=\"purpose\"></textarea></td></tr>" +
 "<tr><td class=\"right jtox-size-third\">Owner:</td><td class=\"data-field\" data-field=\"owner\"></td></tr>" +
 "<tr><td class=\"right jtox-size-third\">Version:</td><td class=\"data-field\" data-field=\"version\">?.?</td></tr>" +
 "<tr><td class=\"right jtox-size-third\">Status:</td><td class=\"data-field\" data-field=\"status\"></td></tr>" +
@@ -139,10 +163,10 @@ var jToxMatrix = {
 "</thead>" +
 "</table>" +
 "<div class=\"actions\">" +
-"<button name=\"assStart\" type=\"submit\">Start</button>" +
-"<button name=\"assFinalize\" type=\"submit\">Finalize</button>" +
-"<button name=\"assDuplicate\" type=\"submit\">Duplicate</button>" +
-"<button name=\"assUpdate\" type=\"submit\">Update</button>" +
+"<button name=\"assStart\">Start</button>" +
+"<button name=\"assFinalize\">Finalize</button>" +
+"<button name=\"assDuplicate\">Duplicate</button>" +
+"<button name=\"assUpdate\">Update</button>" +
 "</div>" +
 "</form>" +
 "</div>" +
