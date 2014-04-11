@@ -96,7 +96,8 @@ var jToxDataset = (function () {
             col["sClass"] = "paddingless";
             col["sWidth"] = "125px";
             return col;
-        	}
+        	},
+        	visibility: "main"
       	},
       	"http://www.opentox.org/api/1.1#Similarity": {title: "Similarity", location: "compound.metric", search: true, used: true},
       }
@@ -218,6 +219,9 @@ var jToxDataset = (function () {
         var grp = self.groups[gr];
         var empty = true;
         ccLib.enumObject(self.groups[gr], function (fId, idx, level) {
+          var vis = (self.features[fId] || {})['visibility'];
+          if (!!vis && (vis == "none" || (!isMain && vis == 'main') || (isMain && vis == "details")))
+            return;
           empty = false;
           if (idx == "name") {
             if (isMain)
@@ -360,7 +364,7 @@ var jToxDataset = (function () {
             self.prepareTabs(detDiv, false, 
               function (id, name, parent) {
                 var fEl = null;
-                if (id != null && cls.shortFeatureId(id) != "Diagram") {
+                if (id != null) {
                   fEl = jT.getTemplate('#jtox-one-detail');
                   parent.appendChild(fEl);
                   ccLib.fillTree(fEl, {title: name, value: self.featureValue(id, full), uri: self.featureUri(id)});
@@ -694,10 +698,6 @@ var jToxDataset = (function () {
   }; // end of prototype
   
   // some public, static methods
-  cls.shortFeatureId = function(fId) {
-    return fId.substr(fId.indexOf('#') + 1); // a small trick - 'not-found' returns -1, and adding 1 results in exactly what we want: 0, i.e. - start, i.e. - no change.
-  };
-  
   cls.processEntry = function (entry, features, fnValue) {
     for (var fid in features) {
       var feature = features[fid];

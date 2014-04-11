@@ -378,7 +378,8 @@ var jToxDataset = (function () {
             col["sClass"] = "paddingless";
             col["sWidth"] = "125px";
             return col;
-        	}
+        	},
+        	visibility: "main"
       	},
       	"http://www.opentox.org/api/1.1#Similarity": {title: "Similarity", location: "compound.metric", search: true, used: true},
       }
@@ -500,6 +501,9 @@ var jToxDataset = (function () {
         var grp = self.groups[gr];
         var empty = true;
         ccLib.enumObject(self.groups[gr], function (fId, idx, level) {
+          var vis = (self.features[fId] || {})['visibility'];
+          if (!!vis && (vis == "none" || (!isMain && vis == 'main') || (isMain && vis == "details")))
+            return;
           empty = false;
           if (idx == "name") {
             if (isMain)
@@ -642,7 +646,7 @@ var jToxDataset = (function () {
             self.prepareTabs(detDiv, false, 
               function (id, name, parent) {
                 var fEl = null;
-                if (id != null && cls.shortFeatureId(id) != "Diagram") {
+                if (id != null) {
                   fEl = jT.getTemplate('#jtox-one-detail');
                   parent.appendChild(fEl);
                   ccLib.fillTree(fEl, {title: name, value: self.featureValue(id, full), uri: self.featureUri(id)});
@@ -976,10 +980,6 @@ var jToxDataset = (function () {
   }; // end of prototype
   
   // some public, static methods
-  cls.shortFeatureId = function(fId) {
-    return fId.substr(fId.indexOf('#') + 1); // a small trick - 'not-found' returns -1, and adding 1 results in exactly what we want: 0, i.e. - start, i.e. - no change.
-  };
-  
   cls.processEntry = function (entry, features, fnValue) {
     for (var fid in features) {
       var feature = features[fid];
@@ -1130,8 +1130,6 @@ var jToxStudy = (function () {
               jT.$(table).addClass('loaded');
               self.processStudies(panel, study.study, false);
             }
-            
-           // now try to order them, if they are all loaded...
           });  
         });
       }
@@ -1735,53 +1733,67 @@ window.jT = window.jToxKit = {
     return url.protocol + "://" + url.host + (url.port.length > 0 ? ":" + url.port : '') + '/' + url.segments[0] + '/';	
 	},
     
+  // initializes one kit, based on the kit name passed, either as params, or found within data-XXX parameters of the element
+  initKit: function(element) {
+    var self = this;
+  	var dataParams = self.$.extend(true, self.settings, self.$(element).data());
+    
+  	if (!dataParams.manualInit){
+    	var kit = dataParams.kit;
+
+  	  // the real initialization function
+      var realInit = function (params) {
+      	if (!kit)
+      		return null;
+        // add jTox if it is missing AND there is not existing object/function with passed name. We can initialize ketcher and others like this too.
+      	if (!window[kit] && kit.indexOf('jTox') != 0)
+    	  	kit = 'jTox' + kit.charAt(0).toUpperCase() + kit.slice(1);
+    
+      	var fn = window[kit];
+      	if (typeof fn == 'function')
+      	  return new fn(element, params);
+        else if (typeof fn == "object" && typeof fn.init == "function")
+          return fn.init(element, params);
+
+        return null;
+      };
+
+  	  // first, get the configuration, if such is passed
+  	  if (!ccLib.isNull(dataParams.configFile)) {
+  	    // we'll use a trick here so the baseUrl parameters set so far to take account... thus passing 'fake' kit instance
+  	    // as the first parameter of jT.call();
+    	  self.call({ settings: dataParams}, dataParams.configFile, function(config){
+      	  if (!!config)
+      	    dataParams['configuration'] = self.$.extend(true, dataParams['configuration'], config);
+          realInit(dataParams);
+    	  });
+  	  }
+  	  else
+  	    realInit(dataParams);
+    }
+  },
+  
   // the jToxKit initialization routine, which scans all elements, marked as 'jtox-toolkit' and initializes them
-	init: function() {
+	init: function(root) {
   	var self = this;
   	
-  	self.initTemplates();
-
-    // make this handler for UUID copying. Once here - it's live, so it works for all tables in the future
-    jT.$(document).on('click', '.jtox-toolkit span.ui-icon-copy', function (e) { ccLib.copyToClipboard(jT.$(this).data('uuid')); return false;});
+  	if (!root) {
+    	self.initTemplates();
   
-    // scan the query parameter for settings
-		var url = ccLib.parseURL(document.location);
-		var queryParams = url.params;
-		queryParams.host = self.formBaseUrl(url);
-	
-    self.settings = jT.$.extend(self.settings, queryParams); // merge with defaults
-    
-	  // initializes the kit, based on the passed kit name
-	  var initKit = function(element, params) {
-	  	var kit = params.kit;
-	  	if (!kit)
-	  		return null;
-	  	if (kit.indexOf('jTox') != 0)
-		  	kit = 'jTox' + kit.charAt(0).toUpperCase() + kit.slice(1);
+      // make this handler for UUID copying. Once here - it's live, so it works for all tables in the future
+      jT.$(document).on('click', '.jtox-toolkit span.ui-icon-copy', function (e) { ccLib.copyToClipboard(jT.$(this).data('uuid')); return false;});
 
-	  	var fn = window[kit];
-	  	return (typeof fn == 'function') ? new fn(element, params) : null;
-	  };
-	  
+      // scan the query parameter for settings
+  		var url = ccLib.parseURL(document.location);
+  		var queryParams = url.params;
+  		queryParams.host = self.formBaseUrl(url);
+  	
+      self.settings = self.$.extend(self.settings, queryParams); // merge with defaults
+      root = document;
+  	}
+
   	// now scan all insertion divs
-  	jT.$('.jtox-toolkit').each(function(i) {
-    	var dataParams = jT.$.extend(true, self.settings, jT.$(this).data());
-    	if (!dataParams.manualInit){
-    	  var el = this;
-    	  // first, get the configuration, if such is passed
-    	  if (!ccLib.isNull(dataParams.configFile)) {
-    	    // we'll use a trick here so the baseUrl parameters set so far to take account... thus passing 'fake' kit instance
-    	    // as the first parameter of jT.call();
-      	  self.call({ settings: dataParams}, dataParams.configFile, function(config){
-        	  if (!!config)
-        	    dataParams['configuration'] = config;
-            initKit(el, dataParams);
-      	  });
-    	  }
-    	  else
-    	    initKit(el, dataParams);
-      }
-  	});
+  	self.$('.jtox-toolkit', root).each(function(i) { self. initKit(this); });
 	},
 	
 	initTemplates: function() {
@@ -1814,9 +1826,11 @@ window.jT = window.jToxKit = {
 	
 	insertTool: function (name, root) {
 	  var html = this.tools[name];
-	  if (!ccLib.isNull(html))
+	  if (!ccLib.isNull(html)) {
   	  root.innerHTML = html;
-  	 return root;
+  	  this.init(root); // since we're pasting as HTML - we need to make re-traverse and initiazaltion of possible jTox kits.
+    }
+    return root;
 	},
 		
   changeTabsIds: function (root, suffix) {
@@ -1830,16 +1844,18 @@ window.jT = window.jToxKit = {
   },
   
   modifyColDef: function (kit, col, category, group) {
-	  if (group == null)
-	    group = "main";
 	  var name = col.sTitle.toLowerCase();
 	  
 	  // helper function for retrieving col definition, if exists. Returns empty object, if no.          
 	  var getColDef = function (cat) {
 	    var catCol = kit.settings.configuration.columns[cat];
 	    if (!ccLib.isNull(catCol)) {
-	      catCol = catCol[group];
-	      if (!ccLib.isNull(catCol))
+	      if (!!group) {
+	        catCol = catCol[group];
+  	      if (!ccLib.isNull(catCol))
+  	        catCol = catCol[name];
+        }
+        else
 	        catCol = catCol[name];
 	    }
 	
@@ -1849,7 +1865,7 @@ window.jT = window.jToxKit = {
 	  };
 	  // now form the default column, if existing and the category-specific one...
 	  // extract column redefinitions and merge them all.
-	  col = this.$.extend(col, getColDef('_'), getColDef(category));
+	  col = this.$.extend(col, (!!group ? getColDef('_') : {}), getColDef(category));
 	  return ccLib.isNull(col.bVisible) || col.bVisible ? col : null;
   },
   

@@ -255,7 +255,7 @@ And, finally - another key aspect that can be reconfigured is default features d
 }
 ```
 
-The only properties that need more explanation are _location_, _accumulate_, _process_ and _render_. The first one is used to determine where in the data entry the value for this feature is stored and/or should be written. For example in those two:
+The only properties that need more explanation are _location_, _accumulate_, _process_, _visibility_ and _render_. The first one is used to determine where in the data entry the value for this feature is stored and/or should be written. For example in those two:
 
 ```
 "http://www.opentox.org/api/1.1#CASRN" : { title: "CAS", location: "compound.cas"},
@@ -265,6 +265,8 @@ The only properties that need more explanation are _location_, _accumulate_, _pr
 this property shows that all features that are _sameAs_ **CASRN** (or **TradeName**) should location their values in `compound.cas`. This is the place that later the values will be searched too. The second property - `accumulate` determines whether such accumulation (via `fnAccumulate` function) should happen at all, or just the rendering engine will search for the value in the specified location.
 
 The third property - `process` is used during dataset pre-processing and is of form `function process(entry, featureId, features)` and is called for each feature in the set.
+
+The fourth one - `visibility` determines where this feature should be shown out: either on general tabs only (value of `main`); or only in detailed info tabs (value of `details`) or in both - value of `all` or missing.
 
 The last property - `render` gives wider possibilities while preparing the table - it identifies a function of the following format: `function render(column, featureId)`, where _column_ is the column definition for this feature built so far (most probably - _sTitle_ put, etc.). This is dataTable column definition, that can be altered in any desired way, includin it's _mRender_ property. 
 
@@ -351,7 +353,8 @@ In the full configuration, shown below example of using last two can be seen for
             col["sClass"] = "paddingless";
             col["sWidth"] = "125px";
             return col;
-        	}
+          },
+          visibility: "main"
       	},
       }
     }
@@ -380,12 +383,6 @@ jToxDataset.processEntry(entry, features, fnValue)
 ```
 Used extensively during dataset preprocessing. When traversing the dataset, each `entry` is passed with already preprocessed `features` so that features that need to have their values extracted and set separately _are_ processed here. Also, if several features are setup to location their values in same entry's property - it is also done here. `fnValue` function (the same passed to `processDataset()`) can participate in the process, it has the following definition: `fnValue(oldValue, newValue)`.
 
-```
-jToxDataset.shortFeatureId(featureId)
-```
-A small helper which returns the part of the feature id, which is _after_ # sign.
-
-Now is time to review a bit more on instance methods of jToxDatset:
 
 ```
 <jToxDataset>.queryDataset(datasetUri)

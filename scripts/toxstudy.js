@@ -64,8 +64,6 @@ var jToxStudy = (function () {
               jT.$(table).addClass('loaded');
               self.processStudies(panel, study.study, false);
             }
-            
-           // now try to order them, if they are all loaded...
           });  
         });
       }

@@ -1,8 +1,11 @@
 TODO:
+- Customizable sDom on the jToxDataset.
+- Sub-components in jToxQuery - subtrcture, sub, similarity, ketcher.
+- How to build jToxQuery structure - put a <div> for each (sub)component, marked with proper tag. Each of the subcomponents adequately finds and uses the jToxQuery general component;
+- 
 
-- make appropriate message when there is no internet
-- make appropriate loading waiting cursor.
 
+IDEAS?
 - (global) extractFeature(dataset, featureId) - return an array of values of that feature for each entry in the dataset. (Can be used for diagram)
 - make toxtree part of jToxKit
 
