@@ -1102,6 +1102,7 @@ var jToxStudy = (function () {
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even in manual initialization.
     
     self.settings = jT.$.extend({}, defaultSettings, jT.settings, settings); // i.e. defaults from jToxStudy
+    self.settings.tab = self.settings.tab || jT.settings.fullUrl.hash;
     // now we have our, local copy of settings.
     
     // get the main template, add it (so that jQuery traversal works) and THEN change the ids.
@@ -1653,10 +1654,9 @@ var jToxStudy = (function () {
       jT.call(self, summaryURI, function(summary) {
         if (!!summary && !!summary.facet)
           self.processSummary(summary.facet);
-          // check if there is a has passed so we switch to it
-          var hash = jT.settings.fullUrl.hash;
-          if (!!hash) {
-            var div = jT.$('.jtox-study-tab.' + hash, self.root)[0];
+          // check if there is an initial tab passed so we switch to it
+          if (!!self.settings.tab) {
+            var div = jT.$('.jtox-study-tab.' + decodeURIComponent(self.settings.tab).replace(/ /g, '_'), self.root)[0];
             if (!!div) {
               for (var idx = 0, cl = div.parentNode.children.length; idx < cl; ++idx)
                 if (div.parentNode.children[idx].id == div.id)

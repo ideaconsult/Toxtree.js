@@ -46,16 +46,16 @@ Beside specifying the exact place of code insertion the `<div>` tag, referred ab
 
 Although different kits can have different configuration parameters, these are common:
 
-- `kit`  (attr. `data-kit`), _required_: specifies the exact type of front-end to be inserted. Only one type is allowed (of course!) - currently available kits are explained in the beginning.
-- `server` (attr. `data-server`), _optional_: the default server to be used on AJAX requests, if the server is not specified on the call itself.
-- `crossDomain` (attr. `data-cross-domain`), _optional_: informs jToxKit to send requests with cross-domain headers. It is fine to be _true_ even for same-server requests, except when Internet Explorer is used. That's why it defaults to *false*.
-- `jsonp` (attr. `data-jsonp`), _optional_: whether to use _JSONP_ style queries to the server, instead of asynchronous ones. Mind that _JSONP_ setting does not influence _POST_ requests. If this one is specified `crossDomain=true` is implied. Default is *false*.
-- `timeout` (attr. `data-timeout`), _optional_: the timeout for AJAX requests, in milliseconds. Default is 5000.
-- `pollDelay` (attr. `data-poll-delay`), _optional_: certain services involve creating a task on the server and waiting for it to finish - this is the time between poll request, while waiting it to finish. In milliseconds. Default is 200.
-- `onConnect` (attr. `data-on-connect`), _optional_: a function name, or function to be called just before any AJAX call.
-- `onSuccess` (attr. `data-on-success`), _optional_: a function name, or function to be called upon successful complete of a AJAX call.
-- `onError` (attr. `data-on-error`), _optional_: a function name, or function to be called when there's an error on AJAX call. The passed _callback_ to `jT.call()` is still called, but with _null_ result.
-- `configuration` (attr. `data-config-file`), _optional_: a way to provide kit-specific configuration, like coulmns visibility and/or ordering for _study_ kit. When provided as `data-config-file` parameter, the configuration file is downloaded and passed as configuration parameter to kit initialization routine.
+- **`kit`**  (attr. `data-kit`), _required_: specifies the exact type of front-end to be inserted. Only one type is allowed (of course!) - currently available kits are explained in the beginning.
+- **`server`** (attr. `data-server`), _optional_: the default server to be used on AJAX requests, if the server is not specified on the call itself.
+- **`crossDomain`** (attr. `data-cross-domain`), _optional_: informs jToxKit to send requests with cross-domain headers. It is fine to be _true_ even for same-server requests, except when Internet Explorer is used. That's why it defaults to *false*.
+- **`jsonp`** (attr. `data-jsonp`), _optional_: whether to use _JSONP_ style queries to the server, instead of asynchronous ones. Mind that _JSONP_ setting does not influence _POST_ requests. If this one is specified `crossDomain=true` is implied. Default is *false*.
+- **`timeout`** (attr. `data-timeout`), _optional_: the timeout for AJAX requests, in milliseconds. Default is 5000.
+- **`pollDelay`** (attr. `data-poll-delay`), _optional_: certain services involve creating a task on the server and waiting for it to finish - this is the time between poll request, while waiting it to finish. In milliseconds. Default is 200.
+- **`onConnect`** (attr. `data-on-connect`), _optional_: a function name, or function to be called just before any AJAX call.
+- **`onSuccess`** (attr. `data-on-success`), _optional_: a function name, or function to be called upon successful complete of a AJAX call.
+- **`onError`** (attr. `data-on-error`), _optional_: a function name, or function to be called when there's an error on AJAX call. The passed _callback_ to `jT.call()` is still called, but with _null_ result.
+- **`configuration`** (attr. `data-config-file`), _optional_: a way to provide kit-specific configuration, like coulmns visibility and/or ordering for _study_ kit. When provided as `data-config-file` parameter, the configuration file is downloaded and passed as configuration parameter to kit initialization routine.
 
 As, can be seen, the later three callbacks can be local for each kit, so it is possible to report connection statuses in the most appropriate for the kit's way. This is also true for Url's, which means that not all kits, needs to communicate with one and the same server.
 
@@ -83,7 +83,8 @@ These are needed in the same page in order for _jToxStudy_ to work. It has some 
 
 Not quite a lot yet, though:
 
-- `substanceUri` (attr. `data-substance-uri`), _optional_: This is the URL of the substance in question. If it is passed during _jToxStudy_ initialization a call to `jToxStudy.querySubstance(uri)` is made. In either case upon successful substance info retrieval automatic calls to `jToxStudy.querySummary(uri)` and `jToxStudy.queryComposition(uri)` are made.
+- **`substanceUri`** (attr. `data-substance-uri`), _optional_: This is the URL of the substance in question. If it is passed during _jToxStudy_ initialization a call to `jToxStudy.querySubstance(uri)` is made. In either case upon successful substance info retrieval automatic calls to `jToxStudy.querySummary(uri)` and `jToxStudy.queryComposition(uri)` are made.
+- **`tab`** (attr. `data-tab`), _optional_: Specifying which study top-category should be preloaded upon page loading. It can be either _encodeURIComponent()_ encoded, or spaces replaced with underscore.
 
 ##### Configuration
 
@@ -183,14 +184,14 @@ It has less dependencies, compare to jToxStudy, namely they are:
 
 Parameters that can be passed either with data-XXX attributes or when initialized manually with JavaScript are:
 
-- `datasetUri` (attr. `data-dataset-uri`), _optional_: This is the main URL of the dataset, that later is used for feautres query, pagination, etc. If not passed initially, a later call to `queryDataset(datasetUri)` has the same effect. 
-- `showTabs` (attr. `data-show-tabs`), _optional_: Determines if the feature enabling / disabling tabs should be visible, or not. Default: *true*.
-- `showExport` (attr. `data-show-export`), _optional_: Determines if the **Export** tab should be added to the right of feature-tabs, filled with possible export parameters. If `showTabs` is false, this has not effect, of course. Default: *true*.
-- `showControls` (attr. `data-show-controls`), _optional_: Determines whether to show the block with filter and pagination controls, which include: information for current view items, dropdown menu for choosing the page size, next and previous page and filtering box. Default: *true*.
-- `metricFeature` (attr. `data-metric-feature`), _optional_: The ID of the feature that should be used, when 'metric' field is present in the dataset. Default: *http://www.opentox.org/api/1.1#Similarity*.
-- `fnAccumulate` (attr. `data-fn-accumulate`), _optional_: The function that should be called during dataset entries' processing, when several values need to be accumulated in the same place. The format of the function is `function fnlocation(featureId, oldValue, newValue, features)`. The default one is concatenating the passed values as comma-separated string.
-- `pageStart` (attr. `data-page-start`), _optional_: From which item the referenced dataset should be visualized. Counted from 0. Default: *0*.
-- `pageSize` (attr. `data-page-size`), _optional_: initial page size for queries - can later be changed either with `queryEntries()` call, or with dropdown menu, if visible. Default: *20*.
+- **`datasetUri`** (attr. `data-dataset-uri`), _optional_: This is the main URL of the dataset, that later is used for feautres query, pagination, etc. If not passed initially, a later call to `queryDataset(datasetUri)` has the same effect. 
+- **`showTabs`** (attr. `data-show-tabs`), _optional_: Determines if the feature enabling / disabling tabs should be visible, or not. Default: *true*.
+- **`showExport`** (attr. `data-show-export`), _optional_: Determines if the **Export** tab should be added to the right of feature-tabs, filled with possible export parameters. If `showTabs` is false, this has not effect, of course. Default: *true*.
+- **`showControls`** (attr. `data-show-controls`), _optional_: Determines whether to show the block with filter and pagination controls, which include: information for current view items, dropdown menu for choosing the page size, next and previous page and filtering box. Default: *true*.
+- **`metricFeature`** (attr. `data-metric-feature`), _optional_: The ID of the feature that should be used, when 'metric' field is present in the dataset. Default: *http://www.opentox.org/api/1.1#Similarity*.
+- **`fnAccumulate`** (attr. `data-fn-accumulate`), _optional_: The function that should be called during dataset entries' processing, when several values need to be accumulated in the same place. The format of the function is `function fnlocation(featureId, oldValue, newValue, features)`. The default one is concatenating the passed values as comma-separated string.
+- **`pageStart`** (attr. `data-page-start`), _optional_: From which item the referenced dataset should be visualized. Counted from 0. Default: *0*.
+- **`pageSize`** (attr. `data-page-size`), _optional_: initial page size for queries - can later be changed either with `queryEntries()` call, or with dropdown menu, if visible. Default: *20*.
 
 
 ##### Configuration
