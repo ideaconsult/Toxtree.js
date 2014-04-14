@@ -9,23 +9,25 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
 
   <title>ToxDataset development page</title>
-  <link rel="stylesheet" href="styles/base.css">
-	<link rel="stylesheet" href="styles/skeleton.css">
+  <link rel="stylesheet" href="tests/base.css">
+	<link rel="stylesheet" href="tests/skeleton.css">
 	<link rel="stylesheet" href="tests/layout.css">
-	<link rel="stylesheet" href="styles/jquery-ui.css">
-	<link rel="stylesheet" href="styles/jquery.dataTables.css">
+	<link rel="stylesheet" href="tests/jquery-ui.css">
+	<link rel="stylesheet" href="tests/jquery.dataTables.css">
+
 	<link rel="stylesheet" href="styles/toxdataset.css">
 	<link rel="stylesheet" href="styles/jtoxkit.css">
 
-  <script src="scripts/jquery.js"></script>
-  <script src="scripts/jquery-ui.js"></script>
-  <script src="scripts/jquery.dataTables.js"></script>
+
+  <script src="tests/jquery.js"></script>
+  <script src="tests/jquery-ui.js"></script>
+  <script src="tests/jquery.dataTables.js"></script>
 
   <script src="scripts/common.js"></script>
   <script src="scripts/jtoxkit.js"></script>
   <script src="scripts/toxdataset.js"></script>
   
-  <script src="scripts/config-dataset.js"></script>
+  <script src="tests/config-dataset.js"></script>
   <script language="javascript">
     $(document).ready(function(){
       var ds = new jToxDataset($(".jtox-toolkit")[0], {crossDomain: true, configuration: config_dataset } );
