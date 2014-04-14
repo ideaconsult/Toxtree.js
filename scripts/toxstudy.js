@@ -305,7 +305,7 @@ var jToxStudy = (function () {
             return sPre;
           },
   				"oLanguage": {
-            "sProcessing": "<img src='" + self.baseUrl + "images/24x24_ambit.gif' border='0'>",
+            "sProcessing": "<img src='" + (jT.settings.baseUrl || self.baseUrl) + "images/24x24_ambit.gif' border='0'>",
             "sLoadingRecords": "No studies found.",
             "sZeroRecords": "No studies found.",
             "sEmptyTable": "No studies available.",
@@ -477,7 +477,7 @@ var jToxStudy = (function () {
   				"sPaginate" : ".dataTables_paginate _paging",
   				"bAutoWidth": false,
   				"oLanguage": {
-            "sProcessing": "<img src='" + self.baseUrl + "images/24x24_ambit.gif' border='0'>",
+            "sProcessing": "<img src='" + (jT.settings.baseUrl || self.baseUrl) + "images/24x24_ambit.gif' border='0'>",
             "sLoadingRecords": "No substances found.",
             "sZeroRecords": "No substances found.",
             "sEmptyTable": "No substances available.",
@@ -537,7 +537,7 @@ var jToxStudy = (function () {
     					"bSortable": false,
     					"mData" : "component.compound.URI",
     					"mRender" : function(val, type, full) {
-    					  return !val ? '' : '<a href="' + self.baseUrl + 'substance?type=related&compound_uri=' + encodeURIComponent(val) + '" target="_blank">Also contained in...</span></a>';
+    					  return !val ? '' : '<a href="' + (jT.settings.baseUrl || self.baseUrl) + 'substance?type=related&compound_uri=' + encodeURIComponent(val) + '" target="_blank">Also contained in...</span></a>';
   					}
 	    		}    				
   		    ]

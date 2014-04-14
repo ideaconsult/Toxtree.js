@@ -256,7 +256,7 @@ var jToxDataset = (function () {
           jT.$('a', el)[0].href = ccLib.addParameter(self.datasetUri, "media=" + encodeURIComponent(expo.type));
           var img = el.getElementsByTagName('img')[0];
           img.alt = img.title = expo.type;
-          img.src = self.baseUrl + expo.icon;
+          img.src = (jT.settings.baseUrl || self.baseUrl) + expo.icon;
         }
       }
       
