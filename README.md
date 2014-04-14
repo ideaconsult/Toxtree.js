@@ -44,6 +44,28 @@ Beside specifying the exact place of code insertion the `<div>` tag, referred ab
 - As **data-XXX** attributes of the inserting _div_. They follow the common *data-XXX* naming convention, i.e. `pollDelay` is referred with `data-poll-delay`. When (each) kit it automatically inserted (the default behaviour), these settings are merged with jToxKit's and are passed on kit's initialization. They take precedence over jToxKit's.
 - As **JS object** when calling `j<kit name>.init(root, settings)` manually. By default on page loading, *jToxKit* scans and initialized itself, also traversing each jToxKit's `<div>`s. The later can be supressed by adding `data-manual-init` attribute, set to *true* to the `<div>`. In this case *j<tox-kit>* should be manually initialized, passing any desired parameters, which (again) will be merged, taking precedence over jToxKit's.
 
+For example, the following three have the same effect:
+
+1. Querying like this:
+
+```
+http://apps.ideaconsult.net:8080/toxbank/substance/IUC4-d982cd73-9ee1-32af-8604-962ae6875cc7/study?tab=P-CHEN&crossDomain=true
+```
+
+2. Or, embedding a jToxKit placeholder like this:
+
+```
+	<div class="jtox-toolkit" data-kit="study" data-tab="P-CHEN" data-cross-domain="true" data-substance-uri="http://apps.ideaconsult.net:8080/biodeg/substance/IUC4-d982cd73-9ee1-32af-8604-962ae6875cc7"></div>
+```
+
+3. Or, making a manual initialization like this:
+
+```
+$(document).ready(function(){
+  var st = new jToxStudy($(".jtox-toolkit")[0], { crossDomain: true, tab: 'P-CHEM' });
+  st.querySubstance("http://apps.ideaconsult.net:8080/toxbank/substance/IUC4-d982cd73-9ee1-32af-8604-962ae6875cc7");
+``` 
+
 Although different kits can have different configuration parameters, these are common:
 
 - **`kit`**  (attr. `data-kit`), _required_: specifies the exact type of front-end to be inserted. Only one type is allowed (of course!) - currently available kits are explained in the beginning.
