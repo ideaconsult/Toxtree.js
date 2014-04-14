@@ -53,8 +53,27 @@ var jToxStudy = (function () {
 	    }
     });
     
-    // keep on initializing...
-    var loadPanel = function(panel){
+    // initialize the tab structure for several versions of dataTables.
+    self.tabs = jT.$(tree).tabs({
+      "select" : function(event, ui) {
+        self.loadPanel(ui.panel);
+      },
+      "beforeActivate" : function(event, ui) {
+        if (ui.newPanel)
+          self.loadPanel(ui.newPanel[0]);
+      }
+    });
+    
+    // when all handlers are setup - make a call, if needed.    
+    if (self.settings['substanceUri'] !== undefined) {
+      self.querySubstance(self.settings['substanceUri']);
+    }
+  };
+  
+  // now follow the prototypes of the instance functions.
+  cls.prototype = {
+    loadPanel: function(panel){
+      var self = this;
       if (panel){
         jT.$('.jtox-study.unloaded', panel).each(function(i){
           var table = this;
@@ -67,27 +86,8 @@ var jToxStudy = (function () {
           });  
         });
       }
-    };
+    },
     
-    // initialize the tab structure for several versions of dataTables.
-    jT.$(tree).tabs({
-      "select" : function(event, ui) {
-        loadPanel(ui.panel);
-      },
-      "beforeActivate" : function(event, ui) {
-        if (ui.newPanel)
-          loadPanel(ui.newPanel[0]);
-      }
-    });
-    
-    // when all handlers are setup - make a call, if needed.    
-    if (self.settings['substanceUri'] !== undefined) {
-      self.querySubstance(self.settings['substanceUri']);
-    }
-  };
-  
-  // now follow the prototypes of the instance functions.
-  cls.prototype = {
     getFormatted: function (data, type, format) {
       var value = null;
       if (typeof format === 'function' )
@@ -337,8 +337,8 @@ var jToxStudy = (function () {
       
       // create the groups on the corresponding tabs, first sorting them alphabetically
       summary.sort(function (a, b) {
-      	var valA = (a.category.description || a.category.title);
-      	var valB = (b.category.description || b.category.title);
+      	var valA = (a.category.order || a.category.description || a.category.title);
+      	var valB = (b.category.order || b.category.description || b.category.title);
       	if (valA == null)
       		return -1;
       	if (valB == null)
@@ -587,6 +587,17 @@ var jToxStudy = (function () {
       jT.call(self, summaryURI, function(summary) {
         if (!!summary && !!summary.facet)
           self.processSummary(summary.facet);
+          // check if there is a has passed so we switch to it
+          var hash = jT.settings.fullUrl.hash;
+          if (!!hash) {
+            var div = jT.$('.jtox-study-tab.' + hash, self.root)[0];
+            if (!!div) {
+              for (var idx = 0, cl = div.parentNode.children.length; idx < cl; ++idx)
+                if (div.parentNode.children[idx].id == div.id)
+                  break;
+              $(self.tabs).tabs('option', 'active', idx - 1);
+            }
+          }
       });
     },
     

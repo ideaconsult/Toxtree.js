@@ -16,7 +16,8 @@ window.jT = window.jToxKit = {
 	settings: {
   	jsonp: false,                   // whether to use JSONP approach, instead of JSON.
   	crossDomain: false,             // should it expect cross-domain capabilities for the queries.
-  	host: null,                     // same as above, but for the calling server, i.e. - the one that loaded the page.        
+  	baseUrl: null,                  // the baseUrl for the server that loaded the page.
+  	fullUrl: null,                  // the url as it is on loading the page - this is parsed one, i.e. parseUrl() processed.
   	timeout: 15000,                 // the timeout an call to the server should be wait before the attempt is considered error.
   	pollDelay: 200,                 // after how many milliseconds a new attempt should be made during task polling.
   	onConnect: function(s){ },		  // function (service): called when a server request is started - for proper visualization. Part of settings.
@@ -80,7 +81,7 @@ window.jT = window.jToxKit = {
       jT.$(document).on('click', '.jtox-toolkit span.ui-icon-copy', function (e) { ccLib.copyToClipboard(jT.$(this).data('uuid')); return false;});
 
       // scan the query parameter for settings
-  		var url = ccLib.parseURL(document.location);
+  		var url = self.settings.fullUrl = ccLib.parseURL(document.location);
   		var queryParams = url.params;
   		if (!queryParams.baseUrl)
   		  queryParams.baseUrl = self.formBaseUrl(url);
