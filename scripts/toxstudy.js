@@ -213,7 +213,9 @@ var jToxStudy = (function () {
                 out += '-';
             }
             
-            out += (data.unit = ccLib.trim(data.unit));
+            data.unit = ccLib.trim(data.unit);
+            if (!ccLib.isNull(data.unit))
+              out += ' ' + data.unit;
           }
           return out.replace(/ /g, "&nbsp;");
         };
