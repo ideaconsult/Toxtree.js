@@ -2127,7 +2127,7 @@ jT.templates['all-studies']  =
 "	      <table class=\"dataTable\">" +
 "	        <thead>" +
 "	          <tr>" +
-"	            <th class=\"right jtox-size-third\">IUC Substance name:</th>" +
+"	            <th class=\"right size-third\">IUC Substance name:</th>" +
 "	            <td class=\"data-field camelCase\" data-field=\"name\"> ? </td>" +
 "	          </tr>" +
 "	          <tr>" +

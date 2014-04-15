@@ -38,20 +38,20 @@
     <div id="jtox-search" class="jtox-search">
       <form>
   	  	<div class="jq-buttonset jtox-inline">
-  			  <input type="radio" id="searchexact" name="searchtype" checked="checked" data-placeholder="Enter CAS, EINECS, Chemical name, SMILES or InChI...">
+  			  <input type="radio" id="searchexact" name="searchtype" checked="checked" data-placeholder="Enter CAS, EINECS, Chemical name, SMILES or InChI_">
   			    <label for="searchexact">Exact structure</label>
           </input>
-  			  <input type="radio" id="searchsimilarity" name="searchtype" data-placeholder="Enter Chemical name, SMILES or InChI...">
+  			  <input type="radio" id="searchsimilarity" name="searchtype" data-placeholder="Enter Chemical name, SMILES or InChI_">
   			    <label for="searchsimilarity">Similarity</label>
           </input>
-  			  <input type="radio" id="searchsubstructure" name="searchtype" data-placeholder="Enter SMARTS...">
+  			  <input type="radio" id="searchsubstructure" name="searchtype" data-placeholder="Enter SMARTS_">
   			    <label for="searchsubstructure">Substructure</label>
           </input>
   			</div>
     		<div class="jtox-inline float-right search-pane">
   			  <div class="dynamic searchsimilarity hidden jtox-inline">
       			<select name='threshold' title ='Tanimoto similarity threshold'>
-    					<option value='0.9' selected>0.9</option>
+    					<option value='0.9' selected="selected">0.9</option>
   			   		<option value='0.8' >0.8</option>
   			   		<option value='0.7' >0.7</option>
   			   		<option value='0.6' >0.6</option>
@@ -67,6 +67,8 @@
           <input type="search" name="searchbox" class="font-middle jtox-handler" data-handler="onSearchBox" />
           <button name="drawbutton"><span class="icon icon-draw" tiyle="Draw the (sub)structure"/></button>
           <button name="searchbutton"><span class="icon icon-search" tiyle="Search"/></button>
+          <div class="dynamic ketcher hidden">
+          </div>
     		</div>
       </form>
     </div>

@@ -3,12 +3,15 @@
 
 .jtox-search .search-pane input {
   font-size: 2em;
-  min-width: 380px;
+  min-width: 360px;
   height: 40px;
+  -moz-transition: width 0.3s ease-out;
+  -webkit-transition: width 0.3s ease-out;
+  transition: width 0.3s ease-out;
 }
 
 .jtox-search .search-pane {
-  padding: 10px;
+  padding: 5px;
 }
 
 .jtox-search .search-pane button {
@@ -20,9 +23,13 @@
 }
 
 .jtox-search .search-pane .dynamic {
-  transition: opacity 0.2s ease;
+  -moz-transition: opacity 0.3s ease-out, height 0.3s ease-out;
+  -webkit-transition: opacity 0.3s ease-out, height 0.3s ease-out;
+  transition: opacity 0.3s ease-out, height 0.3s ease-out;
+  vertical-align: top;
 }
 
 .jtox-search .search-pane .dynamic.hidden {
   opacity: 0.0;
+  height: 0px;
 }

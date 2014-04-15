@@ -107,13 +107,12 @@ var jToxSearch = (function () {
     
     self.settings = jT.$.extend({}, defaultSettings, jT.settings, settings);
     self.rootElement.appendChild(jT.getTemplate('#jtox-search'));
-    self.searchBox = jT.$('.search-box', self.rootElement)[0];
     self.queryKit = jToxQuery.queryKit(self.rootElement);
     
     var form = jT.$('form', self.rootElement)[0];
     form.onsubmit = function () { return false; }
 
-    jT.$('.jq-buttonset', root).buttonset();
+    var radios = jT.$('.jq-buttonset', root).buttonset();
     var onTypeClicked = function () {
       form.searchbox.placeholder = jT.$(this).data('placeholder');
       jT.$('.search-pane .dynamic').addClass('hidden');
@@ -122,6 +121,16 @@ var jToxSearch = (function () {
     
     jT.$('.jq-buttonset input', root).on('change', onTypeClicked);
     ccLib.fireCallback(onTypeClicked, jT.$('.jq-buttonset input', root)[0]);
+    
+    jT.$(form.searchbox)
+    .on('focus', function () {
+      var gap = jT.$(form).width() - jT.$(radios).width() - 30 - jT.$('.search-pane').width();
+      var oldSize = $(this).width();
+      jT.$(this).css('width', '' + (oldSize + gap) + 'px');
+    })
+    .on('blur', function () {
+      jT.$(this).css('width', '');
+    });
     
   };
   
