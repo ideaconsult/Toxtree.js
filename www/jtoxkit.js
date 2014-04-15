@@ -422,35 +422,7 @@ var jToxDataset = (function () {
     
     var newDefs = jT.$.extend(true, { "configuration" : { "baseFeatures": baseFeatures} }, defaultSettings);
     self.settings = jT.$.extend(true, {}, newDefs, jT.settings, settings); // i.e. defaults from jToxDataset
-    self.features = null; // features, as downloaded from server, after being processed.
-    self.dataset = null; // the last-downloaded dataset.
-    self.groups = null; // computed groups, i.e. 'groupName' -> array of feature list, prepared.
-    self.fixTable = self.varTable = null; // the two tables - to be initialized in prepareTables.
     self.instanceNo = instanceCount++;
-    self.entriesCount = null;
-    self.suspendEqualization = false;
-    self.orderList = [];
-    
-    root.appendChild(jT.getTemplate('#jtox-dataset'));
-    
-    // now make some action handlers - on next, prev, filter, etc.
-    var pane = jT.$('.jtox-ds-control', self.rootElement)[0];
-    if (self.settings.showControls) {
-      ccLib.fillTree(pane, { "pagesize": self.settings.pageSize });
-      jT.$('.next-field', pane).on('click', function() { self.nextPage(); });
-      jT.$('.prev-field', pane).on('click', function() { self.prevPage(); });
-      jT.$('select', pane).on('change', function() { self.queryEntries(self.settings.pageStart, parseInt(jT.$(this).val())); })
-      var pressTimeout = null;
-      jT.$('input', pane).on('keydown', function() { 
-        if (pressTimeout != null)
-          clearTimeout(pressTimeout);
-        pressTimeout = setTimeout(function(){
-          self.updateTables();
-        }, 350);
-      });
-    }
-    else // ok - hide me
-      pane.style.display = "none";
 
     // finally make the query, if Uri is provided      
     if (self.settings['datasetUri'] !== undefined){
@@ -460,6 +432,50 @@ var jToxDataset = (function () {
   
   // now follow the prototypes of the instance functions.
   cls.prototype = {
+    init: function () {
+      var self = this;
+      
+      self.features = null; // features, as downloaded from server, after being processed.
+      self.dataset = null; // the last-downloaded dataset.
+      self.groups = null; // computed groups, i.e. 'groupName' -> array of feature list, prepared.
+      self.fixTable = self.varTable = null; // the two tables - to be initialized in prepareTables.
+      self.entriesCount = null;
+      self.suspendEqualization = false;
+      self.orderList = [];
+      self.usedFeatures = [];
+      
+      self.rootElement.appendChild(jT.getTemplate('#jtox-dataset'));
+      
+      // now make some action handlers - on next, prev, filter, etc.
+      var pane = jT.$('.jtox-ds-control', self.rootElement)[0];
+      if (self.settings.showControls) {
+        ccLib.fillTree(pane, { "pagesize": self.settings.pageSize });
+        jT.$('.next-field', pane).on('click', function() { self.nextPage(); });
+        jT.$('.prev-field', pane).on('click', function() { self.prevPage(); });
+        jT.$('select', pane).on('change', function() { self.queryEntries(self.settings.pageStart, parseInt(jT.$(this).val())); })
+        var pressTimeout = null;
+        jT.$('input', pane).on('keydown', function() { 
+          if (pressTimeout != null)
+            clearTimeout(pressTimeout);
+          pressTimeout = setTimeout(function(){
+            self.updateTables();
+          }, 350);
+        });
+      }
+      else // ok - hide me
+        pane.style.display = "none";
+    },
+    
+    clearDataset: function () {
+      if (this.usedFeatures !== undefined) {      
+        jT.$(this.rootElement).empty();
+        for (var i = 0, fl = this.usedFeatures.length; i < fl; ++i) {
+          var fid = this.usedFeatures[i];
+          this.features[fid].used = false;
+        }
+      }
+    },
+    
     /* make a tab-based widget with features and grouped on tabs. It relies on filled and processed 'self.features' as well
     as created 'self.groups'.
     */
@@ -790,8 +806,12 @@ var jToxDataset = (function () {
           var sameAs = cls.findSameAs(fid, self.features);
           if (!self.features[sameAs].used && !self.features[fid].used)
             self.groups[i].push(fid);
-          if (idx != "name")
+          if (idx != "name") {
+            // these we need to be able to return back to original state.
+            self.usedFeatures.push(fid);
+            self.usedFeatures.push(sameAs);
             self.features[fid].used = self.features[sameAs].used = true;
+          }
         });
       }
     },
@@ -936,6 +956,9 @@ var jToxDataset = (function () {
     */
     queryDataset: function (datasetUri) {
       var self = this;
+      // if some oldies exist...
+      self.clearDataset();
+      self.init(); 
       
       // we want to take into account the passed page & pagesize, but remove them, afterwards.
       var urlObj = ccLib.parseURL(datasetUri);
@@ -976,7 +999,7 @@ var jToxDataset = (function () {
           self.queryEntries(self.settings.pageStart, self.settings.pageSize); // and make the query for actual data
         }
       });
-    },
+    }    
   }; // end of prototype
   
   // some public, static methods
@@ -1098,10 +1121,10 @@ var jToxStudy = (function () {
   var cls = function (root, settings) {
     var self = this;
     self.rootElement = root;
-    self.suffix = '_' + instanceCount++;
+    var suffix = '_' + instanceCount++;
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even in manual initialization.
     
-    self.settings = jT.$.extend({}, defaultSettings, jT.settings, settings); // i.e. defaults from jToxStudy
+    self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings); // i.e. defaults from jToxStudy
     self.settings.tab = self.settings.tab || jT.settings.fullUrl.hash;
     // now we have our, local copy of settings.
     
@@ -1109,7 +1132,7 @@ var jToxStudy = (function () {
     // There should be no overlap, because already-added instances will have their IDs changed already...
     var tree = jT.getTemplate('#jtox-studies');
     root.appendChild(tree);
-    jT.changeTabsIds(tree, self.suffix);
+    jT.changeTabsIds(tree, suffix);
     jT.$('div.jtox-study-tab div button', tree).on('click', function (e) {
     	var par = jT.$(this).parents('.jtox-study-tab')[0];
 	    if (jT.$(this).hasClass('expand-all')) {
@@ -1766,10 +1789,17 @@ window.jT = window.jToxKit = {
     	  	kit = 'jTox' + kit.charAt(0).toUpperCase() + kit.slice(1);
     
       	var fn = window[kit];
-      	if (typeof fn == 'function')
-      	  return new fn(element, params);
+      	if (typeof fn == 'function') {
+      	  var obj = new fn(element, params);
+          if (fn.kits === undefined)
+            fn.kits = [];
+          fn.kits.push(obj);
+          return obj;
+      	}
         else if (typeof fn == "object" && typeof fn.init == "function")
           return fn.init(element, params);
+        else
+          console.log("jToxError: trying to initialize unexistend jTox kit: " + kit);
 
         return null;
       };
@@ -1781,11 +1811,11 @@ window.jT = window.jToxKit = {
     	  self.call({ settings: dataParams}, dataParams.configFile, function(config){
       	  if (!!config)
       	    dataParams['configuration'] = self.$.extend(true, dataParams['configuration'], config);
-          realInit(dataParams);
+          jT.$(element).data('jtKit', realInit(dataParams));
     	  });
   	  }
   	  else
-  	    realInit(dataParams);
+        jT.$(element).data('jtKit', realInit(dataParams));
     }
   },
   
@@ -1813,22 +1843,26 @@ window.jT = window.jToxKit = {
   	self.$('.jtox-toolkit', root).each(function(i) { self. initKit(this); });
 	},
 	
+	kit: function (element) {
+  	return $(element).data('jtKit');
+	},
+	
 	initTemplates: function() {
 	  var self = this;
 
     var root = jT.$('.jtox-template')[0];
-    if (root === undefined) {
-  	  var html = '';
-    	for (var t in self.templates) {
-      	html += self.templates[t];
-    	}
-    	
+    if (!root) {
     	root = document.createElement('div');
     	root.className = 'jtox-template';
-    	root.innerHTML = html;
     	document.body.appendChild(root);
     }
     
+	  var html = root.innerHTML;
+  	for (var t in self.templates) {
+    	html += self.templates[t];
+  	}
+  	
+  	root.innerHTML = html;
   	self.templateRoot = root;
 	},
 	

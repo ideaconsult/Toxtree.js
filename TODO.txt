@@ -1,5 +1,12 @@
 TODO:
-- Customizable sDom on the jToxDataset.
+- Introduce "data-widget" - similar to "data-kit".
+- Make jToxSearch widget - for invoking queries for structure search - radio-button driven, similarity, ketcher drawing, etc.
+- Add jT.widget(el) routine and save the initialized widget into data('jtWidget') entry.
+- Make jToxQuery widget - for integratin _different_ types of search. Enumerate "data-query-id" entries, .widget() method, etc.
+- Settings for jToxQuery should include handlers for given queryIds.
+- Integrate jToxDataset, jToxSearch, wrapped with jToxQuery with exemplary menu
+
+
 - Sub-components in jToxQuery - subtrcture, sub, similarity, ketcher.
 - How to build jToxQuery structure - put a <div> for each (sub)component, marked with proper tag. Each of the subcomponents adequately finds and uses the jToxQuery general component;
 - 

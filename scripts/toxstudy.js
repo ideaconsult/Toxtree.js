@@ -32,10 +32,10 @@ var jToxStudy = (function () {
   var cls = function (root, settings) {
     var self = this;
     self.rootElement = root;
-    self.suffix = '_' + instanceCount++;
+    var suffix = '_' + instanceCount++;
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even in manual initialization.
     
-    self.settings = jT.$.extend({}, defaultSettings, jT.settings, settings); // i.e. defaults from jToxStudy
+    self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings); // i.e. defaults from jToxStudy
     self.settings.tab = self.settings.tab || jT.settings.fullUrl.hash;
     // now we have our, local copy of settings.
     
@@ -43,7 +43,7 @@ var jToxStudy = (function () {
     // There should be no overlap, because already-added instances will have their IDs changed already...
     var tree = jT.getTemplate('#jtox-studies');
     root.appendChild(tree);
-    jT.changeTabsIds(tree, self.suffix);
+    jT.changeTabsIds(tree, suffix);
     jT.$('div.jtox-study-tab div button', tree).on('click', function (e) {
     	var par = jT.$(this).parents('.jtox-study-tab')[0];
 	    if (jT.$(this).hasClass('expand-all')) {

@@ -47,10 +47,17 @@ window.jT = window.jToxKit = {
     	  	kit = 'jTox' + kit.charAt(0).toUpperCase() + kit.slice(1);
     
       	var fn = window[kit];
-      	if (typeof fn == 'function')
-      	  return new fn(element, params);
+      	if (typeof fn == 'function') {
+      	  var obj = new fn(element, params);
+          if (fn.kits === undefined)
+            fn.kits = [];
+          fn.kits.push(obj);
+          return obj;
+      	}
         else if (typeof fn == "object" && typeof fn.init == "function")
           return fn.init(element, params);
+        else
+          console.log("jToxError: trying to initialize unexistend jTox kit: " + kit);
 
         return null;
       };
@@ -62,11 +69,11 @@ window.jT = window.jToxKit = {
     	  self.call({ settings: dataParams}, dataParams.configFile, function(config){
       	  if (!!config)
       	    dataParams['configuration'] = self.$.extend(true, dataParams['configuration'], config);
-          realInit(dataParams);
+          jT.$(element).data('jtKit', realInit(dataParams));
     	  });
   	  }
   	  else
-  	    realInit(dataParams);
+        jT.$(element).data('jtKit', realInit(dataParams));
     }
   },
   
@@ -94,22 +101,26 @@ window.jT = window.jToxKit = {
   	self.$('.jtox-toolkit', root).each(function(i) { self. initKit(this); });
 	},
 	
+	kit: function (element) {
+  	return $(element).data('jtKit');
+	},
+	
 	initTemplates: function() {
 	  var self = this;
 
     var root = jT.$('.jtox-template')[0];
-    if (root === undefined) {
-  	  var html = '';
-    	for (var t in self.templates) {
-      	html += self.templates[t];
-    	}
-    	
+    if (!root) {
     	root = document.createElement('div');
     	root.className = 'jtox-template';
-    	root.innerHTML = html;
     	document.body.appendChild(root);
     }
     
+	  var html = root.innerHTML;
+  	for (var t in self.templates) {
+    	html += self.templates[t];
+  	}
+  	
+  	root.innerHTML = html;
   	self.templateRoot = root;
 	},
 	
