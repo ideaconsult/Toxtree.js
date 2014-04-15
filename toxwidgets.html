@@ -17,6 +17,7 @@
 
 	<link rel="stylesheet" href="www/ketcher.css"/>
 	<link rel="stylesheet" href="www/jtoxkit.css">
+	<link rel="stylesheet" href="styles/toxquery.css">
 
   <script src="tests/jquery.js"></script>
   <script src="tests/jquery-migrate-1.2.1.min.js"></script>
@@ -29,14 +30,45 @@
 </head>
 <body>
   <div class="jtox-toolkit" data-kit="query">
-    <div class="jtox-toolkit" data-kit="Structures">
-      <input name="substructure" class="jtox-handler" data-handler="refresh" />
-    </div>
+    <div class="jtox-toolkit" data-kit="search"></div>
 	  <div class="jtox-toolkit" data-kit="dataset" data-cross-domain="true" data-show-tabs="false" data-dataset-uri="http://apps.ideaconsult.net:8080/biodeg/dataset/1"></div>
   </div>
 	<div class="jtox-template">
 <!--[[ jT.templates['widget-search'] -->
-    <div id="jtox-ds-search" class="jtox-ds-search">
+    <div id="jtox-search" class="jtox-search">
+      <form>
+  	  	<div class="jq-buttonset jtox-inline">
+  			  <input type="radio" id="searchexact" name="searchtype" checked="checked" data-placeholder="Enter CAS, EINECS, Chemical name, SMILES or InChI...">
+  			    <label for="searchexact">Exact structure</label>
+          </input>
+  			  <input type="radio" id="searchsimilarity" name="searchtype" data-placeholder="Enter Chemical name, SMILES or InChI...">
+  			    <label for="searchsimilarity">Similarity</label>
+          </input>
+  			  <input type="radio" id="searchsubstructure" name="searchtype" data-placeholder="Enter SMARTS...">
+  			    <label for="searchsubstructure">Substructure</label>
+          </input>
+  			</div>
+    		<div class="jtox-inline float-right search-pane">
+  			  <div class="dynamic searchsimilarity hidden jtox-inline">
+      			<select name='threshold' title ='Tanimoto similarity threshold'>
+    					<option value='0.9' selected>0.9</option>
+  			   		<option value='0.8' >0.8</option>
+  			   		<option value='0.7' >0.7</option>
+  			   		<option value='0.6' >0.6</option>
+  			   		<option value='0.5' >0.5</option>
+  			   		<option value='0.4' >0.4</option>
+  			   		<option value='0.3' >0.3</option>
+  			   		<option value='0.2' >0.2</option>
+  			   		<option value='0.1' >0.1</option>
+      			</select>	
+  			  </div>
+  			  <div class="dynamic searchsubstructure hidden jtox-inline">
+  			  </div>
+          <input type="search" name="searchbox" class="font-middle jtox-handler" data-handler="onSearchBox" />
+          <button name="drawbutton"><span class="icon icon-draw" tiyle="Draw the (sub)structure"/></button>
+          <button name="searchbutton"><span class="icon icon-search" tiyle="Search"/></button>
+    		</div>
+      </form>
     </div>
 <!-- // end of #jtox-ds-search ]]-->
 	</div>

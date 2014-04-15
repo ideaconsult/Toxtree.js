@@ -51,6 +51,10 @@ var jToxQuery = (function () {
   };
   
   cls.prototype = {
+    addHandlers: function (handlers) {
+      self.settings.configuration.handlers = jT.$.extend(self.settings.configuration.handlers, handlers);
+    },
+    
     element: function (handler) {
       return this.handlers[handler];
     },
@@ -61,10 +65,68 @@ var jToxQuery = (function () {
     
     kit: function () {
       if (!this.mainKit)
-        self.mainKit = jT.kit(this);
+        this.mainKit = jT.kit(this.settings.dom.kit);
         
       return this.mainKit;
-    },
+    }
+  }; // end of prototype
+  
+  cls.queryKit = function(element) {
+    var query = null;
+    jT.$(element).parents().each(function() {
+      var kit = jT.kit(this);
+      if (!kit)
+        return;
+      if (kit instanceof jToxQuery)
+        query = kit;
+    });
+    
+    return query;
+  };
+  
+  return cls;
+})();
+
+/* Now comes the jToxSearch component, which implements the compound searching block
+*/
+var jToxSearch = (function () {
+  var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
+    configuration: {
+      handlers: {
+        onSearchBox: function (el, query) {
+          
+        },
+      }
+    }
+  };
+  
+  var cls = function (root, settings) {
+    var self = this;
+    self.rootElement = root;
+    jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even when manually initialized
+    
+    self.settings = jT.$.extend({}, defaultSettings, jT.settings, settings);
+    self.rootElement.appendChild(jT.getTemplate('#jtox-search'));
+    self.searchBox = jT.$('.search-box', self.rootElement)[0];
+    self.queryKit = jToxQuery.queryKit(self.rootElement);
+    
+    var form = jT.$('form', self.rootElement)[0];
+    form.onsubmit = function () { return false; }
+
+    jT.$('.jq-buttonset', root).buttonset();
+    var onTypeClicked = function () {
+      form.searchbox.placeholder = jT.$(this).data('placeholder');
+      jT.$('.search-pane .dynamic').addClass('hidden');
+      jT.$('.search-pane .' + this.id).removeClass('hidden');
+    };
+    
+    jT.$('.jq-buttonset input', root).on('change', onTypeClicked);
+    ccLib.fireCallback(onTypeClicked, jT.$('.jq-buttonset input', root)[0]);
+    
+  };
+  
+  cls.prototype = {
+    
   }; // end of prototype
   
   return cls;

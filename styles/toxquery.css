@@ -1,0 +1,28 @@
+/* toxtstudy.css - Styling for toxstudy engine
+*/
+
+.jtox-search .search-pane input {
+  font-size: 2em;
+  min-width: 380px;
+  height: 40px;
+}
+
+.jtox-search .search-pane {
+  padding: 10px;
+}
+
+.jtox-search .search-pane button {
+  vertical-align: top;
+}
+
+.jtox-search .searchsimilarity select {
+  width: 5em;
+}
+
+.jtox-search .search-pane .dynamic {
+  transition: opacity 0.2s ease;
+}
+
+.jtox-search .search-pane .dynamic.hidden {
+  opacity: 0.0;
+}

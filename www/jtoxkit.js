@@ -2215,7 +2215,7 @@ jT.templates['all-studies']  =
 
 jT.templates['composition-block']  = 
 "    <div id=\"jtox-compoblock\" class=\"jtox-compoblock\">" +
-"      <table class=\"dataTable composition-info jtox-font-small\">" +
+"      <table class=\"dataTable composition-info font-small\">" +
 "        <thead>" +
 "          <tr><th>Composition name:</th><td class=\"data-field camelCase\" data-field=\"name\"> ? </td></tr>" +
 "          <tr><th>Composition UUID:</th><td class=\"data-field\" data-field=\"uuid\"> ? </td></tr>" +
