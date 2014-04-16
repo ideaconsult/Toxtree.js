@@ -117,7 +117,7 @@ var jToxSearch = (function () {
     
     self.search = { mol: "", smiles: "", type: ""};
     
-    var form = jT.$('form', self.rootElement)[0];
+    var form = self.form = jT.$('form', self.rootElement)[0];
     form.onsubmit = function () { return false; }
 
     var radios = jT.$('.jq-buttonset', root).buttonset();
@@ -189,10 +189,32 @@ var jToxSearch = (function () {
 
       setTimeout(function () { jT.$(ketcherBox).toggleClass('shrinken') }, 100);
     });
+    
+    jT.$(form.searchbutton).on('click', function () { return self.makeQuery(); });
   };
   
   cls.prototype = {
+    makeQuery: function (needle) {
+      var self = this;
+      if (!!needle) 
+        self.setNeedle(needle);
+      // TODO: make the actual request
+    },
     
+    setNeedle: function (needle) {
+      var self = this;
+      if (!!needle)
+        console.log("jToxError: Trying to set null needle");
+      else {
+        self.search.mol = null;
+        self.search.type = "auto";
+        self.form.searchbox.value = needle;
+      }
+    },
+    
+    getNeedle: function () {
+      return this.form.searchbox.value;
+    }
   }; // end of prototype
   
   return cls;
