@@ -232,7 +232,7 @@ var ccLib = {
   },
   
   addParameter: function (url, param) {
-    return url + (url.indexOf('?') > 0 ? "&" : "?") + param;
+    return url + (("&?".indexOf(url.charAt(url.length - 1)) == -1) ?  (url.indexOf('?') > 0 ? "&" : "?") : '') + param;
   },
   
   removeParameter: function (url, param) {
@@ -280,6 +280,285 @@ var ccLib = {
 function ccNonEmptyFilter(v) {
   return v !== undefined && v != null && v != '';  
 }
+/* toxquery.js - Universal query widget, that can work with any kit (study or dataset) inside
+ *
+ * Copyright 2012-2014, IDEAconsult Ltd. http://www.ideaconsult.net/
+ * Created by Ivan Georgiev
+**/
+
+var jToxQuery = (function () {
+  var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
+    scanDom: true,
+    dom: {
+      kit: null, // ... here.
+      widgets: {},
+    },
+
+    configuration: {
+      // this is the main thing to be configured
+      handlers: { 
+        query: function (el, query) { query.query(); },
+      }
+    }
+  };
+  
+  var cls = function (root, settings) {
+    var self = this;
+    self.rootElement = root;
+    self.handlers = {};
+    jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even when manually initialized
+    
+    self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
+    self.mainKit = null;
+        
+    if (self.settings.scanDom) {
+      jT.$('.jtox-toolkit', self.rootElement).each(function () {
+        if (jT.$(this).hasClass('jtox-widget'))
+          self.settings.dom.widgets[jT.$(this).data('kit')] = this;
+        else 
+          self.settings.dom.kit = this;
+      });
+    }
+
+    self.initHandlers(root);
+    // finally, wait a bit for everyone to get initialized and make a call, if asked to
+    if (!ccLib.isNull(self.settings.initialQuery))
+      setTimeout(function () { self.query(); }, 200);
+  };
+  
+  cls.prototype = {
+    addHandlers: function (handlers) {
+      self.settings.configuration.handlers = jT.$.extend(self.settings.configuration.handlers, handlers);
+    },
+    
+    element: function (handler) {
+      return this.handlers[handler];
+    },
+    
+    widget: function (name) {
+      return this.settings.dom.widgets[name];
+    },
+    
+    kit: function () {
+      if (!this.mainKit)
+        this.mainKit = jT.kit(this.settings.dom.kit);
+        
+      return this.mainKit;
+    },
+    
+    initHandlers: function (root) {
+      var self = this;
+      var fireHandler = function (e) {
+        var handler = self.settings.configuration.handlers[jT.$(this).data('handler')];
+        if (!!handler)
+          ccLib.fireCallback(handler, this, this, self);
+        else
+          console.log("jToxError: referring unknown handler: " + jT.$(this).data('handler'));
+      };
+      
+      jT.$('.jtox-handler', root)
+      .on('change', fireHandler)
+      .each(function() {
+        self.handlers[jT.$(this).data('handler')] = this;
+      });
+  
+      jT.$('button.jtox-handler', root).on('click', fireHandler);
+    },
+    
+    /* Perform the actual query, traversing all the widgets and asking them to
+    alter the given URL, then - makes the call */
+    query: function () {
+      var uri = this.settings.service || '';
+      for (var w in this.settings.dom.widgets) {
+        var widget = jT.kit(this.settings.dom.widgets[w]);
+        if (!widget) 
+          console.log("jToxError: the widget [" + w + "] is not recognized: ignored");
+        else if (!widget['modifyUri'])
+          console.log("jToxError: the widget [" + w + "] doesn't have 'modifyUri' method: ignored");
+        else
+          uri = widget.modifyUri(uri);
+      }
+      
+      if (!!uri)
+        this.kit().query(uri);
+    }
+  }; // end of prototype
+  
+  cls.queryKit = function(element) {
+    var query = null;
+    jT.$(element).parents().each(function() {
+      var kit = jT.kit(this);
+      if (!kit)
+        return;
+      if (kit instanceof jToxQuery)
+        query = kit;
+    });
+    
+    return query;
+  };
+  
+  return cls;
+})();
+
+/* Now comes the jToxSearch component, which implements the compound searching block
+*/
+var jToxSearch = (function () {
+  var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
+    configuration: {
+      handlers: {
+        onKetcher: function (service, method, async, parameters, onready) {
+          if (service == "knocknock")
+            onready("You are welcome!", null);
+          else
+            jT.call(null, 'molecules/' + service, parameters, function (res, jhr) { onready(res, jhr); });
+        }
+      }
+    }
+  };
+  
+  var queries = {
+    'auto': "/ui/query/compound/search/all",
+    'similarity': "/ui/query/similarity",
+    'smarts': "/ui/query/smarts"
+  };
+  
+  var cls = function (root, settings) {
+    var self = this;
+    self.rootElement = root;
+    jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even when manually initialized
+    
+    self.settings = jT.$.extend({}, defaultSettings, jT.settings, settings);
+    self.rootElement.appendChild(jT.getTemplate('#jtox-search'));
+    self.queryKit = jToxQuery.queryKit(self.rootElement);
+    self.queryKit.initHandlers(root);
+    
+    self.search = { mol: "", type: ""};
+    
+    var form = jT.$('form', self.rootElement)[0];
+    form.onsubmit = function () { return false; }
+
+    var radios = jT.$('.jq-buttonset', root).buttonset();
+    var onTypeClicked = function () {
+      form.searchbox.placeholder = jT.$(this).data('placeholder');
+      jT.$('.search-pane .dynamic').addClass('hidden');
+      jT.$('.search-pane .' + this.id).removeClass('hidden');
+      self.search.type = this.value;
+    };
+    
+    jT.$('.jq-buttonset input', root).on('change', onTypeClicked);
+    ccLib.fireCallback(onTypeClicked, jT.$('.jq-buttonset input', root)[0]);
+    
+    jT.$(form.searchbox)
+    .on('focus', function () {
+      var gap = jT.$(form).width() - jT.$(radios).width() - 30 - jT.$('.search-pane').width();
+      var oldSize = $(this).width();
+      jT.$(this).css('width', '' + (oldSize + gap) + 'px');
+    })
+    .on('blur', function () {
+      jT.$(this).css('width', '');
+    }).
+    on('change', function () { // when we change the value here - all, possible MOL caches should be cleared.
+      self.search.mol = null;
+      self.search.type = "auto";
+    });
+    
+    // Now, deal with KETCHER - make it show, attach handlers to/from it, and handlers for showing/hiding it.
+    var ketcherBox = jT.$('.ketcher', root)[0];
+    var ketcherReady = false;
+    var onKetcher = function (service, method, async, parameters, onready) {
+      if (service == "knocknock")
+        onready("You are welcome!", null);
+      else
+        jT.call(self.queryKit.kit(), 'ui/' + service, {dataType: "text", data: parameters}, function (res, jhr) { onready(res, jhr); });
+    };
+    
+    var ensureKetcher = function () {
+      if (!ketcherReady) {
+        jT.insertTool('ketcher', ketcherBox);
+        ketcher.init({ root: ketcherBox, ajaxRequest: onKetcher });
+        
+        var emptySpace = jT.$('.toolEmptyCell', ketcherBox)[0];
+        jT.$(emptySpace.appendChild(jT.getTemplate('#ketcher-usebutton'))).on('click', function () {
+          var smiles = ketcher.getSmiles();
+          var mol = ketcher.getMolfile();
+          if (!mol) {
+            console.log("jToxError: attempt to submit empty molecule");
+          }
+          else {
+            form.searchbox.value = smiles;
+            self.search.mol = mol;
+            self.search.type = "mol;"
+          }
+        });
+        jT.$(emptySpace.appendChild(jT.getTemplate('#ketcher-drawbutton'))).on('click', function () {
+          ketcher.setMolecule(form.searchbox.value);
+        });
+        ketcherReady = true;
+      }
+      
+      // finally - parse the URL-passed parameters and setup the values appropriately.
+    };
+    
+    jT.$(form.drawbutton).on('click', function () { 
+      if (jT.$(ketcherBox).hasClass('shrinken')) {
+        ensureKetcher();
+        jT.$(ketcherBox).css('display', '');
+      }
+      else
+        setTimeout(function () { jT.$(ketcherBox).css('display', 'none'); }, 500);
+
+      setTimeout(function () { jT.$(ketcherBox).toggleClass('shrinken') }, 100);
+    });
+  };
+  
+  cls.prototype = {
+    // required from jToxQuery - this is how we add what we've collected
+    modifyUri: function (uri) {
+      var form = jT.$('form', this.rootElement)[0];
+    
+      var type = jT.$('input[name="searchtype"]:checked', form).val();
+      
+      var res = queries[type] + (uri.indexOf('?') > -1 ? '' : '?') + uri;
+      var params = { type: this.search.type };
+      
+      if (!!this.search.mol)
+        params.b64search = $.base64.encode(this.search.mol);
+      else {
+        params.search = form.searchbox.value;
+        if (!params.search)
+          params.search = '50-00-0';
+      }
+        
+      if (type == 'similarity')
+        params.threshold = form.threshold.value;
+      
+      return ccLib.addParameter(res, $.param(params));
+    },
+    
+    // some shortcuts for outer world.
+    makeQuery: function (needle) {
+      if (!!needle) 
+        this.setNeedle(needle);
+      this.queryKit.query();
+    },
+    
+    setNeedle: function (needle) {
+      if (!!needle)
+        console.log("jToxError: Trying to set null needle");
+      else {
+        this.search.mol = null;
+        this.search.type = "auto";
+        jT.$('form', this.rootElement)[0].searchbox.value = needle;
+      }
+    },
+    
+    getNeedle: function () {
+      return jT.$('form', this.rootElement)[0].searchbox.value;
+    }
+  }; // end of prototype
+  
+  return cls;
+})();
 /* toxdataset.js - General, universal dataset visualizer.
  *
  * Copyright 2012-2013, IDEAconsult Ltd. http://www.ideaconsult.net/
@@ -554,7 +833,7 @@ var jToxDataset = (function () {
           jT.$('a', el)[0].href = ccLib.addParameter(self.datasetUri, "media=" + encodeURIComponent(expo.type));
           var img = el.getElementsByTagName('img')[0];
           img.alt = img.title = expo.type;
-          img.src = (jT.settings.baseUrl || self.baseUrl) + expo.icon;
+          img.src = jT.settings.baseUrl + expo.icon;
         }
       }
       
@@ -957,9 +1236,9 @@ var jToxDataset = (function () {
     queryDataset: function (datasetUri) {
       var self = this;
       // if some oldies exist...
-      self.clearDataset();
-      self.init(); 
-      
+      this.clearDataset();
+      this.init();
+
       // we want to take into account the passed page & pagesize, but remove them, afterwards.
       var urlObj = ccLib.parseURL(datasetUri);
       if (urlObj.params['pagesize'] !== undefined) {
@@ -975,7 +1254,7 @@ var jToxDataset = (function () {
         datasetUri = ccLib.removeParameter(datasetUri, 'page');
       }
       
-      self.baseUrl = ccLib.isNull(self.settings.baseUrl) ? jT.grabBaseUrl(datasetUri) : self.settings.baseUrl;
+      self.settings.baseUrl = self.settings.baseUrl || jT.grabBaseUrl(datasetUri);
       
       // remember the _original_ datasetUri and make a call with one size length to retrieve all features...
       self.datasetUri = datasetUri;
@@ -999,6 +1278,12 @@ var jToxDataset = (function () {
           self.queryEntries(self.settings.pageStart, self.settings.pageSize); // and make the query for actual data
         }
       });
+    },
+    
+    /* This is a needed shortcut that jToxQuery routine will call
+    */
+    query: function (uri) {
+      this.queryDataset(uri);
     }    
   }; // end of prototype
   
@@ -1776,7 +2061,7 @@ window.jT = window.jToxKit = {
   // initializes one kit, based on the kit name passed, either as params, or found within data-XXX parameters of the element
   initKit: function(element) {
     var self = this;
-  	var dataParams = self.$.extend(true, self.settings, self.$(element).data());
+  	var dataParams = self.$.extend(true, {}, self.settings, self.$(element).data());
     
   	if (!dataParams.manualInit){
     	var kit = dataParams.kit;
@@ -1836,7 +2121,7 @@ window.jT = window.jToxKit = {
   		if (!queryParams.baseUrl)
   		  queryParams.baseUrl = self.formBaseUrl(url);
   	
-      self.settings = self.$.extend(self.settings, queryParams); // merge with defaults
+      self.settings = self.$.extend(true, self.settings, queryParams); // merge with defaults
       root = document;
   	}
 
@@ -2009,7 +2294,7 @@ window.jT = window.jToxKit = {
 		if (kit == null)
 		  kit = this;
 		else 
-  		settings = jT.$.extend(settings, kit.settings, { baseUrl: kit.baseUrl });
+  		settings = jT.$.extend(settings, kit.settings);
 
 		ccLib.fireCallback(settings.onConnect, kit, service);
 		  
@@ -2059,6 +2344,54 @@ jT.$ = jQuery; // .noConflict();
 jT.$(document).ready(function(){
   jT.init();
 });
+jT.templates['widget-search']  = 
+"    <div id=\"jtox-search\" class=\"jtox-search\">" +
+"      <form>" +
+"  	  	<div class=\"jq-buttonset jtox-inline\">" +
+"  			  <input type=\"radio\" id=\"searchauto\" value=\"auto\" name=\"searchtype\" checked=\"checked\" data-placeholder=\"Enter CAS, EINECS, Chemical name, SMILES or InChI_\">" +
+"  			    <label for=\"searchauto\" title=\"Exact structure or search by an identifier. CAS, Chemical name, SMILES or InChI. The input type is guessed automatically.\">Exact structure</label>" +
+"          </input>" +
+"  			  <input type=\"radio\" id=\"searchsimilarity\" value=\"similarity\" name=\"searchtype\" data-placeholder=\"Enter Chemical name, SMILES or InChI_\">" +
+"  			    <label for=\"searchsimilarity\" title=\"Enter SMILES or draw structure\">Similarity</label>" +
+"          </input>" +
+"  			  <input type=\"radio\" id=\"searchsmarts\" value=\"smarts\" name=\"searchtype\" data-placeholder=\"Enter SMARTS_\">" +
+"  			    <label for=\"searchsmarts\" title=\"Enter or draw a SMARTS query\">Substructure</label>" +
+"          </input>" +
+"  			</div>" +
+"    		<div class=\"jtox-inline float-right search-pane\">" +
+"  			  <div class=\"dynamic searchsimilarity hidden jtox-inline\">" +
+"      			<select name='threshold' title ='Tanimoto similarity threshold'>" +
+"    					<option value='0.9' selected=\"selected\">0.9</option>" +
+"  			   		<option value='0.8' >0.8</option>" +
+"  			   		<option value='0.7' >0.7</option>" +
+"  			   		<option value='0.6' >0.6</option>" +
+"  			   		<option value='0.5' >0.5</option>" +
+"  			   		<option value='0.4' >0.4</option>" +
+"  			   		<option value='0.3' >0.3</option>" +
+"  			   		<option value='0.2' >0.2</option>" +
+"  			   		<option value='0.1' >0.1</option>" +
+"      			</select>	" +
+"  			  </div>" +
+"  			  <div class=\"dynamic searchsubstructure hidden jtox-inline\">" +
+"  			    <select name=\"smarts\" title =\"Predefined functional groups\">" +
+"  			    </select>" +
+"  			  </div>" +
+"  			  <div class=\"jtox-inline\">" +
+"            <input type=\"text\" name=\"searchbox\" class=\"jtox-handler\"/>" +
+"            <button name=\"drawbutton\" title=\"Draw the (sub)structure\"><span class=\"ui-icon ui-icon-pencil\"/></button>" +
+"            <button name=\"searchbutton\" class=\"jtox-handler\" title=\"Search\" data-handler=\"query\"><span class=\"ui-icon ui-icon-search\"/></button>" +
+"  			  </div>" +
+"    		</div>" +
+"      </form>" +
+"      <div class=\"ketcher shrinken\"></div>" +
+"    </div>" +
+""; // end of #jtox-ds-search 
+
+jT.templates['ketcher-buttons']  = 
+"    <button id=\"ketcher-usebutton\">Use <span class=\"ui-icon ui-icon-arrowthick-1-n\"></span></button>" +
+"    <button id=\"ketcher-drawbutton\">Draw <span class=\"ui-icon ui-icon-arrowthick-1-s\"></span></button>" +
+""; // end of ketcher-buttons 
+
 jT.templates['all-dataset']  = 
 "	  <div id=\"jtox-dataset\">" +
 "	    <div class=\"jtox-ds-features\"></div>" +

@@ -31,23 +31,23 @@
   <script src="scripts/toxquery.js"></script>
 </head>
 <body>
-  <div class="jtox-toolkit" data-kit="query">
-    <div class="jtox-toolkit" data-kit="search"></div>
-	  <div class="jtox-toolkit" data-kit="dataset" data-cross-domain="true" data-show-tabs="false" data-dataset-uri="http://apps.ideaconsult.net:8080/biodeg/dataset/1"></div>
+  <div class="jtox-toolkit" data-kit="query" data-initial-query="yes">
+    <div class="jtox-toolkit jtox-widget" data-kit="search"></div>
+	  <div class="jtox-toolkit" data-kit="dataset" data-cross-domain="true" data-show-tabs="false"></div>
   </div>
 	<div class="jtox-template">
 <!--[[ jT.templates['widget-search'] -->
     <div id="jtox-search" class="jtox-search">
       <form>
   	  	<div class="jq-buttonset jtox-inline">
-  			  <input type="radio" id="searchexact" name="searchtype" checked="checked" data-placeholder="Enter CAS, EINECS, Chemical name, SMILES or InChI_">
-  			    <label for="searchexact" title="Exact structure or search by an identifier. CAS, Chemical name, SMILES or InChI. The input type is guessed automatically.">Exact structure</label>
+  			  <input type="radio" id="searchauto" value="auto" name="searchtype" checked="checked" data-placeholder="Enter CAS, EINECS, Chemical name, SMILES or InChI_">
+  			    <label for="searchauto" title="Exact structure or search by an identifier. CAS, Chemical name, SMILES or InChI. The input type is guessed automatically.">Exact structure</label>
           </input>
-  			  <input type="radio" id="searchsimilarity" name="searchtype" data-placeholder="Enter Chemical name, SMILES or InChI_">
+  			  <input type="radio" id="searchsimilarity" value="similarity" name="searchtype" data-placeholder="Enter Chemical name, SMILES or InChI_">
   			    <label for="searchsimilarity" title="Enter SMILES or draw structure">Similarity</label>
           </input>
-  			  <input type="radio" id="searchsubstructure" name="searchtype" data-placeholder="Enter SMARTS_">
-  			    <label for="searchsubstructure" title="Enter or draw a SMARTS query">Substructure</label>
+  			  <input type="radio" id="searchsmarts" value="smarts" name="searchtype" data-placeholder="Enter SMARTS_">
+  			    <label for="searchsmarts" title="Enter or draw a SMARTS query">Substructure</label>
           </input>
   			</div>
     		<div class="jtox-inline float-right search-pane">
@@ -65,13 +65,13 @@
       			</select>	
   			  </div>
   			  <div class="dynamic searchsubstructure hidden jtox-inline">
-  			    <select name="subcategory" title ="Predefined functional groups">
+  			    <select name="smarts" title ="Predefined functional groups">
   			    </select>
   			  </div>
   			  <div class="jtox-inline">
-            <input type="text" name="searchbox" class="jtox-handler" data-handler="onSearchBox" />
+            <input type="text" name="searchbox" class="jtox-handler"/>
             <button name="drawbutton" title="Draw the (sub)structure"><span class="ui-icon ui-icon-pencil"/></button>
-            <button name="searchbutton" title="Search"><span class="ui-icon ui-icon-search"/></button>
+            <button name="searchbutton" class="jtox-handler" title="Search" data-handler="query"><span class="ui-icon ui-icon-search"/></button>
   			  </div>
     		</div>
       </form>

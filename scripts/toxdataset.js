@@ -272,7 +272,7 @@ var jToxDataset = (function () {
           jT.$('a', el)[0].href = ccLib.addParameter(self.datasetUri, "media=" + encodeURIComponent(expo.type));
           var img = el.getElementsByTagName('img')[0];
           img.alt = img.title = expo.type;
-          img.src = (jT.settings.baseUrl || self.baseUrl) + expo.icon;
+          img.src = jT.settings.baseUrl + expo.icon;
         }
       }
       
@@ -675,9 +675,9 @@ var jToxDataset = (function () {
     queryDataset: function (datasetUri) {
       var self = this;
       // if some oldies exist...
-      self.clearDataset();
-      self.init(); 
-      
+      this.clearDataset();
+      this.init();
+
       // we want to take into account the passed page & pagesize, but remove them, afterwards.
       var urlObj = ccLib.parseURL(datasetUri);
       if (urlObj.params['pagesize'] !== undefined) {
@@ -693,7 +693,7 @@ var jToxDataset = (function () {
         datasetUri = ccLib.removeParameter(datasetUri, 'page');
       }
       
-      self.baseUrl = ccLib.isNull(self.settings.baseUrl) ? jT.grabBaseUrl(datasetUri) : self.settings.baseUrl;
+      self.settings.baseUrl = self.settings.baseUrl || jT.grabBaseUrl(datasetUri);
       
       // remember the _original_ datasetUri and make a call with one size length to retrieve all features...
       self.datasetUri = datasetUri;
@@ -717,6 +717,12 @@ var jToxDataset = (function () {
           self.queryEntries(self.settings.pageStart, self.settings.pageSize); // and make the query for actual data
         }
       });
+    },
+    
+    /* This is a needed shortcut that jToxQuery routine will call
+    */
+    query: function (uri) {
+      this.queryDataset(uri);
     }    
   }; // end of prototype
   

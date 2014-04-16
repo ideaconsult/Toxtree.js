@@ -34,7 +34,7 @@ window.jT = window.jToxKit = {
   // initializes one kit, based on the kit name passed, either as params, or found within data-XXX parameters of the element
   initKit: function(element) {
     var self = this;
-  	var dataParams = self.$.extend(true, self.settings, self.$(element).data());
+  	var dataParams = self.$.extend(true, {}, self.settings, self.$(element).data());
     
   	if (!dataParams.manualInit){
     	var kit = dataParams.kit;
@@ -94,7 +94,7 @@ window.jT = window.jToxKit = {
   		if (!queryParams.baseUrl)
   		  queryParams.baseUrl = self.formBaseUrl(url);
   	
-      self.settings = self.$.extend(self.settings, queryParams); // merge with defaults
+      self.settings = self.$.extend(true, self.settings, queryParams); // merge with defaults
       root = document;
   	}
 
@@ -267,7 +267,7 @@ window.jT = window.jToxKit = {
 		if (kit == null)
 		  kit = this;
 		else 
-  		settings = jT.$.extend(settings, kit.settings, { baseUrl: kit.baseUrl });
+  		settings = jT.$.extend(settings, kit.settings);
 
 		ccLib.fireCallback(settings.onConnect, kit, service);
 		  

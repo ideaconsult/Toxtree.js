@@ -232,7 +232,7 @@ var ccLib = {
   },
   
   addParameter: function (url, param) {
-    return url + (url.indexOf('?') > 0 ? "&" : "?") + param;
+    return url + (("&?".indexOf(url.charAt(url.length - 1)) == -1) ?  (url.indexOf('?') > 0 ? "&" : "?") : '') + param;
   },
   
   removeParameter: function (url, param) {
