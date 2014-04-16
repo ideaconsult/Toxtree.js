@@ -100,7 +100,7 @@ var jToxSearch = (function () {
           if (service == "knocknock")
             onready("You are welcome!", null);
           else
-            jT.call(null, 'molecules/' + service, function (res, jhr) { onready(res, jhr); });
+            jT.call(null, 'molecules/' + service, parameters, function (res, jhr) { onready(res, jhr); });
         }
       }
     }
@@ -114,6 +114,8 @@ var jToxSearch = (function () {
     self.settings = jT.$.extend({}, defaultSettings, jT.settings, settings);
     self.rootElement.appendChild(jT.getTemplate('#jtox-search'));
     self.queryKit = jToxQuery.queryKit(self.rootElement);
+    
+    self.search = { mol: "", smiles: "", type: ""};
     
     var form = jT.$('form', self.rootElement)[0];
     form.onsubmit = function () { return false; }
@@ -136,19 +138,50 @@ var jToxSearch = (function () {
     })
     .on('blur', function () {
       jT.$(this).css('width', '');
+    }).
+    on('change', function () { // when we change the value here - all, possible MOL caches should be cleared.
+      self.search.mol = null;
+      self.search.type = "auto";
     });
     
+    // Now, deal with KETCHER - make it show, attach handlers to/from it, and handlers for showing/hiding it.
     var ketcherBox = jT.$('.ketcher', root)[0];
     var ketcherReady = false;
+    var onKetcher = function (service, method, async, parameters, onready) {
+      if (service == "knocknock")
+        onready("You are welcome!", null);
+      else
+        jT.call(self.queryKit.kit(), 'ui/' + service, {dataType: "text", data: parameters}, function (res, jhr) { onready(res, jhr); });
+    };
+    
+    var ensureKetcher = function () {
+      if (!ketcherReady) {
+        jT.insertTool('ketcher', ketcherBox);
+        ketcher.init({ root: ketcherBox, ajaxRequest: onKetcher });
+        
+        var emptySpace = jT.$('.toolEmptyCell', ketcherBox)[0];
+        jT.$(emptySpace.appendChild(jT.getTemplate('#ketcher-usebutton'))).on('click', function () {
+          var smiles = ketcher.getSmiles();
+          var mol = ketcher.getMolfile();
+          if (!mol) {
+            console.log("jToxError: attempt to submit empty molecule");
+          }
+          else {
+            form.searchbox.value = self.search.smiles = smiles;
+            self.search.mol = mol;
+            self.search.type = "mol;"
+          }
+        });
+        jT.$(emptySpace.appendChild(jT.getTemplate('#ketcher-drawbutton'))).on('click', function () {
+          ketcher.setMolecule(form.searchbox.value);
+        });
+        ketcherReady = true;
+      }
+    };
     
     jT.$(form.drawbutton).on('click', function () { 
       if (jT.$(ketcherBox).hasClass('shrinken')) {
-        if (!ketcherReady) {
-          jT.insertTool('ketcher', ketcherBox);
-          ketcher.init({ root: ketcherBox, ajaxRequest: self.settings.configuration.handlers.onKetcher });
-          ketcherReady = true;
-        }
-        
+        ensureKetcher();
         jT.$(ketcherBox).css('display', '');
       }
       else
@@ -156,7 +189,6 @@ var jToxSearch = (function () {
 
       setTimeout(function () { jT.$(ketcherBox).toggleClass('shrinken') }, 100);
     });
-    
   };
   
   cls.prototype = {

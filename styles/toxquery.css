@@ -60,3 +60,16 @@
   left: 100%;
 /*   opacity: 0.0; */
 }
+
+.jtox-search .ketcher .toolEmptyCell {
+  vertical-align: middle;
+}
+
+.jtox-search .ketcher .toolEmptyCell button {
+  margin: 0px;
+  padding: 4px 8px;
+}
+
+.jtox-search .ketcher .toolEmptyCell button span {
+  display: inline-block;
+}

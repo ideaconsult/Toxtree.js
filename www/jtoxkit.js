@@ -1756,6 +1756,7 @@ window.jT = window.jToxKit = {
 	/* SETTINGS. The following parametes can be passed in settings object to jT.init(), or as data-XXX - with the same names. Values set here are the defaults.
 	*/
 	settings: {
+	  plainText: false,               // whether to expect result as plain text, and not JSON. Used in special cases like ketcher.
   	jsonp: false,                   // whether to use JSONP approach, instead of JSON.
   	crossDomain: false,             // should it expect cross-domain capabilities for the queries.
   	baseUrl: null,                  // the baseUrl for the server that loaded the page.
@@ -2001,26 +2002,28 @@ window.jT = window.jToxKit = {
 			callback = params; // the params parameters is obviously omitted
 			params = {};
 		}
+		else if (params == null)
+		  params = {};
 		
 	  var settings = jT.$.extend({}, this.settings, params);
 		if (kit == null)
 		  kit = this;
 		else 
-  		settings = jT.$.extend(settings, kit.settings);
+  		settings = jT.$.extend(settings, kit.settings, { baseUrl: kit.baseUrl });
 
 		ccLib.fireCallback(settings.onConnect, kit, service);
 		  
-		var accType = settings.jsonp ? "application/x-javascript" : "application/json";
+		var accType = settings.plainText ? "text/plain" : (settings.jsonp ? "application/x-javascript" : "application/json");
 		
-		if (params.data === undefined){
+		if (!params.data){
 			params.data = {};
 			if (settings.jsonp)
 				params.data.media = accType;
 				
-			if (params.method === undefined)
+			if (!params.method)
 				params.method = 'GET';
 		}
-		else if (params.method === undefined)
+		else if (!params.method)
 				params.method = 'POST';
 
 		// on some queries, like tasks, we DO have baseUrl at the beginning
@@ -2029,7 +2032,7 @@ window.jT = window.jToxKit = {
 			
 		// now make the actual call
 		jT.$.ajax(service, {
-			dataType: settings.jsonp ? 'jsonp' : 'json',
+			dataType: params.dataType || (settings.plainText ? "text": (settings.jsonp ? 'jsonp' : 'json')),
 			headers: { Accept: accType },
 			crossDomain: settings.crossDomain || settings.jsonp,
 			timeout: settings.timeout,
