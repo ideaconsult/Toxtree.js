@@ -25,8 +25,9 @@
 
   <script language="javascript">
     jT.$(document).ready(function () {
-      jT.insertTool('ketcher', jT.$('#ketcher-test')[0]);
-      ketcher.init({ ajaxRequest: function (service, method, async, parameters, onready) {
+      var kr = jT.$('#ketcher-test')[0];
+      jT.insertTool('ketcher', kr);
+      ketcher.init({ root: kr, ajaxRequest: function (service, method, async, parameters, onready) {
         if (service == "knocknock")
           onready("You are welcome!", null);
         else

@@ -15,8 +15,8 @@
 	<link rel="stylesheet" href="tests/jquery-ui.css">
 	<link rel="stylesheet" href="tests/jquery.dataTables.css">
 
-	<link rel="stylesheet" href="www/ketcher.css"/>
 	<link rel="stylesheet" href="www/jtoxkit.css">
+	<link rel="stylesheet" href="www/ketcher.css"/>
 	<link rel="stylesheet" href="styles/toxquery.css">
 
   <script src="tests/jquery.js"></script>
@@ -26,6 +26,7 @@
   <script src="tests/jquery.dataTables.js"></script>
 
   <script src="www/jtoxkit.js"></script>
+  <script src="www/ketcher.js"></script>
   <script src="scripts/toxquery.js"></script>
 </head>
 <body>
@@ -39,13 +40,13 @@
       <form>
   	  	<div class="jq-buttonset jtox-inline">
   			  <input type="radio" id="searchexact" name="searchtype" checked="checked" data-placeholder="Enter CAS, EINECS, Chemical name, SMILES or InChI_">
-  			    <label for="searchexact">Exact structure</label>
+  			    <label for="searchexact" title="Exact structure or search by an identifier. CAS, Chemical name, SMILES or InChI. The input type is guessed automatically.">Exact structure</label>
           </input>
   			  <input type="radio" id="searchsimilarity" name="searchtype" data-placeholder="Enter Chemical name, SMILES or InChI_">
-  			    <label for="searchsimilarity">Similarity</label>
+  			    <label for="searchsimilarity" title="Enter SMILES or draw structure">Similarity</label>
           </input>
   			  <input type="radio" id="searchsubstructure" name="searchtype" data-placeholder="Enter SMARTS_">
-  			    <label for="searchsubstructure">Substructure</label>
+  			    <label for="searchsubstructure" title="Enter or draw a SMARTS query">Substructure</label>
           </input>
   			</div>
     		<div class="jtox-inline float-right search-pane">
@@ -63,14 +64,17 @@
       			</select>	
   			  </div>
   			  <div class="dynamic searchsubstructure hidden jtox-inline">
+  			    <select name="subcategory" title ="Predefined functional groups">
+  			    </select>
   			  </div>
-          <input type="search" name="searchbox" class="font-middle jtox-handler" data-handler="onSearchBox" />
-          <button name="drawbutton"><span class="icon icon-draw" tiyle="Draw the (sub)structure"/></button>
-          <button name="searchbutton"><span class="icon icon-search" tiyle="Search"/></button>
-          <div class="dynamic ketcher hidden">
-          </div>
+  			  <div class="jtox-inline">
+            <input type="text" name="searchbox" class="jtox-handler" data-handler="onSearchBox" />
+            <button name="drawbutton"><span class="ui-icon ui-icon-pencil" tiyle="Draw the (sub)structure"/></button>
+            <button name="searchbutton"><span class="ui-icon ui-icon-search" tiyle="Search"/></button>
+  			  </div>
     		</div>
       </form>
+      <div class="ketcher shrinken"></div>
     </div>
 <!-- // end of #jtox-ds-search ]]-->
 	</div>

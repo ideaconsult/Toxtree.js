@@ -94,8 +94,14 @@ var jToxSearch = (function () {
     configuration: {
       handlers: {
         onSearchBox: function (el, query) {
-          
         },
+        
+        onKetcher: function (service, method, async, parameters, onready) {
+          if (service == "knocknock")
+            onready("You are welcome!", null);
+          else
+            jT.call(null, 'molecules/' + service, function (res, jhr) { onready(res, jhr); });
+        }
       }
     }
   };
@@ -130,6 +136,25 @@ var jToxSearch = (function () {
     })
     .on('blur', function () {
       jT.$(this).css('width', '');
+    });
+    
+    var ketcherBox = jT.$('.ketcher', root)[0];
+    var ketcherReady = false;
+    
+    jT.$(form.drawbutton).on('click', function () { 
+      if (jT.$(ketcherBox).hasClass('shrinken')) {
+        if (!ketcherReady) {
+          jT.insertTool('ketcher', ketcherBox);
+          ketcher.init({ root: ketcherBox, ajaxRequest: self.settings.configuration.handlers.onKetcher });
+          ketcherReady = true;
+        }
+        
+        jT.$(ketcherBox).css('display', '');
+      }
+      else
+        setTimeout(function () { jT.$(ketcherBox).css('display', 'none'); }, 500);
+
+      setTimeout(function () { jT.$(ketcherBox).toggleClass('shrinken') }, 100);
     });
     
   };
