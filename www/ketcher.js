@@ -17135,7 +17135,7 @@ ui.onKeyUp = function (event)
     // Esc
     if (event.keyCode == 27)
     {
-        if (this == document || !this.visible())
+        if (this == ui.root || !this.visible())
         {
             if (!p$('window_cover').visible())
             {
@@ -17168,7 +17168,7 @@ ui.onKeyUp = function (event)
         ui.ctrlShortcuts.indexOf(event.which) != -1) && (event.keyCode != 46 && Prototype.Browser.WebKit))
         return;
 
-    if (this != document)
+    if (this != ui.root)
         return;
 
     util.stopEventPropagation(event);
@@ -20877,7 +20877,7 @@ ketcher.runTest = function(test, context) {
 jT.tools['ketcher'] = 
 "" +
 "<div class=\"ketcher_root\">" +
-"<table id=\"ketcher_window\">" +
+"<table id=\"ketcher_window\" tabindex=\"1\">" +
 "<tr align=\"center\" id=\"main_toolbar\">" +
 "<td style=\"width:36px\"><div style=\"position:relative\"><img class=\"sideButton modeButton stateButton\" id=\"selector\" selid=\"selector_lasso\" src=\"png/action/lasso.png\" alt=\"\" title=\"Select Tool (Esc)\" /><img class=\"dropdownButton\" id=\"selector_dropdown\" src=\"png/dropdown.png\" alt=\"\" /></div></td>" +
 "<td class=\"toolDelimiter\"></td>" +
@@ -20898,7 +20898,7 @@ jT.tools['ketcher'] =
 "<td class=\"toolButtonCell toolButton serverRequired\" id=\"clean_up\"><img title=\"Clean Up (Ctrl+L)\" alt=\"\" src=\"png/action/layout.png\" /></td>" +
 "<td class=\"toolButtonCell toolButton serverRequired\" id=\"aromatize\"><img title=\"Aromatize\" alt=\"\" src=\"png/action/arom.png\" /></td>" +
 "<td class=\"toolButtonCell toolButton serverRequired\" id=\"dearomatize\"><img title=\"Dearomatize\" alt=\"\" src=\"png/action/dearom.png\" /></td>" +
-"<td style=\"width:100%\"></td>" +
+"<td class=\"toolEmptyCell\" style=\"width:100%\"></td>" +
 "<td style=\"width:1px\" rowspan=\"14\"></td>" +
 "<td style=\"width:36px;padding:0 2px 0 0;\"><a href=\"http://www.ggasoftware.com/\" target=\"_blank\"><img src=\"png/logo.png\" alt=\"\" title=\"GGA Software Services\" /></a></td>" +
 "</tr>" +

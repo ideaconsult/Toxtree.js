@@ -51,6 +51,10 @@ var jToxQuery = (function () {
   };
   
   cls.prototype = {
+    addHandlers: function (handlers) {
+      self.settings.configuration.handlers = jT.$.extend(self.settings.configuration.handlers, handlers);
+    },
+    
     element: function (handler) {
       return this.handlers[handler];
     },
@@ -61,10 +65,134 @@ var jToxQuery = (function () {
     
     kit: function () {
       if (!this.mainKit)
-        self.mainKit = jT.kit(this);
+        this.mainKit = jT.kit(this.settings.dom.kit);
         
       return this.mainKit;
-    },
+    }
+  }; // end of prototype
+  
+  cls.queryKit = function(element) {
+    var query = null;
+    jT.$(element).parents().each(function() {
+      var kit = jT.kit(this);
+      if (!kit)
+        return;
+      if (kit instanceof jToxQuery)
+        query = kit;
+    });
+    
+    return query;
+  };
+  
+  return cls;
+})();
+
+/* Now comes the jToxSearch component, which implements the compound searching block
+*/
+var jToxSearch = (function () {
+  var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
+    configuration: {
+      handlers: {
+        onSearchBox: function (el, query) {
+        },
+        
+        onKetcher: function (service, method, async, parameters, onready) {
+          if (service == "knocknock")
+            onready("You are welcome!", null);
+          else
+            jT.call(null, 'molecules/' + service, parameters, function (res, jhr) { onready(res, jhr); });
+        }
+      }
+    }
+  };
+  
+  var cls = function (root, settings) {
+    var self = this;
+    self.rootElement = root;
+    jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even when manually initialized
+    
+    self.settings = jT.$.extend({}, defaultSettings, jT.settings, settings);
+    self.rootElement.appendChild(jT.getTemplate('#jtox-search'));
+    self.queryKit = jToxQuery.queryKit(self.rootElement);
+    
+    self.search = { mol: "", smiles: "", type: ""};
+    
+    var form = jT.$('form', self.rootElement)[0];
+    form.onsubmit = function () { return false; }
+
+    var radios = jT.$('.jq-buttonset', root).buttonset();
+    var onTypeClicked = function () {
+      form.searchbox.placeholder = jT.$(this).data('placeholder');
+      jT.$('.search-pane .dynamic').addClass('hidden');
+      jT.$('.search-pane .' + this.id).removeClass('hidden');
+    };
+    
+    jT.$('.jq-buttonset input', root).on('change', onTypeClicked);
+    ccLib.fireCallback(onTypeClicked, jT.$('.jq-buttonset input', root)[0]);
+    
+    jT.$(form.searchbox)
+    .on('focus', function () {
+      var gap = jT.$(form).width() - jT.$(radios).width() - 30 - jT.$('.search-pane').width();
+      var oldSize = $(this).width();
+      jT.$(this).css('width', '' + (oldSize + gap) + 'px');
+    })
+    .on('blur', function () {
+      jT.$(this).css('width', '');
+    }).
+    on('change', function () { // when we change the value here - all, possible MOL caches should be cleared.
+      self.search.mol = null;
+      self.search.type = "auto";
+    });
+    
+    // Now, deal with KETCHER - make it show, attach handlers to/from it, and handlers for showing/hiding it.
+    var ketcherBox = jT.$('.ketcher', root)[0];
+    var ketcherReady = false;
+    var onKetcher = function (service, method, async, parameters, onready) {
+      if (service == "knocknock")
+        onready("You are welcome!", null);
+      else
+        jT.call(self.queryKit.kit(), 'ui/' + service, {dataType: "text", data: parameters}, function (res, jhr) { onready(res, jhr); });
+    };
+    
+    var ensureKetcher = function () {
+      if (!ketcherReady) {
+        jT.insertTool('ketcher', ketcherBox);
+        ketcher.init({ root: ketcherBox, ajaxRequest: onKetcher });
+        
+        var emptySpace = jT.$('.toolEmptyCell', ketcherBox)[0];
+        jT.$(emptySpace.appendChild(jT.getTemplate('#ketcher-usebutton'))).on('click', function () {
+          var smiles = ketcher.getSmiles();
+          var mol = ketcher.getMolfile();
+          if (!mol) {
+            console.log("jToxError: attempt to submit empty molecule");
+          }
+          else {
+            form.searchbox.value = self.search.smiles = smiles;
+            self.search.mol = mol;
+            self.search.type = "mol;"
+          }
+        });
+        jT.$(emptySpace.appendChild(jT.getTemplate('#ketcher-drawbutton'))).on('click', function () {
+          ketcher.setMolecule(form.searchbox.value);
+        });
+        ketcherReady = true;
+      }
+    };
+    
+    jT.$(form.drawbutton).on('click', function () { 
+      if (jT.$(ketcherBox).hasClass('shrinken')) {
+        ensureKetcher();
+        jT.$(ketcherBox).css('display', '');
+      }
+      else
+        setTimeout(function () { jT.$(ketcherBox).css('display', 'none'); }, 500);
+
+      setTimeout(function () { jT.$(ketcherBox).toggleClass('shrinken') }, 100);
+    });
+  };
+  
+  cls.prototype = {
+    
   }; // end of prototype
   
   return cls;

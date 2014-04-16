@@ -45,19 +45,19 @@
   display: none !important;
 }
 
-.jtox-size-quarter {
+.jtox-toolkit .size-quarter {
   width: 25%;
 }
 
-.jtox-size-third {
+.jtox-toolkit .size-third {
   width: 33%;
 }
 
-.jtox-size-half {
+.jtox-toolkit .size-half {
   width: 50%;
 }
 
-.jtox-size-full {
+.jtox-toolkit .size-full {
   width: 100%;
 }
 
@@ -81,13 +81,22 @@
 	margin: 0px !important;
 }
 
-.jtox-font-small {
+.jtox-toolkit .font-small {
   font-size: small;
 }
 
-.jtox-font-smaller {
+.jtox-toolkit .font-smaller {
   font-size: smaller;
 }
+
+.jtox-toolkit .font-big {
+  font-size: large;
+}
+
+.jtox-toolkit .font-bigger {
+  font-size: larger;
+}
+
 
 .jtox-toolkit .paddingless {
   padding: 0px !important;
