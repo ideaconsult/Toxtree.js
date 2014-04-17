@@ -123,15 +123,9 @@ var jToxQuery = (function () {
 var jToxSearch = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     defaultSmiles: '50-00-0',
+    smartsList: 'funcgroups',
     configuration: {
-      handlers: {
-        onKetcher: function (service, method, async, parameters, onready) {
-          if (service == "knocknock")
-            onready("You are welcome!", null);
-          else
-            jT.call(null, 'molecules/' + service, parameters, function (res, jhr) { onready(res, jhr); });
-        }
-      }
+      handlers: { }
     }
   };
   
@@ -182,9 +176,48 @@ var jToxSearch = (function () {
     });
     
     // spend some time to setup the SMARTS groups
-    if (!!window.funcgroups) {
-      var family = {};
-        
+    if (!!window[self.settings.smartsList]) {
+      var list = window[self.settings.smartsList];
+      var familyList = [];
+      var familyIdx = {};
+      
+      for (var i = 0, sl = list.length; i < sl; ++i) {
+        var entry = list[i];
+        if (familyIdx[entry.family] === undefined) {
+          familyIdx[entry.family] = familyList.length;
+          familyList.push([]);
+        }
+
+        familyList[familyIdx[entry.family]].push(entry);        
+      }
+      
+      // now we can iterate over them
+      var df = document.createDocumentFragment();
+      for (fi = 0, fl = familyList.length; fi < fl; ++fi) {
+        var grp = document.createElement('optgroup');
+        grp.label = familyList[fi][0].family;
+
+        for (i = 0, el = familyList[fi].length; i < el; ++i) {
+          var e = familyList[fi][i];
+          var opt = document.createElement('option');
+          opt.innerHTML = e.name;
+          opt.value = e.smarts;
+          if (!!e.hint)
+            jT.$(opt).attr('data-hint', e.hint);
+          grp.appendChild(opt);
+        }
+        df.appendChild(grp);
+      }
+      
+      // now it's time to add all this and make the expected behavior
+      form.smarts.appendChild(df);
+      form.smarts.firstElementChild.checked = true;
+      
+      jT.$(form.smarts).on('change', function () {
+        var hint = jT.$(this[this.selectedIndex]).data('hint');
+        form.smarts.title = (!!hint ? hint : '');
+        form.searchbox.value = this.value;
+      });
     }
     
     // Now, deal with KETCHER - make it show, attach handlers to/from it, and handlers for showing/hiding it.
@@ -194,7 +227,7 @@ var jToxSearch = (function () {
       if (service == "knocknock")
         onready("You are welcome!", null);
       else
-        jT.call(self.queryKit.kit(), 'ui/' + service, {dataType: "text", data: parameters}, function (res, jhr) { onready(res, jhr); });
+        jT.call(self.queryKit.kit(), '/ui/' + service, {dataType: "text", data: parameters}, function (res, jhr) { onready(res, jhr); });
     };
     
     var ensureKetcher = function () {
