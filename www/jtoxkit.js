@@ -676,7 +676,7 @@ var jToxDataset = (function () {
         
         "Calculated": function (name, miniset) {
           var arr = [];
-          if (!ccLib.isNull(miniset.dataEntry[0].compound.metric))
+          if (miniset.dataEntry.length > 0 && !ccLib.isNull(miniset.dataEntry[0].compound.metric))
             arr.push(this.settings.metricFeature);
 
           for (var f in miniset.features) {
