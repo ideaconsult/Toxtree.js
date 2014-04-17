@@ -1744,7 +1744,7 @@ var jToxStudy = (function () {
           "bProcessing": true,
           "bLengthChange": false,
   				"bAutoWidth": false,
-          "sDom" : "rt<Fip>",
+          "sDom" : self.settings.configuration.sDom || "rt<Fip>",
           "aoColumns": colDefs,
           "fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
             var el = jT.$('.jtox-study-title .data-field', jT.$(this).parents('.jtox-study'))[0];
@@ -1918,9 +1918,7 @@ var jToxStudy = (function () {
   				"bSearchable": true,
   				"bProcessing" : true,
   				"bPaginate" : true,
-          "sDom" : "rt<Fip>",
-/*   				"sDom" : '<"help remove-bottom"i><"help"p>Trt<"help"lf>', */
-/* 				  "sPaginationType": "full_numbers", */
+          "sDom" : self.settings.configuration.sDom || "rt<Fip>",
   				"sPaginate" : ".dataTables_paginate _paging",
   				"bAutoWidth": false,
   				"oLanguage": {
