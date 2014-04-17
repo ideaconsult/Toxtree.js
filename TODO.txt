@@ -1,8 +1,9 @@
 TODO:
-- implement ketcher element initialization & usage
+- remove jtox-widget and search for 'main' from the main kit
+- parse query parameters into internal structures / inputs in jToxSearch
 - add substructure selection block?
 - make sDom customizable;
-- Integrate jToxDataset and jToxSearch using jToxQuery;
+- rename jToxDataset to jToxCompound
 - make jToxModel for model listing (in tables);
 - make jToxSource for data source listing (datasets) - in table;
 

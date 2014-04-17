@@ -404,6 +404,7 @@ var jToxQuery = (function () {
 */
 var jToxSearch = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
+    defaultSmiles: '50-00-0',
     configuration: {
       handlers: {
         onKetcher: function (service, method, async, parameters, onready) {
@@ -417,9 +418,9 @@ var jToxSearch = (function () {
   };
   
   var queries = {
-    'auto': "/ui/query/compound/search/all",
-    'similarity': "/ui/query/similarity",
-    'smarts': "/ui/query/smarts"
+    'auto': "/query/compound/search/all",
+    'similarity': "/query/similarity",
+    'smarts': "/query/smarts"
   };
   
   var cls = function (root, settings) {
@@ -519,14 +520,21 @@ var jToxSearch = (function () {
       var type = jT.$('input[name="searchtype"]:checked', form).val();
       
       var res = queries[type] + (uri.indexOf('?') > -1 ? '' : '?') + uri;
-      var params = { type: this.search.type };
-      
-      if (!!this.search.mol)
+      var params = { };
+
+      if (!!this.search.url) {
+        params.type = 'url';
+        params.search = encodeURI(this.search.url);
+      }
+      else if (!!this.search.mol) {
         params.b64search = $.base64.encode(this.search.mol);
+        params.type = 'mol';
+      }
       else {
         params.search = form.searchbox.value;
+        params.type = "smiles";
         if (!params.search)
-          params.search = '50-00-0';
+          params.search = this.settings.defaultSmiles;
       }
         
       if (type == 'similarity')
@@ -2372,8 +2380,9 @@ jT.templates['widget-search']  =
 "  			   		<option value='0.1' >0.1</option>" +
 "      			</select>	" +
 "  			  </div>" +
-"  			  <div class=\"dynamic searchsubstructure hidden jtox-inline\">" +
+"  			  <div class=\"dynamic searchsmarts hidden jtox-inline\">" +
 "  			    <select name=\"smarts\" title =\"Predefined functional groups\">" +
+"  			      <option value=\"\" checked>Custom SMARTS</option>" +
 "  			    </select>" +
 "  			  </div>" +
 "  			  <div class=\"jtox-inline\">" +
