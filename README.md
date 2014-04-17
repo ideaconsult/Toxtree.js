@@ -5,9 +5,10 @@ A kit of front-ends for accessing toxicological web services, based on [AMBIT](h
 approach for using any or all of available front ends in third-party web pages.
 Each different front-end is referred as _kit_. Currently available are:
 
-- `study` - [IUCLID5](http://iuclid.eu/) studies visuzalizer.
-- `dataset` - viewer for dataset query results.
-- `tree` - a Web front end to OpenTox services. Currently developed as standalone web front-end and soon-to-be integrated in the kit. Described [below](#jtoxtree).
+- `study` - [IUCLID5](http://iuclid.eu/) studies visuzalizer... [more](#jtoxstudy)
+- `dataset` - viewer for dataset query results... [more](#jtoxdataset)
+- `query` - a wrapper around other kits and widgets, making them work together... [more](#jtoxquery).
+- `tree` - a Web front end to OpenTox services. Currently developed as standalone web front-end and soon-to-be integrated in the kit...[more](#jtoxtree).
 
 The toolkit is intended to be used by non-programmers, and thus it's integration process is rather simple - referring two files and marking a placeholder in HTML of where all the structure to be inserted. However, it relies that certain external libraries like [jQuery](http://www.jquery.com) and some of [jQueryUI](http://www.jqueryui.com) widgets are already included in the page.
 
@@ -16,9 +17,9 @@ Integration manual
 ------------------
 In order to use **jToxKit** in your page, you need to implement these steps:
 
-- In the header of the page add one script reference: `<script src="jtoxkit.js"></script>`. A minified version is available too: `<script src="jT.min.js"></script>`.
+- In the header of the page add one script reference: `<script src="jtoxkit.js"></script>`. A minified version is available too: `<script src="jtoxkit.min.js"></script>`.
 - In the header of the page add one stylesheet file reference: `<link rel="stylesheet" href="jtoxkit.css"/>`.
-- At the place in HTML body, where you want to have some of _jTokKit_ front-ends, add one _div_ element: `<div class="jtox-toolkit" data-kit="study"></div>`. More explanation of `data-XXX` parameters is given below. The class `jtox-toolkit` marks the insertion point for any _jToxKit_ kit.
+- At the place in HTML body, where you want to have some of _jTokKit_ widgets, add one _div_ element (example:`<div class="jtox-toolkit" data-kit="study"></div>`). More explanation of `data-XXX` parameters is given below. The class `jtox-toolkit` marks the insertion point for any _jToxKit_ kit.
 - Make sure third-party libs that we depend on, are included too - they can vary for different (of our) _kits_, but these are common for entire **jToxKit**:
 
 ```
@@ -26,11 +27,11 @@ In order to use **jToxKit** in your page, you need to implement these steps:
   <script src="jquery.js"></script>
   <script src="jquery.ui.core.js"></script>
 ```
--  The above steps are enough to have all structure inserted and _jToxKit_ initialized. If you need to make additional query calls, or similar, you can do so at any time **after** DOM is ready. For example querying _jToxStydy_ for studies for a substance from a given URL can go like this:
+-  The above steps are enough to have all structures inserted and _jToxKit_ initialized. If you need to make additional query calls, or similar, you can do so at any time **after** DOM is ready. For example querying _jToxStydy_ for studies for a substance from a given URL can go like this:
 
 ```
 $(document).ready(function() { 
-  jToxStudy.querySubstance("http://apps.ideaconsult.net:8080/biodeg/substance/IUC4-efdb21bb-e79f-3286-a988-b6f6944d3734");
+  jToxStudy.kits()[0].querySubstance("http://apps.ideaconsult.net:8080/biodeg/substance/IUC4-efdb21bb-e79f-3286-a988-b6f6944d3734");
 });
 ```
 
@@ -69,19 +70,68 @@ $(document).ready(function(){
 Although different kits can have different configuration parameters, these are common:
 
 - **`kit`**  (attr. `data-kit`), _required_: specifies the exact type of front-end to be inserted. Only one type is allowed (of course!) - currently available kits are explained in the beginning.
-- **`server`** (attr. `data-server`), _optional_: the default server to be used on AJAX requests, if the server is not specified on the call itself.
+- **`baseUrl`** (attr. `data-base-url`), _optional_: the default server to be used on AJAX requests, if the server is not specified on the call itself.
 - **`crossDomain`** (attr. `data-cross-domain`), _optional_: informs jToxKit to send requests with cross-domain headers. It is fine to be _true_ even for same-server requests, except when Internet Explorer is used. That's why it defaults to *false*.
 - **`jsonp`** (attr. `data-jsonp`), _optional_: whether to use _JSONP_ style queries to the server, instead of asynchronous ones. Mind that _JSONP_ setting does not influence _POST_ requests. If this one is specified `crossDomain=true` is implied. Default is *false*.
+- **`plainText`** (attr. `data-plain-text`), _optional_: if you want AJAX to expect plain text, instead of JSON - set this to true. You rarely need to do so as a setting, it is more likely to need to for specific call, which can be dome via `params` parameters of `jToxKit.call()` method, which is explained later. Default is *false*.
 - **`timeout`** (attr. `data-timeout`), _optional_: the timeout for AJAX requests, in milliseconds. Default is 5000.
 - **`pollDelay`** (attr. `data-poll-delay`), _optional_: certain services involve creating a task on the server and waiting for it to finish - this is the time between poll request, while waiting it to finish. In milliseconds. Default is 200.
 - **`onConnect`** (attr. `data-on-connect`), _optional_: a function name, or function to be called just before any AJAX call.
 - **`onSuccess`** (attr. `data-on-success`), _optional_: a function name, or function to be called upon successful complete of a AJAX call.
 - **`onError`** (attr. `data-on-error`), _optional_: a function name, or function to be called when there's an error on AJAX call. The passed _callback_ to `jT.call()` is still called, but with _null_ result.
-- **`configuration`** (attr. `data-config-file`), _optional_: a way to provide kit-specific configuration, like coulmns visibility and/or ordering for _study_ kit. When provided as `data-config-file` parameter, the configuration file is downloaded and passed as configuration parameter to kit initialization routine.
+- **`configuration`** (attr. `data-config-file`), _optional_: a way to provide kit-specific configuration, like columns visibility and/or ordering for _study_ kit. When provided as `data-config-file` parameter, the configuration file is downloaded and passed as configuration parameter to kit initialization routine.
 
 As, can be seen, the later three callbacks can be local for each kit, so it is possible to report connection statuses in the most appropriate for the kit's way. This is also true for Url's, which means that not all kits, needs to communicate with one and the same server.
 
-###<a name="jtoxstudy"></a> jToxStudy kit
+### Common methods
+
+There are certain methods that are common for all kits and some kit wrappers (like _jToxQuery_) rely on having them:
+
+```
+jToxKit.initKit(element)
+```
+The actual kit initialization procedure - it determines the kit that need to be used relying on `data-kit` option and creates a new instance, passing the `element` as kit's root.
+
+
+```
+jToxKit.kit(element)
+```
+Returns the instance of the kit that has the passed `element` as its root. When passed a _<div>_ element, marked with `jtox-toolkit` class - this method will return the instance that was created during kit's initialization, i.e. - during `initKit()` call.
+
+
+```
+jToxKit.insertTool(name, root)
+```
+Inserts a third-party tool, which was added to jToxKit's production files, like _ketcher_, for example. It insertes that HTML code for the `name` tool under the passed `root`. If this tool has separate script files (and it probably does), it needs to be included separately on the page.
+
+```
+jToxKit.call(kit, service, params, callback)
+```
+The general function for making server calls - all other kits should use _this_ method. The passed `kit` instance's settings are used for _baseUrl_, _crossDomain_, _jsonp_ other that may be relevant. If null is passed - the default settings from _jToxKit_ itself are used. The most important parameter is `service` which determines the actual call to be made. The next parameter `params` is explained later - it can be omitted. Finally there is `callback`, which is called in both success and error. It's format is `function callback(result, jhr)`, where `result` is what came from server, or _null_ on error, and `jhr` is the actual jQuery AJAX object.
+The `params` parameter (if present) can have the following properties:
+- `data` - additional that need to be passed, this usually means also the method is _POST_ and it is set so, if not speicfied explicitly;
+- `method` - the HTTP method to be used. The default is _GET_, but if some `data` is passed - it defaults to _POST_.
+- `dataType` - if you want to change the expected server response to something different from JSON - use this one.
+
+```
+<kit class>.kits()
+```
+Return a list of all kit instances from this _kit class_. For example:
+`jToxQuery.kits()[0]` returns the first instance of jToxQuery found on the page.
+
+```
+<kit instance>.modifyUri(uri)
+```
+When a certain kit is wrapped with another one, like the way `jToxQuery` wraps `jToxSearch` - this is the mechanism which allows `jToxQuery` to collect "preferences" of all sub-widgets, before passing the so-constructed `uri` to the main kit. Refer [jToxQuery](#jtoxquery)'s documentation for more information.
+
+```
+<kit instance>.query(uri)
+```
+A shorthand, general method, that _jToxQuery_ can call on any (main) kit, to perform it's prederred query method. For example for [jToxDataset](#jtoxdataset) this method is another way to call `<jToxStudy>.queryDataset(datasetUri)`.
+
+
+<a name="jtoxstudy"></a> jToxStudy kit
+--------------------------------------
 
 This kit gives front-end to AMBIT services, which provide import of IUCLID5 generated and maintained data for toxicological studies (experiments). The kit name is `study` (for use in `data-kit` initialization attribute). First, there are several additional
 
@@ -184,7 +234,8 @@ The `substanceUri` is the same as in previous function, but this one takes care 
 ```
 The `substanceUri` is the same as in previous function. This one queries for a summary of all studies available for the given substance. It fills up the numbers in the studies' tabs and prepares the tables for particular queries later on, which are executes upon each tab's activation.
 
-###<a name="jtoxdataset"></a> jToxDataset kit
+<a name="jtoxdataset"></a> jToxDataset kit
+------------------------------------------
 
 An OpenTox dataset management and visualization tool. Since _dataset_ is very basic term in OpenTox hierarchy it is used in other places like [jToxQuery](#jtoxquery) and [jToxTree kit](#jtoxtree). It is vital that the scope of this kit it _not_ to provide complete, versatile interface for making queries, linking between them, etc. - it aims at visualizing and providing basic navigation within _one_ particular query. It is designed to be easily configurable - up to the point of being only one table, and easily driven with API calls, which are explained below.
 
@@ -429,12 +480,87 @@ These two are shortcuts for the previous function, taking into account the curre
 Filter the presented entries with the given needle, finding substring match on each features, not marked with `search: false` in their definition.
 
 
-###<a name="jtoxquery"></a> jToxQuery kit
+<a name="jtoxquery"></a> jToxQuery kit
+--------------------------------------
 
-A kit on top of the others for cross queries, running predictions, etc.
+A general purpose kit, that wraps several others to make them work together. For example - in the normal query & browse user experience, when you need to define certain criteria for your search and have a browser intepret them - you actually have one _browser_ component and one or more other, that alter the actual data to be browsed, i.e. - they alter the server queries that are made to obtain the data to be browsed. The key aspect of _jToxQuery_ is that it is independent of underlying components (kits). Of course, it relying on certain structure and behavior.
+
+There are two type of sub-kits: _main kit_ (only one) and _widgets_ (zero or more). There is one way to determine which is which - widgets have `jtox-widget` class added to their root element. All such are enumerated and treated a bit different.
+
+There is another important term here: _handler_, these are DOM elements that should initiate some kind of action via _jToxQuery_. These can be _input_ elements, _select_, _button_, etc. - anything that reacts on _change_ or _click_ events. They to mark an element as handler-active is to add `jtox-handler` to it's classes and then specify the name of the handler to be called, via `data-handler` attribtue. Doing so, _jToxQuery_ will take care to invoke this handler, when a change/click happens on this element.
+
+How are handlers specified? Using the stadard _configuration_ mechanism - there is a `handler` object under `confifuration` key, which is in _jToxQuery_'s settings. This is how the default settings for _jToxQuery_ look like:
+
+```
+{ 
+  configuration: {
+    // this is the main thing to be configured
+    handlers: { 
+      query: function (el, query) { query.query(); },
+    }
+  }
+};
+```
+
+As can be seen, each handler function is passed two arguments: `el` - the element which provoked this handler, to be called, and `query` - the instance of jToxQuery which is mitigating the call. Having that, if you define button in your HTML:
+
+```
+<button name="searchbutton" class="jtox-handler" title="Search" data-handler="query"><span class="ui-icon ui-icon-search"/></button>
+```
+You'll have _jToxQuery_ call the `query()` method of the _main kit_ each time the user presses this button.
+
+There are two ways to enrich this list of handlers - pass proper _configuration_ to the _jToxQuery_ kit itself, or call `<jToxQuery>.addHandlers(handlers)` passing an object with additional handlers that you intend to use. They way to find kit's parent _jToxQuery_ instance is using `jToxQuery.queryKit(<kit's root element>)` method, described below.
+
+##### Parameters
+
+There are few things that can be setup from outside:
+
+- **`scanDom`** (attr. `data-scan-dom`), _optional_: It can be used to stop _jToxQuery_ from scanning it's sub-elements to discover and built the _widgets_ list. Default: _true_.
+
+- **`dom`**, _optional_: It can't be passed with data attribute, because it is an objet with two properties: `widgets` and `kit`, which can contain the DOM elements, which are roots of _widgets_ and the _main kit_ of jToxQuery. This can be used, when you want to specify them yourself, like the case when they are not _under_ the jToxQuery's root. Default _null_.
+- **`initialQuery`** (atrt. `data-initial-query`), _optional_: Whether to make a initiate a query immediately after all (sub)kits are initialized. Default is _false_.
+- **`service`** (attr. `data-service`), _optional: The initial serivce/uri string to be used, when building the final URI for calling. See `query()` method for more information.
 
 
-###<a name="jtoxtree"></a> jToxTree kit
+##### Methods
+
+There are just a few method of these kit:
+
+```
+jToxQuery.queryKit(element)
+```
+
+Returns the instance of `jToxQuery` kit, which is rooted in the closest parent of passed `element`. This is the way a widget, or main kit to find which jToxQuery it belongs to - passing it's `rootElement`, for example.
+
+```
+<jToxQuery>.widget(name)
+```
+Returns an instance of a widget, with given `name`
+
+```
+<jToxQuery>.addHandlers(handlers)
+```
+Adds the supplied set of `handlers` to the handler list recnognized and used by _jToxQuery_. Without doing this refering them at certain DOM elements won't have any effect.
+
+```
+<jToxQuery>.kit()
+```
+Returns the main kit, that is managed by this _jToxQuery_ instance.
+
+```
+<jToxQuery>.query()
+```
+The most important function of the kit - the one that actually incorporates all widgets and the main kit to provide the final functionality. What it does, is to walk on all widgets and ask them to alter one and the same URI, using their `modifyUri()` method. The loop looks like this:
+
+```
+uri = widget.modifyUri(uri);
+```
+
+The initial value of `uri` is the passed `service` or empty one. After the uri is build this way, a call to main kit's `query()` is made and voilah!
+
+
+<a name="jtoxtree"></a> jToxTree kit
+------------------------------------
 
 A special usage of jToxQuery for ToxTree purposes along with decision tree visualziation.
 **IMPORTANT!:** Not yet implemented as part of *jToxKit*.

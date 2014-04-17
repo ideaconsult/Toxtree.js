@@ -1,5 +1,5 @@
 TODO:
-- make sDom customizable;
+- change queryKit to parentKit(selector)
 - rename jToxDataset to jToxCompound
 - make jToxModel for model listing (in tables);
 - make jToxSource for data source listing (datasets) - in table;

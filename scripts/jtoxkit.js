@@ -247,20 +247,6 @@ window.jT = window.jToxKit = {
       return this.settings.baseUrl;
 	},
 	
-	/* Uses a kit-defined set of queries to make an automated jToxKit.call
-	*/
-	service: function (kit, service, data, callback) {
-		var params = { };
-		if (!!kit && kit.queries[service] !== undefined) {
-			var info = kit.queries[service];
-			service = info.service;
-			params.method = info.method;
-			params.data = data;
-		}
-		
-		this.call(kit, ccLib.formatString(service, data), params, callback);
-	},
-	
 	/* Makes a server call for provided service, with settings form the given kit and calls 'callback' at the end - always.
 	The 'params', if passed, can have following attributes:
 		'method': the HTTP method to be used

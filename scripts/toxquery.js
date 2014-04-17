@@ -7,6 +7,7 @@
 var jToxQuery = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     scanDom: true,
+    initialQuery: false,
     dom: {
       kit: null, // ... here.
       widgets: {},
@@ -23,7 +24,6 @@ var jToxQuery = (function () {
   var cls = function (root, settings) {
     var self = this;
     self.rootElement = root;
-    self.handlers = {};
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even when manually initialized
     
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
@@ -49,10 +49,6 @@ var jToxQuery = (function () {
       self.settings.configuration.handlers = jT.$.extend(self.settings.configuration.handlers, handlers);
     },
     
-    element: function (handler) {
-      return this.handlers[handler];
-    },
-    
     widget: function (name) {
       return this.settings.dom.widgets[name];
     },
@@ -74,12 +70,7 @@ var jToxQuery = (function () {
           console.log("jToxQuery: referring unknown handler: " + jT.$(this).data('handler'));
       };
       
-      jT.$('.jtox-handler', root)
-      .on('change', fireHandler)
-      .each(function() {
-        self.handlers[jT.$(this).data('handler')] = this;
-      });
-  
+      jT.$('.jtox-handler', root).on('change', fireHandler);
       jT.$('button.jtox-handler', root).on('click', fireHandler);
     },
     

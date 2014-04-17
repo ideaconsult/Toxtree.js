@@ -6,6 +6,7 @@
 
 var jToxStudy = (function () {
   var defaultSettings = {
+    tab: null,
     configuration: { 
       columns: {
       	"_": {
