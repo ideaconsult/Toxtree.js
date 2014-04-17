@@ -34,10 +34,21 @@ window.jT = window.jToxKit = {
   // initializes one kit, based on the kit name passed, either as params, or found within data-XXX parameters of the element
   initKit: function(element) {
     var self = this;
-  	var dataParams = self.$.extend(true, {}, self.settings, self.$(element).data());
+
+  	var dataParams = self.$(element).data();
     
   	if (!dataParams.manualInit){
     	var kit = dataParams.kit;
+    	var topSettings = self.$.extend(true, {}, self.settings);
+
+    	// we need to traverse up, to collect some parent's settings...
+    	self.$(self.$(element).parents('.jtox-toolkit').toArray().reverse()).each(function(){
+      	if (!self.$(this).hasClass('jtox-widget')) {
+        	topSettings = self.$.extend(true, topSettings, self.$(this).data());
+      	}
+    	});
+    	
+      dataParams = self.$.extend(true, topSettings, dataParams);
 
   	  // the real initialization function
       var realInit = function (params) {

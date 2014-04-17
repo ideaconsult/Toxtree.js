@@ -131,6 +131,7 @@ var jToxSearch = (function () {
   
   var queries = {
     'auto': "/query/compound/search/all",
+    'url': "/query/compound/url/all",
     'similarity': "/query/similarity",
     'smarts': "/query/smarts"
   };
@@ -278,11 +279,13 @@ var jToxSearch = (function () {
     // required from jToxQuery - this is how we add what we've collected
     modifyUri: function (uri) {
       var form = jT.$('form', this.rootElement)[0];
-    
+      var params = { type: this.search.type };
       var type = jT.$('input[name="searchtype"]:checked', form).val();
       
+      if (type == "auto" && params.type == 'url')
+        type = "url";
+        
       var res = queries[type] + (uri.indexOf('?') > -1 ? '' : '?') + uri;
-      var params = { type: this.search.type };
 
       if (!!this.search.mol) {
         params.b64search = $.base64.encode(this.search.mol);
@@ -295,8 +298,6 @@ var jToxSearch = (function () {
         
       if (type == 'similarity')
         params.threshold = form.threshold.value;
-      else if (type == "auto" && params.type == 'url')
-        return form.searchbox.value;
       
       return ccLib.addParameter(res, $.param(params));
     },
