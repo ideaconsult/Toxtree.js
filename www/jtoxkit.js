@@ -500,7 +500,7 @@ var jToxSearch = (function () {
       jT.$(form.smarts).on('change', function () {
         var hint = jT.$(this[this.selectedIndex]).data('hint');
         form.smarts.title = (!!hint ? hint : '');
-        form.searchbox.value = this.value;
+        self.setAuto(this.value);
       });
     }
     
