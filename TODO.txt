@@ -1,7 +1,6 @@
 TODO:
-- remove jtox-widget and search for 'main' from the main kit
+- merge query settings, if jtox-widget is present in the jtox-toolkit definition.
 - parse query parameters into internal structures / inputs in jToxSearch
-- add substructure selection block?
 - make sDom customizable;
 - rename jToxDataset to jToxCompound
 - make jToxModel for model listing (in tables);

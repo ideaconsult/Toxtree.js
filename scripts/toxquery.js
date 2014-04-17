@@ -71,7 +71,7 @@ var jToxQuery = (function () {
         if (!!handler)
           ccLib.fireCallback(handler, this, this, self);
         else
-          console.log("jToxError: referring unknown handler: " + jT.$(this).data('handler'));
+          console.log("jToxQuery: referring unknown handler: " + jT.$(this).data('handler'));
       };
       
       jT.$('.jtox-handler', root)
@@ -155,7 +155,6 @@ var jToxSearch = (function () {
       form.searchbox.placeholder = jT.$(this).data('placeholder');
       jT.$('.search-pane .dynamic').addClass('hidden');
       jT.$('.search-pane .' + this.id).removeClass('hidden');
-      self.search.type = this.value;
     };
     
     jT.$('.jq-buttonset input', root).on('change', onTypeClicked);
@@ -169,10 +168,12 @@ var jToxSearch = (function () {
     })
     .on('blur', function () {
       jT.$(this).css('width', '');
-    }).
-    on('change', function () { // when we change the value here - all, possible MOL caches should be cleared.
-      self.search.mol = null;
-      self.search.type = "auto";
+    })
+    .on('change', function () { // when we change the value here - all, possible MOL caches should be cleared.
+      if (this.value.indexOf('http') > -1)
+        self.setURL();
+      else
+        self.setAuto();
     });
     
     // spend some time to setup the SMARTS groups
@@ -239,17 +240,12 @@ var jToxSearch = (function () {
         jT.$(emptySpace.appendChild(jT.getTemplate('#ketcher-usebutton'))).on('click', function () {
           var smiles = ketcher.getSmiles();
           var mol = ketcher.getMolfile();
-          if (!mol) {
-            console.log("jToxError: attempt to submit empty molecule");
-          }
-          else {
+          self.setMol(mol);
+          if (!!smiles)
             form.searchbox.value = smiles;
-            self.search.mol = mol;
-            self.search.type = "mol;"
-          }
         });
         jT.$(emptySpace.appendChild(jT.getTemplate('#ketcher-drawbutton'))).on('click', function () {
-          ketcher.setMolecule(form.searchbox.value);
+          ketcher.setMolecule(self.search.mol || form.searchbox.value);
         });
         ketcherReady = true;
       }
@@ -267,7 +263,15 @@ var jToxSearch = (function () {
     });
 
     // finally - parse the URL-passed parameters and setup the values appropriately.
-
+    if (!!self.settings.b64search) {
+      self.setMol($.base64.decode(self.settings.b64search));
+    }
+    else if (!!self.settings.search) {
+      if (self.settings.search.indexOf('http') > -1)
+        self.setURL(self.settings.search);
+      else
+        self.setAuto(self.settings.search);
+    }
   };
   
   cls.prototype = {
@@ -278,25 +282,21 @@ var jToxSearch = (function () {
       var type = jT.$('input[name="searchtype"]:checked', form).val();
       
       var res = queries[type] + (uri.indexOf('?') > -1 ? '' : '?') + uri;
-      var params = { };
+      var params = { type: this.search.type };
 
-      if (!!this.search.url) {
-        params.type = 'url';
-        params.search = encodeURI(this.search.url);
-      }
-      else if (!!this.search.mol) {
+      if (!!this.search.mol) {
         params.b64search = $.base64.encode(this.search.mol);
-        params.type = 'mol';
       }
       else {
         params.search = form.searchbox.value;
-        params.type = "smiles";
         if (!params.search)
           params.search = this.settings.defaultSmiles;
       }
         
       if (type == 'similarity')
         params.threshold = form.threshold.value;
+      else if (type == "auto" && params.type == 'url')
+        return form.searchbox.value;
       
       return ccLib.addParameter(res, $.param(params));
     },
@@ -304,22 +304,45 @@ var jToxSearch = (function () {
     // some shortcuts for outer world.
     makeQuery: function (needle) {
       if (!!needle) 
-        this.setNeedle(needle);
+        this.setAuto(needle);
       this.queryKit.query();
     },
     
-    setNeedle: function (needle) {
-      if (!!needle)
-        console.log("jToxError: Trying to set null needle");
-      else {
-        this.search.mol = null;
-        this.search.type = "auto";
-        jT.$('form', this.rootElement)[0].searchbox.value = needle;
-      }
+    getNeedle: function () {
+      return this.search.type == 'mol' ? this.search.mol : jT.$('form', this.rootElement)[0].searchbox.value;
     },
     
-    getNeedle: function () {
-      return jT.$('form', this.rootElement)[0].searchbox.value;
+    setAuto: function (needle) {
+      this.search.mol = null;
+      this.search.type = 'auto';
+
+      var box = jT.$('form', this.rootElement)[0].searchbox;
+      if (!!this.search.oldplace)
+        box.placeholder = this.search.oldplace;
+      if (needle != null)
+        box.value = needle;
+    },
+    
+    setMol: function (mol) {
+      var box = jT.$('form', this.rootElement)[0].searchbox;
+      this.search.mol = mol;
+      this.search.type = 'mol';
+      this.search.oldplace = box.placeholder;
+      
+      box.placeholder = "MOL formula saved_";
+      box.value = '';
+    },
+    
+    setURL: function (url) {
+      this.search.mol = null;
+      this.search.type = 'url';
+      var box = jT.$('form', this.rootElement)[0].searchbox;
+
+      if (!!this.search.oldplace)
+        box.placeholder = this.search.oldplace;
+        
+      if (url != null)
+        box.value = url;
     }
   }; // end of prototype
   
