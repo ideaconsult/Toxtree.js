@@ -463,6 +463,12 @@ var jToxSearch = (function () {
       self.search.type = "auto";
     });
     
+    // spend some time to setup the SMARTS groups
+    if (!!window.funcgroups) {
+      var family = {};
+        
+    }
+    
     // Now, deal with KETCHER - make it show, attach handlers to/from it, and handlers for showing/hiding it.
     var ketcherBox = jT.$('.ketcher', root)[0];
     var ketcherReady = false;
@@ -496,8 +502,6 @@ var jToxSearch = (function () {
         });
         ketcherReady = true;
       }
-      
-      // finally - parse the URL-passed parameters and setup the values appropriately.
     };
     
     jT.$(form.drawbutton).on('click', function () { 
@@ -508,8 +512,11 @@ var jToxSearch = (function () {
       else
         setTimeout(function () { jT.$(ketcherBox).css('display', 'none'); }, 500);
 
-      setTimeout(function () { jT.$(ketcherBox).toggleClass('shrinken') }, 100);
+      setTimeout(function () { jT.$(ketcherBox).toggleClass('shrinken') }, 50);
     });
+
+    // finally - parse the URL-passed parameters and setup the values appropriately.
+
   };
   
   cls.prototype = {
@@ -841,7 +848,7 @@ var jToxDataset = (function () {
           jT.$('a', el)[0].href = ccLib.addParameter(self.datasetUri, "media=" + encodeURIComponent(expo.type));
           var img = el.getElementsByTagName('img')[0];
           img.alt = img.title = expo.type;
-          img.src = jT.settings.baseUrl + expo.icon;
+          img.src = (jT.settings.baseUrl || self.settings.baseUrl) + expo.icon;
         }
       }
       
