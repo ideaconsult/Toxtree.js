@@ -40,7 +40,7 @@ var jToxQuery = (function () {
 
     self.initHandlers(root);
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
-    if (!ccLib.isNull(self.settings.initialQuery))
+    if (!!self.settings.initialQuery)
       setTimeout(function () { self.query(); }, 200);
   };
   
@@ -272,6 +272,7 @@ var jToxSearch = (function () {
         params.search = form.searchbox.value;
         if (!params.search)
           params.search = this.settings.defaultSmiles;
+          this.setAuto(params.search);
       }
         
       if (type == 'similarity')

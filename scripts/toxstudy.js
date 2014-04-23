@@ -56,7 +56,7 @@ var jToxStudy = (function () {
 	    }
     });
     
-    // initialize the tab structure for several versions of dataTables.
+    // initialize the tab structure for several versions of tabs.
     self.tabs = jT.$(tree).tabs({
       "select" : function(event, ui) {
         self.loadPanel(ui.panel);

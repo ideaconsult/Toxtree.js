@@ -213,6 +213,16 @@ window.jT = window.jToxKit = {
 	  });
   },
   
+  processColumns: function (kit, category) {
+    var colDefs = [];
+    var catList = kit.settings.configuration.columns[category];
+    for (var name in catList)
+      colDefs.push(catList[name])
+      
+    this.sortColDefs(colDefs);
+    return colDefs;
+  },
+  
   shortenedData: function (data, message, deflen) {
     var res = '';
     

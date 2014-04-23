@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+
+  <title>ToxDataset development page</title>
+  <link rel="stylesheet" href="tests/base.css">
+	<link rel="stylesheet" href="tests/skeleton.css">
+	<link rel="stylesheet" href="tests/layout.css">
+	<link rel="stylesheet" href="tests/jquery-ui.css">
+	<link rel="stylesheet" href="tests/jquery.dataTables.css">
+
+	<link rel="stylesheet" href="styles/jtoxkit.css">
+<!-- 	<link rel="stylesheet" href="styles/toxdataset.css"> -->
+
+  <script src="tests/jquery.js"></script>
+  <script src="tests/jquery-ui.js"></script>
+  <script src="tests/jquery.dataTables.js"></script>
+
+  <script src="scripts/common.js"></script>
+  <script src="scripts/jtoxkit.js"></script>
+  <script src="scripts/toxdataset.js"></script>
+  
+  <script src="tests/config-dataset.js"></script>
+<!--
+  <script language="javascript">
+    $(document).ready(function(){
+      var ds = new jToxDataset($(".jtox-toolkit")[0], {crossDomain: true, configuration: config_dataset } );
+    });
+  </script>
+-->
+</head>
+<body>
+	<div class="jtox-toolkit" data-kit="dataset" data-base-url="http://apps.ideaconsult.net:8080/biodeg"></div>
+  <div class="jtox-template">
+<!--[[ jT.templates['all-dataset'] -->
+	  <div id="jtox-dataset">
+      <table></table>
+	  </div>
+<!-- // end of #jtox-dataset ]]-->
+<!--[[ jT.templates['dataset-one-detail'] -->
+    <table>
+      <tbody>
+        <tr id="jtox-dataset-details">
+          <th class="right"><span class="data-field" data-field="title"> ? </span><sup><a target="_blank" class="data-field attribute" data-attribute="href" data-field="uri">?</a></sup></th>
+          <td class="left data-field" data-field="value"> ? </td>
+        </tr>
+      </tbody>
+    </table>
+<!-- // end of #jtox-dataset-details ]]-->
+  </div>
+</body>
+</html>
