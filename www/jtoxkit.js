@@ -375,19 +375,6 @@ var jToxQuery = (function () {
     }
   }; // end of prototype
   
-  cls.queryKit = function(element) {
-    var query = null;
-    jT.$(element).parents().each(function() {
-      var kit = jT.kit(this);
-      if (!kit)
-        return;
-      if (kit instanceof jToxQuery)
-        query = kit;
-    });
-    
-    return query;
-  };
-  
   return cls;
 })();
 
@@ -416,7 +403,7 @@ var jToxSearch = (function () {
     
     self.settings = jT.$.extend({}, defaultSettings, jT.settings, settings);
     self.rootElement.appendChild(jT.getTemplate('#jtox-search'));
-    self.queryKit = jToxQuery.queryKit(self.rootElement);
+    self.queryKit = jT.parentKit(jToxQuery, self.rootElement);
     self.queryKit.initHandlers(root);
     
     self.search = { mol: "", type: ""};
@@ -2205,6 +2192,21 @@ window.jT = window.jToxKit = {
 	kit: function (element) {
   	return $(element).data('jtKit');
 	},
+	
+	parentKit: function(name, element) {
+    var query = null;
+    if (typeof name == 'string')
+      name = window[name];
+    self.$(element).parents('.jtox-toolkit').each(function() {
+      var kit = jT.kit(this);
+      if (!kit)
+        return;
+      if (kit instanceof name)
+        query = kit;
+    });
+    
+    return query;
+  },
 	
 	initTemplates: function() {
 	  var self = this;

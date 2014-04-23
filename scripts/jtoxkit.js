@@ -117,6 +117,21 @@ window.jT = window.jToxKit = {
   	return $(element).data('jtKit');
 	},
 	
+	parentKit: function(name, element) {
+    var query = null;
+    if (typeof name == 'string')
+      name = window[name];
+    self.$(element).parents('.jtox-toolkit').each(function() {
+      var kit = jT.kit(this);
+      if (!kit)
+        return;
+      if (kit instanceof name)
+        query = kit;
+    });
+    
+    return query;
+  },
+	
 	initTemplates: function() {
 	  var self = this;
 

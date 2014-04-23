@@ -100,6 +100,12 @@ Returns the instance of the kit that has the passed `element` as its root. When 
 
 
 ```
+jToxKit.parentKit(prototype, element)
+```
+Returns the instance of `prototype` which has its root as the closest parent of `element`. In other words - traverses up all the parents of `element` until it reaches a jToxKit's kit, which is of given `prototype`.
+
+
+```
 jToxKit.insertTool(name, root)
 ```
 Inserts a third-party tool, which was added to jToxKit's production files, like _ketcher_, for example. It insertes that HTML code for the `name` tool under the passed `root`. If this tool has separate script files (and it probably does), it needs to be included separately on the page.
@@ -509,7 +515,7 @@ As can be seen, each handler function is passed two arguments: `el` - the elemen
 ```
 You'll have _jToxQuery_ call the `query()` method of the _main kit_ each time the user presses this button.
 
-There are two ways to enrich this list of handlers - pass proper _configuration_ to the _jToxQuery_ kit itself, or call `<jToxQuery>.addHandlers(handlers)` passing an object with additional handlers that you intend to use. They way to find kit's parent _jToxQuery_ instance is using `jToxQuery.queryKit(<kit's root element>)` method, described below.
+There are two ways to enrich this list of handlers - pass proper _configuration_ to the _jToxQuery_ kit itself, or call `<jToxQuery>.addHandlers(handlers)` passing an object with additional handlers that you intend to use. They way to find kit's parent _jToxQuery_ instance is using `jToxKit.parentKit(jToxQuery, <kit's root element>)` method, described above.
 
 ##### Parameters
 
