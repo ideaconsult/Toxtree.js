@@ -18,6 +18,44 @@
 
 	<link rel="stylesheet" href="../www/jtoxkit.css"/>
 	<link rel="stylesheet" href="../www/ketcher.css"/>
+	<style>
+	#sidebar {
+	  position: absolute;
+	  width: 350px;
+	  left: 0px;
+  	bottom: 0px;
+  	top: 50px;
+  	z-index: 100;
+  	padding-right: 16px;
+  	padding: 0px 16px 0px 8px;
+  	transition: left 0.5s ease;
+  	-moz-transition: left 0.5s ease;
+  	-webkit-transition: left 0.5s ease;
+  	background: rgba(0,0,0,0.05);
+  	border-radius: 7px;
+	}
+	
+	#sidebar.hidden {
+  	left: -358px;
+	}
+	
+	#sidebar>span.ui-icon {
+	  position: relative;
+  	left: 350px;
+/*
+  	background-color: rgba(0,0,0,0.1);
+  	border-radius: 3px;
+*/
+	}
+	
+	#sidebar .content {
+  	background-color: #ffffff;
+  	font-size: 80%;
+  	overflow: scroll;
+  	height: 95%;
+	}
+	
+	</style>
 
   <script src="oecdcategories.js"></script>
 
@@ -30,13 +68,29 @@
 
   <script src="../www/jtoxkit.js"></script>
   <script src="../www/ketcher.js"></script>
+  <script src="config-dataset.js"></script>
+  <script language="JavaScript">
+    $(document).ready(function(){
+      $('#sidebar span.ui-icon').on('click', function () {
+        $(this).parent().toggleClass('hidden');
+      })
+    });
+  </script>
 </head>
 <body>
-  <div class="jtox-toolkit" data-kit="query" data-initial-query="yes" data-base-url="http://apps.ideaconsult.net:8080/biodeg">
+  <div class="jtox-toolkit" data-kit="query" data-initial-query="yes" data-cross-domain="true" data-configuration="config_dataset" data-base-url="http://apps.ideaconsult.net:8080/biodeg">
     <div class="jtox-toolkit jtox-widget" data-kit="search"></div>
-    <div class="jtox-toolkit jtox-widget" data-kit="dataset" data-s-dom="rt" data-selectable="true" data-selection-handler="query"></div>
-	  <div class="jtox-toolkit" data-kit="compound" data-cross-domain="true" data-show-tabs="false"></div>
+    <div id="sidebar" class="hidden">
+      <span class="ui-icon ui-icon-carat-2-e-w"></span>
+      <div class="content">
+        <h5>Datasets</h5>
+        <div class="jtox-toolkit jtox-widget" data-kit="dataset" data-short-stars="true" data-s-dom="rt" data-selectable="true" data-selection-handler="query"></div>
+        <h5>Models</h5>
+        <div class="jtox-toolkit jtox-widget" data-kit="model" data-short-stars="true" data-s-dom="rt" data-selectable="true" data-selection-handler="query"></div>
+      </div>
+    </div>
+	  <div id="browser" class="jtox-toolkit" data-kit="compound"></div>
   </div>
-  <div class="jtox-toolkit" data-kit="study" data-cross-domain="true" data-substance-uri="http://apps.ideaconsult.net:8080/biodeg/substance/IUC5-410e026d-f182-4e36-b14f-28013022f906"></div>
+<!--   <div class="jtox-toolkit" data-kit="study" data-cross-domain="true" data-substance-uri="http://apps.ideaconsult.net:8080/biodeg/substance/IUC5-410e026d-f182-4e36-b14f-28013022f906"></div> -->
 </body>
 </html>

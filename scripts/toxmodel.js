@@ -38,6 +38,7 @@ var jToxModel = (function () {
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even when manually initialized
     
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
+    self.models = null;
     
     self.rootElement.appendChild(jT.getTemplate('#jtox-model'));
     self.init();
@@ -106,9 +107,14 @@ var jToxModel = (function () {
       jT.$(self.table).dataTable().fnClearTable();
       jT.call(self, uri, function (result) {
         if (!!result) {
+          self.models = result.model;
           jT.$(self.table).dataTable().fnAddData(result.model);
         }
       });
+    },
+    
+    runPrediction: function (modelUri, compoundUri, callback) {
+      // TODO: implement this here.
     },
     
     query: function (uri) {

@@ -883,7 +883,7 @@ var jToxCompound = (function () {
           jT.$('a', el)[0].href = ccLib.addParameter(self.datasetUri, "media=" + encodeURIComponent(expo.type));
           var img = el.getElementsByTagName('img')[0];
           img.alt = img.title = expo.type;
-          img.src = (jT.settings.baseUrl || self.settings.baseUrl) + expo.icon;
+          img.src = (jT.settings.baseUrl || self.settings.baseUrl) + '/' + expo.icon;
         }
       }
       
@@ -1600,6 +1600,7 @@ var jToxModel = (function () {
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even when manually initialized
     
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
+    self.models = null;
     
     self.rootElement.appendChild(jT.getTemplate('#jtox-model'));
     self.init();
@@ -1668,9 +1669,14 @@ var jToxModel = (function () {
       jT.$(self.table).dataTable().fnClearTable();
       jT.call(self, uri, function (result) {
         if (!!result) {
+          self.models = result.model;
           jT.$(self.table).dataTable().fnAddData(result.model);
         }
       });
+    },
+    
+    runPrediction: function (modelUri, compoundUri, callback) {
+      // TODO: implement this here.
     },
     
     query: function (uri) {
@@ -2381,7 +2387,7 @@ window.jT = window.jToxKit = {
 
   	var dataParams = self.$(element).data();
     
-  	if (!dataParams.manualInit){
+  	if (!dataParams.manualInit) {
     	var kit = dataParams.kit;
     	var topSettings = self.$.extend(true, {}, self.settings);
 
@@ -2428,8 +2434,12 @@ window.jT = window.jToxKit = {
           jT.$(element).data('jtKit', realInit(dataParams));
     	  });
   	  }
-  	  else
+  	  else {
+  	    if (!ccLib.isNull(dataParams.configuration) && typeof dataParams.configuration == "string" && !ccLib.isNull(window[dataParams.configuration]))
+  	      dataParams.configuration = window[dataParams.configuration];
+    	  
         jT.$(element).data('jtKit', realInit(dataParams));
+  	  }
     }
   },
   

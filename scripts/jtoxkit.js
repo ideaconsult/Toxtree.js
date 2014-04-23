@@ -37,7 +37,7 @@ window.jT = window.jToxKit = {
 
   	var dataParams = self.$(element).data();
     
-  	if (!dataParams.manualInit){
+  	if (!dataParams.manualInit) {
     	var kit = dataParams.kit;
     	var topSettings = self.$.extend(true, {}, self.settings);
 
@@ -84,8 +84,12 @@ window.jT = window.jToxKit = {
           jT.$(element).data('jtKit', realInit(dataParams));
     	  });
   	  }
-  	  else
+  	  else {
+  	    if (!ccLib.isNull(dataParams.configuration) && typeof dataParams.configuration == "string" && !ccLib.isNull(window[dataParams.configuration]))
+  	      dataParams.configuration = window[dataParams.configuration];
+    	  
         jT.$(element).data('jtKit', realInit(dataParams));
+  	  }
     }
   },
   
