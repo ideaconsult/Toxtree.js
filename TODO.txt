@@ -1,7 +1,5 @@
 TODO:
-- make jToxModel for model listing (in tables);
-- make jToxSource for data source listing (datasets) - in table;
-
+- 
 
 IDEAS?
 - (global) extractFeature(dataset, featureId) - return an array of values of that feature for each entry in the dataset. (Can be used for diagram)

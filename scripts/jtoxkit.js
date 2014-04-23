@@ -216,8 +216,11 @@ window.jT = window.jToxKit = {
   processColumns: function (kit, category) {
     var colDefs = [];
     var catList = kit.settings.configuration.columns[category];
-    for (var name in catList)
-      colDefs.push(catList[name])
+    for (var name in catList) {
+      var col = this.modifyColDef(kit, catList[name], category);
+      if (col != null)
+        colDefs.push(col);
+    }
       
     this.sortColDefs(colDefs);
     return colDefs;

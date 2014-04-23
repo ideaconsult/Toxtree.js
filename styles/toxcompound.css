@@ -106,7 +106,7 @@
 }
 
 .jtox-ds-control input {
-  position: absolute;
+  position: fixed;
   right:10px;
   width: 25%;
 }
