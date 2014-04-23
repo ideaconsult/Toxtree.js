@@ -1,4 +1,4 @@
-/* toxquery.js - Universal query widget, that can work with any kit (study or dataset) inside
+/* toxquery.js - Universal query widget, that can work with any kit (study or compound) inside
  *
  * Copyright 2012-2014, IDEAconsult Ltd. http://www.ideaconsult.net/
  * Created by Ivan Georgiev

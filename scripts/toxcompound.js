@@ -1,10 +1,10 @@
-/* toxdataset.js - General, universal dataset visualizer.
+/* toxcompound.js - General, universal compound dataset visualizer.
  *
  * Copyright 2012-2013, IDEAconsult Ltd. http://www.ideaconsult.net/
  * Created by Ivan Georgiev
 **/
 
-var jToxDataset = (function () {
+var jToxCompound = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     "showTabs": true,         // should we show tabs with groups, or not
     "showExport": true,       // should we add export tab up there
@@ -139,7 +139,7 @@ var jToxDataset = (function () {
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even in manual initialization.
     
     var newDefs = jT.$.extend(true, { "configuration" : { "baseFeatures": baseFeatures} }, defaultSettings);
-    self.settings = jT.$.extend(true, {}, newDefs, jT.settings, settings); // i.e. defaults from jToxDataset
+    self.settings = jT.$.extend(true, {}, newDefs, jT.settings, settings); // i.e. defaults from jToxCompound
     self.instanceNo = instanceCount++;
 
     // finally make the query, if Uri is provided      
@@ -162,7 +162,7 @@ var jToxDataset = (function () {
       self.orderList = [];
       self.usedFeatures = [];
       
-      self.rootElement.appendChild(jT.getTemplate('#jtox-dataset'));
+      self.rootElement.appendChild(jT.getTemplate('#jtox-compound'));
       
       // now make some action handlers - on next, prev, filter, etc.
       var pane = jT.$('.jtox-ds-control', self.rootElement)[0];

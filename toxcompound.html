@@ -15,7 +15,7 @@
 	<link rel="stylesheet" href="tests/jquery-ui.css">
 	<link rel="stylesheet" href="tests/jquery.dataTables.css">
 
-	<link rel="stylesheet" href="styles/toxdataset.css">
+	<link rel="stylesheet" href="styles/toxcompound.css">
 	<link rel="stylesheet" href="styles/jtoxkit.css">
 
 
@@ -25,12 +25,12 @@
 
   <script src="scripts/common.js"></script>
   <script src="scripts/jtoxkit.js"></script>
-  <script src="scripts/toxdataset.js"></script>
+  <script src="scripts/toxcompound.js"></script>
   
   <script src="tests/config-dataset.js"></script>
   <script language="javascript">
     $(document).ready(function(){
-      var ds = new jToxDataset($(".jtox-toolkit")[0], {crossDomain: true, configuration: config_dataset } );
+      var ds = new jToxCompound($(".jtox-toolkit")[0], {crossDomain: true, configuration: config_dataset } );
       ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/dataset/18?feature_uris[]=http://apps.ideaconsult.net:8080/toxbank/model/6/predicted");
 /*       ds.queryDataset("http://apps.ideaconsult.net:8080/ambit2/dataset/1945542");  */
 /*       ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/query/similarity?search=c1ccccc1O&threshold=0.5"); */
@@ -41,8 +41,8 @@
 <body>
 	<div class="jtox-toolkit" data-kit="dataset" data-manual-init="yes" data-show-features="yes" data-show-export="yes"></div>
   <div class="jtox-template">
-<!--[[ jT.templates['all-dataset'] -->
-	  <div id="jtox-dataset">
+<!--[[ jT.templates['all-compound'] -->
+	  <div id="jtox-compound">
 	    <div class="jtox-ds-features"></div>
 	    <div class="jtox-ds-control">
 	      Showing from <span class="data-field from-field" data-field="pagestart"> ? </span> to <span class="data-field" data-field="pageend"> ? </span> in pages of <select class="data-field" data-field="pagesize">
@@ -65,21 +65,21 @@
 	    </div>
 	  </div>
 <!-- // end of #jtox-dataset ]]-->
-<!--[[ jT.templates['dataset-one-feature'] -->
+<!--[[ jT.templates['compound-one-feature'] -->
     <div id="jtox-ds-feature" class="jtox-ds-feature"><input type="checkbox" checked="yes" class="jtox-checkbox" /><span class="data-field jtox-title" data-field="title"> ? </span><sup><a target="_blank" class="data-field attribute" data-attribute="href" data-field="uri">?</a></sup></div>
 <!-- // end of #jtox-ds-feature ]]-->
-<!--[[ jT.templates['dataset-download'] -->
+<!--[[ jT.templates['compound-download'] -->
     <div id="jtox-ds-download" class="jtox-inline jtox-ds-download">
       <a target="_blank"><img class="borderless"/></a>
     </div>
 <!-- // end of #jtox-ds-download ]]-->
-<!--[[ jT.templates['dataset-export'] -->
+<!--[[ jT.templates['compound-export'] -->
     <div id="jtox-ds-export">
       <div class="jtox-inline">Download dataset as: </div>
       <div class="jtox-inline jtox-exportlist"></div>
     </div>
 <!-- // end of #jtox-ds-export ]]-->
-<!--[[ jT.templates['dataset-one-detail'] -->
+<!--[[ jT.templates['compound-one-detail'] -->
     <table>
       <tbody>
         <tr id="jtox-one-detail">
@@ -89,7 +89,7 @@
       </tbody>
     </table>
 <!-- // end of #jtox-one-detail ]]-->
-<!--[[ jT.templates['dataset-details-table'] -->
+<!--[[ jT.templates['compound-details-table'] -->
     <table id="jtox-details-table" class="jtox-details-table"></table>
 <!-- // end of #jtox-details-table ]]-->
   </div>

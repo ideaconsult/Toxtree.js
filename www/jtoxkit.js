@@ -280,7 +280,7 @@ var ccLib = {
 function ccNonEmptyFilter(v) {
   return v !== undefined && v != null && v != '';  
 }
-/* toxquery.js - Universal query widget, that can work with any kit (study or dataset) inside
+/* toxquery.js - Universal query widget, that can work with any kit (study or compound) inside
  *
  * Copyright 2012-2014, IDEAconsult Ltd. http://www.ideaconsult.net/
  * Created by Ivan Georgiev
@@ -609,13 +609,13 @@ var jToxSearch = (function () {
   
   return cls;
 })();
-/* toxdataset.js - General, universal dataset visualizer.
+/* toxcompound.js - General, universal compound dataset visualizer.
  *
  * Copyright 2012-2013, IDEAconsult Ltd. http://www.ideaconsult.net/
  * Created by Ivan Georgiev
 **/
 
-var jToxDataset = (function () {
+var jToxCompound = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     "showTabs": true,         // should we show tabs with groups, or not
     "showExport": true,       // should we add export tab up there
@@ -750,7 +750,7 @@ var jToxDataset = (function () {
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even in manual initialization.
     
     var newDefs = jT.$.extend(true, { "configuration" : { "baseFeatures": baseFeatures} }, defaultSettings);
-    self.settings = jT.$.extend(true, {}, newDefs, jT.settings, settings); // i.e. defaults from jToxDataset
+    self.settings = jT.$.extend(true, {}, newDefs, jT.settings, settings); // i.e. defaults from jToxCompound
     self.instanceNo = instanceCount++;
 
     // finally make the query, if Uri is provided      
@@ -773,7 +773,7 @@ var jToxDataset = (function () {
       self.orderList = [];
       self.usedFeatures = [];
       
-      self.rootElement.appendChild(jT.getTemplate('#jtox-dataset'));
+      self.rootElement.appendChild(jT.getTemplate('#jtox-compound'));
       
       // now make some action handlers - on next, prev, filter, etc.
       var pane = jT.$('.jtox-ds-control', self.rootElement)[0];
@@ -1974,12 +1974,12 @@ var jToxStudy = (function () {
       
       var substances = {};
 
-      jToxDataset.processFeatures(json.feature);
+      jToxCompound.processFeatures(json.feature);
       // proprocess the data...
       for (var i = 0, cmpl = json.composition.length; i < cmpl; ++i) {
         var cmp = json.composition[i];
         
-        jToxDataset.processEntry(cmp.component, json.feature, fnDatasetValue);
+        jToxCompound.processEntry(cmp.component, json.feature, fnDatasetValue);
 
         // now prepare the subs        
         var theSubs = substances[cmp.compositionUUID];
@@ -2059,7 +2059,7 @@ var jToxStudy = (function () {
           // go and query for the reference query
           jT.call(self, substance.referenceSubstance.uri, function (dataset){
             if (!!dataset) {
-              jToxDataset.processDataset(dataset, null, fnDatasetValue);
+              jToxCompound.processDataset(dataset, null, fnDatasetValue);
               ccLib.fillTree(rootTab, dataset.dataEntry[0]);
             }
           });
@@ -2452,8 +2452,8 @@ jT.templates['ketcher-buttons']  =
 "    <button id=\"ketcher-drawbutton\">Draw <span class=\"ui-icon ui-icon-arrowthick-1-s\"></span></button>" +
 ""; // end of ketcher-buttons 
 
-jT.templates['all-dataset']  = 
-"	  <div id=\"jtox-dataset\">" +
+jT.templates['all-compound']  = 
+"	  <div id=\"jtox-compound\">" +
 "	    <div class=\"jtox-ds-features\"></div>" +
 "	    <div class=\"jtox-ds-control\">" +
 "	      Showing from <span class=\"data-field from-field\" data-field=\"pagestart\"> ? </span> to <span class=\"data-field\" data-field=\"pageend\"> ? </span> in pages of <select class=\"data-field\" data-field=\"pagesize\">" +
@@ -2477,24 +2477,24 @@ jT.templates['all-dataset']  =
 "	  </div>" +
 ""; // end of #jtox-dataset 
 
-jT.templates['dataset-one-feature']  = 
+jT.templates['compound-one-feature']  = 
 "    <div id=\"jtox-ds-feature\" class=\"jtox-ds-feature\"><input type=\"checkbox\" checked=\"yes\" class=\"jtox-checkbox\" /><span class=\"data-field jtox-title\" data-field=\"title\"> ? </span><sup><a target=\"_blank\" class=\"data-field attribute\" data-attribute=\"href\" data-field=\"uri\">?</a></sup></div>" +
 ""; // end of #jtox-ds-feature 
 
-jT.templates['dataset-download']  = 
+jT.templates['compound-download']  = 
 "    <div id=\"jtox-ds-download\" class=\"jtox-inline jtox-ds-download\">" +
 "      <a target=\"_blank\"><img class=\"borderless\"/></a>" +
 "    </div>" +
 ""; // end of #jtox-ds-download 
 
-jT.templates['dataset-export']  = 
+jT.templates['compound-export']  = 
 "    <div id=\"jtox-ds-export\">" +
 "      <div class=\"jtox-inline\">Download dataset as: </div>" +
 "      <div class=\"jtox-inline jtox-exportlist\"></div>" +
 "    </div>" +
 ""; // end of #jtox-ds-export 
 
-jT.templates['dataset-one-detail']  = 
+jT.templates['compound-one-detail']  = 
 "    <table>" +
 "      <tbody>" +
 "        <tr id=\"jtox-one-detail\">" +
@@ -2505,7 +2505,7 @@ jT.templates['dataset-one-detail']  =
 "    </table>" +
 ""; // end of #jtox-one-detail 
 
-jT.templates['dataset-details-table']  = 
+jT.templates['compound-details-table']  = 
 "    <table id=\"jtox-details-table\" class=\"jtox-details-table\"></table>" +
 ""; // end of #jtox-details-table 
 

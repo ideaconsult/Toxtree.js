@@ -550,12 +550,12 @@ var jToxStudy = (function () {
       
       var substances = {};
 
-      jToxDataset.processFeatures(json.feature);
+      jToxCompound.processFeatures(json.feature);
       // proprocess the data...
       for (var i = 0, cmpl = json.composition.length; i < cmpl; ++i) {
         var cmp = json.composition[i];
         
-        jToxDataset.processEntry(cmp.component, json.feature, fnDatasetValue);
+        jToxCompound.processEntry(cmp.component, json.feature, fnDatasetValue);
 
         // now prepare the subs        
         var theSubs = substances[cmp.compositionUUID];
@@ -635,7 +635,7 @@ var jToxStudy = (function () {
           // go and query for the reference query
           jT.call(self, substance.referenceSubstance.uri, function (dataset){
             if (!!dataset) {
-              jToxDataset.processDataset(dataset, null, fnDatasetValue);
+              jToxCompound.processDataset(dataset, null, fnDatasetValue);
               ccLib.fillTree(rootTab, dataset.dataEntry[0]);
             }
           });

@@ -133,7 +133,7 @@ When a certain kit is wrapped with another one, like the way `jToxQuery` wraps `
 ```
 <kit instance>.query(uri)
 ```
-A shorthand, general method, that _jToxQuery_ can call on any (main) kit, to perform it's prederred query method. For example for [jToxDataset](#jtoxdataset) this method is another way to call `<jToxStudy>.queryDataset(datasetUri)`.
+A shorthand, general method, that _jToxQuery_ can call on any (main) kit, to perform it's prederred query method. For example for [jToxCompound](#jtoxdataset) this method is another way to call `<jToxStudy>.queryDataset(datasetUri)`.
 
 
 <a name="jtoxstudy"></a> jToxStudy kit
@@ -240,7 +240,7 @@ The `substanceUri` is the same as in previous function, but this one takes care 
 ```
 The `substanceUri` is the same as in previous function. This one queries for a summary of all studies available for the given substance. It fills up the numbers in the studies' tabs and prepares the tables for particular queries later on, which are executes upon each tab's activation.
 
-<a name="jtoxdataset"></a> jToxDataset kit
+<a name="jtoxdataset"></a> jToxCompound kit
 ------------------------------------------
 
 An OpenTox dataset management and visualization tool. Since _dataset_ is very basic term in OpenTox hierarchy it is used in other places like [jToxQuery](#jtoxquery) and [jToxTree kit](#jtoxtree). It is vital that the scope of this kit it _not_ to provide complete, versatile interface for making queries, linking between them, etc. - it aims at visualizing and providing basic navigation within _one_ particular query. It is designed to be easily configurable - up to the point of being only one table, and easily driven with API calls, which are explained below.
@@ -443,45 +443,45 @@ In the full configuration, shown below example of using last two can be seen for
 
 ##### Methods
 
-_jToxDataset_ has several methods to drive visuzalization, as well as several "static" ones, which makes it possible for other kits to use its functionality. Let's start whith these:
+_jToxCompound_ has several methods to drive visuzalization, as well as several "static" ones, which makes it possible for other kits to use its functionality. Let's start whith these:
 
 
 ```
-jToxDataset.processDataset(dataset, features, fnValue, startIdx)
+jToxCompound.processDataset(dataset, features, fnValue, startIdx)
 ```
 Only the first parameter `dataset` is required and it is the downloaded dataset, as is from the OpenTox server. If features are already preprocessed (see below) they can be passed here as second parameter - `features`. The third - `fnValue` is a user-provided function that takes part during each entry's preprocessing, it is explained in details in a second. The last parameter `startIdx` is the starting index within the dataset, if a call is made for some other part of the dataset. Remember - this is a static call and it does _not_ preserve context information like page size, index, etc.
 
 
 ```
-jToxDataset.processFeatures(features)
+jToxCompound.processFeatures(features)
 ```
 Very important function in unified feature processing. It traverses all reported features, merging those that mean one and the same thing, as reported by their `sameAs` parameter, also takes care of predefined features that can instruct it to "location" certain feature value inside the dataset entry, itself. This is called internally by `processDataset()` or should be called if `features` parameter is passed to the later.
 
 
 ```
-jToxDataset.processEntry(entry, features, fnValue)
+jToxCompound.processEntry(entry, features, fnValue)
 ```
 Used extensively during dataset preprocessing. When traversing the dataset, each `entry` is passed with already preprocessed `features` so that features that need to have their values extracted and set separately _are_ processed here. Also, if several features are setup to location their values in same entry's property - it is also done here. `fnValue` function (the same passed to `processDataset()`) can participate in the process, it has the following definition: `fnValue(oldValue, newValue)`.
 
 
 ```
-<jToxDataset>.queryDataset(datasetUri)
+<jToxCompound>.queryDataset(datasetUri)
 ```
 The starting point of dataset visualization. This function makes a separate call for feature-retrieving, preprocesses them (as described above), prepares the visuzalization table, showing or hiding, whatever is needed and calls `processEntries` for actual dataset entries' retrieval. Cannot be called several times within same instance.
 
 ```
-<jToxDataset>.queryEntries(start, size, fnComplete)
+<jToxCompound>.queryEntries(start, size, fnComplete)
 ```
 The actual dataset entries retrieving function. It makes call to get entries from the already set up dataset, starting from `start`-th one and asking for `size` of them. `fnComplete` is called after all information is processed and the visuzalzation table is feeded. All pagination UI elements are updated, if not hidden.
 
 ```
-<jToxDataset>.nextPage()
-<jToxDataset>.prevPage()
+<jToxCompound>.nextPage()
+<jToxCompound>.prevPage()
 ```
 These two are shortcuts for the previous function, taking into account the current page size and also taking care not to query for something outside of the known limits of the dataset.
 
 ```
-<jToxDataset>.filterEntries(needle)
+<jToxCompound>.filterEntries(needle)
 ```
 Filter the presented entries with the given needle, finding substring match on each features, not marked with `search: false` in their definition.
 
