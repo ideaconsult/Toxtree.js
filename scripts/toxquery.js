@@ -38,7 +38,7 @@ var jToxQuery = (function () {
       });
     }
 
-    self.initHandlers(root);
+    self.initHandlers();
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
     if (!!self.settings.initialQuery)
       setTimeout(function () { self.query(); }, 200);
@@ -60,7 +60,7 @@ var jToxQuery = (function () {
       return this.mainKit;
     },
     
-    initHandlers: function (root) {
+    initHandlers: function () {
       var self = this;
       var fireHandler = function (e) {
         var handler = self.settings.configuration.handlers[jT.$(this).data('handler')];
@@ -70,8 +70,8 @@ var jToxQuery = (function () {
           console.log("jToxQuery: referring unknown handler: " + jT.$(this).data('handler'));
       };
       
-      jT.$('.jtox-handler', root).on('change', fireHandler);
-      jT.$('button.jtox-handler', root).on('click', fireHandler);
+      jT.$(document).on('change', '.jtox-handler', fireHandler);
+      jT.$(document).on('click', 'button.jtox-handler', fireHandler);
     },
     
     /* Perform the actual query, traversing all the widgets and asking them to
@@ -122,7 +122,6 @@ var jToxSearch = (function () {
     self.settings = jT.$.extend({}, defaultSettings, jT.settings, settings);
     self.rootElement.appendChild(jT.getTemplate('#jtox-search'));
     self.queryKit = jT.parentKit(jToxQuery, self.rootElement);
-    self.queryKit.initHandlers(root);
     
     self.search = { mol: "", type: ""};
     

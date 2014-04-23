@@ -7,6 +7,7 @@
 var jToxDataset = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     shortStars: false,
+    selectable: false,
     sDom: "<Fi>rt",
     /* listUri */
     configuration: { 
@@ -67,6 +68,20 @@ var jToxDataset = (function () {
         self.settings.configuration.columns.dataset.Stars.sWidth = "40px";
       }
       
+      if (self.settings.selectable) {
+        var oldFn = self.settings.configuration.columns.dataset.Id.mRender;
+        self.settings.configuration.columns.dataset.Id.mRender = function (data, type, full) {
+          var oldRes = oldFn(data, type, full);
+          if (type != 'display')
+            return oldRes;
+          
+          return  '<input type="checkbox" value="' + full.URI + '"' +
+                  (!!self.settings.selectionHandler ? ' class="jtox-handler" data-handler="' + self.settings.selectionHandler + '"' : '') +
+                  '/>' + oldRes;
+        }
+        self.settings.configuration.columns.dataset.Id.sWidth = "60px";
+      }
+      
       // READYY! Go and prepare THE table.
       self.table = jT.$('table', self.rootElement).dataTable({
         "bPaginate": false,
@@ -90,11 +105,25 @@ var jToxDataset = (function () {
       if (uri == null)
         uri = self.settings.baseUrl + '/dataset';
       
+      jT.$(self.table).dataTable().fnClearTable();
       jT.call(self, uri, function (result) {
         if (!!result) {
           jT.$(self.table).dataTable().fnAddData(result.dataset);
         }
       });
+    },
+    
+    query: function (uri) {
+      this.listDatasets(uri);
+    },
+    
+    modifyUri: function (uri) {
+      jT.$('input[type="checkbox"]', this.rootElement).each(function () {
+        if (this.checked)
+          uri = ccLib.addParameter(uri, 'dataset_uris[]=' + encodeURIComponent(this.value));
+      })
+      
+      return uri;
     }
   };
   

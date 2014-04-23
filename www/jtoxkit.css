@@ -401,6 +401,9 @@ td.jtox-multi table {
   font-size: larger;
 }
 
+.jtox-toolkit .transparent {
+  opacity: 0.3;
+}
 
 .jtox-toolkit .paddingless {
   padding: 0px !important;
@@ -426,7 +429,6 @@ td.jtox-multi table {
 .jtox-toolkit .dataTables_length label select,
 .jtox-inline {
   display: inline-block;
-  width: auto;  
 }
 
 .jtox-toolkit table.dataTable td,
