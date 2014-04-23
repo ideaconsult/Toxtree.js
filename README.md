@@ -6,7 +6,7 @@ approach for using any or all of available front ends in third-party web pages.
 Each different front-end is referred as _kit_. Currently available are:
 
 - `study` - [IUCLID5](http://iuclid.eu/) studies visuzalizer... [more](#jtoxstudy)
-- `dataset` - viewer for dataset query results... [more](#jtoxdataset)
+- `compound` - viewer for compound datasets and query results... [more](#jtoxcompound)
 - `query` - a wrapper around other kits and widgets, making them work together... [more](#jtoxquery).
 - `tree` - a Web front end to OpenTox services. Currently developed as standalone web front-end and soon-to-be integrated in the kit...[more](#jtoxtree).
 
@@ -79,13 +79,14 @@ Although different kits can have different configuration parameters, these are c
 - **`onConnect`** (attr. `data-on-connect`), _optional_: a function name, or function to be called just before any AJAX call.
 - **`onSuccess`** (attr. `data-on-success`), _optional_: a function name, or function to be called upon successful complete of a AJAX call.
 - **`onError`** (attr. `data-on-error`), _optional_: a function name, or function to be called when there's an error on AJAX call. The passed _callback_ to `jT.call()` is still called, but with _null_ result.
+- **`sDom`** (attr. `data-s-dom`). _optional_: a redefinition of sDom setting for dataTables instance. It does not apply for [jToxCompound](#jtoxcompound), because it uses two, synchronized tables and custom filter and pagination controls.
 - **`configuration`** (attr. `data-config-file`), _optional_: a way to provide kit-specific configuration, like columns visibility and/or ordering for _study_ kit. When provided as `data-config-file` parameter, the configuration file is downloaded and passed as configuration parameter to kit initialization routine.
 
 As, can be seen, the later three callbacks can be local for each kit, so it is possible to report connection statuses in the most appropriate for the kit's way. This is also true for Url's, which means that not all kits, needs to communicate with one and the same server.
 
 ### Common methods
 
-There are certain methods that are common for all kits and some kit wrappers (like _jToxQuery_) rely on having them:
+There are certain methods that are common for all kits and some kit wrappers - like [jToxQuery](#jtoxquery) - rely on having them:
 
 ```
 jToxKit.initKit(element)
@@ -133,7 +134,7 @@ When a certain kit is wrapped with another one, like the way `jToxQuery` wraps `
 ```
 <kit instance>.query(uri)
 ```
-A shorthand, general method, that _jToxQuery_ can call on any (main) kit, to perform it's prederred query method. For example for [jToxCompound](#jtoxdataset) this method is another way to call `<jToxStudy>.queryDataset(datasetUri)`.
+A shorthand, general method, that _jToxQuery_ can call on any (main) kit, to perform it's prederred query method. For example for [jToxCompound](#jtoxcompound) this method is another way to call `<jToxCompound>.queryDataset(datasetUri)`.
 
 
 <a name="jtoxstudy"></a> jToxStudy kit
@@ -240,10 +241,10 @@ The `substanceUri` is the same as in previous function, but this one takes care 
 ```
 The `substanceUri` is the same as in previous function. This one queries for a summary of all studies available for the given substance. It fills up the numbers in the studies' tabs and prepares the tables for particular queries later on, which are executes upon each tab's activation.
 
-<a name="jtoxdataset"></a> jToxCompound kit
+<a name="jtoxcompound"></a> jToxCompound kit
 ------------------------------------------
 
-An OpenTox dataset management and visualization tool. Since _dataset_ is very basic term in OpenTox hierarchy it is used in other places like [jToxQuery](#jtoxquery) and [jToxTree kit](#jtoxtree). It is vital that the scope of this kit it _not_ to provide complete, versatile interface for making queries, linking between them, etc. - it aims at visualizing and providing basic navigation within _one_ particular query. It is designed to be easily configurable - up to the point of being only one table, and easily driven with API calls, which are explained below.
+An OpenTox compound dataset management and visualization tool. Since _compound_ is very basic term in OpenTox hierarchy it is used in other places like [jToxQuery](#jtoxquery) and [jToxTree kit](#jtoxtree). It is vital that the scope of this kit it _not_ to provide complete, versatile interface for making queries, linking between them, etc. - it aims at visualizing and providing basic navigation within _one_ particular query. It is designed to be easily configurable - up to the point of being only one table, and easily driven with API calls, which are explained below.
 
 As a consequence of this perspective, all functionality as filtering and ordering, is applied to the currently downloaded dataset entries, i.e. - one "page" of the dataset. This is due to the fact that for many datasets it is impossible to have general procedures applied to them, thus the scope of this kit is limited to local visuzalization functions only.
 
@@ -666,7 +667,7 @@ It is as simple as running the `build.sh` script! It can, even be run without pa
 $ ./build.sh 
 Clearing old files...
 Backing tool [ketcher]...
-Processing targets [common toxdataset toxstudy jtoxkit]...
+Processing targets [common toxcompound toxstudy jtoxkit]...
 Merging JS files from [../scripts] ...
 Adding html2js transformed ones from [..]...
 Merging CSS files from [../styles] ...

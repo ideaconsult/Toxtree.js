@@ -7,6 +7,7 @@
 var jToxStudy = (function () {
   var defaultSettings = {
     tab: null,
+    sDom: "rt<Fip>",
     configuration: { 
       columns: {
       	"_": {
@@ -299,7 +300,7 @@ var jToxStudy = (function () {
           "bProcessing": true,
           "bLengthChange": false,
   				"bAutoWidth": false,
-          "sDom" : self.settings.configuration.sDom || "rt<Fip>",
+          "sDom" : self.settings.sDom || "rt<Fip>",
           "aoColumns": colDefs,
           "fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
             var el = jT.$('.jtox-study-title .data-field', jT.$(this).parents('.jtox-study'))[0];
@@ -473,7 +474,7 @@ var jToxStudy = (function () {
   				"bSearchable": true,
   				"bProcessing" : true,
   				"bPaginate" : true,
-          "sDom" : self.settings.configuration.sDom || "rt<Fip>",
+          "sDom" : self.settings.sDom || "rt<Fip>",
   				"sPaginate" : ".dataTables_paginate _paging",
   				"bAutoWidth": false,
   				"oLanguage": {
