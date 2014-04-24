@@ -557,7 +557,7 @@ More columns can be added, or these can be turned off just by adding `bVisible: 
 <a name="jtoxmodel"></a> jToxModel kit
 ------------------------------------------
 
-The model(s) browsing kit - pretty similar to [jToxDataet](#jtoxdataset) as functionality and configuration. It is rather simple and is mainly used as a widget within [jToxQuery](#jtoxquery) kit.
+The model(s) and algorithm(s) browsing kit - pretty similar to [jToxDataet](#jtoxdataset) as functionality and configuration. However, it has two modes of running - algorithm listing or model listing, and it is upon initialization. This kit is mainly used as a widget within [jToxQuery](#jtoxquery) kit.
 
 ##### Parameters
 
@@ -565,11 +565,13 @@ There are few things that can be setup from outside:
 
 - **`selectable`** (attr. `data-selectable`), _optional_: Determines whether the widget should show selection box in the first column. The `input` box added has the model _URI_ as it's value. Default: _false_.
 - **`selectionHandler`** (attr. `data-selection-handler`), _optional_: Used with combination of previous parameter (_selectable_). If this one is provided it is added as `data-handler`, i.e. - it gives the name of the handler to be invokes by _jToxQuery_ when the selection box has changed it's value. Default: _null_.
-- **`algorithmFilter`** (attr. `data-algorithm-filter`), _optional_: Determines whether to add a link for viewing models filtered on specific algorithm. It'll put a link on each row and make a new request for the whole page. Other way of filtering will be to use the _dataTable_'s filter box, which won't navigate to a different page. Default: _false_.
+- **`algorithmLink`** (attr. `data-algorithm-link`), _optional_: Determines whether to add a link for viewing models filtered on specific algorithm. It'll put a link on each row and make a new request for the whole page. Other way of filtering will be to use the _dataTable_'s filter box, which won't navigate to a different page. Default: _false_.
+- **`algorithms`** (attr. `data-algorithms`), _optional_: Whether to list available algorithms, rather than available models. Default: _false_.
 - **`maxStars`** (attr. `data-max-stars`), _optional_: How many stars are considered maximum, when building the long version of ratings. Default: _10_.
 - **`shortStars`** (attr. `data-short-stars`), _optional_: Whether to show show star rating notation, i.e. - one star and the number of stars next to it, opposed to the long (default) version - always showing the maximum number of stars, with given number of them - highlighted. Default is _false_.
 - **`sDom`** (attr. `data-s-dom`), _optional_: The redefinition of _sDom_ attribute for the table. Default _"\<Fif\>rt"_.
 - **`modelUri`** (attr. `data-model-uri`), _optional_: The address to query for list of models. If none is bassed the standard `<baseURL>/model` is used.
+- **`algorithmNeedle`** (attr. `data-algorithms-needle`), _optional_: If algorithms listing mode is selected (`algorithms` = _true_) - this is the needle to be used when listing them. Default: _null_.
 
 
 ##### Methods
@@ -578,9 +580,20 @@ They are not plenty - just a few:
 
 ```
 <jToxModel>.listModels(uri)
-<jToxModel>.query(uri)
 ```
 Makes a query for retrieving the list of models from the server. If `uri` passed is null - the default form: `<baseURL>/model` is used.
+
+
+```
+<jToxModel>.listAlgorithms(needle)
+```
+Makes a query for retrieving all available algorithms from the server. If `needle` is passed it is used in the search of the form: `<baseURL>/algorithms?search=<needle>`.
+
+```
+<jToxModel>.query(uri)
+```
+This is a shortcut to either _listModels()_ or _listAlgorithms()_ method, depending on `settings.algorithms` parameter.
+
 
 ```
 <jToxModel>.modifyUri(uri)
@@ -589,19 +602,25 @@ The required method for this kit to be part of [jToxQuery](#jtoxquery) kit. What
 
 ##### Configuration
 
-All the columns of the table can be configured, the same way [jToxStudy](#jtoxstudy) does. All column definitions are found under `model` property. The default set looks like this:
+All the columns of the table can be configured, the same way [jToxStudy](#jtoxstudy) does. All column definitions are found under `model` or `algorithm` roperties, depending on the mode the kit is running. The default set looks like this:
 
 ```
 configuration: { 
- columns : {
-   model: {
+  columns : {
+    model: {
      'Id': { iOrder: 0, sTitle: "Id", mData: "id", sWidth: "50px", mRender: function ... },
      'Title': { iOrder: 1, sTitle: "Title", mData: "title", sDefaultContent: "-" },
      'Stars': { iOrder: 2, sTitle: "Stars", mData: "stars", sWidth: "160px" },
      'Algorithm': {iOrder: 3, sTitle: "Algorithm", mData: "algorithm" },
      'Info': { iOrder: 4, sTitle: "Info", mData: "trainingDataset", mRender: function ... }
-   }
- }
+    },
+    algorithm: {
+     'Id': { iOrder: 0, sTitle: "Id", mData: "id", sWidth: "150px", mRender: function ... },
+     'Title': { iOrder: 1, sTitle: "Title", mData: "name", sDefaultContent: "-" },
+     'Description': {iOrder: 2, sTitle: "Description", sClass: "shortened", mData: "description", sDefaultContent: '-' },
+     'Info': { iOrder: 3, sTitle: "Info", mData: "format", mRender: function ... }
+    }
+  }
 }
 
 ```

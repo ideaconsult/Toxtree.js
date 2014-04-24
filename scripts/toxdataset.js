@@ -129,7 +129,7 @@ var jToxDataset = (function () {
       if (type != 'display')
         return oldRes;
       
-      return  '<input type="checkbox" value="' + full.URI + '"' +
+      return  '<input type="checkbox" value="' + (full.URI || full.uri) + '"' +
               (!!kit.settings.selectionHandler ? ' class="jtox-handler" data-handler="' + kit.settings.selectionHandler + '"' : '') +
               '/>' + oldRes;
     }

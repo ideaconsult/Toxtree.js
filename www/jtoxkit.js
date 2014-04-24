@@ -1553,7 +1553,7 @@ var jToxDataset = (function () {
       if (type != 'display')
         return oldRes;
       
-      return  '<input type="checkbox" value="' + full.URI + '"' +
+      return  '<input type="checkbox" value="' + (full.URI || full.uri) + '"' +
               (!!kit.settings.selectionHandler ? ' class="jtox-handler" data-handler="' + kit.settings.selectionHandler + '"' : '') +
               '/>' + oldRes;
     }
@@ -1572,7 +1572,9 @@ var jToxModel = (function () {
     selectable: false,
     selectionHandler: null,
     maxStars: 10,
-    algorithmFilter: true,
+    algorithmLink: true,
+    algorithms: false,
+    algorithmNeedle: null,
     sDom: "<Fif>rt",
     /* modelUri */
     configuration: { 
@@ -1591,6 +1593,22 @@ var jToxModel = (function () {
               return data;
             return '<a href="' + data + '"><span class="ui-icon ui-icon-calculator"></span>&nbsp;training set</a>';
           } }
+        },
+        algorithm: {
+          'Id': { iOrder: 0, sTitle: "Id", mData: "id", sWidth: "150px", mRender: function (data, type, full) {
+            if (type != 'display')
+              return data;
+            return '<a target="_blank" href="' + full.uri + '"><span class="ui-icon ui-icon-link jtox-inline"></span> M' + data + '</a>';
+          }},
+          'Title': { iOrder: 1, sTitle: "Title", mData: "name", sDefaultContent: "-" },
+          'Description': {iOrder: 2, sTitle: "Description", sClass: "shortened", mData: "description", sDefaultContent: '-' },
+          'Info': { iOrder: 3, sTitle: "Info", mData: "format", mRender: function (data, type, full) {
+            if (type != 'display' || !data)
+              return data;
+            return  '<strong>' + data + '</strong>; ' +
+                    (full.isSupevised ? '<strong>Supervised</strong>; ' : '') +
+                    '<a target="_blank" href="' + full.implementationOf + '">' + full.implementationOf + '</a>';
+          } }
         }
       }
     }
@@ -1608,7 +1626,7 @@ var jToxModel = (function () {
     self.init();
         
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
-    self.listModels(self.settings.modelUri)
+    self.query();
   };
   
   cls.prototype = {
@@ -1616,33 +1634,34 @@ var jToxModel = (function () {
       var self = this;
       
       // but before given it up - make a small sorting..
-      self.settings.configuration.columns.model.Stars.mRender = function (data, type, full) { return type != 'display' ? data : jToxDataset.putStars(self, data, "Model star rating (worst) 1 - 10 (best)"); };
-      if (self.settings.shortStars) {
-        self.settings.configuration.columns.model.Stars.sWidth = "40px";
-      }
-      
-      // deal if the selection is chosen
-      if (self.settings.selectable) {
-        self.settings.configuration.columns.model.Id.mRender = jToxDataset.addSelection(self, self.settings.configuration.columns.model.Id.mRender);
-        self.settings.configuration.columns.model.Id.sWidth = "60px";
-      }
-      
-      // add this function here.
-      self.settings.configuration.columns.model.Algorithm.mRender = function (data, type, full) { 
-        var name = data.URI.match(/http:\/\/.*\/algorithm\/(\w+).*/)[1];
-        if (type != 'display')
-          return name;
-        var res = '<a target="_blank" href="' + data.URI + '">' + 
-                  '<img src="' + (self.settings.baseUrl || jT.settings.baseUrl) + data.img + '"/>&nbsp;' +
-                  name + 
-                  '</a>';
-        if (self.settings.algorithmFilter) {
-          res += '<a href="' + ccLib.addParameter(self.modelUri, 'algorithm=' + encodeURIComponent(data.URI)) + '"><span class="ui-icon ui-icon-calculator float-right" title="Show models using algorithm ' + name + '"></span></a>';
+      if (!self.settings.algorithms) {
+        self.settings.configuration.columns.model.Stars.mRender = function (data, type, full) { return type != 'display' ? data : jToxDataset.putStars(self, data, "Model star rating (worst) 1 - 10 (best)"); };
+        if (self.settings.shortStars) {
+          self.settings.configuration.columns.model.Stars.sWidth = "40px";
         }
 
-        return res;
-      };
+        self.settings.configuration.columns.model.Algorithm.mRender = function (data, type, full) { 
+          var name = data.URI.match(/http:\/\/.*\/algorithm\/(\w+).*/)[1];
+          if (type != 'display')
+            return name;
+          var res = '<a target="_blank" href="' + data.URI + '">' + 
+                    '<img src="' + (self.settings.baseUrl || jT.settings.baseUrl) + data.img + '"/>&nbsp;' +
+                    name + 
+                    '</a>';
+          if (self.settings.algorithmLink) {
+            res += '<a href="' + ccLib.addParameter(self.modelUri, 'algorithm=' + encodeURIComponent(data.URI)) + '"><span class="ui-icon ui-icon-calculator float-right" title="Show models using algorithm ' + name + '"></span></a>';
+          }
+  
+          return res;
+        };
+      }
       
+      var cat = self.settings.algorithms ? 'algorithm' : 'model';
+      // deal if the selection is chosen
+      if (self.settings.selectable) {
+        self.settings.configuration.columns[cat].Id.mRender = jToxDataset.addSelection(self, self.settings.configuration.columns.model.Id.mRender);
+        self.settings.configuration.columns[cat].Id.sWidth = "60px";
+      }
       
       // READYY! Go and prepare THE table.
       self.table = jT.$('table', self.rootElement).dataTable({
@@ -1650,7 +1669,7 @@ var jToxModel = (function () {
         "bLengthChange": false,
 				"bAutoWidth": false,
         "sDom" : self.settings.sDom,
-        "aoColumns": jT.processColumns(self, 'model'),
+        "aoColumns": jT.processColumns(self, cat),
 				"oLanguage": {
           "sLoadingRecords": "No models found.",
           "sZeroRecords": "No models found.",
@@ -1677,12 +1696,35 @@ var jToxModel = (function () {
       });
     },
     
-    runPrediction: function (modelUri, compoundUri, callback) {
-      // TODO: implement this here.
+    /* List algorithms that contain given 'needle' in their name
+    */
+    listAlgorithms: function (needle) {
+      var self = this;
+      var uri = self.settings.baseUrl + '/algorithm';
+      if (!!needle)
+        uri = ccLib.addParameter(uri, 'search=' + needle);
+      jT.call(self, uri, function (result) {
+        if (!!result) {
+          self.algorithms = result.algorithm;
+          jT.$(self.table).dataTable().fnAddData(result.algorithm);
+        }
+      });
+    },
+    
+    getModel: function (algoUri, callback) {
+      // TODO: make a request for getting / creating a model for given algorithm
+    },
+    
+    runPrediction: function (compoundUri, modelUri, callback) {
+      // TODO: make a POST request for prediction for given compound on given model
+      // the callback is returned after the task polling is done.
     },
     
     query: function (uri) {
-      this.listModels(uri);
+      if (this.settings.algorithms)
+        this.listAlgorithms(this.settings.algorithmNeedle = (uri || this.settings.algorithmNeedle));
+      else
+        this.listModels(this.settings.modelUri = (uri || this.settings.modelUri));
     },
     
     modifyUri: function (uri) {
