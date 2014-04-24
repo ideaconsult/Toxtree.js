@@ -302,8 +302,7 @@ td.jtox-multi table {
   border-left: 1px solid #ccc; 
   -moz-border-radius: 7px;
   -webkit-border-radius: 7px;
-  border-radius: 7px;
-  
+  border-radius: 7px; 
 }
 
 .jtox-foldable:hover {
@@ -325,7 +324,7 @@ td.jtox-multi table {
 }
 
 .jtox-foldable>.title {
-  background: url(../images/sort_desc.png) right top no-repeat;
+  background: url(../images/sort_asc.png) right top no-repeat;
   background-size: 19px 19px;
 }
 
