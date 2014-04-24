@@ -1433,6 +1433,7 @@ var jToxDataset = (function () {
     shortStars: false,
     maxStars: 10,
     selectable: false,
+    selectionHandler: null,
     sDom: "<Fif>rt",
     /* listUri */
     configuration: { 
@@ -1569,10 +1570,11 @@ var jToxDataset = (function () {
 var jToxModel = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     selectable: false,
+    selectionHandler: null,
     maxStars: 10,
     algorithmFilter: true,
     sDom: "<Fif>rt",
-    /* listUri */
+    /* modelUri */
     configuration: { 
       columns : {
         model: {
@@ -1606,7 +1608,7 @@ var jToxModel = (function () {
     self.init();
         
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
-    self.listModels(self.settings.listUri)
+    self.listModels(self.settings.modelUri)
   };
   
   cls.prototype = {

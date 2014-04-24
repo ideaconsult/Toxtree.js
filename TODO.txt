@@ -1,5 +1,6 @@
 TODO:
-- 
+- docs: describe the new configuration option (citing a global variable)
+- docs: jToxModel & jToxDataset
 
 IDEAS?
 - (global) extractFeature(dataset, featureId) - return an array of values of that feature for each entry in the dataset. (Can be used for diagram)

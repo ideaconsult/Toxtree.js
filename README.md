@@ -7,6 +7,8 @@ Each different front-end is referred as _kit_. Currently available are:
 
 - `study` - [IUCLID5](http://iuclid.eu/) studies visuzalizer... [more](#jtoxstudy)
 - `compound` - viewer for compound datasets and query results... [more](#jtoxcompound)
+- `dataset` - viewer and selector of list of datasets... [more](#jtoxdataset)
+- `model` - view and selector of list of available models/algorithms... [more](#jtoxmodel)
 - `query` - a wrapper around other kits and widgets, making them work together... [more](#jtoxquery).
 - `tree` - a Web front end to OpenTox services. Currently developed as standalone web front-end and soon-to-be integrated in the kit...[more](#jtoxtree).
 
@@ -80,9 +82,10 @@ Although different kits can have different configuration parameters, these are c
 - **`onSuccess`** (attr. `data-on-success`), _optional_: a function name, or function to be called upon successful complete of a AJAX call.
 - **`onError`** (attr. `data-on-error`), _optional_: a function name, or function to be called when there's an error on AJAX call. The passed _callback_ to `jT.call()` is still called, but with _null_ result.
 - **`sDom`** (attr. `data-s-dom`). _optional_: a redefinition of sDom setting for dataTables instance. It does not apply for [jToxCompound](#jtoxcompound), because it uses two, synchronized tables and custom filter and pagination controls.
-- **`configuration`** (attr. `data-config-file`), _optional_: a way to provide kit-specific configuration, like columns visibility and/or ordering for _study_ kit. When provided as `data-config-file` parameter, the configuration file is downloaded and passed as configuration parameter to kit initialization routine.
+- **`configuration`** (attr. `data-configuration`), _optional_: a way to provide kit-specific configuration, like columns visibility and/or ordering for _study_ kit. If it is recognized as string value - a global vairbale with this name is used, otherwise - the passed object itself. No default value.
+- **`configFile`** (attr. `data-config-file`) _optional_: Another way to provide configuration for a kit, but this time - providing the name/path of external JSON file, which is downloaded and used as configuration parameter. No default value.
 
-As, can be seen, the later three callbacks can be local for each kit, so it is possible to report connection statuses in the most appropriate for the kit's way. This is also true for Url's, which means that not all kits, needs to communicate with one and the same server.
+As, can be seen, the three connection callbacks can be local for each kit, so it is possible to report connection statuses in the most appropriate for the kit's way. This is also true for Url's, which means that not all kits, needs to communicate with one and the same server.
 
 ### Common methods
 
@@ -242,7 +245,7 @@ The `substanceUri` is the same as in previous function, but this one takes care 
 The `substanceUri` is the same as in previous function. This one queries for a summary of all studies available for the given substance. It fills up the numbers in the studies' tabs and prepares the tables for particular queries later on, which are executes upon each tab's activation.
 
 <a name="jtoxcompound"></a> jToxCompound kit
-------------------------------------------
+--------------------------------------------
 
 An OpenTox compound dataset management and visualization tool. Since _compound_ is very basic term in OpenTox hierarchy it is used in other places like [jToxQuery](#jtoxquery) and [jToxTree kit](#jtoxtree). It is vital that the scope of this kit it _not_ to provide complete, versatile interface for making queries, linking between them, etc. - it aims at visualizing and providing basic navigation within _one_ particular query. It is designed to be easily configurable - up to the point of being only one table, and easily driven with API calls, which are explained below.
 
@@ -485,6 +488,125 @@ These two are shortcuts for the previous function, taking into account the curre
 <jToxCompound>.filterEntries(needle)
 ```
 Filter the presented entries with the given needle, finding substring match on each features, not marked with `search: false` in their definition.
+
+
+<a name="jtoxdataset"></a> jToxDataset kit
+------------------------------------------
+
+The dataset(s) browsing kit - if [jToxCompound](#jtoxcompound) is browsing entries within a data, this kit is browsing datasets on a server. It is rather simple and is mainly used as a widget within [jToxQuery](#jtoxquery) kit.
+
+##### Parameters
+
+There are few things that can be setup from outside:
+
+- **`selectable`** (attr. `data-selectable`), _optional_: Determines whether the widget should show selection box in the first column. The `input` box added has the dataset _URI_ as it's value. Default: _false_.
+- **`selectionHandler`** (attr. `data-selection-handler`), _optional_: Used with combination of previous parameter (_selectable_). If this one is provided it is added as `data-handler`, i.e. - it gives the name of the handler to be invokes by _jToxQuery_ when the selection box has changed it's value. Default: _null_.
+- **`maxStars`** (attr. `data-max-stars`), _optional_: How many stars are considered maximum, when building the long version of ratings. Default: _10_.
+- **`shortStars`** (attr. `data-short-stars`), _optional_: Whether to show show star rating notation, i.e. - one star and the number of stars next to it, opposed to the long (default) version - always showing the maximum number of stars, with given number of them - highlighted. Default is _false_.
+- **`sDom`** (attr. `data-s-dom`), _optional_: The redefinition of _sDom_ attribute for the table. Default _"\<Fif\>rt"_.
+- **`listUri`** (attr. `data-list-uri`), _optional_: The address to query for list of datasets. If none is bassed the standard `<baseURL>/dataset` is used.
+
+
+##### Methods
+
+They are not plenty - just a few:
+
+```
+<jToxDataset>.listDatasets(uri)
+<jToxDataset>.query(uri)
+```
+Makes a query for retrieving the list of datasets from the server. If `uri` passed is null - the default form: `<baseURL>/dataset` is used.
+
+```
+<jToxDataset>.modifyUri(uri)
+```
+The required method for this kit to be part of [jToxQuery](#jtoxquery) kit. What it does is to scan all input boxes, which means `selectable` should be set to _true_, and add `dataset_uris[]=<selected uri>` parameter to the given `uri` for each of selected datasets.
+
+There are several public static methods, that can be used from elsewhere:
+
+```
+jToxDataset.putStars(kit, stars, title)
+```
+Returns an _html_ text with given amount of `stars` put, taking into account the kit's settings for _maxStars_ and _shortStars_. The _title_ is the tooltip that is set for the block.
+
+```
+jToxDataset.addSelection(kit, oldFn)
+```
+Returns a _dataTables_ rendering function (i.e. `function (data, type, full)`), using the provided old one - `oldFn`, and adding a selection box, with proper handling before it.
+
+##### Configuration
+
+All the columns of the table can be configured, the same way [jToxStudy](#jtoxstudy) does. All column definitions are found under `dataset` property. The default set looks like this:
+
+```
+configuration: { 
+  columns : {
+    dataset: {
+      'Id': { iOrder: 0, sTitle: "Id", mData: "URI", sWidth: "50px", mRender: function ... },
+      'Title': { iOrder: 1, sTitle: "Title", mData: "title", sDefaultContent: "-" },
+      'Stars': { iOrder: 2, sTitle: "Stars", mData: "stars", sWidth: "160px" },
+      'Info': { iOrder: 3, sTitle: "Info", mData: "rights", mRender: function ... }
+    }
+  }
+}
+
+```
+
+More columns can be added, or these can be turned off just by adding `bVisible: false` to the certain definition.
+
+<a name="jtoxmodel"></a> jToxModel kit
+------------------------------------------
+
+The model(s) browsing kit - pretty similar to [jToxDataet](#jtoxdataset) as functionality and configuration. It is rather simple and is mainly used as a widget within [jToxQuery](#jtoxquery) kit.
+
+##### Parameters
+
+There are few things that can be setup from outside:
+
+- **`selectable`** (attr. `data-selectable`), _optional_: Determines whether the widget should show selection box in the first column. The `input` box added has the model _URI_ as it's value. Default: _false_.
+- **`selectionHandler`** (attr. `data-selection-handler`), _optional_: Used with combination of previous parameter (_selectable_). If this one is provided it is added as `data-handler`, i.e. - it gives the name of the handler to be invokes by _jToxQuery_ when the selection box has changed it's value. Default: _null_.
+- **`algorithmFilter`** (attr. `data-algorithm-filter`), _optional_: Determines whether to add a link for viewing models filtered on specific algorithm. It'll put a link on each row and make a new request for the whole page. Other way of filtering will be to use the _dataTable_'s filter box, which won't navigate to a different page. Default: _false_.
+- **`maxStars`** (attr. `data-max-stars`), _optional_: How many stars are considered maximum, when building the long version of ratings. Default: _10_.
+- **`shortStars`** (attr. `data-short-stars`), _optional_: Whether to show show star rating notation, i.e. - one star and the number of stars next to it, opposed to the long (default) version - always showing the maximum number of stars, with given number of them - highlighted. Default is _false_.
+- **`sDom`** (attr. `data-s-dom`), _optional_: The redefinition of _sDom_ attribute for the table. Default _"\<Fif\>rt"_.
+- **`modelUri`** (attr. `data-model-uri`), _optional_: The address to query for list of models. If none is bassed the standard `<baseURL>/model` is used.
+
+
+##### Methods
+
+They are not plenty - just a few:
+
+```
+<jToxModel>.listModels(uri)
+<jToxModel>.query(uri)
+```
+Makes a query for retrieving the list of models from the server. If `uri` passed is null - the default form: `<baseURL>/model` is used.
+
+```
+<jToxModel>.modifyUri(uri)
+```
+The required method for this kit to be part of [jToxQuery](#jtoxquery) kit. What it does is to scan all input boxes, which means `selectable` should be set to _true_, and add `feature_uris[]=<selected uri>` parameter to the given `uri` for each of selected models.
+
+##### Configuration
+
+All the columns of the table can be configured, the same way [jToxStudy](#jtoxstudy) does. All column definitions are found under `model` property. The default set looks like this:
+
+```
+configuration: { 
+ columns : {
+   model: {
+     'Id': { iOrder: 0, sTitle: "Id", mData: "id", sWidth: "50px", mRender: function ... },
+     'Title': { iOrder: 1, sTitle: "Title", mData: "title", sDefaultContent: "-" },
+     'Stars': { iOrder: 2, sTitle: "Stars", mData: "stars", sWidth: "160px" },
+     'Algorithm': {iOrder: 3, sTitle: "Algorithm", mData: "algorithm" },
+     'Info': { iOrder: 4, sTitle: "Info", mData: "trainingDataset", mRender: function ... }
+   }
+ }
+}
+
+```
+
+More columns can be added, or these can be turned off just by adding `bVisible: false` to the certain definition.
 
 
 <a name="jtoxquery"></a> jToxQuery kit

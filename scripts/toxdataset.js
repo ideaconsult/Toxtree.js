@@ -9,6 +9,7 @@ var jToxDataset = (function () {
     shortStars: false,
     maxStars: 10,
     selectable: false,
+    selectionHandler: null,
     sDom: "<Fif>rt",
     /* listUri */
     configuration: { 
