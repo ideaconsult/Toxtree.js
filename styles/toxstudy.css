@@ -10,11 +10,6 @@ div.jtox-substance {
   padding: 5px 5px 35px 5px;
 }
 
-.jtox-study.folded table,
-.jtox-study.folded div.dataTables_wrapper {
-  display: none;
-}
-
 .jtox-compoblock {
   margin-top: 25px;
   margin-bottom: 45px;  
@@ -32,13 +27,13 @@ div.jtox-substance {
   text-align: right;
 }
 
-div.jtox-study.unloaded .jtox-study-title,
-div.jtox-study.unloaded.folded .jtox-study-title {
+div.jtox-study.unloaded div.title,
+div.jtox-study.unloaded.folded div.title {
   background: url(../images/waiting_small.gif) right top no-repeat;
   background-size: 16px 16px;
 }
 
-.jtox-toolkit .unloaded table {
+div.jtox-study.unloaded table {
   display: none;
 }
 
@@ -46,21 +41,11 @@ div.jtox-study.unloaded.folded .jtox-study-title {
   font-size: 80%;
 }
 
-div.jtox-study.loaded.folded .jtox-study-title {
-  background: url(../images/sort_desc.png) right top no-repeat;
-  background-size: 19px 19px;
-}
-
-div.jtox-study.loaded .jtox-study-title {
-  background: url(../images/sort_asc.png) right top no-repeat;
-  background-size: 19px 19px;
-}
-
 div.jtox-study.folded {
   padding-bottom: 5px;
 }
 
-div.jtox-study .jtox-study-title {
+div.jtox-study .title {
   font-weight: bold;
   clear: both;
   padding: 0px;

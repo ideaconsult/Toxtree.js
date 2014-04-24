@@ -127,11 +127,6 @@ var jToxStudy = (function () {
         theCat = jT.getTemplate('#jtox-study');
         tab.appendChild(theCat);
         jT.$(theCat).addClass(category);
-        
-        // install the click handler for fold / unfold
-        jT.$('.jtox-study-title', theCat).click(function() {
-          jT.$(theCat).toggleClass('folded');
-        });
       }
       
       return theCat;
@@ -303,7 +298,7 @@ var jToxStudy = (function () {
           "sDom" : self.settings.sDom || "rt<Fip>",
           "aoColumns": colDefs,
           "fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
-            var el = jT.$('.jtox-study-title .data-field', jT.$(this).parents('.jtox-study'))[0];
+            var el = jT.$('.title .data-field', jT.$(this).parents('.jtox-study'))[0];
             el.innerHTML = self.updateCount(el.innerHTML, iTotal);
             return sPre;
           },

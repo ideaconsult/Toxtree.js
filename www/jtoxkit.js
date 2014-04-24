@@ -1868,11 +1868,6 @@ var jToxStudy = (function () {
         theCat = jT.getTemplate('#jtox-study');
         tab.appendChild(theCat);
         jT.$(theCat).addClass(category);
-        
-        // install the click handler for fold / unfold
-        jT.$('.jtox-study-title', theCat).click(function() {
-          jT.$(theCat).toggleClass('folded');
-        });
       }
       
       return theCat;
@@ -2044,7 +2039,7 @@ var jToxStudy = (function () {
           "sDom" : self.settings.sDom || "rt<Fip>",
           "aoColumns": colDefs,
           "fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
-            var el = jT.$('.jtox-study-title .data-field', jT.$(this).parents('.jtox-study'))[0];
+            var el = jT.$('.title .data-field', jT.$(this).parents('.jtox-study'))[0];
             el.innerHTML = self.updateCount(el.innerHTML, iTotal);
             return sPre;
           },
@@ -2495,7 +2490,9 @@ window.jT = window.jToxKit = {
     	self.initTemplates();
   
       // make this handler for UUID copying. Once here - it's live, so it works for all tables in the future
-      jT.$(document).on('click', '.jtox-toolkit span.ui-icon-copy', function (e) { ccLib.copyToClipboard(jT.$(this).data('uuid')); return false;});
+      self.$(document).on('click', '.jtox-toolkit span.ui-icon-copy', function () { ccLib.copyToClipboard(self.$(this).data('uuid')); return false;});
+      // install the click handler for fold / unfold
+      self.$(document).on('click', '.jtox-foldable>.title', function() { self.$(this).parent().toggleClass('folded'); });
 
       // scan the query parameter for settings
   		var url = self.settings.fullUrl = ccLib.parseURL(document.location);
@@ -2983,8 +2980,10 @@ jT.templates['composition-block']  =
 
 jT.templates['one-study']  = 
 "    <div id=\"jtox-study\" class=\"jtox-study jtox-foldable folded unloaded\">" +
-"      <div class=\"jtox-study-title\"><p class=\"data-field\" data-field=\"title\">? (0)</p></div>" +
-"      <table class=\"jtox-study-table\"></table>" +
+"      <div class=\"title\"><p class=\"data-field\" data-field=\"title\">? (0)</p></div>" +
+"      <div class=\"content\">" +
+"        <table class=\"jtox-study-table content\"></table>" +
+"      </div>" +
 "    </div>" +
 ""; // end of #jtox-study 
 

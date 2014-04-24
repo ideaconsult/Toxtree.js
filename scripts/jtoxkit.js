@@ -101,7 +101,9 @@ window.jT = window.jToxKit = {
     	self.initTemplates();
   
       // make this handler for UUID copying. Once here - it's live, so it works for all tables in the future
-      jT.$(document).on('click', '.jtox-toolkit span.ui-icon-copy', function (e) { ccLib.copyToClipboard(jT.$(this).data('uuid')); return false;});
+      self.$(document).on('click', '.jtox-toolkit span.ui-icon-copy', function () { ccLib.copyToClipboard(self.$(this).data('uuid')); return false;});
+      // install the click handler for fold / unfold
+      self.$(document).on('click', '.jtox-foldable>.title', function() { self.$(this).parent().toggleClass('folded'); });
 
       // scan the query parameter for settings
   		var url = self.settings.fullUrl = ccLib.parseURL(document.location);
