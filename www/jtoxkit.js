@@ -1524,7 +1524,7 @@ var jToxDataset = (function () {
     modifyUri: function (uri) {
       jT.$('input[type="checkbox"]', this.rootElement).each(function () {
         if (this.checked)
-          uri = ccLib.addParameter(uri, 'dataset_uris[]=' + encodeURIComponent(this.value));
+          uri = ccLib.addParameter(uri, 'feature_uris[]=' + encodeURIComponent(this.value + '/feature'));
       })
       
       return uri;
@@ -1730,7 +1730,7 @@ var jToxModel = (function () {
     modifyUri: function (uri) {
       jT.$('input[type="checkbox"]', this.rootElement).each(function () {
         if (this.checked)
-          uri = ccLib.addParameter(uri, 'feature_uris[]=' + encodeURIComponent(this.value));
+          uri = ccLib.addParameter(uri, 'feature_uris[]=' + encodeURIComponent(this.value + '/predicted'));
       })
       
       return uri;
