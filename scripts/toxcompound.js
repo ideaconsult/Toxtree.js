@@ -11,6 +11,7 @@ var jToxCompound = (function () {
     "showControls": true,     // should we show the pagination/navigation controls.
     "pageSize": 20,           // what is the default (startint) page size.
     "pageStart": 0,           // what is the default startint point for entries retrieval
+    "rememberChecks": false,  // whether to remember feature-checkbox settings between queries
     "metricFeature": "http://www.opentox.org/api/1.1#Similarity",   // This is the default metric feature, if no other is specified
     "fnAccumulate": function(fId, oldVal, newVal, features) {
       if (ccLib.isNull(newVal))
@@ -141,6 +142,8 @@ var jToxCompound = (function () {
     var newDefs = jT.$.extend(true, { "configuration" : { "baseFeatures": baseFeatures} }, defaultSettings);
     self.settings = jT.$.extend(true, {}, newDefs, jT.settings, settings); // i.e. defaults from jToxCompound
     self.instanceNo = instanceCount++;
+    if (self.settings.rememberChecks && self.settings.showTabs)
+      self.featureStates = {};
 
     // finally make the query, if Uri is provided      
     if (self.settings['datasetUri'] !== undefined){
@@ -240,13 +243,19 @@ var jToxCompound = (function () {
             return;
           empty = false;
           if (idx == "name") {
-            if (isMain)
-              nodeFn(null, fId, divEl);
+            if (isMain) {
+              var fEl = nodeFn(null, fId, divEl);
+              if (self.settings.rememberChecks)
+                jT.$('input[type="checkbox"]', fEl)[0].checked = (self.featureStates[fId] === undefined || self.featureStates[fId]);
+            }
           }
           else if (!isMain || level == 1) {
             var title = self.features[fId].title;
-            if (!ccLib.isNull(title))
-              nodeFn(fId, title, divEl);
+            if (!ccLib.isNull(title)) {
+              var fEl = nodeFn(fId, title, divEl);
+              if (self.settings.rememberChecks)
+                jT.$('input[type="checkbox"]', fEl)[0].checked = (self.featureStates[fId] === undefined || self.featureStates[fId]);
+            }
           }
         });
 
@@ -329,15 +338,16 @@ var jToxCompound = (function () {
       varCols.push({ "sClass": "jtox-hidden jtox-ds-details paddingless", "mData": "index", "mRender": function(data, type, full) { return ''; }  });
 
       // prepare the function for column switching...      
-      var fnShowColumn = function(sel, idx) {
-        return function() {
-          var cells = jT.$(sel + ' table tr>*:nth-child(' + (idx + 1) + ')', self.rootElement);
-          if (this.checked)
-            jT.$(cells).show();
-          else
-            jT.$(cells).hide();
-          self.equalizeTables();
-        }
+      var fnShowColumn = function() {
+        var dt = $(this).data();
+        var cells = jT.$(dt.sel + ' table tr>*:nth-child(' + (dt.idx + 1) + ')', self.rootElement);
+        if (this.checked)
+          jT.$(cells).show();
+        else
+          jT.$(cells).hide();
+        if (self.settings.rememberChecks)
+          self.featureStates[dt.id] = this.checked;
+        self.equalizeTables();
       };
       
       var fnExpandCell = function (cell, expand) {
@@ -445,7 +455,7 @@ var jToxCompound = (function () {
           // finally - assign column switching to the checkbox of main tab.
           if (level == 1)
             ++checkIdx;
-          jT.$(checkList[checkIdx]).on('change', fnShowColumn(colList == fixCols ? '.jtox-ds-fixed' : '.jtox-ds-variable', colList.length))
+          jT.$(checkList[checkIdx]).data({ sel: colList == fixCols ? '.jtox-ds-fixed' : '.jtox-ds-variable', idx: colList.length, id: fId}).on('change', fnShowColumn)
           
           // and push it into the proper list.
           colList.push(col);
