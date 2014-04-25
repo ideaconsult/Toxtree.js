@@ -20,7 +20,7 @@
 	<link rel="stylesheet" href="../www/ketcher.css"/>
 	<style>
 	#sidebar {
-	  position: absolute;
+	  position: fixed;
   	background-color: #fafafa;
   	border: 1px solid #ccc;
 	  width: 350px;
@@ -67,7 +67,7 @@
     -ms-transform: rotate(270deg);  	
 	}
 		
-  #browser {
+  #browser, #searchbar {
     margin-left: 30px;
   }
 	</style>
@@ -111,7 +111,7 @@
 </head>
 <body>
   <div class="jtox-toolkit" data-kit="query" data-initial-query="yes" data-cross-domain="true" data-configuration="config_dataset" data-base-url="http://apps.ideaconsult.net:8080/biodeg">
-    <div class="jtox-toolkit jtox-widget" data-kit="search"></div>
+    <div id="searchbar" class="jtox-toolkit jtox-widget" data-kit="search"></div>
     <div id="sidebar" class="hidden">
       <div>
         <span class="ui-icon ui-icon-carat-2-e-w"></span>
