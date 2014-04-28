@@ -83,8 +83,19 @@
 
   <script src="../www/jtoxkit.js"></script>
   <script src="../www/ketcher.js"></script>
-  <script src="config-dataset.js"></script>
   <script language="JavaScript">
+    function onSideLoaded(set) {
+    	var tEl = $('.title', $(this.rootElement).parents('.jtox-foldable')[0])[0];
+    	tEl.innerHTML = tEl.innerHTML.replace(/(.+)\((\d+)\/(\d+)(.*)?/, '$1($2/' + set.length + '$4');;
+    }
+    
+    function onSelectedUpdate(el) {
+      var par = $(el).parents('.jtox-foldable')[0];
+    	var tEl = $('.title', par)[0];
+    	var v = $('input[type="checkbox"]:checked', par).length;
+    	tEl.innerHTML = tEl.innerHTML.replace(/(.+)\((\d+)\/(\d+)(.*)?/, '$1(' + v + '/$3$4');;
+    }
+    
     $(document).ready(function(){
       var openBar = function () {
         $(this).parents('#sidebar').toggleClass('hidden');
@@ -92,22 +103,17 @@
       $('#sidebar span.ui-icon').on('click', openBar);
       $('#sidebar div.side-title').on('click', openBar);
       
-      var updateCount = function (el) {
-      	var tEl = $('.title', $(el).parents('.jtox-foldable')[0])[0];
-      	var v = $('input[type="checkbox"]:checked', el.parentNode).length;
-      	tEl.innerHTML = tEl.innerHTML.replace(/(.+)\((\d+)\)(.*)?/, '$1(' + v + ')$3');;
-      };
-      
       $('#sidebar a.select-all').on('click', function () {
         $('input[type="checkbox"]', this.parentNode).each(function () { this.checked = true;});
-        updateCount(this);
+        onSelectedUpdate(this);
       });
       $('#sidebar a.unselect-all').on('click', function () {
         $('input[type="checkbox"]', this.parentNode).each(function () { this.checked = false;});
-        updateCount(this);
+        onSelectedUpdate(this);
       });
     });
   </script>
+  <script src="config-dataset.js"></script>
 </head>
 <body>
   <div class="jtox-toolkit" data-kit="query" data-initial-query="yes" data-cross-domain="true" data-configuration="config_dataset" data-base-url="http://apps.ideaconsult.net:8080/biodeg">
@@ -120,20 +126,20 @@
       <div class="content">
         <div class="jtox-foldable folded">
           <div class="title">
-            <h5>Datasets (0)</h5>
+            <h5>Datasets (0/0)</h5>
           </div>
           <div class="content">
             <a href="#" class="select-all">select all</a>&nbsp;<a href="#" class="unselect-all">unselect all</a>
-            <div class="jtox-toolkit jtox-widget" data-kit="dataset" data-short-stars="true" data-s-dom="rt" data-selectable="true" data-selection-handler="checked"></div>
+            <div class="jtox-toolkit jtox-widget" data-kit="dataset" data-short-stars="true" data-s-dom="rt" data-selectable="true" data-selection-handler="checked" data-on-ready="onSideLoaded"></div>
           </div>
         </div>
         <div class="jtox-foldable folded">
           <div class="title">
-            <h5>Models (0)</h5>
+            <h5>Models (0/0)</h5>
           </div>
           <div class="content">
             <a href="#" class="select-all">select all</a>&nbsp;<a href="#" class="unselect-all">unselect all</a>
-            <div class="jtox-toolkit jtox-widget" data-kit="model" data-short-stars="true" data-s-dom="rt" data-selectable="true" data-selection-handler="checked"></div>
+            <div class="jtox-toolkit jtox-widget" data-kit="model" data-short-stars="true" data-s-dom="rt" data-selectable="true" data-selection-handler="checked" data-on-ready="onSideLoaded"></div>
           </div>
         </div>
       </div>

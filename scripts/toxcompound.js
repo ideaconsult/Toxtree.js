@@ -13,6 +13,7 @@ var jToxCompound = (function () {
     "pageStart": 0,           // what is the default startint point for entries retrieval
     "rememberChecks": false,  // whether to remember feature-checkbox settings between queries
     "metricFeature": "http://www.opentox.org/api/1.1#Similarity",   // This is the default metric feature, if no other is specified
+    "onReady": null,
     "fnAccumulate": function(fId, oldVal, newVal, features) {
       if (ccLib.isNull(newVal))
         return oldVal;
@@ -253,7 +254,7 @@ var jToxCompound = (function () {
             var title = self.features[fId].title;
             if (!ccLib.isNull(title)) {
               var fEl = nodeFn(fId, title, divEl);
-              if (self.settings.rememberChecks)
+              if (isMain && self.settings.rememberChecks)
                 jT.$('input[type="checkbox"]', fEl)[0].checked = (self.featureStates[fId] === undefined || self.featureStates[fId]);
             }
           }
@@ -673,6 +674,7 @@ var jToxCompound = (function () {
           }
 
           // time to call the supplied function, if any.
+          ccLib.fireCallback(self.settings.onReady, self, dataset);
           if (typeof fnComplete == 'function')
             fnComplete();
         }

@@ -83,16 +83,6 @@ var config_dataset = {
   	}
 	},
 	"handlers": {
-  	"checked": function (el) {
-    	var tEl = $('.title', $(el).parents('.jtox-foldable')[0])[0];
-    	var oldV = tEl.innerHTML.match(/(.+)\((\d+)\)(.*)?/);
-    	var v = parseInt(oldV[2]);
-    	if (el.checked)
-    	  ++v;
-    	 else
-    	  --v;
-    	
-    	tEl.innerHTML = oldV[1] + '(' + v + ')' + oldV[3];
-  	}
+  	"checked": onSelectedUpdate
 	}
 };

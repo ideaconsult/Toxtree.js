@@ -20,7 +20,7 @@ var ccLib = {
   fireCallback: function (callback, self) {
     if (typeof callback != 'function')
       callback = window[callback];
-    return callback.apply((self !== undefined && self != null) ? self : document, Array.prototype.slice.call(arguments, 2));
+    return (typeof callback == 'function') ? (callback.apply((self !== undefined && self != null) ? self : document, Array.prototype.slice.call(arguments, 2))) : null;
   },
   
   /* Function setObjValue(obj, value)Set a given to the given element (obj) in the most appropriate way - be it property - the necessary one, or innetHTML
@@ -624,6 +624,7 @@ var jToxCompound = (function () {
     "pageStart": 0,           // what is the default startint point for entries retrieval
     "rememberChecks": false,  // whether to remember feature-checkbox settings between queries
     "metricFeature": "http://www.opentox.org/api/1.1#Similarity",   // This is the default metric feature, if no other is specified
+    "onReady": null,
     "fnAccumulate": function(fId, oldVal, newVal, features) {
       if (ccLib.isNull(newVal))
         return oldVal;
@@ -864,7 +865,7 @@ var jToxCompound = (function () {
             var title = self.features[fId].title;
             if (!ccLib.isNull(title)) {
               var fEl = nodeFn(fId, title, divEl);
-              if (self.settings.rememberChecks)
+              if (isMain && self.settings.rememberChecks)
                 jT.$('input[type="checkbox"]', fEl)[0].checked = (self.featureStates[fId] === undefined || self.featureStates[fId]);
             }
           }
@@ -1284,6 +1285,7 @@ var jToxCompound = (function () {
           }
 
           // time to call the supplied function, if any.
+          ccLib.fireCallback(self.settings.onReady, self, dataset);
           if (typeof fnComplete == 'function')
             fnComplete();
         }
@@ -1445,6 +1447,7 @@ var jToxDataset = (function () {
     selectable: false,
     selectionHandler: null,
     sDom: "<Fif>rt",
+    onReady: null,
     /* listUri */
     configuration: { 
       columns : {
@@ -1523,6 +1526,7 @@ var jToxDataset = (function () {
       jT.call(self, uri, function (result) {
         if (!!result) {
           jT.$(self.table).dataTable().fnAddData(result.dataset);
+          ccLib.fireCallback(self.settings.onReady, self, result.dataset);
         }
       });
     },
@@ -1585,6 +1589,7 @@ var jToxModel = (function () {
     algorithmLink: true,
     algorithms: false,
     algorithmNeedle: null,
+    onReady: null,
     sDom: "<Fif>rt",
     /* modelUri */
     configuration: { 
@@ -1702,6 +1707,7 @@ var jToxModel = (function () {
         if (!!result) {
           self.models = result.model;
           jT.$(self.table).dataTable().fnAddData(result.model);
+          ccLib.fireCallback(self.settings.onReady, self, result.model);
         }
       });
     },
@@ -1717,6 +1723,7 @@ var jToxModel = (function () {
         if (!!result) {
           self.algorithms = result.algorithm;
           jT.$(self.table).dataTable().fnAddData(result.algorithm);
+          ccLib.fireCallback(self.settings.onReady, self, result.algorithm);
         }
       });
     },
