@@ -90,7 +90,7 @@ var jToxDataset = (function () {
       jT.call(self, uri, function (result) {
         if (!!result) {
           jT.$(self.table).dataTable().fnAddData(result.dataset);
-          ccLib.fireCallback(self.settings.onReady, self, result.dataset);
+          ccLib.fireCallback(self.settings.onReady, self, result);
         }
       });
     },

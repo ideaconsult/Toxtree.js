@@ -1526,7 +1526,7 @@ var jToxDataset = (function () {
       jT.call(self, uri, function (result) {
         if (!!result) {
           jT.$(self.table).dataTable().fnAddData(result.dataset);
-          ccLib.fireCallback(self.settings.onReady, self, result.dataset);
+          ccLib.fireCallback(self.settings.onReady, self, result);
         }
       });
     },
@@ -1707,7 +1707,7 @@ var jToxModel = (function () {
         if (!!result) {
           self.models = result.model;
           jT.$(self.table).dataTable().fnAddData(result.model);
-          ccLib.fireCallback(self.settings.onReady, self, result.model);
+          ccLib.fireCallback(self.settings.onReady, self, result);
         }
       });
     },
@@ -1723,7 +1723,7 @@ var jToxModel = (function () {
         if (!!result) {
           self.algorithms = result.algorithm;
           jT.$(self.table).dataTable().fnAddData(result.algorithm);
-          ccLib.fireCallback(self.settings.onReady, self, result.algorithm);
+          ccLib.fireCallback(self.settings.onReady, self, result);
         }
       });
     },

@@ -84,8 +84,9 @@
   <script src="../www/jtoxkit.js"></script>
   <script src="../www/ketcher.js"></script>
   <script language="JavaScript">
-    function onSideLoaded(set) {
+    function onSideLoaded(result) {
     	var tEl = $('.title', $(this.rootElement).parents('.jtox-foldable')[0])[0];
+    	var set = result.dataset || result.model;
     	tEl.innerHTML = tEl.innerHTML.replace(/(.+)\((\d+)\/(\d+)(.*)?/, '$1($2/' + set.length + '$4');;
     }
     
