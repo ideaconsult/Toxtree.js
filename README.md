@@ -5,10 +5,10 @@ A kit of front-ends for accessing toxicological web services, based on [AMBIT](h
 approach for using any or all of available front ends in third-party web pages.
 Each different front-end is referred as _kit_. Currently available are:
 
-- `study` - [IUCLID5](http://iuclid.eu/) studies visuzalizer... [more](#jtoxstudy)
 - `compound` - viewer for compound datasets and query results... [more](#jtoxcompound)
 - `dataset` - viewer and selector of list of datasets... [more](#jtoxdataset)
 - `model` - view and selector of list of available models/algorithms... [more](#jtoxmodel)
+- `study` - [IUCLID5](http://iuclid.eu/) substance studies visuzalizer... [more](#jtoxstudy)
 - `query` - a wrapper around other kits and widgets, making them work together... [more](#jtoxquery).
 - `tree` - a Web front end to OpenTox services. Currently developed as standalone web front-end and soon-to-be integrated in the kit...[more](#jtoxtree).
 
@@ -141,114 +141,10 @@ When a certain kit is wrapped with another one, like the way `jToxQuery` wraps `
 A shorthand, general method, that _jToxQuery_ can call on any (main) kit, to perform it's prederred query method. For example for [jToxCompound](#jtoxcompound) this method is another way to call `<jToxCompound>.queryDataset(datasetUri)`.
 
 
-<a name="jtoxstudy"></a> jToxStudy kit
---------------------------------------
-
-This kit gives front-end to AMBIT services, which provide import of IUCLID5 generated and maintained data for toxicological studies (experiments). The kit name is `study` (for use in `data-kit` initialization attribute). First, there are several additional
-
-##### Dependencies
-
-From [jQueryUI](http://www.jqueryui.com) Version 1.8+, based library *jQueryUI tabs* and jQuery based [DataTables](http:/www.datatables.net) Version 1.9+. For column resizing we also depend on [colResizable](http://quocity.com/colresizable/), which in turn needs [jQuery migrate plugin](http://jquery.com/upgrade-guide/1.9/#jquery-migrate-plugin) for its reference of `$.explorer` - feel free not to include the latest, if you don't have such error from _colResizable_ (they might update not to use it, some day).
-
-```
-	<link rel="stylesheet" href="jquery.ui.tabs.css"/>
-	<link rel="stylesheet" href="jquery.dataTables.css"/>
-	<script src="jquery-migrate-1.2.1.min.js"></script>
-	<script src="colResizable-1.3.min.js"></script>
-	<script src="jquery.ui.widget.js"></script>
-	<script src="jquery.ui.tabs.js"></script>
-	<script src="jquery.dataTables.js"></script>
-```
-
-These are needed in the same page in order for _jToxStudy_ to work. It has some additional
-
-##### Parameters
-
-Not quite a lot yet, though:
-
-- **`substanceUri`** (attr. `data-substance-uri`), _optional_: This is the URL of the substance in question. If it is passed during _jToxStudy_ initialization a call to `jToxStudy.querySubstance(uri)` is made. In either case upon successful substance info retrieval automatic calls to `jToxStudy.querySummary(uri)` and `jToxStudy.queryComposition(uri)` are made.
-- **`tab`** (attr. `data-tab`), _optional_: Specifying which study top-category should be preloaded upon page loading. It can be either _encodeURIComponent()_ encoded, or spaces replaced with underscore.
-
-##### Configuration
-
-The configuration structure as passed to the kit initialization or references with `data-config-file` is used to give column visibility and re-naming possibilities. An example of valid configuration objest / json is this:
-
-```
-{
-	"columns": {
-		"_": { 
-			"main": { 
-				"name": { "bVisible": false } 
-			},
-			"effects": {
-				"endpoint": { "sTitle": "Type", "iOrder": -2 },
-				"result": { "sTitle": "Value", "iOrder": -1 }
-			}
-		},
-		"PC_PARTITION_SECTION": {
-			"effects": {
-				"endpoint": { "iOrder": 0 },
-				"result": { "iOrder": 0 }
-			}
-		}
-	}
-}
-```
-
-All column redefinitions are following _dataTables_ syntax, but only parameters that need to be changed are given. Additional `iOrder` is used to make reordering of the column in the table. The rule is:
-
-- If `iOrder` is missing in column definition it is considered **0**.
-- Columns are sorted on `iOrder` attribute before being passed to _dataTable_ initialization routine.
-
-The standard `bVisible` parameter can be present (usually only for hiding) which makes the column absent from column definitions at all.
-
-Each column (re)definitions are grouped on several levels:
-
-- (_low_) The semantic meaning: `parameters`, `conditions`, `effects`, `protocol`, `interpretation` and `main`.
-- (_high_) Per study category definitions are possible, so different categories can have different naming, ordering and visibility. The `_` category is the default.
-
-So the actual column re-definition goes like this:
-
-- First, the normal definition of column is taken, either from defaults or from study parsing;
-- Second, if present, the column (re)definition from default category (`_`) for this column title is merge with it, overwriting existing attributes.
-- Finally, if present, the column (re)definition for category-specific section, again idetified with column title (the original one) is merge/overwrited.
-- If this, final, column definition has `bVisible` to be present and false - the column is extracted from further processing and addition.
-
-The array of so built columns is then sorted on `iOrder` and passed to _dataTables_ initialization.
-
-
-##### Methods
-
-_jToxStudy_ methods that can be invoked from outside are quite few, actually:
-
-
-```
-new jToxStudy(root, settings)
-```
-It is called either internally from _jToxKit_ upon initialization, or later from the user. The first parameter is an _HTMLElement_ which will be used for base for populating necessary DOM tree. It returns a new instance of jToxStudy, referred as `<jToxStudy>` that can later be queried with methods, described below:
-
-
-```
-<jToxStudy>.querySubstance(substanceUri)
-```
-If `substanceUri` parameter is not provided during initialization, this is the way to ask for studies for particular substance. Fill's up the fist tab and queries for _composition_ and _studies summary_.
-
-
-```
-<jToxStudy>.queryComposition(substanceUri)
-```
-The `substanceUri` is the same as in previous function, but this one takes care only for _Composition_ tab. Usually called automatically from previous function, when it successfully retrieved substance information.
-
-
-```
-<jToxStudy>.querySummary(substanceUri)
-```
-The `substanceUri` is the same as in previous function. This one queries for a summary of all studies available for the given substance. It fills up the numbers in the studies' tabs and prepares the tables for particular queries later on, which are executes upon each tab's activation.
-
 <a name="jtoxcompound"></a> jToxCompound kit
 --------------------------------------------
 
-An OpenTox compound dataset management and visualization tool. Since _compound_ is very basic term in OpenTox hierarchy it is used in other places like [jToxQuery](#jtoxquery) and [jToxTree kit](#jtoxtree). It is vital that the scope of this kit it _not_ to provide complete, versatile interface for making queries, linking between them, etc. - it aims at visualizing and providing basic navigation within _one_ particular query. It is designed to be easily configurable - up to the point of being only one table, and easily driven with API calls, which are explained below.
+An OpenTox compound dataset management and visualization tool. Since _compound_ is very basic term in OpenTox hierarchy it is used in other places like [jToxQuery](#jtoxquery) and [jToxTree kit](#jtoxtree). It is vital to undestand that the scope of this kit it _not_ to provide complete, versatile interface for making queries, linking between them, etc. - it aims at visualizing and providing basic navigation within _one_ particular query. It is designed to be easily configurable - up to the point of being only one table, and easily driven with API calls, which are explained below.
 
 As a consequence of this perspective, all functionality as filtering and ordering, is applied to the currently downloaded dataset entries, i.e. - one "page" of the dataset. This is due to the fact that for many datasets it is impossible to have general procedures applied to them, thus the scope of this kit is limited to local visuzalization functions only.
 
@@ -273,6 +169,7 @@ Parameters that can be passed either with data-XXX attributes or when initialize
 - **`showExport`** (attr. `data-show-export`), _optional_: Determines if the **Export** tab should be added to the right of feature-tabs, filled with possible export parameters. If `showTabs` is false, this has not effect, of course. Default: *true*.
 - **`showControls`** (attr. `data-show-controls`), _optional_: Determines whether to show the block with filter and pagination controls, which include: information for current view items, dropdown menu for choosing the page size, next and previous page and filtering box. Default: *true*.
 - **`hideEmpty`** (attr. `data-hide-empty`), _optional_: Determines whether to hide empty group tabs instead of make them inactive. Default: _false_.
+- **`hasDetails`** (attr. `data-has-details`), _optional_: Determines whether a details openning icon and all corresponding functionality, should be shown on each row. Default: _true_.
 - **`rememberChecks`** (attr. `data-remember-checks`), _optional_: Whether to remember feature check states, between different _queryDataset()_ calls. Default: _false_.
 - **`metricFeature`** (attr. `data-metric-feature`), _optional_: The ID of the feature that should be used, when 'metric' field is present in the dataset. Default: *http://www.opentox.org/api/1.1#Similarity*.
 - **`fnAccumulate`** (attr. `data-fn-accumulate`), _optional_: The function that should be called during dataset entries' processing, when several values need to be accumulated in the same place. The format of the function is `function fnlocation(featureId, oldValue, newValue, features)`. The default one is concatenating the passed values as comma-separated string.
@@ -491,6 +388,111 @@ These two are shortcuts for the previous function, taking into account the curre
 <jToxCompound>.filterEntries(needle)
 ```
 Filter the presented entries with the given needle, finding substring match on each features, not marked with `search: false` in their definition.
+
+
+<a name="jtoxstudy"></a> jToxStudy kit
+--------------------------------------
+
+This kit gives front-end to AMBIT services, which provide import of IUCLID5 generated and maintained data for toxicological studies (experiments). The kit name is `study` (for use in `data-kit` initialization attribute). First, there are several additional
+
+##### Dependencies
+
+From [jQueryUI](http://www.jqueryui.com) Version 1.8+, based library *jQueryUI tabs* and jQuery based [DataTables](http:/www.datatables.net) Version 1.9+. For column resizing we also depend on [colResizable](http://quocity.com/colresizable/), which in turn needs [jQuery migrate plugin](http://jquery.com/upgrade-guide/1.9/#jquery-migrate-plugin) for its reference of `$.explorer` - feel free not to include the latest, if you don't have such error from _colResizable_ (they might update not to use it, some day).
+
+```
+	<link rel="stylesheet" href="jquery.ui.tabs.css"/>
+	<link rel="stylesheet" href="jquery.dataTables.css"/>
+	<script src="jquery-migrate-1.2.1.min.js"></script>
+	<script src="colResizable-1.3.min.js"></script>
+	<script src="jquery.ui.widget.js"></script>
+	<script src="jquery.ui.tabs.js"></script>
+	<script src="jquery.dataTables.js"></script>
+```
+
+These are needed in the same page in order for _jToxStudy_ to work. It has some additional
+
+##### Parameters
+
+Not quite a lot yet, though:
+
+- **`substanceUri`** (attr. `data-substance-uri`), _optional_: This is the URL of the substance in question. If it is passed during _jToxStudy_ initialization a call to `jToxStudy.querySubstance(uri)` is made. In either case upon successful substance info retrieval automatic calls to `jToxStudy.querySummary(uri)` and `jToxStudy.queryComposition(uri)` are made.
+- **`tab`** (attr. `data-tab`), _optional_: Specifying which study top-category should be preloaded upon page loading. It can be either _encodeURIComponent()_ encoded, or spaces replaced with underscore.
+
+##### Configuration
+
+The configuration structure as passed to the kit initialization or references with `data-config-file` is used to give column visibility and re-naming possibilities. An example of valid configuration objest / json is this:
+
+```
+{
+	"columns": {
+		"_": { 
+			"main": { 
+				"name": { "bVisible": false } 
+			},
+			"effects": {
+				"endpoint": { "sTitle": "Type", "iOrder": -2 },
+				"result": { "sTitle": "Value", "iOrder": -1 }
+			}
+		},
+		"PC_PARTITION_SECTION": {
+			"effects": {
+				"endpoint": { "iOrder": 0 },
+				"result": { "iOrder": 0 }
+			}
+		}
+	}
+}
+```
+
+All column redefinitions are following _dataTables_ syntax, but only parameters that need to be changed are given. Additional `iOrder` is used to make reordering of the column in the table. The rule is:
+
+- If `iOrder` is missing in column definition it is considered **0**.
+- Columns are sorted on `iOrder` attribute before being passed to _dataTable_ initialization routine.
+
+The standard `bVisible` parameter can be present (usually only for hiding) which makes the column absent from column definitions at all.
+
+Each column (re)definitions are grouped on several levels:
+
+- (_low_) The semantic meaning: `parameters`, `conditions`, `effects`, `protocol`, `interpretation` and `main`.
+- (_high_) Per study category definitions are possible, so different categories can have different naming, ordering and visibility. The `_` category is the default.
+
+So the actual column re-definition goes like this:
+
+- First, the normal definition of column is taken, either from defaults or from study parsing;
+- Second, if present, the column (re)definition from default category (`_`) for this column title is merge with it, overwriting existing attributes.
+- Finally, if present, the column (re)definition for category-specific section, again idetified with column title (the original one) is merge/overwrited.
+- If this, final, column definition has `bVisible` to be present and false - the column is extracted from further processing and addition.
+
+The array of so built columns is then sorted on `iOrder` and passed to _dataTables_ initialization.
+
+
+##### Methods
+
+_jToxStudy_ methods that can be invoked from outside are quite few, actually:
+
+
+```
+new jToxStudy(root, settings)
+```
+It is called either internally from _jToxKit_ upon initialization, or later from the user. The first parameter is an _HTMLElement_ which will be used for base for populating necessary DOM tree. It returns a new instance of jToxStudy, referred as `<jToxStudy>` that can later be queried with methods, described below:
+
+
+```
+<jToxStudy>.querySubstance(substanceUri)
+```
+If `substanceUri` parameter is not provided during initialization, this is the way to ask for studies for particular substance. Fill's up the fist tab and queries for _composition_ and _studies summary_.
+
+
+```
+<jToxStudy>.queryComposition(substanceUri)
+```
+The `substanceUri` is the same as in previous function, but this one takes care only for _Composition_ tab. Usually called automatically from previous function, when it successfully retrieved substance information.
+
+
+```
+<jToxStudy>.querySummary(substanceUri)
+```
+The `substanceUri` is the same as in previous function. This one queries for a summary of all studies available for the given substance. It fills up the numbers in the studies' tabs and prepares the tables for particular queries later on, which are executes upon each tab's activation.
 
 
 <a name="jtoxdataset"></a> jToxDataset kit

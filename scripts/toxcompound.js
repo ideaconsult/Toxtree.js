@@ -10,6 +10,7 @@ var jToxCompound = (function () {
     "showExport": true,       // should we add export tab up there
     "showControls": true,     // should we show the pagination/navigation controls.
     "hideEmpty": false,       // whether to hide empty groups instead of making them inactive
+    "hasDetails": true,       // whether browser should provide the option for per-item detailed info rows.
     "pageSize": 20,           // what is the default (startint) page size.
     "pageStart": 0,           // what is the default startint point for entries retrieval
     "rememberChecks": false,  // whether to remember feature-checkbox settings between queries
@@ -337,7 +338,9 @@ var jToxCompound = (function () {
             return (type != "display") ?
               '' + data : 
               "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;<br/>" + 
-                '<span class="jtox-details-open ui-icon ui-icon-circle-triangle-e" title="Press to open/close detailed info for the entry"></span>';
+                (self.settings.hasDetails ?              
+                  '<span class="jtox-details-open ui-icon ui-icon-circle-triangle-e" title="Press to open/close detailed info for the entry"></span>'
+                  : '');
           }
         },
         { "sClass": "jtox-hidden", "mData": "index", "sDefaultContent": "-", "bSortable": true, "mRender": function(data, type, full) { return ccLib.isNull(self.orderList) ? 0 : self.orderList[data]; } }, // column used for ordering
@@ -370,7 +373,7 @@ var jToxCompound = (function () {
           cell.removeAttribute('colspan');
       };
       
-      var fnShowDetails = function(row) {
+      var fnShowDetails = (self.settings.hasDetails ? function(row) {
         var cell = jT.$(".jtox-ds-details", row)[0];
         var idx = jT.$(row).data('jtox-index');
         jT.$(row).toggleClass('jtox-detailed-row');
@@ -422,7 +425,7 @@ var jToxCompound = (function () {
           jT.$(varCell).empty();
           self.equalizeTables();
         }
-      };
+      } : null); // fnShowDetails definition end
 
       // make a query for all checkboxes in the main tab, so they can be traversed in parallel with the features and 
       // a change handler added.
@@ -484,8 +487,9 @@ var jToxCompound = (function () {
         "aoColumns": fixCols,
         "bSort": false,
         "fnCreatedRow": function( nRow, aData, iDataIndex ) {
-          // attach the click handling      
-          jT.$('.jtox-details-open', nRow).on('click', function(e) {  fnShowDetails(nRow); });
+          // attach the click handling
+          if (self.settings.hasDetails)
+            jT.$('.jtox-details-open', nRow).on('click', function(e) {  fnShowDetails(nRow); });
           jT.$(nRow).data('jtox-index', iDataIndex);
         },
         "oLanguage" : {
