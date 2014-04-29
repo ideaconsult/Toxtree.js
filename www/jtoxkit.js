@@ -1070,7 +1070,7 @@ var jToxCompound = (function () {
           
           if (!!feature.shorten) {
             col["mRender"] = function(data, type, full) {
-              return (type != "display") ? '' + data : jT.shortenedData(data, "Press to copy the value in the clipboard");
+              return (type != "display") ? '' + data : jT.ui.shortenedData(data, "Press to copy the value in the clipboard");
             };
             col["sWidth"] = "75px";
           }
@@ -1500,14 +1500,14 @@ var jToxDataset = (function () {
       
       // arrange certain things on the columns first - like dealing with short/long stars
       self.settings.configuration.columns.dataset.Stars.mRender = function (data, type, full) {
-        return type != 'display' ? data : cls.putStars(self, data, "Dataset quality stars rating (worst) 1-10 (best)");
+        return type != 'display' ? data : jT.ui.putStars(self, data, "Dataset quality stars rating (worst) 1-10 (best)");
       };
       if (self.settings.shortStars)
         self.settings.configuration.columns.dataset.Stars.sWidth = "40px";
       
       // deal if the selection is chosen
       if (self.settings.selectable) {
-        var oldFn = self.settings.configuration.columns.dataset.Id.mRender = cls.addSelection(self, self.settings.configuration.columns.dataset.Id.mRender);
+        var oldFn = self.settings.configuration.columns.dataset.Id.mRender = jT.ui.addSelection(self, self.settings.configuration.columns.dataset.Id.mRender);
         self.settings.configuration.columns.dataset.Id.sWidth = "60px";
       }
       
@@ -1517,7 +1517,7 @@ var jToxDataset = (function () {
         "bLengthChange": false,
 				"bAutoWidth": false,
         "sDom" : self.settings.sDom,
-        "aoColumns": jT.processColumns(self, 'dataset'),
+        "aoColumns": jT.ui.processColumns(self, 'dataset'),
 				"oLanguage": {
           "sLoadingRecords": "No datasets found.",
           "sZeroRecords": "No datasets found.",
@@ -1556,35 +1556,7 @@ var jToxDataset = (function () {
       return uri;
     }
   };
-  
-  cls.putStars = function (kit, stars, title) {
-    if (!kit.settings.shortStars) {
-      var res = '<div title="' + title + '">';
-      for (var i = 0;i < kit.settings.maxStars;++i) {
-        res += '<span class="ui-icon ui-icon-star jtox-inline';
-        if (i >= stars)
-          res += ' transparent';
-        res += '"></span>';
-      }
-      return res + '</div>';
-    }
-    else { // i.e. short version
-      return '<span class="ui-icon ui-icon-star jtox-inline" title="' + title + '"></span>' + stars;
-    }
-  };
-  
-  cls.addSelection = function (kit, oldFn) {
-    return function (data, type, full) {
-      var oldRes = oldFn(data, type, full);
-      if (type != 'display')
-        return oldRes;
-      
-      return  '<input type="checkbox" value="' + (full.URI || full.uri) + '"' +
-              (!!kit.settings.selectionHandler ? ' class="jtox-handler" data-handler="' + kit.settings.selectionHandler + '"' : '') +
-              '/>' + oldRes;
-    }
-  };
-
+    
   return cls;
 })();
 /* toxmodel.js - A kit for querying/manipulating all available models (algorithms)
@@ -1662,7 +1634,7 @@ var jToxModel = (function () {
       
       // but before given it up - make a small sorting..
       if (!self.settings.algorithms) {
-        self.settings.configuration.columns.model.Stars.mRender = function (data, type, full) { return type != 'display' ? data : jToxDataset.putStars(self, data, "Model star rating (worst) 1 - 10 (best)"); };
+        self.settings.configuration.columns.model.Stars.mRender = function (data, type, full) { return type != 'display' ? data : jT.ui.putStars(self, data, "Model star rating (worst) 1 - 10 (best)"); };
         if (self.settings.shortStars) {
           self.settings.configuration.columns.model.Stars.sWidth = "40px";
         }
@@ -1686,7 +1658,7 @@ var jToxModel = (function () {
       var cat = self.settings.algorithms ? 'algorithm' : 'model';
       // deal if the selection is chosen
       if (self.settings.selectable) {
-        self.settings.configuration.columns[cat].Id.mRender = jToxDataset.addSelection(self, self.settings.configuration.columns.model.Id.mRender);
+        self.settings.configuration.columns[cat].Id.mRender = jT.ui.addSelection(self, self.settings.configuration.columns.model.Id.mRender);
         self.settings.configuration.columns[cat].Id.sWidth = "60px";
       }
       
@@ -1696,7 +1668,7 @@ var jToxModel = (function () {
         "bLengthChange": false,
 				"bAutoWidth": false,
         "sDom" : self.settings.sDom,
-        "aoColumns": jT.processColumns(self, cat),
+        "aoColumns": jT.ui.processColumns(self, cat),
 				"oLanguage": {
           "sLoadingRecords": "No models found.",
           "sZeroRecords": "No models found.",
@@ -1815,7 +1787,7 @@ var jToxStudy = (function () {
     // There should be no overlap, because already-added instances will have their IDs changed already...
     var tree = jT.getTemplate('#jtox-studies');
     root.appendChild(tree);
-    jT.changeTabsIds(tree, suffix);
+    jT.ui.changeTabsIds(tree, suffix);
     jT.$('div.jtox-study-tab div button', tree).on('click', function (e) {
     	var par = jT.$(this).parents('.jtox-study-tab')[0];
 	    if (jT.$(this).hasClass('expand-all')) {
@@ -1920,7 +1892,7 @@ var jToxStudy = (function () {
 	        { "sTitle": "Result", "sClass": "center middle jtox-multi", "sWidth": "15%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, function (data, type) { return formatLoHigh(data.result, type) }) } },
 	        { "sTitle": "Guideline", "sClass": "center middle", "sWidth": "15%", "mData": "protocol.guideline", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
 	        { "sTitle": "Owner", "sClass": "center middle shortened", "sWidth": "15%", "mData": "citation.owner", "sDefaultContent": "?"  }, 
-	        { "sTitle": "UUID", "sClass": "center middle", "sWidth": "15%", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : jT.shortenedData(data, "Press to copy the UUID in the clipboard"); } }
+	        { "sTitle": "UUID", "sClass": "center middle", "sWidth": "15%", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : jT.ui.shortenedData(data, "Press to copy the UUID in the clipboard"); } }
 	      ];
   
         var colDefs = [];
@@ -1950,7 +1922,7 @@ var jToxStudy = (function () {
         var putDefaults = function(start, len, group) {
           for (var i = 0;i < len; ++i) {
             var col = jT.$.extend({}, defaultColumns[i + start]);
-            col = jT.modifyColDef(self, col, category, group);
+            col = jT.ui.modifyColDef(self, col, category, group);
             if (col != null)
               colDefs.push(col);
           }
@@ -2008,7 +1980,7 @@ var jToxStudy = (function () {
             "sDefaultContent": "-"
           };
           
-          col = jT.modifyColDef(self, col, category, "parameters");
+          col = jT.ui.modifyColDef(self, col, category, "parameters");
           if (col == null)
             return null;
           
@@ -2028,7 +2000,7 @@ var jToxStudy = (function () {
             "mData" : "effects"
           };
           
-          col = jT.modifyColDef(self, col, category, "conditions");
+          col = jT.ui.modifyColDef(self, col, category, "conditions");
           if (col == null)
             return null;
           
@@ -2050,14 +2022,14 @@ var jToxStudy = (function () {
         // now is time to put interpretation columns..
         putAGroup(study.interpretation, function(i){
           var col = { "sTitle": i, "sClass" : "center middle jtox-multi", "mData" : "interpretation." + i, "sDefaultContent": "-"};
-          return jT.modifyColDef(self, col, category, "interpretation");
+          return jT.ui.modifyColDef(self, col, category, "interpretation");
         });
         
         // finally put the protocol entries
         putDefaults(3, 3, "protocol");
         
         // but before given it up - make a small sorting..
-        jT.sortColDefs(colDefs);
+        jT.ui.sortColDefs(colDefs);
         
         // READYY! Go and prepare THE table.
         jT.$(theTable).dataTable( {
@@ -2592,80 +2564,7 @@ window.jT = window.jToxKit = {
     }
     return root;
 	},
-		
-  changeTabsIds: function (root, suffix) {
-    jT.$('ul li a', root).each(function() {
-      var id = jT.$(this).attr('href').substr(1);
-      var el = document.getElementById(id);
-      id += suffix;
-      el.id = id;
-      jT.$(this).attr('href', '#' + id);
-    })  
-  },
   
-  modifyColDef: function (kit, col, category, group) {
-	  var name = col.sTitle.toLowerCase();
-	  
-	  // helper function for retrieving col definition, if exists. Returns empty object, if no.          
-	  var getColDef = function (cat) {
-	    var catCol = kit.settings.configuration.columns[cat];
-	    if (!ccLib.isNull(catCol)) {
-	      if (!!group) {
-	        catCol = catCol[group];
-  	      if (!ccLib.isNull(catCol))
-  	        catCol = catCol[name];
-        }
-        else
-	        catCol = catCol[name];
-	    }
-	
-	    if (ccLib.isNull(catCol))
-	      catCol = {};
-	    return catCol;
-	  };
-	  // now form the default column, if existing and the category-specific one...
-	  // extract column redefinitions and merge them all.
-	  col = this.$.extend(col, (!!group ? getColDef('_') : {}), getColDef(category));
-	  return ccLib.isNull(col.bVisible) || col.bVisible ? col : null;
-  },
-  
-  sortColDefs: function (colDefs) {
-	  colDefs.sort(function(a, b) {
-	    var valA = ccLib.isNull(a.iOrder) ? 0 : a.iOrder;
-	    var valB = ccLib.isNull(b.iOrder) ? 0 : b.iOrder;
-	    return valA - valB;
-	  });
-  },
-  
-  processColumns: function (kit, category) {
-    var colDefs = [];
-    var catList = kit.settings.configuration.columns[category];
-    for (var name in catList) {
-      var col = this.modifyColDef(kit, catList[name], category);
-      if (col != null)
-        colDefs.push(col);
-    }
-      
-    this.sortColDefs(colDefs);
-    return colDefs;
-  },
-  
-  shortenedData: function (data, message, deflen) {
-    var res = '';
-    
-    if (ccLib.isNull(deflen))
-      deflen = 5;
-    if (data.toString().length <= deflen) {
-      res += data;
-    }
-    else {
-      res += '<div class="shortened">' + data + '</div>';
-      if (message != null)
-        res += '<span class="ui-icon ui-icon-copy" title="' + message + '" data-uuid="' + data + '"></span>';
-    }
-    return res;
-  },
-		
 	/* Poll a given taskId and calls the callback when a result from the server comes - 
 	be it "running", "completed" or "error" - the callback is always called.
 	*/
@@ -2756,6 +2655,111 @@ window.jT = window.jToxKit = {
 			}
 		});
 	}
+};
+
+/* UI related functions of jToxKit are put here for more convenient usage
+*/
+window.jT.ui = {
+  shortenedData: function (data, message, deflen) {
+    var res = '';
+    
+    if (ccLib.isNull(deflen))
+      deflen = 5;
+    if (data.toString().length <= deflen) {
+      res += data;
+    }
+    else {
+      res += '<div class="shortened">' + data + '</div>';
+      if (message != null)
+        res += '<span class="ui-icon ui-icon-copy" title="' + message + '" data-uuid="' + data + '"></span>';
+    }
+    return res;
+  },
+  
+  changeTabsIds: function (root, suffix) {
+    jT.$('ul li a', root).each(function() {
+      var id = jT.$(this).attr('href').substr(1);
+      var el = document.getElementById(id);
+      id += suffix;
+      el.id = id;
+      jT.$(this).attr('href', '#' + id);
+    })  
+  },
+  
+  modifyColDef: function (kit, col, category, group) {
+	  var name = col.sTitle.toLowerCase();
+	  
+	  // helper function for retrieving col definition, if exists. Returns empty object, if no.          
+	  var getColDef = function (cat) {
+	    var catCol = kit.settings.configuration.columns[cat];
+	    if (!ccLib.isNull(catCol)) {
+	      if (!!group) {
+	        catCol = catCol[group];
+  	      if (!ccLib.isNull(catCol))
+  	        catCol = catCol[name];
+        }
+        else
+	        catCol = catCol[name];
+	    }
+	
+	    if (ccLib.isNull(catCol))
+	      catCol = {};
+	    return catCol;
+	  };
+	  // now form the default column, if existing and the category-specific one...
+	  // extract column redefinitions and merge them all.
+	  col = jT.$.extend(col, (!!group ? getColDef('_') : {}), getColDef(category));
+	  return ccLib.isNull(col.bVisible) || col.bVisible ? col : null;
+  },
+  
+  sortColDefs: function (colDefs) {
+	  colDefs.sort(function(a, b) {
+	    var valA = ccLib.isNull(a.iOrder) ? 0 : a.iOrder;
+	    var valB = ccLib.isNull(b.iOrder) ? 0 : b.iOrder;
+	    return valA - valB;
+	  });
+  },
+  
+  processColumns: function (kit, category) {
+    var colDefs = [];
+    var catList = kit.settings.configuration.columns[category];
+    for (var name in catList) {
+      var col = this.modifyColDef(kit, catList[name], category);
+      if (col != null)
+        colDefs.push(col);
+    }
+      
+    this.sortColDefs(colDefs);
+    return colDefs;
+  },  
+  
+  putStars: function (kit, stars, title) {
+    if (!kit.settings.shortStars) {
+      var res = '<div title="' + title + '">';
+      for (var i = 0;i < kit.settings.maxStars;++i) {
+        res += '<span class="ui-icon ui-icon-star jtox-inline';
+        if (i >= stars)
+          res += ' transparent';
+        res += '"></span>';
+      }
+      return res + '</div>';
+    }
+    else { // i.e. short version
+      return '<span class="ui-icon ui-icon-star jtox-inline" title="' + title + '"></span>' + stars;
+    }
+  },
+  
+  addSelection: function (kit, oldFn) {
+    return function (data, type, full) {
+      var oldRes = oldFn(data, type, full);
+      if (type != 'display')
+        return oldRes;
+      
+      return  '<input type="checkbox" value="' + (full.URI || full.uri) + '"' +
+              (!!kit.settings.selectionHandler ? ' class="jtox-handler" data-handler="' + kit.settings.selectionHandler + '"' : '') +
+              '/>' + oldRes;
+    }
+  }
 };
 
 // we need to do this here - because other tools/libraries could have scheduled themselves on 'ready',

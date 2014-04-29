@@ -459,7 +459,7 @@ var jToxCompound = (function () {
           
           if (!!feature.shorten) {
             col["mRender"] = function(data, type, full) {
-              return (type != "display") ? '' + data : jT.shortenedData(data, "Press to copy the value in the clipboard");
+              return (type != "display") ? '' + data : jT.ui.shortenedData(data, "Press to copy the value in the clipboard");
             };
             col["sWidth"] = "75px";
           }

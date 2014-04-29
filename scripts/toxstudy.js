@@ -45,7 +45,7 @@ var jToxStudy = (function () {
     // There should be no overlap, because already-added instances will have their IDs changed already...
     var tree = jT.getTemplate('#jtox-studies');
     root.appendChild(tree);
-    jT.changeTabsIds(tree, suffix);
+    jT.ui.changeTabsIds(tree, suffix);
     jT.$('div.jtox-study-tab div button', tree).on('click', function (e) {
     	var par = jT.$(this).parents('.jtox-study-tab')[0];
 	    if (jT.$(this).hasClass('expand-all')) {
@@ -150,7 +150,7 @@ var jToxStudy = (function () {
 	        { "sTitle": "Result", "sClass": "center middle jtox-multi", "sWidth": "15%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, function (data, type) { return formatLoHigh(data.result, type) }) } },
 	        { "sTitle": "Guideline", "sClass": "center middle", "sWidth": "15%", "mData": "protocol.guideline", "mRender" : "[,]", "sDefaultContent": "?"  },    // Protocol columns
 	        { "sTitle": "Owner", "sClass": "center middle shortened", "sWidth": "15%", "mData": "citation.owner", "sDefaultContent": "?"  }, 
-	        { "sTitle": "UUID", "sClass": "center middle", "sWidth": "15%", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : jT.shortenedData(data, "Press to copy the UUID in the clipboard"); } }
+	        { "sTitle": "UUID", "sClass": "center middle", "sWidth": "15%", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : jT.ui.shortenedData(data, "Press to copy the UUID in the clipboard"); } }
 	      ];
   
         var colDefs = [];
@@ -180,7 +180,7 @@ var jToxStudy = (function () {
         var putDefaults = function(start, len, group) {
           for (var i = 0;i < len; ++i) {
             var col = jT.$.extend({}, defaultColumns[i + start]);
-            col = jT.modifyColDef(self, col, category, group);
+            col = jT.ui.modifyColDef(self, col, category, group);
             if (col != null)
               colDefs.push(col);
           }
@@ -238,7 +238,7 @@ var jToxStudy = (function () {
             "sDefaultContent": "-"
           };
           
-          col = jT.modifyColDef(self, col, category, "parameters");
+          col = jT.ui.modifyColDef(self, col, category, "parameters");
           if (col == null)
             return null;
           
@@ -258,7 +258,7 @@ var jToxStudy = (function () {
             "mData" : "effects"
           };
           
-          col = jT.modifyColDef(self, col, category, "conditions");
+          col = jT.ui.modifyColDef(self, col, category, "conditions");
           if (col == null)
             return null;
           
@@ -280,14 +280,14 @@ var jToxStudy = (function () {
         // now is time to put interpretation columns..
         putAGroup(study.interpretation, function(i){
           var col = { "sTitle": i, "sClass" : "center middle jtox-multi", "mData" : "interpretation." + i, "sDefaultContent": "-"};
-          return jT.modifyColDef(self, col, category, "interpretation");
+          return jT.ui.modifyColDef(self, col, category, "interpretation");
         });
         
         // finally put the protocol entries
         putDefaults(3, 3, "protocol");
         
         // but before given it up - make a small sorting..
-        jT.sortColDefs(colDefs);
+        jT.ui.sortColDefs(colDefs);
         
         // READYY! Go and prepare THE table.
         jT.$(theTable).dataTable( {

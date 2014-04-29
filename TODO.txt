@@ -1,12 +1,12 @@
 TODO:
-- jToxCompound - make custom details, so that jToxSubstance can be incorporated.
 - jToxKit - some universal way to add icons/components to Id tag.
+- jToxKit - add 'ui' part and put some stuff in it: 'putStars', 'addSelection', 'numberCellFn'
 - jToxSubstance - a separate kit
 - jToxComposition
 
 IDEAS?
 - (global) extractFeature(dataset, featureId) - return an array of values of that feature for each entry in the dataset. (Can be used for diagram)
-- make toxtree part of jToxKit
+- make toxtree part of jToxKit (jToxCompound - stationary version, i.e. - browsing compound through fixed blocks, iterating over them)
 
 Assessment:
 - Ability to re-use the built tab/features structures? Additional setting?

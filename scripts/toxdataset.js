@@ -52,14 +52,14 @@ var jToxDataset = (function () {
       
       // arrange certain things on the columns first - like dealing with short/long stars
       self.settings.configuration.columns.dataset.Stars.mRender = function (data, type, full) {
-        return type != 'display' ? data : cls.putStars(self, data, "Dataset quality stars rating (worst) 1-10 (best)");
+        return type != 'display' ? data : jT.ui.putStars(self, data, "Dataset quality stars rating (worst) 1-10 (best)");
       };
       if (self.settings.shortStars)
         self.settings.configuration.columns.dataset.Stars.sWidth = "40px";
       
       // deal if the selection is chosen
       if (self.settings.selectable) {
-        var oldFn = self.settings.configuration.columns.dataset.Id.mRender = cls.addSelection(self, self.settings.configuration.columns.dataset.Id.mRender);
+        var oldFn = self.settings.configuration.columns.dataset.Id.mRender = jT.ui.addSelection(self, self.settings.configuration.columns.dataset.Id.mRender);
         self.settings.configuration.columns.dataset.Id.sWidth = "60px";
       }
       
@@ -69,7 +69,7 @@ var jToxDataset = (function () {
         "bLengthChange": false,
 				"bAutoWidth": false,
         "sDom" : self.settings.sDom,
-        "aoColumns": jT.processColumns(self, 'dataset'),
+        "aoColumns": jT.ui.processColumns(self, 'dataset'),
 				"oLanguage": {
           "sLoadingRecords": "No datasets found.",
           "sZeroRecords": "No datasets found.",
@@ -108,34 +108,6 @@ var jToxDataset = (function () {
       return uri;
     }
   };
-  
-  cls.putStars = function (kit, stars, title) {
-    if (!kit.settings.shortStars) {
-      var res = '<div title="' + title + '">';
-      for (var i = 0;i < kit.settings.maxStars;++i) {
-        res += '<span class="ui-icon ui-icon-star jtox-inline';
-        if (i >= stars)
-          res += ' transparent';
-        res += '"></span>';
-      }
-      return res + '</div>';
-    }
-    else { // i.e. short version
-      return '<span class="ui-icon ui-icon-star jtox-inline" title="' + title + '"></span>' + stars;
-    }
-  };
-  
-  cls.addSelection = function (kit, oldFn) {
-    return function (data, type, full) {
-      var oldRes = oldFn(data, type, full);
-      if (type != 'display')
-        return oldRes;
-      
-      return  '<input type="checkbox" value="' + (full.URI || full.uri) + '"' +
-              (!!kit.settings.selectionHandler ? ' class="jtox-handler" data-handler="' + kit.settings.selectionHandler + '"' : '') +
-              '/>' + oldRes;
-    }
-  };
-
+    
   return cls;
 })();

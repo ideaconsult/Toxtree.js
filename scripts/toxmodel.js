@@ -73,7 +73,7 @@ var jToxModel = (function () {
       
       // but before given it up - make a small sorting..
       if (!self.settings.algorithms) {
-        self.settings.configuration.columns.model.Stars.mRender = function (data, type, full) { return type != 'display' ? data : jToxDataset.putStars(self, data, "Model star rating (worst) 1 - 10 (best)"); };
+        self.settings.configuration.columns.model.Stars.mRender = function (data, type, full) { return type != 'display' ? data : jT.ui.putStars(self, data, "Model star rating (worst) 1 - 10 (best)"); };
         if (self.settings.shortStars) {
           self.settings.configuration.columns.model.Stars.sWidth = "40px";
         }
@@ -97,7 +97,7 @@ var jToxModel = (function () {
       var cat = self.settings.algorithms ? 'algorithm' : 'model';
       // deal if the selection is chosen
       if (self.settings.selectable) {
-        self.settings.configuration.columns[cat].Id.mRender = jToxDataset.addSelection(self, self.settings.configuration.columns.model.Id.mRender);
+        self.settings.configuration.columns[cat].Id.mRender = jT.ui.addSelection(self, self.settings.configuration.columns.model.Id.mRender);
         self.settings.configuration.columns[cat].Id.sWidth = "60px";
       }
       
@@ -107,7 +107,7 @@ var jToxModel = (function () {
         "bLengthChange": false,
 				"bAutoWidth": false,
         "sDom" : self.settings.sDom,
-        "aoColumns": jT.processColumns(self, cat),
+        "aoColumns": jT.ui.processColumns(self, cat),
 				"oLanguage": {
           "sLoadingRecords": "No models found.",
           "sZeroRecords": "No models found.",

@@ -174,80 +174,7 @@ window.jT = window.jToxKit = {
     }
     return root;
 	},
-		
-  changeTabsIds: function (root, suffix) {
-    jT.$('ul li a', root).each(function() {
-      var id = jT.$(this).attr('href').substr(1);
-      var el = document.getElementById(id);
-      id += suffix;
-      el.id = id;
-      jT.$(this).attr('href', '#' + id);
-    })  
-  },
   
-  modifyColDef: function (kit, col, category, group) {
-	  var name = col.sTitle.toLowerCase();
-	  
-	  // helper function for retrieving col definition, if exists. Returns empty object, if no.          
-	  var getColDef = function (cat) {
-	    var catCol = kit.settings.configuration.columns[cat];
-	    if (!ccLib.isNull(catCol)) {
-	      if (!!group) {
-	        catCol = catCol[group];
-  	      if (!ccLib.isNull(catCol))
-  	        catCol = catCol[name];
-        }
-        else
-	        catCol = catCol[name];
-	    }
-	
-	    if (ccLib.isNull(catCol))
-	      catCol = {};
-	    return catCol;
-	  };
-	  // now form the default column, if existing and the category-specific one...
-	  // extract column redefinitions and merge them all.
-	  col = this.$.extend(col, (!!group ? getColDef('_') : {}), getColDef(category));
-	  return ccLib.isNull(col.bVisible) || col.bVisible ? col : null;
-  },
-  
-  sortColDefs: function (colDefs) {
-	  colDefs.sort(function(a, b) {
-	    var valA = ccLib.isNull(a.iOrder) ? 0 : a.iOrder;
-	    var valB = ccLib.isNull(b.iOrder) ? 0 : b.iOrder;
-	    return valA - valB;
-	  });
-  },
-  
-  processColumns: function (kit, category) {
-    var colDefs = [];
-    var catList = kit.settings.configuration.columns[category];
-    for (var name in catList) {
-      var col = this.modifyColDef(kit, catList[name], category);
-      if (col != null)
-        colDefs.push(col);
-    }
-      
-    this.sortColDefs(colDefs);
-    return colDefs;
-  },
-  
-  shortenedData: function (data, message, deflen) {
-    var res = '';
-    
-    if (ccLib.isNull(deflen))
-      deflen = 5;
-    if (data.toString().length <= deflen) {
-      res += data;
-    }
-    else {
-      res += '<div class="shortened">' + data + '</div>';
-      if (message != null)
-        res += '<span class="ui-icon ui-icon-copy" title="' + message + '" data-uuid="' + data + '"></span>';
-    }
-    return res;
-  },
-		
 	/* Poll a given taskId and calls the callback when a result from the server comes - 
 	be it "running", "completed" or "error" - the callback is always called.
 	*/
@@ -338,6 +265,111 @@ window.jT = window.jToxKit = {
 			}
 		});
 	}
+};
+
+/* UI related functions of jToxKit are put here for more convenient usage
+*/
+window.jT.ui = {
+  shortenedData: function (data, message, deflen) {
+    var res = '';
+    
+    if (ccLib.isNull(deflen))
+      deflen = 5;
+    if (data.toString().length <= deflen) {
+      res += data;
+    }
+    else {
+      res += '<div class="shortened">' + data + '</div>';
+      if (message != null)
+        res += '<span class="ui-icon ui-icon-copy" title="' + message + '" data-uuid="' + data + '"></span>';
+    }
+    return res;
+  },
+  
+  changeTabsIds: function (root, suffix) {
+    jT.$('ul li a', root).each(function() {
+      var id = jT.$(this).attr('href').substr(1);
+      var el = document.getElementById(id);
+      id += suffix;
+      el.id = id;
+      jT.$(this).attr('href', '#' + id);
+    })  
+  },
+  
+  modifyColDef: function (kit, col, category, group) {
+	  var name = col.sTitle.toLowerCase();
+	  
+	  // helper function for retrieving col definition, if exists. Returns empty object, if no.          
+	  var getColDef = function (cat) {
+	    var catCol = kit.settings.configuration.columns[cat];
+	    if (!ccLib.isNull(catCol)) {
+	      if (!!group) {
+	        catCol = catCol[group];
+  	      if (!ccLib.isNull(catCol))
+  	        catCol = catCol[name];
+        }
+        else
+	        catCol = catCol[name];
+	    }
+	
+	    if (ccLib.isNull(catCol))
+	      catCol = {};
+	    return catCol;
+	  };
+	  // now form the default column, if existing and the category-specific one...
+	  // extract column redefinitions and merge them all.
+	  col = jT.$.extend(col, (!!group ? getColDef('_') : {}), getColDef(category));
+	  return ccLib.isNull(col.bVisible) || col.bVisible ? col : null;
+  },
+  
+  sortColDefs: function (colDefs) {
+	  colDefs.sort(function(a, b) {
+	    var valA = ccLib.isNull(a.iOrder) ? 0 : a.iOrder;
+	    var valB = ccLib.isNull(b.iOrder) ? 0 : b.iOrder;
+	    return valA - valB;
+	  });
+  },
+  
+  processColumns: function (kit, category) {
+    var colDefs = [];
+    var catList = kit.settings.configuration.columns[category];
+    for (var name in catList) {
+      var col = this.modifyColDef(kit, catList[name], category);
+      if (col != null)
+        colDefs.push(col);
+    }
+      
+    this.sortColDefs(colDefs);
+    return colDefs;
+  },  
+  
+  putStars: function (kit, stars, title) {
+    if (!kit.settings.shortStars) {
+      var res = '<div title="' + title + '">';
+      for (var i = 0;i < kit.settings.maxStars;++i) {
+        res += '<span class="ui-icon ui-icon-star jtox-inline';
+        if (i >= stars)
+          res += ' transparent';
+        res += '"></span>';
+      }
+      return res + '</div>';
+    }
+    else { // i.e. short version
+      return '<span class="ui-icon ui-icon-star jtox-inline" title="' + title + '"></span>' + stars;
+    }
+  },
+  
+  addSelection: function (kit, oldFn) {
+    return function (data, type, full) {
+      var oldRes = oldFn(data, type, full);
+      if (type != 'display')
+        return oldRes;
+      
+      return  '<input type="checkbox" value="' + (full.URI || full.uri) + '"' +
+              (!!kit.settings.selectionHandler ? ' class="jtox-handler" data-handler="' + kit.settings.selectionHandler + '"' : '') +
+              '/>' + oldRes;
+    }
+  }
 };
 
 // we need to do this here - because other tools/libraries could have scheduled themselves on 'ready',
