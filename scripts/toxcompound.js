@@ -339,7 +339,7 @@ var jToxCompound = (function () {
               '' + data : 
               "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;<br/>" + 
                 (self.settings.hasDetails ?              
-                  '<span class="jtox-details-open ui-icon ui-icon-circle-triangle-e" title="Press to open/close detailed info for the entry"></span>'
+                  '<span class="jtox-details-open ui-icon ui-icon-circle-triangle-e" title="Press to open/close detailed info for this compound"></span>'
                   : '');
           }
         },
@@ -511,6 +511,7 @@ var jToxCompound = (function () {
           jT.$(nRow).data('jtox-index', iDataIndex);
         },
         "fnDrawCallback": function(oSettings) {
+          // this is for synchro-sorting the two tables
           var sorted = jT.$('.jtox-row', this);
           for (var i = 0, rlen = sorted.length;i < rlen; ++i) {
             var idx = jT.$(sorted[i]).data('jtox-index');
@@ -702,21 +703,8 @@ var jToxCompound = (function () {
       this.clearDataset();
       this.init();
 
-      // we want to take into account the passed page & pagesize, but remove them, afterwards.
-      var urlObj = ccLib.parseURL(datasetUri);
-      if (urlObj.params['pagesize'] !== undefined) {
-        var sz = parseInt(urlObj.params['pagesize']);
-        if (sz > 0)
-          self.settings.pageSize = sz;
-          datasetUri = ccLib.removeParameter(datasetUri, 'pagesize');
-      }
-      if (urlObj.params['page'] !== undefined) {
-        var beg = parseInt(urlObj.params['page']);
-        if (beg >= 0)
-          self.settings.pageStart = beg * self.settings.pageSize;
-        datasetUri = ccLib.removeParameter(datasetUri, 'page');
-      }
-      
+      datasetUri = jT.grabPaging(self, datasetUri);
+
       self.settings.baseUrl = self.settings.baseUrl || jT.grabBaseUrl(datasetUri);
       
       // remember the _original_ datasetUri and make a call with one size length to retrieve all features...

@@ -1,6 +1,5 @@
 TODO:
 - jToxKit - some universal way to add icons/components to Id tag.
-- jToxKit - add 'ui' part and put some stuff in it: 'putStars', 'addSelection', 'numberCellFn'
 - jToxSubstance - a separate kit
 - jToxComposition
 

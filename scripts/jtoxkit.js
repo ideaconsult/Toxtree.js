@@ -207,6 +207,29 @@ window.jT = window.jToxKit = {
     else
       return this.settings.baseUrl;
 	},
+
+  /* Grab the paging information from the given URL and place it into the settings of passed
+  kit, as <kit>.settings.pageStart and <kit>.settings.pageSize. Pay attention that it is 'pageStart' 
+  and not 'pageNo'.
+  */
+  grabPaging: function (kit, url) {
+    var urlObj = ccLib.parseURL(url);
+    if (urlObj.params['pagesize'] !== undefined) {
+      var sz = parseInt(urlObj.params['pagesize']);
+      if (sz > 0)
+        kit.settings.pageSize = sz;
+      url = ccLib.removeParameter(url, 'pagesize');
+    }
+    
+    if (urlObj.params['page'] !== undefined) {
+      var beg = parseInt(urlObj.params['page']);
+      if (beg >= 0)
+        kit.settings.pageStart = beg * kit.settings.pageSize;
+      url = ccLib.removeParameter(url, 'page');
+    }
+    
+    return url;
+  },
 	
 	/* Makes a server call for provided service, with settings form the given kit and calls 'callback' at the end - always.
 	The 'params', if passed, can have following attributes:
@@ -341,7 +364,24 @@ window.jT.ui = {
       
     this.sortColDefs(colDefs);
     return colDefs;
-  },  
+  },
+  
+  queryInfo: function (aoData) {
+    var info = {};
+    for (var i = 0, dl = aoData.length; i < dl; ++i)
+      info[aoData[i].name] = aoData[i].value;
+  
+    if (info.iSortingCols > 0) {
+      info.iSortDirection = info.sSortDir_0.toLowerCase();
+      info.sSortData = info["mDataProp_" + info.iSortCol_0];
+    }
+    else {
+      info.iSortDirection = 0;
+      info.sSortData = "";
+    }
+    
+    return info;
+  },
   
   putStars: function (kit, stars, title) {
     if (!kit.settings.shortStars) {
@@ -365,9 +405,11 @@ window.jT.ui = {
       if (type != 'display')
         return oldRes;
       
-      return  '<input type="checkbox" value="' + (full.URI || full.uri) + '"' +
+      var html = '<input type="checkbox" value="' + (full.URI || full.uri) + '"' +
               (!!kit.settings.selectionHandler ? ' class="jtox-handler" data-handler="' + kit.settings.selectionHandler + '"' : '') +
-              '/>' + oldRes;
+              '/>';
+              
+      return html + oldRes;
     }
   }
 };
