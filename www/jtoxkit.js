@@ -620,6 +620,7 @@ var jToxCompound = (function () {
     "showTabs": true,         // should we show tabs with groups, or not
     "showExport": true,       // should we add export tab up there
     "showControls": true,     // should we show the pagination/navigation controls.
+    "hideEmpty": false,       // whether to hide empty groups instead of making them inactive
     "pageSize": 20,           // what is the default (startint) page size.
     "pageStart": 0,           // what is the default startint point for entries retrieval
     "rememberChecks": false,  // whether to remember feature-checkbox settings between queries
@@ -835,7 +836,7 @@ var jToxCompound = (function () {
       var idx = 0;
       for (var gr in self.groups) {
         var grId = "jtox-ds-" + gr.replace(/\s/g, "_") + "-" + self.instanceNo;
-        createATab(grId, gr.replace(/_/g, " "));
+        var tabLi = createATab(grId, gr.replace(/_/g, " "));
         
         // now prepare the content...
         var divEl = document.createElement('div');
@@ -871,8 +872,15 @@ var jToxCompound = (function () {
           }
         });
 
-        if (empty)
-          emptyList.push(idx);
+        if (empty) {
+          if (self.settings.hideEmpty) {
+            jT.$(divEl).remove();
+            jT.$(tabLi).remove();
+            --idx;
+          }
+          else
+            emptyList.push(idx);
+        }
         ++idx;
       }
       

@@ -27,10 +27,9 @@
   <script src="scripts/jtoxkit.js"></script>
   <script src="scripts/toxcompound.js"></script>
   
-  <script src="tests/config-dataset.js"></script>
   <script language="javascript">
     $(document).ready(function(){
-      window['ds'] = new jToxCompound($(".jtox-toolkit")[0], {crossDomain: true, rememberChecks: true, configuration: config_dataset } );
+      window['ds'] = new jToxCompound($(".jtox-toolkit")[0], {crossDomain: true, rememberChecks: true, hideEmpty: true} );
       window.ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/dataset/18?feature_uris[]=http://apps.ideaconsult.net:8080/toxbank/model/6/predicted");
 /*       ds.queryDataset("http://apps.ideaconsult.net:8080/ambit2/dataset/1945542");  */
 /*       ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/query/similarity?search=c1ccccc1O&threshold=0.5"); */
