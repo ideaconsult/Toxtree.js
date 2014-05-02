@@ -32,6 +32,7 @@
   	transition: left 0.5s ease;
   	-moz-transition: left 0.5s ease;
   	-webkit-transition: left 0.5s ease;
+  	-o-transition: left 0.5s ease;
   	border-radius: 7px;
   	box-shadow: 3px 3px 7px #999;
 	}
@@ -70,6 +71,15 @@
   #browser, #searchbar .ketcher {
     margin-left: 30px;
   }
+  
+  #browser {
+    position: relative;
+    top: 0px;
+  	transition: top 0.3s ease 0.2s;
+  	-moz-transition: top 0.3s ease 0.2s;
+  	-webkit-transition: top 0.3s ease 0.2s;
+  	-o-transition: top 0.3s ease 0.2s;
+  }
 	</style>
 
   <script src="oecdcategories.js"></script>
@@ -98,11 +108,11 @@
     }
     
     $(document).ready(function(){
-      var openBar = function () {
+      var toggleBar = function () {
         $(this).parents('#sidebar').toggleClass('hidden');
       };
-      $('#sidebar span.ui-icon').on('click', openBar);
-      $('#sidebar div.side-title').on('click', openBar);
+      $('#sidebar span.ui-icon').on('click', toggleBar);
+      $('#sidebar div.side-title').on('click', toggleBar);
       
       $('#sidebar a.select-all').on('click', function () {
         $('input[type="checkbox"]', this.parentNode).each(function () { this.checked = true;});
