@@ -12,7 +12,7 @@ var jToxModel = (function () {
     algorithmLink: true,
     algorithms: false,
     algorithmNeedle: null,
-    onReady: null,
+    onLoaded: null,
     sDom: "<Fif>rt",
     /* modelUri */
     configuration: { 
@@ -130,7 +130,7 @@ var jToxModel = (function () {
         if (!!result) {
           self.models = result.model;
           jT.$(self.table).dataTable().fnAddData(result.model);
-          ccLib.fireCallback(self.settings.onReady, self, result);
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
       });
     },
@@ -146,7 +146,7 @@ var jToxModel = (function () {
         if (!!result) {
           self.algorithms = result.algorithm;
           jT.$(self.table).dataTable().fnAddData(result.algorithm);
-          ccLib.fireCallback(self.settings.onReady, self, result);
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
       });
     },

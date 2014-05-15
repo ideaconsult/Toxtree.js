@@ -634,7 +634,7 @@ var jToxCompound = (function () {
     "pageStart": 0,           // what is the default startint point for entries retrieval
     "rememberChecks": false,  // whether to remember feature-checkbox settings between queries
     "metricFeature": "http://www.opentox.org/api/1.1#Similarity",   // This is the default metric feature, if no other is specified
-    "onReady": null,
+    "onLoaded": null,
     "fnAccumulate": function(fId, oldVal, newVal, features) {
       if (ccLib.isNull(newVal))
         return oldVal;
@@ -1306,7 +1306,7 @@ var jToxCompound = (function () {
           }
 
           // time to call the supplied function, if any.
-          ccLib.fireCallback(self.settings.onReady, self, dataset);
+          ccLib.fireCallback(self.settings.onLoaded, self, dataset);
           if (typeof fnComplete == 'function')
             fnComplete();
         }
@@ -1455,7 +1455,7 @@ var jToxDataset = (function () {
     selectable: false,
     selectionHandler: null,
     sDom: "<Fif>rt",
-    onReady: null,
+    onLoaded: null,
     /* listUri */
     configuration: { 
       columns : {
@@ -1534,7 +1534,7 @@ var jToxDataset = (function () {
       jT.call(self, uri, function (result) {
         if (!!result) {
           jT.$(self.table).dataTable().fnAddData(result.dataset);
-          ccLib.fireCallback(self.settings.onReady, self, result);
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
       });
     },
@@ -1569,7 +1569,7 @@ var jToxModel = (function () {
     algorithmLink: true,
     algorithms: false,
     algorithmNeedle: null,
-    onReady: null,
+    onLoaded: null,
     sDom: "<Fif>rt",
     /* modelUri */
     configuration: { 
@@ -1687,7 +1687,7 @@ var jToxModel = (function () {
         if (!!result) {
           self.models = result.model;
           jT.$(self.table).dataTable().fnAddData(result.model);
-          ccLib.fireCallback(self.settings.onReady, self, result);
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
       });
     },
@@ -1703,7 +1703,7 @@ var jToxModel = (function () {
         if (!!result) {
           self.algorithms = result.algorithm;
           jT.$(self.table).dataTable().fnAddData(result.algorithm);
-          ccLib.fireCallback(self.settings.onReady, self, result);
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
       });
     },

@@ -8,7 +8,7 @@ var jToxSubstance = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     selectable: false,
     sDom: "<if>rt<Fp>",
-    onReady: null,
+    onLoaded: null,
     
     pageStart: 0,
     pageSize: 20,

@@ -11,7 +11,7 @@ var jToxDataset = (function () {
     selectable: false,
     selectionHandler: null,
     sDom: "<Fif>rt",
-    onReady: null,
+    onLoaded: null,
     /* listUri */
     configuration: { 
       columns : {
@@ -90,7 +90,7 @@ var jToxDataset = (function () {
       jT.call(self, uri, function (result) {
         if (!!result) {
           jT.$(self.table).dataTable().fnAddData(result.dataset);
-          ccLib.fireCallback(self.settings.onReady, self, result);
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
       });
     },
