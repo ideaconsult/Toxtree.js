@@ -18,9 +18,17 @@ var ccLib = {
   },
 
   fireCallback: function (callback, self) {
-    if (typeof callback != 'function')
-      callback = window[callback];
-    return (typeof callback == 'function') ? (callback.apply((self !== undefined && self != null) ? self : document, Array.prototype.slice.call(arguments, 2))) : null;
+    if (!jQuery.isArray(callback))
+      callback = [callback];
+      
+    var ret = null;
+    for (var i = 0, cl = callback.length; i < cl; ++i) {
+      var callone = callback[i];
+      if (typeof callone != 'function')
+        callone = window[callone];
+      ret = (typeof callone == 'function') ? (callone.apply((self !== undefined && self != null) ? self : document, Array.prototype.slice.call(arguments, 2))) : null;
+    }
+    return ret;
   },
   
   /* Function setObjValue(obj, value)Set a given to the given element (obj) in the most appropriate way - be it property - the necessary one, or innetHTML
@@ -1881,7 +1889,7 @@ var jToxStudy = (function () {
 	        { "sTitle": "Text", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, function (data, type) { return !!data.result.textValue  ? data.result.textValue : '-'; }); } },
 	        { "sTitle": "Guideline", "sClass": "center middle", "sWidth": "15%", "mData": "protocol.guideline", "mRender" : "[,]", "sDefaultContent": "-"  },    // Protocol columns
 	        { "sTitle": "Owner", "sClass": "center middle shortened", "sWidth": "15%", "mData": "citation.owner", "sDefaultContent": "-" },
-	        { "sTitle": "Citation", "sClass": "center middle shortened", "sWidth": "15%", "mData": "citation", "mRender": function (data, type, full) { return (data.title || "") + ' ' + (!!data.year && data.year.length > 1 ? data.year : "") + ' ' + (data.owner || ""); }  },
+	        { "sTitle": "Citation", "sClass": "center middle shortened", "sWidth": "15%", "mData": "citation", "mRender": function (data, type, full) { return (data.title || "") + ' ' + (!!data.year && data.year.length > 1 ? data.year : ""); }  },
 	        { "sTitle": "UUID", "sClass": "center middle", "sWidth": "15%", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : jT.ui.shortenedData(data, "Press to copy the UUID in the clipboard"); } }
 	      ];
   

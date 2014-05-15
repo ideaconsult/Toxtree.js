@@ -18,9 +18,17 @@ var ccLib = {
   },
 
   fireCallback: function (callback, self) {
-    if (typeof callback != 'function')
-      callback = window[callback];
-    return (typeof callback == 'function') ? (callback.apply((self !== undefined && self != null) ? self : document, Array.prototype.slice.call(arguments, 2))) : null;
+    if (!jQuery.isArray(callback))
+      callback = [callback];
+      
+    var ret = null;
+    for (var i = 0, cl = callback.length; i < cl; ++i) {
+      var callone = callback[i];
+      if (typeof callone != 'function')
+        callone = window[callone];
+      ret = (typeof callone == 'function') ? (callone.apply((self !== undefined && self != null) ? self : document, Array.prototype.slice.call(arguments, 2))) : null;
+    }
+    return ret;
   },
   
   /* Function setObjValue(obj, value)Set a given to the given element (obj) in the most appropriate way - be it property - the necessary one, or innetHTML

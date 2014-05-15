@@ -1,7 +1,6 @@
 TODO:
 - jToxKit - some universal way to add icons/components to Id tag.
 - jToxKit - generalize onReady to whole events mechanism.
-- ccLib - modify fireCallback() so it can work with array of handlers...
 - jToxSubstance - a separate kit
 - jToxComposition
 
