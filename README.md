@@ -81,7 +81,7 @@ Although different kits can have different configuration parameters, these are c
 - **`onConnect`** (attr. `data-on-connect`), _optional_: a function name, or function to be called just before any AJAX call.
 - **`onSuccess`** (attr. `data-on-success`), _optional_: a function name, or function to be called upon successful complete of a AJAX call.
 - **`onError`** (attr. `data-on-error`), _optional_: a function name, or function to be called when there's an error on AJAX call. The passed _callback_ to `jT.call()` is still called, but with _null_ result.
-- **`onLoaded`** (attr. `data-on-loaded`), _optional_: another kit-specific callback, which is called form the kit itself, when it's main querying result has arrived, be it _dataset_, _model_ or whatever. The callback is called within kit's context (i.e. the kit instance is `this`) and the returned set is passed as first agrument. Default _null_.
+- **`onLoaded`** (attr. `data-on-loaded`), _optional_: another kit-specific callback, which is called from the kit itself, when it's main querying result has arrived, be it _dataset_, _model_ or whatever. The callback is called within kit's context (i.e. the kit instance is `this`) and the returned set is passed as first agrument. Default _null_.
 - **`sDom`** (attr. `data-s-dom`). _optional_: a redefinition of sDom setting for dataTables instance. It does not apply for [jToxCompound](#jtoxcompound), because it uses two, synchronized tables and custom filter and pagination controls.
 - **`configuration`** (attr. `data-configuration`), _optional_: a way to provide kit-specific configuration, like columns visibility and/or ordering for _study_ kit. If it is recognized as string value - a global vairbale with this name is used, otherwise - the passed object itself. No default value.
 - **`configFile`** (attr. `data-config-file`) _optional_: Another way to provide configuration for a kit, but this time - providing the name/path of external JSON file, which is downloaded and used as configuration parameter. No default value.
@@ -175,6 +175,7 @@ Parameters that can be passed either with data-XXX attributes or when initialize
 - **`fnAccumulate`** (attr. `data-fn-accumulate`), _optional_: The function that should be called during dataset entries' processing, when several values need to be accumulated in the same place. The format of the function is `function fnlocation(featureId, oldValue, newValue, features)`. The default one is concatenating the passed values as comma-separated string.
 - **`pageStart`** (attr. `data-page-start`), _optional_: From which item the referenced dataset should be visualized. Counted from 0. Default: *0*.
 - **`pageSize`** (attr. `data-page-size`), _optional_: initial page size for queries - can later be changed either with `queryEntries()` call, or with dropdown menu, if visible. Default: *20*.
+- **`onPrepared`** (attr. `data-on-prepared`), _optional_: A callback which is called when the initial call for determining the columns, tabs etc. has completed. The one-entry dataset is passed as a parameter, the context (i.e. _this_) is the kit itself. Default: _null_.
 
 
 ##### Configuration
@@ -413,10 +414,14 @@ These are needed in the same page in order for _jToxStudy_ to work. It has some 
 
 ##### Parameters
 
-Not quite a lot yet, though:
+Not quite a lot yet, mainly event handlers:
 
 - **`substanceUri`** (attr. `data-substance-uri`), _optional_: This is the URL of the substance in question. If it is passed during _jToxStudy_ initialization a call to `jToxStudy.querySubstance(uri)` is made. In either case upon successful substance info retrieval automatic calls to `jToxStudy.querySummary(uri)` and `jToxStudy.queryComposition(uri)` are made.
 - **`tab`** (attr. `data-tab`), _optional_: Specifying which study top-category should be preloaded upon page loading. It can be either _encodeURIComponent()_ encoded, or spaces replaced with underscore.
+- **`onLoaded`** (attr. `data-on-loaded`), _optional_: This one is invoked when the general information for the substance is loaded - before all supplmentary info is even queries (like composition, studies, etc.). As usual the context (i.e. _this_) is the kit itself, and the passed parameter is the substance data retrieved from the server. Default: _null_.
+- **`onSummary`** (attr. `data-on-summary`), _optional_: Inkoved when study summary information arrives from the server. Passed as parameter, within kit's context (i.e. _this_). Default: _null_.
+- **`onComposition`** (attr. `data-on-composition`), _optional_: Invoked when the composition info for that substance arrives from the server. It is passed as a parameter within kit's context (i.e. _this_). Default: _null_.
+- **`onStudy`** (attr. `data-on-study`), _optional_: This one is invoked when a set of studies for certain category arrives from the server. The array of studies is passed as a parameter, again within kit's context (i.e. _this_). Default: _null_.
 
 ##### Configuration
 

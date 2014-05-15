@@ -15,7 +15,8 @@ var jToxCompound = (function () {
     "pageStart": 0,           // what is the default startint point for entries retrieval
     "rememberChecks": false,  // whether to remember feature-checkbox settings between queries
     "metricFeature": "http://www.opentox.org/api/1.1#Similarity",   // This is the default metric feature, if no other is specified
-    "onLoaded": null,
+    "onLoaded": null,         // invoked when a set of compound is loaded.
+    "onPrepared": null,       // invoked when the initial call for determining the tabs/columns is ready
     "fnAccumulate": function(fId, oldVal, newVal, features) {
       if (ccLib.isNull(newVal))
         return oldVal;
@@ -637,7 +638,7 @@ var jToxCompound = (function () {
     },
     
     // make the actual query for the (next) portion of data.
-    queryEntries: function(from, size, fnComplete) {
+    queryEntries: function(from, size) {
       var self = this;
       if (from < 0)
         from = 0;
@@ -688,8 +689,6 @@ var jToxCompound = (function () {
 
           // time to call the supplied function, if any.
           ccLib.fireCallback(self.settings.onLoaded, self, dataset);
-          if (typeof fnComplete == 'function')
-            fnComplete();
         }
       });
     },
@@ -726,6 +725,7 @@ var jToxCompound = (function () {
           
           self.prepareTables(); // prepare the tables - we need features to build them - we have them!
           self.equalizeTables(); // to make them nicer, while waiting...
+          ccLib.fireCallback(self.settings.onPrepared, self, dataset);
           self.queryEntries(self.settings.pageStart, self.settings.pageSize); // and make the query for actual data
         }
       });

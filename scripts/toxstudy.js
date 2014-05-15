@@ -8,6 +8,11 @@ var jToxStudy = (function () {
   var defaultSettings = {
     tab: null,
     sDom: "rt<Fip>",
+    // events
+    onSummary: null,    // invoked when the summary is loaded
+    onComposition: null, // invoked when the 
+    onStudy: null,      // invoked for each loaded study
+    onLoaded: null,     // invoked when the substance general info is loaded
     configuration: { 
       columns: {
       	"_": {
@@ -85,6 +90,7 @@ var jToxStudy = (function () {
               jT.$(table).removeClass('unloaded folded');
               jT.$(table).addClass('loaded');
               self.processStudies(panel, study.study, false);
+              ccLib.fireCallback(self.settings.onStudy, self, study.study);
             }
           });  
         });
@@ -585,6 +591,7 @@ var jToxStudy = (function () {
       jT.call(self, summaryURI, function(summary) {
         if (!!summary && !!summary.facet)
           self.processSummary(summary.facet);
+          ccLib.fireCallback(self.settings.onSummary, self, summary.facet);
           // check if there is an initial tab passed so we switch to it
           if (!!self.settings.tab) {
             var div = jT.$('.jtox-study-tab.' + decodeURIComponent(self.settings.tab).replace(/ /g, '_'), self.root)[0];
@@ -606,6 +613,7 @@ var jToxStudy = (function () {
       jT.call(self, compositionURI, function(composition) {
         if (!!composition && !!composition.composition)
           self.processComposition(composition);
+          ccLib.fireCallback(self.settings.onComposition, self, composition.composition);
         });
     },
     
@@ -638,6 +646,7 @@ var jToxStudy = (function () {
             }
           });
            
+          ccLib.fireCallback(self.settings.onLoaded, self, substance.substance);
           // query for the summary and the composition too.
           self.querySummary(substance.URI + "/studysummary");
           self.queryComposition(substance.URI + "/composition");
