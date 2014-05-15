@@ -150,7 +150,7 @@ var jToxStudy = (function () {
 	        { "sTitle": "Result", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, function (data, type) { return formatLoHigh(data.result, type) }); } },
 	        { "sTitle": "Text", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, function (data, type) { return !!data.result.textValue  ? data.result.textValue : '-'; }); } },
 	        { "sTitle": "Guideline", "sClass": "center middle", "sWidth": "15%", "mData": "protocol.guideline", "mRender" : "[,]", "sDefaultContent": "-"  },    // Protocol columns
-	        { "sTitle": "Citation", "sClass": "center middle shortened", "sWidth": "15%", "mData": "citation", "mRender": function (data, type, full) { return (data.title || "") + (!!data.year && data.year.length > 1 ? data.year : "") + (data.owner || ""); }  },
+	        { "sTitle": "Citation", "sClass": "center middle shortened", "sWidth": "15%", "mData": "citation", "mRender": function (data, type, full) { return (data.title || "") + ' ' + (!!data.year && data.year.length > 1 ? data.year : "") + ' ' + (data.owner || ""); }  },
 	        { "sTitle": "UUID", "sClass": "center middle", "sWidth": "15%", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : jT.ui.shortenedData(data, "Press to copy the UUID in the clipboard"); } }
 	      ];
   
