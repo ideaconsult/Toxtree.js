@@ -304,7 +304,7 @@ var jToxStudy = (function () {
             return sPre;
           },
   				"oLanguage": {
-            "sProcessing": "<img src='" + (jT.settings.baseUrl || self.baseUrl) + "images/24x24_ambit.gif' border='0'>",
+            "sProcessing": "<img src='" + (jT.settings.baseUrl || self.baseUrl) + "/images/24x24_ambit.gif' border='0'>",
             "sLoadingRecords": "No studies found.",
             "sZeroRecords": "No studies found.",
             "sEmptyTable": "No studies available.",
@@ -474,7 +474,7 @@ var jToxStudy = (function () {
   				"sPaginate" : ".dataTables_paginate _paging",
   				"bAutoWidth": false,
   				"oLanguage": {
-            "sProcessing": "<img src='" + (jT.settings.baseUrl || self.baseUrl) + "images/24x24_ambit.gif' border='0'>",
+            "sProcessing": "<img src='" + (jT.settings.baseUrl || self.baseUrl) + "/images/24x24_ambit.gif' border='0'>",
             "sLoadingRecords": "No substances found.",
             "sZeroRecords": "No substances found.",
             "sEmptyTable": "No substances available.",
