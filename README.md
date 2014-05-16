@@ -513,8 +513,9 @@ There are few things that can be setup from outside:
 - **`selectionHandler`** (attr. `data-selection-handler`), _optional_: Used with combination of previous parameter (_selectable_). If this one is provided it is added as `data-handler`, i.e. - it gives the name of the handler to be invokes by _jToxQuery_ when the selection box has changed it's value. Default: _null_.
 - **`maxStars`** (attr. `data-max-stars`), _optional_: How many stars are considered maximum, when building the long version of ratings. Default: _10_.
 - **`shortStars`** (attr. `data-short-stars`), _optional_: Whether to show show star rating notation, i.e. - one star and the number of stars next to it, opposed to the long (default) version - always showing the maximum number of stars, with given number of them - highlighted. Default is _false_.
+- **`loadOnInit`** (attr. `data-load-on-init`), _optional_: Whether to make an initial query even when _datasetUri_ is not specified. Default is _false_.
 - **`sDom`** (attr. `data-s-dom`), _optional_: The redefinition of _sDom_ attribute for the table. Default _"\<Fif\>rt"_.
-- **`listUri`** (attr. `data-list-uri`), _optional_: The address to query for list of datasets. If none is bassed the standard `<baseURL>/dataset` is used.
+- **`datasetUri`** (attr. `data-dataset-uri`), _optional_: The address to query for list of datasets. If none is bassed the standard `<baseURL>/dataset` is used.
 
 
 ##### Methods
@@ -579,6 +580,7 @@ There are few things that can be setup from outside:
 - **`algorithms`** (attr. `data-algorithms`), _optional_: Whether to list available algorithms, rather than available models. Default: _false_.
 - **`maxStars`** (attr. `data-max-stars`), _optional_: How many stars are considered maximum, when building the long version of ratings. Default: _10_.
 - **`shortStars`** (attr. `data-short-stars`), _optional_: Whether to show show star rating notation, i.e. - one star and the number of stars next to it, opposed to the long (default) version - always showing the maximum number of stars, with given number of them - highlighted. Default is _false_.
+- **`loadOnInit`** (attr. `data-load-on-init`), _optional_: Whether to make an initial query even when _modelUri_ or _algorithmNeedle_ are not specified. Default is _false_.
 - **`sDom`** (attr. `data-s-dom`), _optional_: The redefinition of _sDom_ attribute for the table. Default _"\<Fif\>rt"_.
 - **`modelUri`** (attr. `data-model-uri`), _optional_: The address to query for list of models. If none is bassed the standard `<baseURL>/model` is used.
 - **`algorithmNeedle`** (attr. `data-algorithms-needle`), _optional_: If algorithms listing mode is selected (`algorithms` = _true_) - this is the needle to be used when listing them. Default: _null_.

@@ -1456,7 +1456,8 @@ var jToxDataset = (function () {
     selectionHandler: null,
     sDom: "<Fif>rt",
     onLoaded: null,
-    /* listUri */
+    loadOnInit: false,
+    /* datasetUri */
     configuration: { 
       columns : {
         dataset: {
@@ -1487,7 +1488,8 @@ var jToxDataset = (function () {
     self.init();
         
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
-    self.listDatasets(self.settings.listUri)
+    if (self.settings.datasetUri != undefined || self.settings.loadOnInit)
+      self.listDatasets(self.settings.datasetUri)
   };
   
   cls.prototype = {
@@ -1529,6 +1531,8 @@ var jToxDataset = (function () {
       var self = this;
       if (uri == null)
         uri = self.settings.baseUrl + '/dataset';
+      else if (!self.settings.baseUrl)
+        self.settings.baseUrl = jT.grabBaseUrl(uri);
       
       jT.$(self.table).dataTable().fnClearTable();
       jT.call(self, uri, function (result) {
@@ -1568,9 +1572,10 @@ var jToxModel = (function () {
     maxStars: 10,
     algorithmLink: true,
     algorithms: false,
-    algorithmNeedle: null,
     onLoaded: null,
     sDom: "<Fif>rt",
+    loadOnInit: false,
+    /* algorithmNeedle */
     /* modelUri */
     configuration: { 
       columns : {
@@ -1621,7 +1626,8 @@ var jToxModel = (function () {
     self.init();
         
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
-    self.query();
+    if (self.settings.modelUri !== undefined || self.settings.algorithmNeedle !== undefined || self.settings.loadOnInit)
+      self.query();
   };
   
   cls.prototype = {
@@ -1680,6 +1686,8 @@ var jToxModel = (function () {
       var self = this;
       if (uri == null)
         uri = self.settings.baseUrl + '/model';
+      else if (!self.settings.baseUrl)
+        self.settings.baseUrl = jT.grabBaseUrl(uri);
 
       self.modelUri = uri;
       jT.$(self.table).dataTable().fnClearTable();
