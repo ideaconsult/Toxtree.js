@@ -2,7 +2,7 @@
 */
 
 div.jtox-study,
-div.jtox-composition,
+div.jtox-compo-tab,
 div.jtox-substance {
   display: block;
   font-size: small;
@@ -10,21 +10,9 @@ div.jtox-substance {
   padding: 5px 5px 35px 5px;
 }
 
-.jtox-compoblock {
+.jtox-compo-tab {
   margin-top: 25px;
   margin-bottom: 45px;  
-}
-
-.jtox-toolkit table.composition-info.dataTable td,
-.jtox-toolkit table.composition-info.dataTable th {
-  border: 0px;
-  padding-bottom: 0px;
-  padding-top: 0px;
-}
-
-.jtox-toolkit table.composition-info.dataTable th {
-  width: 20%;
-  text-align: right;
 }
 
 div.jtox-study.unloaded div.title,

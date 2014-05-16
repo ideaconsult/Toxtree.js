@@ -22,10 +22,7 @@ var jToxStudy = (function () {
 	    		"effects": { },
 	    		"protocol": { },
 	    		"interpretation": { },
-	    	},
-    		"composition": { 
-	    		"main" : { }
-    		}
+	    	}
     	}
     }
   };    // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
@@ -455,136 +452,7 @@ var jToxStudy = (function () {
         this.style.height = '' + this.offsetHeight + 'px';
       });
     },
-    
-    formatConcentration: function (precision, val, unit) {
-    	return ((precision === undefined || precision === null || "=" == precision ? "" : precision) + val + " " + (unit == null || unit == '' ? '<span class="units">% (w/w)</span>' : unit)).replace(/ /g, "&nbsp;").replace("span&nbsp;", "span ");
-    },
-    
-    processComposition: function(json){
-      var self = this;
-      var tab = jT.$('.jtox-composition', self.rootElement)[0];
-      
-      // clear the old tabs, if any.
-      if (jT.$(tab).hasClass('unloaded')){
-        jT.$(tab).removeClass('unloaded');
-        jT.$(tab).empty();
-      }
-      
-      var prepareFillTable = function (json, panel) {
-        var theTable = jT.$('.substances-table', panel);
-        // prepare the table...
-        jT.$(theTable).dataTable({
-  				"bSearchable": true,
-  				"bProcessing" : true,
-  				"bPaginate" : true,
-          "sDom" : self.settings.sDom || "rt<Fip>",
-  				"sPaginate" : ".dataTables_paginate _paging",
-  				"bAutoWidth": false,
-  				"oLanguage": {
-            "sProcessing": "<img src='" + (jT.settings.baseUrl || self.baseUrl) + "/images/24x24_ambit.gif' border='0'>",
-            "sLoadingRecords": "No substances found.",
-            "sZeroRecords": "No substances found.",
-            "sEmptyTable": "No substances available.",
-            "sInfo": "Showing _TOTAL_ substance(s) (_START_ to _END_)",
-          },
-  		    "aoColumns": [
-            {  //1
-    					"sClass" : "left",
-    					"sWidth" : "10%",
-    					"mData" : "relation",
-    					"mRender" : function(val, type, full) {
-    					  if (type != 'display')
-    					    return '' + val;
-    					  var func = ("HAS_ADDITIVE" == val) ? full.proportion.function_as_additive : "";
-    					  return '<span class="camelCase">' +  val.replace("HAS_", "").toLowerCase() + '</span>' + ((func === undefined || func === null || func == '') ? "" : " (" + func + ")");
-              }
-            },	    
-    				{ //2
-    					"sClass" : "camelCase left",
-    					"sWidth" : "15%",
-    					"mData" : "component.compound.name",
-    					"mRender" : function(val, type, full) {
-    						return (type != 'display') ? '' + val : 
-    						  '<a href="' + full.component.compound.URI + '" target="_blank" title="Click to view the compound"><span class="ui-icon ui-icon-link" style="float: left; margin-right: .3em;"></span></a>' + val;
-    					}
-    				},	    	
-    				{ //3
-    					"sClass" : "left",
-    					"sWidth" : "10%",
-    					"mData" : "component.compound.einecs",
-    				},
-    				{ //4
-    					"sClass" : "left",
-    					"sWidth" : "10%",
-    					"mData" : "component.compound.cas",
-    				},
-    				{ //5
-    					"sClass" : "center",
-    					"sWidth" : "15%",
-    					"mData" : "proportion.typical",
-    					"mRender" : function(val, type, full) { return type != 'display' ? '' + val.value : self.formatConcentration(val.precision, val.value, val.unit); }
-    				},
-    				{ //6
-    					"sClass" : "center",
-    					"sWidth" : "15%",
-    					"mData" : "proportion.real",
-    					"mRender" : function(val, type, full) { return type != 'display' ? '' + val.lowerValue : self.formatConcentration(val.lowerPrecision, val.lowerValue, val.unit); }
-    				},
-    				{ //7,8
-    					"sClass" : "center",
-    					"sWidth" : "15%",
-    					"mData" : "proportion.real",
-    					"mRender" : function(val, type, full) { return type != 'display' ? '' + val.upperValue : self.formatConcentration(val.upperPrecision, val.upperValue, val.unit); }
-    				},
-            { //9
-    					"sClass" : "center",
-    					"bSortable": false,
-    					"mData" : "component.compound.URI",
-    					"mRender" : function(val, type, full) {
-    					  return !val ? '' : '<a href="' + (jT.settings.baseUrl || self.baseUrl) + 'substance?type=related&compound_uri=' + encodeURIComponent(val) + '" target="_blank">Also contained in...</span></a>';
-  					}
-	    		}    				
-  		    ]
-  		  });
-
-        // and fill up the table.
-        jT.$(theTable).dataTable().fnAddData(json);
-        return theTable;
-      };
-      
-      var substances = {};
-
-      jToxCompound.processFeatures(json.feature);
-      // proprocess the data...
-      for (var i = 0, cmpl = json.composition.length; i < cmpl; ++i) {
-        var cmp = json.composition[i];
         
-        jToxCompound.processEntry(cmp.component, json.feature, fnDatasetValue);
-
-        // now prepare the subs        
-        var theSubs = substances[cmp.compositionUUID];
-        if (theSubs === undefined)
-          substances[cmp.compositionUUID] = theSubs = { name: "", purity: "", maxvalue: 0, uuid : cmp.compositionUUID, composition : [] };
-        
-        theSubs.composition.push(cmp);
-        var val = cmp.proportion.typical;
-        if (cmp.relation == 'HAS_CONSTITUENT' && (theSubs.maxvalue < val.value || theSubs.name == '')) {
-          theSubs.name = cmp.component.compound['name'] + ' ' + self.formatConcentration(val.precision, val.value, val.unit);
-          theSubs.maxvalue = val.value;
-          val = cmp.proportion.real;
-          theSubs.purity = (val.lowerValue + '-' + val.upperValue + ' ' + (val.unit == null || val.unit == '' ? '<span class="units">% (w/w)</span>' : val.unit)).replace(/ /g, "&nbsp;").replace("span&nbsp;", "span ");
-        }
-      }
-      
-      // now make the actual filling
-      for (var i in substances) {
-        var panel = jT.getTemplate('#jtox-compoblock');
-        tab.appendChild(panel);
-        ccLib.fillTree(jT.$('.composition-info', panel)[0], substances[i]);
-        prepareFillTable(substances[i].composition, panel);
-      }
-    },
-    
     querySummary: function(summaryURI) {
       var self = this;
       
@@ -607,14 +475,12 @@ var jToxStudy = (function () {
       });
     },
     
-    queryComposition: function(compositionURI) {
+    insertComposition: function(compositionURI) {
       var self = this;
       
-      jT.call(self, compositionURI, function(composition) {
-        if (!!composition && !!composition.composition)
-          self.processComposition(composition);
-          ccLib.fireCallback(self.settings.onComposition, self, composition.composition);
-        });
+      var compoRoot = jT.$('.jtox-compo-tab', self.rootElement)[0];
+      var ds = new jToxComposition(compoRoot);
+      ds.queryComposition(compositionURI);
     },
     
     querySubstance: function(substanceURI) {
@@ -649,7 +515,7 @@ var jToxStudy = (function () {
           ccLib.fireCallback(self.settings.onLoaded, self, substance.substance);
           // query for the summary and the composition too.
           self.querySummary(substance.URI + "/studysummary");
-          self.queryComposition(substance.URI + "/composition");
+          self.insertComposition(substance.URI + "/composition");
         }
       });
     }

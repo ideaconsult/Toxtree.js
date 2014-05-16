@@ -73,7 +73,7 @@ var jToxSubstance = (function () {
       };
       
       if (self.settings.selectable) {
-        coldId.mRender = jT.ui.addSelection(self, colIdFn);
+        colId.mRender = jT.ui.addSelection(self, colIdFn);
         colId.sWidth = "60px";
       }
       else

@@ -320,6 +320,9 @@ window.jT.ui = {
   },
   
   modifyColDef: function (kit, col, category, group) {
+    if (col.sTitle === undefined || col.sTitle == null)
+      return null;
+      
 	  var name = col.sTitle.toLowerCase();
 	  
 	  // helper function for retrieving col definition, if exists. Returns empty object, if no.          
