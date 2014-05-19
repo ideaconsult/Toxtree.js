@@ -12,23 +12,28 @@ var jToxSubstance = (function () {
     
     pageStart: 0,
     pageSize: 20,
+    maxLength: 0,     // the initial value - most probably will be 
     /* substanceUri */
     configuration: { 
       columns : {
         substance: {
-          'Info': { sTitle: "Info", mData: "externalIdentifiers", mReder: function (data, type, full) {
-            
-          } },
+          'Id': { sTitle: 'Action', mData: 'URI', sDefaultContent: "-"}, // a placeholder
           'Substance Name': { sTitle: "Substance Name", mData: "name", sDefaultContent: "-" },
-          'Substance UUID': { sTitle: "Substance UUID", mData: "i5uuid", sClass: "shortened", sWidth: "160px" },
+          'Substance UUID': { sTitle: "Substance UUID", mData: "i5uuid", sClass: "shortened", sWidth: "60px" },
           'Composition Type': { sTitle: "Composition Type", mData: "substanceType", sDefaultContent: '-' },
           'Public name': { sTitle: "Public name", mData: "publicname", sDefaultContent: '-'},
-          'Reference substance UUID': { sTitle: "Reference substance UUID", mData: "referenceSubstance", mRender: function (data, type, full) {
+          'Reference substance UUID': { sTitle: "Reference substance UUID", mData: "referenceSubstance", sWidth: "60px", mRender: function (data, type, full) {
             return (type != 'display') ? 
               data.i5uuid : 
               '<a target="_blank" href="' + data.uri + '">' + jT.ui.shortenedData(data.i5uuid, "Press to copy the UUID in the clipboard") + '</a>';
           } },
           'Owner': { sTitle: "Owner", mData: "ownerName", sDefaultContent: '-'},
+          'Info': { sTitle: "Info", mData: "externalIdentifiers", mRender: function (data, type, full) {
+            var arr = [];
+            for (var i = 0, dl = data.length;i < dl; ++i)
+              arr.push(data[i].type);
+            return arr.join(', ');
+          } }
         }
       }
     }
@@ -54,8 +59,10 @@ var jToxSubstance = (function () {
       var self = this;
       
       // deal if the selection is chosen
-      var colInfo = self.settings.configuration.columns.substance.Info;
-      var infoFn = function (data, type, full) {
+      var colId = self.settings.configuration.columns.substance.Id;
+      colId.bVisible = true;
+      colId.sName = '';
+      var idFn = function (data, type, full) {
         if (type != 'display')
           return data;
 
@@ -90,8 +97,7 @@ var jToxSubstance = (function () {
           if (self.settings.hasDetails)
             jT.$('.jtox-details-open', nRow).on('click', function(e) {  fnShowDetails(nRow, e); });
         },
-        "bServerSide": true,
-        "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) { self.queryEntries(info, fnCallback); },
+        "bServerSide": false,
 				"oLanguage": {
           "sLoadingRecords": "No substances found.",
           "sZeroRecords": "No substances found.",
@@ -103,27 +109,44 @@ var jToxSubstance = (function () {
       jT.$(self.table).dataTable().fnAdjustColumnSizing();
     },
     
-    queryEntries: function (info, callback) {
+    queryEntries: function (aoData, fnCallback) {
       var self = this;
-      var uri = self.substanceUri;
+      var info = jT.ui.queryInfo(aoData);
+      var data = { "sEcho": info.sEcho, iTotalRecords: 0, iTotalDisplayRecords: 0, aaData: [] };
+      if (!self.substanceUri) {
+        fnCallback(data);
+        return;
+      }
       
-      var
+      var qStart = Math.floor(info.iDisplayStart / info.iDisplayLength);
+      var uri = ccLib.addParameter(self.substanceUri, "page=" + qStart + "&pagesize=" + info.iDisplayLength);
       jT.call(self, uri, function (result) {
         if (!!result) {
-          callback(info, result.substance);
+          for (var i = 0, rl = result.substance.length; i < rl; ++i)
+            result.substance[i].index = i + info.
+          data.iTotalRecords = result.substance.length;
+          data.iTotalDisplayRecords = result.substance.length;
+          data.aaData = result.substance;
+          fnCallback(data);
         }
       });
     },
     
     querySubstance: function (uri) {
       var self = this;
-      self.substanceUri = jT.grabPaging(uri);
+      self.substanceUri = jT.grabPaging(self, uri);
+      jT.$(self.table).dataTable().fnFilter('');
     },   
     
     query: function (uri) {
       this.querySubstance(uri);
     }
   };
+  
+  // some "inheritance" :-)
+  cls.prototype.nextPage = jToxCompound.prototype.nextPage;
+  cls.prototype.prevPage = jToxCompound.prototype.prevPage;
+  cls.prototype.updateControls = jToxCompound.prototype.updateControls;
   
   return cls;
 })();

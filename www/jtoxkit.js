@@ -1256,6 +1256,35 @@ var jToxCompound = (function () {
         self.queryEntries(self.settings.pageStart - self.settings.pageSize);
     },
     
+    updateControls: function (qStart, qSize) {
+      var self = this;
+
+      // first initialize the counters.
+      qStart = self.settings.pageStart = qStart * self.settings.pageSize;
+        if (qSize < self.settings.pageSize) // we've reached the end!!
+          self.entriesCount = qStart + qSize;
+      
+      if (self.settings.showControls){
+        var pane = jT.$('.jtox-ds-control', self.rootElement)[0];
+        ccLib.fillTree(pane, {
+          "pagestart": qStart + 1,
+          "pageend": qStart + qSize,
+        });
+        
+        var nextBut = jT.$('.next-field', pane);
+        if (self.entriesCount === null || qStart + qSize < self.entriesCount)
+          jT.$(nextBut).addClass('paginate_enabled_next').removeClass('paginate_disabled_next');
+        else
+          jT.$(nextBut).addClass('paginate_disabled_next').removeClass('paginate_enabled_next');
+          
+        var prevBut = jT.$('.prev-field', pane);
+        if (qStart > 0)
+          jT.$(prevBut).addClass('paginate_enabled_previous').removeClass('paginate_disabled_previous');
+        else
+          jT.$(prevBut).addClass('paginate_disabled_previous').removeClass('paginate_enabled_previous');
+      }
+    },
+    
     // make the actual query for the (next) portion of data.
     queryEntries: function(from, size) {
       var self = this;
@@ -1273,12 +1302,6 @@ var jToxCompound = (function () {
 
       jT.call(self, qUri, function(dataset){
         if (!!dataset){
-          // first initialize the counters.
-          var qSize = dataset.dataEntry.length;
-          qStart = self.settings.pageStart = qStart * self.settings.pageSize;
-            if (qSize < self.settings.pageSize) // we've reached the end!!
-              self.entriesCount = qStart + qSize;
-
           // then, preprocess the dataset
           self.dataset = cls.processDataset(dataset, self.features, self.settings.fnAccumulate, self.settings.pageStart);
 
@@ -1286,25 +1309,7 @@ var jToxCompound = (function () {
           self.updateTables();
 
           // finally - go and update controls if they are visible
-          if (self.settings.showControls){
-            var pane = jT.$('.jtox-ds-control', self.rootElement)[0];
-            ccLib.fillTree(pane, {
-              "pagestart": qStart + 1,
-              "pageend": qStart + qSize,
-            });
-            
-            var nextBut = jT.$('.next-field', pane);
-            if (self.entriesCount === null || qStart + qSize < self.entriesCount)
-              jT.$(nextBut).addClass('paginate_enabled_next').removeClass('paginate_disabled_next');
-            else
-              jT.$(nextBut).addClass('paginate_disabled_next').removeClass('paginate_enabled_next');
-              
-            var prevBut = jT.$('.prev-field', pane);
-            if (qStart > 0)
-              jT.$(prevBut).addClass('paginate_enabled_previous').removeClass('paginate_disabled_previous');
-            else
-              jT.$(prevBut).addClass('paginate_disabled_previous').removeClass('paginate_enabled_previous');
-          }
+          self.updateControls(qStart, dataset.dataEntry.length);
 
           // time to call the supplied function, if any.
           ccLib.fireCallback(self.settings.onLoaded, self, dataset);
@@ -1775,7 +1780,7 @@ var jToxComposition = (function () {
 					'Typical concentration': { sTitle: "Typical concentration", sClass: "center", sWidth: "15%", mData: "proportion.typical", mRender: function(val, type, full) { return type != 'display' ? '' + val.value : jToxComposition.formatConcentration(val.precision, val.value, val.unit); } },
 					'Concentration ranges': { sTitle: "Concentration ranges", sClass : "center colspan-2", sWidth : "20%", mData : "proportion.real", mRender : function(val, type, full) { return type != 'display' ? '' + val.lowerValue : jToxComposition.formatConcentration(val.lowerPrecision, val.lowerValue, val.unit); } },
 					'Upper range': { sTitle: 'Upper range', sClass: "center", sWidth: "20%", mData: "proportion.real", mRender: function(val, type, full) { return type != 'display' ? '' + val.upperValue : jToxComposition.formatConcentration(val.upperPrecision, val.upperValue, val.unit); } },
-					'Also': { sTitle: "Also", sClass: "center", bSortable: false, mData: "component.compound.URI", mRender: function(val, type, full) { return !val ? '' : '<a href="' + (jT.settings.baseUrl || self.baseUrl) + 'substance?type=related&compound_uri=' + encodeURIComponent(val) + '" target="_blank">Also contained in...</span></a>'; } }
+					'Also': { sTitle: "Also", sClass: "center", bSortable: false, mData: "component.compound.URI", mRender: function(val, type, full) { return !val ? '' : '<a href="' + (jT.settings.baseUrl || self.baseUrl) + '/substance?type=related&compound_uri=' + encodeURIComponent(val) + '" target="_blank">Also contained in...</span></a>'; } }
 				}
       }
     }
@@ -1851,6 +1856,7 @@ var jToxComposition = (function () {
           for (var i = 0, cmpl = json.composition.length; i < cmpl; ++i) {
             var cmp = json.composition[i];
             
+            // TODO: Start using show banner!
             jToxCompound.processEntry(cmp.component, json.feature, fnDatasetValue);
     
             // now prepare the subs        
