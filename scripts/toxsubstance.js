@@ -16,14 +16,11 @@ var jToxSubstance = (function () {
     configuration: { 
       columns : {
         substance: {
-          'Id': { mData: "URI", sWidth: "50px", mRender: function (data, type, full) {
-            var num = parseInt(data.match(/http:\/\/.*\/dataset\/(\d+).*/)[1]);
-            if (type != 'display')
-              return num;
-            return '<a target="_blank" href="' + data + '"><span class="ui-icon ui-icon-link jtox-inline"></span> D' + num + '</a>';
-          }},
-          'Name': { sTitle: "Name", mData: "name", sDefaultContent: "-" },
-          'UUID': { sTitle: "UUID", mData: "i5uuid", sWidth: "160px" },
+          'Info': { sTitle: "Info", mData: "externalIdentifiers", mReder: function (data, type, full) {
+            
+          } },
+          'Substance Name': { sTitle: "Substance Name", mData: "name", sDefaultContent: "-" },
+          'Substance UUID': { sTitle: "Substance UUID", mData: "i5uuid", sClass: "shortened", sWidth: "160px" },
           'Composition Type': { sTitle: "Composition Type", mData: "substanceType", sDefaultContent: '-' },
           'Public name': { sTitle: "Public name", mData: "publicname", sDefaultContent: '-'},
           'Reference substance UUID': { sTitle: "Reference substance UUID", mData: "referenceSubstance", mRender: function (data, type, full) {
@@ -32,9 +29,6 @@ var jToxSubstance = (function () {
               '<a target="_blank" href="' + data.uri + '">' + jT.ui.shortenedData(data.i5uuid, "Press to copy the UUID in the clipboard") + '</a>';
           } },
           'Owner': { sTitle: "Owner", mData: "ownerName", sDefaultContent: '-'},
-          'Info': { sTitle: "Info", mData: "externalIdentifiers", mReder: function (data, type, full) {
-            
-          } }
         }
       }
     }
@@ -60,8 +54,8 @@ var jToxSubstance = (function () {
       var self = this;
       
       // deal if the selection is chosen
-      var colId = self.settings.configuration.columns.substance.Id;
-      var colIdFn = function (data, type, full) {
+      var colInfo = self.settings.configuration.columns.substance.Info;
+      var infoFn = function (data, type, full) {
         if (type != 'display')
           return data;
 
@@ -73,11 +67,11 @@ var jToxSubstance = (function () {
       };
       
       if (self.settings.selectable) {
-        colId.mRender = jT.ui.addSelection(self, colIdFn);
-        colId.sWidth = "60px";
+        colInfo.mRender = jT.ui.addSelection(self, infoFn);
+        colInfo.sWidth = "60px";
       }
       else
-        colId.mRender = colIdFn;
+        colInfo.mRender = infoFn;
         
       var fnShowDetails = !self.settings.hasDetails ? null : function (row, e) {
         jT.$(e.currentTarget).toggleClass('ui-icon-circle-triangle-e');
@@ -111,13 +105,14 @@ var jToxSubstance = (function () {
     
     queryEntries: function (info, callback) {
       var self = this;
-      var uri = self.substanceUri
-      jT.call(self, , function (result) {
+      var uri = self.substanceUri;
+      
+      var
+      jT.call(self, uri, function (result) {
         if (!!result) {
-          
+          callback(info, result.substance);
         }
       });
-      
     },
     
     querySubstance: function (uri) {
