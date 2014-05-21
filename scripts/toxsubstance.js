@@ -7,22 +7,22 @@
 var jToxSubstance = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     selectable: false,
-    sDom: "<if>rt<Fp>",
+    showControls: true,
     onLoaded: null,
     
     pageStart: 0,
-    pageSize: 20,
+    pageSize: 10,
     maxLength: 0,     // the initial value - most probably will be 
     /* substanceUri */
     configuration: { 
       columns : {
         substance: {
-          'Id': { sTitle: 'Action', mData: 'URI', sDefaultContent: "-"}, // a placeholder
+          'Id': { sTitle: 'Id', mData: 'index', sDefaultContent: "-"}, // a placeholder
           'Substance Name': { sTitle: "Substance Name", mData: "name", sDefaultContent: "-" },
-          'Substance UUID': { sTitle: "Substance UUID", mData: "i5uuid", sClass: "shortened", sWidth: "60px" },
+          'Substance UUID': { sTitle: "Substance UUID", mData: "i5uuid", sClass: "shortened", sWidth: "20%" },
           'Composition Type': { sTitle: "Composition Type", mData: "substanceType", sDefaultContent: '-' },
           'Public name': { sTitle: "Public name", mData: "publicname", sDefaultContent: '-'},
-          'Reference substance UUID': { sTitle: "Reference substance UUID", mData: "referenceSubstance", sWidth: "60px", mRender: function (data, type, full) {
+          'Reference substance UUID': { sTitle: "Reference substance UUID", mData: "referenceSubstance", sWidth: "20%", mRender: function (data, type, full) {
             return (type != 'display') ? 
               data.i5uuid : 
               '<a target="_blank" href="' + data.uri + '">' + jT.ui.shortenedData(data.i5uuid, "Press to copy the UUID in the clipboard") + '</a>';
@@ -60,7 +60,6 @@ var jToxSubstance = (function () {
       
       // deal if the selection is chosen
       var colId = self.settings.configuration.columns.substance.Id;
-      colId.bVisible = true;
       colId.sName = '';
       var idFn = function (data, type, full) {
         if (type != 'display')
@@ -74,11 +73,11 @@ var jToxSubstance = (function () {
       };
       
       if (self.settings.selectable) {
-        colInfo.mRender = jT.ui.addSelection(self, infoFn);
-        colInfo.sWidth = "60px";
+        colId.mRender = jT.ui.addSelection(self, idFn);
+        colId.sWidth = "60px";
       }
       else
-        colInfo.mRender = infoFn;
+        colId.mRender = idFn;
         
       var fnShowDetails = !self.settings.hasDetails ? null : function (row, e) {
         jT.$(e.currentTarget).toggleClass('ui-icon-circle-triangle-e');
@@ -86,12 +85,20 @@ var jToxSubstance = (function () {
         alert('Show/hide details'); 
       };
       
+      jT.ui.putControls(self, { 
+        nextPage: function () { self.nextPage(); },
+        prevPage: function () { self.prevPage(); },
+        sizeChange: function() { self.queryEntries(self.settings.pageStart, parseInt(jT.$(this).val())); },
+        filter: function () { jT.$(self.table).dataTable().fnFilter(jT.$(this).val()); }
+      });
+      
       // READYY! Go and prepare THE table.
       self.table = jT.$('table', self.rootElement).dataTable({
-        "bPaginate": true,
-        "bLengthChange": true,
-				"bAutoWidth": true,
-        "sDom" : self.settings.sDom,
+        "bPaginate": false,
+        "bProcessing": true,
+        "bLengthChange": false,
+        "bAutoWidth": false,
+        "sDom" : "rt",
         "aoColumns": jT.ui.processColumns(self, 'substance'),
         "fnCreatedRow": function( nRow, aData, iDataIndex ) {
           if (self.settings.hasDetails)
@@ -109,25 +116,31 @@ var jToxSubstance = (function () {
       jT.$(self.table).dataTable().fnAdjustColumnSizing();
     },
     
-    queryEntries: function (aoData, fnCallback) {
+    queryEntries: function(from, size) {
       var self = this;
-      var info = jT.ui.queryInfo(aoData);
-      var data = { "sEcho": info.sEcho, iTotalRecords: 0, iTotalDisplayRecords: 0, aaData: [] };
-      if (!self.substanceUri) {
-        fnCallback(data);
-        return;
-      }
-      
-      var qStart = Math.floor(info.iDisplayStart / info.iDisplayLength);
-      var uri = ccLib.addParameter(self.substanceUri, "page=" + qStart + "&pagesize=" + info.iDisplayLength);
-      jT.call(self, uri, function (result) {
+      if (from < 0)
+        from = 0;
+        
+      if (!size || size < 0)
+        size = self.settings.pageSize;
+        
+      var qStart = Math.floor(from / size);
+      var qUri = ccLib.addParameter(self.substanceUri, "page=" + qStart + "&pagesize=" + size);
+      jT.call(self, qUri, function (result) {
         if (!!result) {
+          jT.$(self.table).dataTable().fnClearTable();
+        
+          self.settings.pageSize = size;
+          self.settings.pageStart = from;
+        
           for (var i = 0, rl = result.substance.length; i < rl; ++i)
-            result.substance[i].index = i + info.
-          data.iTotalRecords = result.substance.length;
-          data.iTotalDisplayRecords = result.substance.length;
-          data.aaData = result.substance;
-          fnCallback(data);
+            result.substance[i].index = i + from + 1;
+          jT.$(self.table).dataTable().fnAddData(result.substance);
+          
+          self.updateControls(qStart, result.substance.length);
+
+          // time to call the supplied function, if any.
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
       });
     },
@@ -135,7 +148,7 @@ var jToxSubstance = (function () {
     querySubstance: function (uri) {
       var self = this;
       self.substanceUri = jT.grabPaging(self, uri);
-      jT.$(self.table).dataTable().fnFilter('');
+      self.queryEntries(self.settings.pageStart);
     },   
     
     query: function (uri) {

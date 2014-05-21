@@ -171,24 +171,12 @@ var jToxCompound = (function () {
       
       self.rootElement.appendChild(jT.getTemplate('#jtox-compound'));
       
-      // now make some action handlers - on next, prev, filter, etc.
-      var pane = jT.$('.jtox-ds-control', self.rootElement)[0];
-      if (self.settings.showControls) {
-        ccLib.fillTree(pane, { "pagesize": self.settings.pageSize });
-        jT.$('.next-field', pane).on('click', function() { self.nextPage(); });
-        jT.$('.prev-field', pane).on('click', function() { self.prevPage(); });
-        jT.$('select', pane).on('change', function() { self.queryEntries(self.settings.pageStart, parseInt(jT.$(this).val())); })
-        var pressTimeout = null;
-        jT.$('input', pane).on('keydown', function() { 
-          if (pressTimeout != null)
-            clearTimeout(pressTimeout);
-          pressTimeout = setTimeout(function(){
-            self.updateTables();
-          }, 350);
-        });
-      }
-      else // ok - hide me
-        pane.style.display = "none";
+      jT.ui.putControls(self, { 
+        nextPage: function () { self.nextPage(); },
+        prevPage: function () { self.prevPage(); },
+        sizeChange: function() { self.queryEntries(self.settings.pageStart, parseInt(jT.$(this).val())); },
+        filter: function () { self.updateTables() }
+      });
     },
     
     clearDataset: function () {
@@ -528,7 +516,7 @@ var jToxCompound = (function () {
 
     updateTables: function() {
       var self = this;
-      self.filterEntries(jT.$('.jtox-ds-control input', self.rootElement).val());
+      self.filterEntries(jT.$('.jtox-controls input', self.rootElement).val());
     },
     
     /* Prepare the groups and the features.
@@ -627,7 +615,7 @@ var jToxCompound = (function () {
     // These two are shortcuts for calling the queryEntries routine
     nextPage: function() {
       var self = this;
-      if (self.entriesCount === null || self.settings.pageStart + self.settings.pageSize < self.entriesCount)
+      if (self.entriesCount == null || self.settings.pageStart + self.settings.pageSize < self.entriesCount)
         self.queryEntries(self.settings.pageStart + self.settings.pageSize);
     },
     
@@ -642,18 +630,18 @@ var jToxCompound = (function () {
 
       // first initialize the counters.
       qStart = self.settings.pageStart = qStart * self.settings.pageSize;
-        if (qSize < self.settings.pageSize) // we've reached the end!!
-          self.entriesCount = qStart + qSize;
+      if (qSize < self.settings.pageSize) // we've reached the end!!
+        self.entriesCount = qStart + qSize;
       
       if (self.settings.showControls){
-        var pane = jT.$('.jtox-ds-control', self.rootElement)[0];
+        var pane = jT.$('.jtox-controls', self.rootElement)[0];
         ccLib.fillTree(pane, {
           "pagestart": qStart + 1,
           "pageend": qStart + qSize,
         });
         
         var nextBut = jT.$('.next-field', pane);
-        if (self.entriesCount === null || qStart + qSize < self.entriesCount)
+        if (self.entriesCount == null || qStart + qSize < self.entriesCount)
           jT.$(nextBut).addClass('paginate_enabled_next').removeClass('paginate_disabled_next');
         else
           jT.$(nextBut).addClass('paginate_disabled_next').removeClass('paginate_enabled_next');
@@ -675,7 +663,7 @@ var jToxCompound = (function () {
         size = self.settings.pageSize;
         
       // setup the size, as well
-      jT.$('.jtox-ds-control select', self.rootElement).val(size);
+      jT.$('.jtox-controls select', self.rootElement).val(size);
       self.settings.pageSize = size;
       
       var qStart = Math.floor(from / size);

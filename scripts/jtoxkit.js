@@ -414,6 +414,25 @@ window.jT.ui = {
               
       return html + oldRes;
     }
+  },
+  
+  putControls: function (kit, handlers) {
+    var pane = jT.$('.jtox-controls', kit.rootElement)[0];
+    if (kit.settings.showControls) {
+      ccLib.fillTree(pane, { "pagesize": kit.settings.pageSize });
+      jT.$('.next-field', pane).on('click', handlers.nextPage);
+      jT.$('.prev-field', pane).on('click', handlers.prevPage);
+      jT.$('select', pane).on('change', handlers.sizeChange)
+      var pressTimeout = null;
+      jT.$('input', pane).on('keydown', function(e) {
+        var el = this;
+        if (pressTimeout != null)
+          clearTimeout(pressTimeout);
+        pressTimeout = setTimeout(function () { handlers.filter.apply(el, [e]); }, 350);
+      });
+    }
+    else // ok - hide me
+      pane.style.display = "none";
   }
 };
 

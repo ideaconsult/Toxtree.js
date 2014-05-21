@@ -790,24 +790,12 @@ var jToxCompound = (function () {
       
       self.rootElement.appendChild(jT.getTemplate('#jtox-compound'));
       
-      // now make some action handlers - on next, prev, filter, etc.
-      var pane = jT.$('.jtox-ds-control', self.rootElement)[0];
-      if (self.settings.showControls) {
-        ccLib.fillTree(pane, { "pagesize": self.settings.pageSize });
-        jT.$('.next-field', pane).on('click', function() { self.nextPage(); });
-        jT.$('.prev-field', pane).on('click', function() { self.prevPage(); });
-        jT.$('select', pane).on('change', function() { self.queryEntries(self.settings.pageStart, parseInt(jT.$(this).val())); })
-        var pressTimeout = null;
-        jT.$('input', pane).on('keydown', function() { 
-          if (pressTimeout != null)
-            clearTimeout(pressTimeout);
-          pressTimeout = setTimeout(function(){
-            self.updateTables();
-          }, 350);
-        });
-      }
-      else // ok - hide me
-        pane.style.display = "none";
+      jT.ui.putControls(self, { 
+        nextPage: function () { self.nextPage(); },
+        prevPage: function () { self.prevPage(); },
+        sizeChange: function() { self.queryEntries(self.settings.pageStart, parseInt(jT.$(this).val())); },
+        filter: function () { self.updateTables() }
+      });
     },
     
     clearDataset: function () {
@@ -1147,7 +1135,7 @@ var jToxCompound = (function () {
 
     updateTables: function() {
       var self = this;
-      self.filterEntries(jT.$('.jtox-ds-control input', self.rootElement).val());
+      self.filterEntries(jT.$('.jtox-controls input', self.rootElement).val());
     },
     
     /* Prepare the groups and the features.
@@ -1246,7 +1234,7 @@ var jToxCompound = (function () {
     // These two are shortcuts for calling the queryEntries routine
     nextPage: function() {
       var self = this;
-      if (self.entriesCount === null || self.settings.pageStart + self.settings.pageSize < self.entriesCount)
+      if (self.entriesCount == null || self.settings.pageStart + self.settings.pageSize < self.entriesCount)
         self.queryEntries(self.settings.pageStart + self.settings.pageSize);
     },
     
@@ -1261,18 +1249,18 @@ var jToxCompound = (function () {
 
       // first initialize the counters.
       qStart = self.settings.pageStart = qStart * self.settings.pageSize;
-        if (qSize < self.settings.pageSize) // we've reached the end!!
-          self.entriesCount = qStart + qSize;
+      if (qSize < self.settings.pageSize) // we've reached the end!!
+        self.entriesCount = qStart + qSize;
       
       if (self.settings.showControls){
-        var pane = jT.$('.jtox-ds-control', self.rootElement)[0];
+        var pane = jT.$('.jtox-controls', self.rootElement)[0];
         ccLib.fillTree(pane, {
           "pagestart": qStart + 1,
           "pageend": qStart + qSize,
         });
         
         var nextBut = jT.$('.next-field', pane);
-        if (self.entriesCount === null || qStart + qSize < self.entriesCount)
+        if (self.entriesCount == null || qStart + qSize < self.entriesCount)
           jT.$(nextBut).addClass('paginate_enabled_next').removeClass('paginate_disabled_next');
         else
           jT.$(nextBut).addClass('paginate_disabled_next').removeClass('paginate_enabled_next');
@@ -1294,7 +1282,7 @@ var jToxCompound = (function () {
         size = self.settings.pageSize;
         
       // setup the size, as well
-      jT.$('.jtox-ds-control select', self.rootElement).val(size);
+      jT.$('.jtox-controls select', self.rootElement).val(size);
       self.settings.pageSize = size;
       
       var qStart = Math.floor(from / size);
@@ -1746,6 +1734,171 @@ var jToxModel = (function () {
       return uri;
     }
   };
+  
+  return cls;
+})();
+/* toxsubstance.js - A kit for browsing substances
+ *
+ * Copyright 2012-2014, IDEAconsult Ltd. http://www.ideaconsult.net/
+ * Created by Ivan Georgiev
+**/
+
+var jToxSubstance = (function () {
+  var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
+    selectable: false,
+    showControls: true,
+    onLoaded: null,
+    
+    pageStart: 0,
+    pageSize: 10,
+    maxLength: 0,     // the initial value - most probably will be 
+    /* substanceUri */
+    configuration: { 
+      columns : {
+        substance: {
+          'Id': { sTitle: 'Id', mData: 'index', sDefaultContent: "-"}, // a placeholder
+          'Substance Name': { sTitle: "Substance Name", mData: "name", sDefaultContent: "-" },
+          'Substance UUID': { sTitle: "Substance UUID", mData: "i5uuid", sClass: "shortened", sWidth: "20%" },
+          'Composition Type': { sTitle: "Composition Type", mData: "substanceType", sDefaultContent: '-' },
+          'Public name': { sTitle: "Public name", mData: "publicname", sDefaultContent: '-'},
+          'Reference substance UUID': { sTitle: "Reference substance UUID", mData: "referenceSubstance", sWidth: "20%", mRender: function (data, type, full) {
+            return (type != 'display') ? 
+              data.i5uuid : 
+              '<a target="_blank" href="' + data.uri + '">' + jT.ui.shortenedData(data.i5uuid, "Press to copy the UUID in the clipboard") + '</a>';
+          } },
+          'Owner': { sTitle: "Owner", mData: "ownerName", sDefaultContent: '-'},
+          'Info': { sTitle: "Info", mData: "externalIdentifiers", mRender: function (data, type, full) {
+            var arr = [];
+            for (var i = 0, dl = data.length;i < dl; ++i)
+              arr.push(data[i].type);
+            return arr.join(', ');
+          } }
+        }
+      }
+    }
+  };
+  
+  var cls = function (root, settings) {
+    var self = this;
+    self.rootElement = root;
+    jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even when manually initialized
+    
+    self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
+    
+    self.rootElement.appendChild(jT.getTemplate('#jtox-substance'));
+    self.init();
+        
+    // finally, if provided - make the query
+    if (!!self.settings.substanceUri)
+      self.querySubstance(self.settings.substanceUri)
+  };
+  
+  cls.prototype = {
+    init: function () {
+      var self = this;
+      
+      // deal if the selection is chosen
+      var colId = self.settings.configuration.columns.substance.Id;
+      colId.sName = '';
+      var idFn = function (data, type, full) {
+        if (type != 'display')
+          return data;
+
+        var res = '';
+        res += '&nbsp;-&nbsp;' + data + '&nbsp;-&nbsp;';
+        if (self.settings.hasDetails)
+          res += '<span class="jtox-details-open ui-icon ui-icon-circle-triangle-e" title="Press to open/close detailed info for this substance"></span>';
+        return res;
+      };
+      
+      if (self.settings.selectable) {
+        colId.mRender = jT.ui.addSelection(self, idFn);
+        colId.sWidth = "60px";
+      }
+      else
+        colId.mRender = idFn;
+        
+      var fnShowDetails = !self.settings.hasDetails ? null : function (row, e) {
+        jT.$(e.currentTarget).toggleClass('ui-icon-circle-triangle-e');
+        jT.$(e.currentTarget).toggleClass('ui-icon-circle-triangle-w');
+        alert('Show/hide details'); 
+      };
+      
+      jT.ui.putControls(self, { 
+        nextPage: function () { self.nextPage(); },
+        prevPage: function () { self.prevPage(); },
+        sizeChange: function() { self.queryEntries(self.settings.pageStart, parseInt(jT.$(this).val())); },
+        filter: function () { jT.$(self.table).dataTable().fnFilter(jT.$(this).val()); }
+      });
+      
+      // READYY! Go and prepare THE table.
+      self.table = jT.$('table', self.rootElement).dataTable({
+        "bPaginate": false,
+        "bProcessing": true,
+        "bLengthChange": false,
+        "bAutoWidth": false,
+        "sDom" : "rt",
+        "aoColumns": jT.ui.processColumns(self, 'substance'),
+        "fnCreatedRow": function( nRow, aData, iDataIndex ) {
+          if (self.settings.hasDetails)
+            jT.$('.jtox-details-open', nRow).on('click', function(e) {  fnShowDetails(nRow, e); });
+        },
+        "bServerSide": false,
+				"oLanguage": {
+          "sLoadingRecords": "No substances found.",
+          "sZeroRecords": "No substances found.",
+          "sEmptyTable": "No substances available.",
+          "sInfo": "Showing _TOTAL_ substance(s) (_START_ to _END_)"
+        }
+      });
+      
+      jT.$(self.table).dataTable().fnAdjustColumnSizing();
+    },
+    
+    queryEntries: function(from, size) {
+      var self = this;
+      if (from < 0)
+        from = 0;
+        
+      if (!size || size < 0)
+        size = self.settings.pageSize;
+        
+      var qStart = Math.floor(from / size);
+      var qUri = ccLib.addParameter(self.substanceUri, "page=" + qStart + "&pagesize=" + size);
+      jT.call(self, qUri, function (result) {
+        if (!!result) {
+          jT.$(self.table).dataTable().fnClearTable();
+        
+          self.settings.pageSize = size;
+          self.settings.pageStart = from;
+        
+          for (var i = 0, rl = result.substance.length; i < rl; ++i)
+            result.substance[i].index = i + from + 1;
+          jT.$(self.table).dataTable().fnAddData(result.substance);
+          
+          self.updateControls(qStart, result.substance.length);
+
+          // time to call the supplied function, if any.
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
+        }
+      });
+    },
+    
+    querySubstance: function (uri) {
+      var self = this;
+      self.substanceUri = jT.grabPaging(self, uri);
+      self.queryEntries(self.settings.pageStart);
+    },   
+    
+    query: function (uri) {
+      this.querySubstance(uri);
+    }
+  };
+  
+  // some "inheritance" :-)
+  cls.prototype.nextPage = jToxCompound.prototype.nextPage;
+  cls.prototype.prevPage = jToxCompound.prototype.prevPage;
+  cls.prototype.updateControls = jToxCompound.prototype.updateControls;
   
   return cls;
 })();
@@ -2836,6 +2989,25 @@ window.jT.ui = {
               
       return html + oldRes;
     }
+  },
+  
+  putControls: function (kit, handlers) {
+    var pane = jT.$('.jtox-controls', kit.rootElement)[0];
+    if (kit.settings.showControls) {
+      ccLib.fillTree(pane, { "pagesize": kit.settings.pageSize });
+      jT.$('.next-field', pane).on('click', handlers.nextPage);
+      jT.$('.prev-field', pane).on('click', handlers.prevPage);
+      jT.$('select', pane).on('change', handlers.sizeChange)
+      var pressTimeout = null;
+      jT.$('input', pane).on('keydown', function(e) {
+        var el = this;
+        if (pressTimeout != null)
+          clearTimeout(pressTimeout);
+        pressTimeout = setTimeout(function () { handlers.filter.apply(el, [e]); }, 350);
+      });
+    }
+    else // ok - hide me
+      pane.style.display = "none";
   }
 };
 
@@ -2897,7 +3069,7 @@ jT.templates['ketcher-buttons']  =
 jT.templates['all-compound']  = 
 "	  <div id=\"jtox-compound\">" +
 "	    <div class=\"jtox-ds-features\"></div>" +
-"	    <div class=\"jtox-ds-control\">" +
+"	    <div class=\"jtox-controls\">" +
 "	      Showing from <span class=\"data-field from-field\" data-field=\"pagestart\"> ? </span> to <span class=\"data-field\" data-field=\"pageend\"> ? </span> in pages of <select class=\"data-field\" data-field=\"pagesize\">" +
 "          <option value=\"10\" selected=\"yes\">10</option>" +
 "          <option value=\"20\">20</option>" +
@@ -2962,6 +3134,26 @@ jT.templates['all-model']  =
 "      <table></table>" +
 "	  </div>" +
 ""; // end of #jtox-model 
+
+jT.templates['all-substance']  = 
+"	  <div id=\"jtox-substance\">" +
+"	    <div class=\"jtox-controls\">" +
+"	      Showing from <span class=\"data-field from-field\" data-field=\"pagestart\"> ? </span> to <span class=\"data-field\" data-field=\"pageend\"> ? </span> in pages of <select class=\"data-field\" data-field=\"pagesize\">" +
+"          <option value=\"10\" selected=\"yes\">10</option>" +
+"          <option value=\"20\">20</option>" +
+"          <option value=\"50\">50</option>" +
+"          <option value=\"100\">100</option>" +
+"          <option value=\"200\">200</option>" +
+"          <option value=\"500\">500</option>" +
+"        </select> substances" +
+"	      <a class=\"paginate_disabled_previous prev-field\" tabindex=\"0\" role=\"button\">Previous</a><a class=\"paginate_enabled_next next-field\" tabindex=\"0\" role=\"button\">Next</a>" +
+"	      <input type=\"text\" class=\"filterbox\" placeholder=\"Filter...\" />" +
+"	    </div>" +
+"	    <div>" +
+"        <table></table>" +
+"	    </div>" +
+"	  </div>" +
+""; // end of #jtox-substance 
 
 jT.templates['all-composition']  = 
 "    <div id=\"jtox-composition\" class=\"jtox-composition unloaded\">" +
