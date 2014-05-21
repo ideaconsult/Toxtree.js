@@ -62,7 +62,7 @@ var jToxComposition = (function () {
       // deal if the selection is chosen
       var colId = self.settings.configuration.columns.composition.Name;
       if (self.settings.selectable) {
-        colId.mRender = jT.ui.addSelection(self, colId.mRender);
+        jT.ui.putActions(self, colId, { selection: true});
         colId.sWidth = "60px";
       }
         

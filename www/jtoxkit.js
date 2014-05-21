@@ -1498,7 +1498,7 @@ var jToxDataset = (function () {
       
       // deal if the selection is chosen
       if (self.settings.selectable) {
-        self.settings.configuration.columns.dataset.Id.mRender = jT.ui.addSelection(self, self.settings.configuration.columns.dataset.Id.mRender);
+        jT.ui.putActions(self, self.settings.configuration.columns.dataset.Id, { selection: true });
         self.settings.configuration.columns.dataset.Id.sWidth = "60px";
       }
       
@@ -1573,25 +1573,19 @@ var jToxModel = (function () {
     configuration: { 
       columns : {
         model: {
-          'Id': { iOrder: 0, sTitle: "Id", mData: "id", sWidth: "50px", mRender: function (data, type, full) {
-            if (type != 'display')
-              return data;
-            return '<a target="_blank" href="' + full.URI + '"><span class="ui-icon ui-icon-link jtox-inline"></span> M' + data + '</a>';
+          'Id': { iOrder: 0, sTitle: "Id", mData: "URI", sWidth: "50px", mRender: function (data, type, full) {
+            return (type != 'display') ? full.id : '<a target="_blank" href="' + data + '"><span class="ui-icon ui-icon-link jtox-inline"></span> M' + full.id + '</a>';
           }},
           'Title': { iOrder: 1, sTitle: "Title", mData: "title", sDefaultContent: "-" },
           'Stars': { iOrder: 2, sTitle: "Stars", mData: "stars", sWidth: "160px" },
           'Algorithm': {iOrder: 3, sTitle: "Algorithm", mData: "algorithm" },
           'Info': { iOrder: 4, sTitle: "Info", mData: "trainingDataset", mRender: function (data, type, full) {
-            if (type != 'display' || !data)
-              return data;
-            return '<a href="' + data + '"><span class="ui-icon ui-icon-calculator"></span>&nbsp;training set</a>';
+            return (type != 'display' || !data) ? data : '<a href="' + data + '"><span class="ui-icon ui-icon-calculator"></span>&nbsp;training set</a>';
           } }
         },
         algorithm: {
-          'Id': { iOrder: 0, sTitle: "Id", mData: "id", sWidth: "150px", mRender: function (data, type, full) {
-            if (type != 'display')
-              return data;
-            return '<a target="_blank" href="' + full.uri + '"><span class="ui-icon ui-icon-link jtox-inline"></span> M' + data + '</a>';
+          'Id': { iOrder: 0, sTitle: "Id", mData: "uri", sWidth: "150px", mRender: function (data, type, full) {
+            return (type != 'display') ? full.id : '<a target="_blank" href="' + data + '"><span class="ui-icon ui-icon-link jtox-inline"></span> M' + full.id + '</a>';
           }},
           'Title': { iOrder: 1, sTitle: "Title", mData: "name", sDefaultContent: "-" },
           'Description': {iOrder: 2, sTitle: "Description", sClass: "shortened", mData: "description", sDefaultContent: '-' },
@@ -1653,7 +1647,7 @@ var jToxModel = (function () {
       var cat = self.settings.algorithms ? 'algorithm' : 'model';
       // deal if the selection is chosen
       if (self.settings.selectable) {
-        self.settings.configuration.columns[cat].Id.mRender = jT.ui.addSelection(self, self.settings.configuration.columns.model.Id.mRender);
+        jT.ui.putActions(self, self.settings.configuration.columns[cat].Id, { selection: true});
         self.settings.configuration.columns[cat].Id.sWidth = "60px";
       }
       
@@ -1758,10 +1752,12 @@ var jToxSubstance = (function () {
         substance: {
           'Id': { sTitle: 'Id', mData: 'index', sDefaultContent: "-"}, // a placeholder
           'Substance Name': { sTitle: "Substance Name", mData: "name", sDefaultContent: "-" },
-          'Substance UUID': { sTitle: "Substance UUID", mData: "i5uuid", sClass: "shortened", sWidth: "20%" },
+          'Substance UUID': { sTitle: "Substance UUID", mData: "i5uuid", sClass: "shortened", sWidth: "20%", mRender: function (data, type, full) {
+            return (type != 'display') ? data : jT.ui.shortenedData(data, "Press to copy the UUID in the clipboard");
+          } },
           'Composition Type': { sTitle: "Composition Type", mData: "substanceType", sDefaultContent: '-' },
           'Public name': { sTitle: "Public name", mData: "publicname", sDefaultContent: '-'},
-          'Reference substance UUID': { sTitle: "Reference substance UUID", mData: "referenceSubstance", sWidth: "20%", mRender: function (data, type, full) {
+          'Reference substance UUID': { sTitle: "Reference substance UUID", mData: "referenceSubstance", sClass: "shortened", sWidth: "20%", mRender: function (data, type, full) {
             return (type != 'display') ? 
               data.i5uuid : 
               '<a target="_blank" href="' + data.uri + '">' + jT.ui.shortenedData(data.i5uuid, "Press to copy the UUID in the clipboard") + '</a>';
@@ -1812,6 +1808,7 @@ var jToxSubstance = (function () {
       };
       
       if (self.settings.selectable) {
+        jT.ui.putActions(self, colId, { selection: true});
         colId.mRender = jT.ui.addSelection(self, idFn);
         colId.sWidth = "60px";
       }
@@ -1837,7 +1834,7 @@ var jToxSubstance = (function () {
         "bProcessing": true,
         "bLengthChange": false,
         "bAutoWidth": false,
-        "sDom" : "rt",
+        "sDom": "rt",
         "aoColumns": jT.ui.processColumns(self, 'substance'),
         "fnCreatedRow": function( nRow, aData, iDataIndex ) {
           if (self.settings.hasDetails)
@@ -1966,7 +1963,7 @@ var jToxComposition = (function () {
       // deal if the selection is chosen
       var colId = self.settings.configuration.columns.composition.Name;
       if (self.settings.selectable) {
-        colId.mRender = jT.ui.addSelection(self, colId.mRender);
+        jT.ui.putActions(self, colId, { selection: true});
         colId.sWidth = "60px";
       }
         
@@ -2977,18 +2974,26 @@ window.jT.ui = {
     }
   },
   
-  addSelection: function (kit, oldFn) {
-    return function (data, type, full) {
-      var oldRes = oldFn(data, type, full);
-      if (type != 'display')
-        return oldRes;
+  putActions: function (kit, col, defs) {
+    if (!!defs && !jQuery.isEmptyObject(defs)) {
+      var oldFn = col.mRender;
+      var newFn = function (data, type, full) {
+        var html = oldFn(data, type, full);
+        if (type != 'display')
+          return html;
+          
+        if (typeof defs.selection == 'function')
+          html += defs.selection(data, type, full);
+        else if (!!defs.selection)
+          html += '<input type="checkbox" value="' + data + '"' +
+                (!!kit.settings.selectionHandler ? ' class="jtox-handler" data-handler="' + kit.settings.selectionHandler + '"' : '') +
+                '/>';
+        return html;
+      };
       
-      var html = '<input type="checkbox" value="' + (full.URI || full.uri) + '"' +
-              (!!kit.settings.selectionHandler ? ' class="jtox-handler" data-handler="' + kit.settings.selectionHandler + '"' : '') +
-              '/>';
-              
-      return html + oldRes;
+      col.mRender = newFn;
     }
+    return col;
   },
   
   putControls: function (kit, handlers) {

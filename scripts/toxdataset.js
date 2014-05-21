@@ -61,7 +61,7 @@ var jToxDataset = (function () {
       
       // deal if the selection is chosen
       if (self.settings.selectable) {
-        self.settings.configuration.columns.dataset.Id.mRender = jT.ui.addSelection(self, self.settings.configuration.columns.dataset.Id.mRender);
+        jT.ui.putActions(self, self.settings.configuration.columns.dataset.Id, { selection: true });
         self.settings.configuration.columns.dataset.Id.sWidth = "60px";
       }
       

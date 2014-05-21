@@ -19,10 +19,12 @@ var jToxSubstance = (function () {
         substance: {
           'Id': { sTitle: 'Id', mData: 'index', sDefaultContent: "-"}, // a placeholder
           'Substance Name': { sTitle: "Substance Name", mData: "name", sDefaultContent: "-" },
-          'Substance UUID': { sTitle: "Substance UUID", mData: "i5uuid", sClass: "shortened", sWidth: "20%" },
+          'Substance UUID': { sTitle: "Substance UUID", mData: "i5uuid", sClass: "shortened", sWidth: "20%", mRender: function (data, type, full) {
+            return (type != 'display') ? data : jT.ui.shortenedData(data, "Press to copy the UUID in the clipboard");
+          } },
           'Composition Type': { sTitle: "Composition Type", mData: "substanceType", sDefaultContent: '-' },
           'Public name': { sTitle: "Public name", mData: "publicname", sDefaultContent: '-'},
-          'Reference substance UUID': { sTitle: "Reference substance UUID", mData: "referenceSubstance", sWidth: "20%", mRender: function (data, type, full) {
+          'Reference substance UUID': { sTitle: "Reference substance UUID", mData: "referenceSubstance", sClass: "shortened", sWidth: "20%", mRender: function (data, type, full) {
             return (type != 'display') ? 
               data.i5uuid : 
               '<a target="_blank" href="' + data.uri + '">' + jT.ui.shortenedData(data.i5uuid, "Press to copy the UUID in the clipboard") + '</a>';
@@ -73,6 +75,7 @@ var jToxSubstance = (function () {
       };
       
       if (self.settings.selectable) {
+        jT.ui.putActions(self, colId, { selection: true});
         colId.mRender = jT.ui.addSelection(self, idFn);
         colId.sWidth = "60px";
       }
@@ -98,7 +101,7 @@ var jToxSubstance = (function () {
         "bProcessing": true,
         "bLengthChange": false,
         "bAutoWidth": false,
-        "sDom" : "rt",
+        "sDom": "rt",
         "aoColumns": jT.ui.processColumns(self, 'substance'),
         "fnCreatedRow": function( nRow, aData, iDataIndex ) {
           if (self.settings.hasDetails)

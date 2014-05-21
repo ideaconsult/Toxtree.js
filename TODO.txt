@@ -1,5 +1,5 @@
 TODO:
-- jToxSubstance - a separate kit
+- Docs: change these: addSelection in README to really point to jToxKit.ui
 - jToxComposition - start using showBanner!
 
 IDEAS?

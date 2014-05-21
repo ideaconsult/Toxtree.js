@@ -402,18 +402,26 @@ window.jT.ui = {
     }
   },
   
-  addSelection: function (kit, oldFn) {
-    return function (data, type, full) {
-      var oldRes = oldFn(data, type, full);
-      if (type != 'display')
-        return oldRes;
+  putActions: function (kit, col, defs) {
+    if (!!defs && !jQuery.isEmptyObject(defs)) {
+      var oldFn = col.mRender;
+      var newFn = function (data, type, full) {
+        var html = oldFn(data, type, full);
+        if (type != 'display')
+          return html;
+          
+        if (typeof defs.selection == 'function')
+          html += defs.selection(data, type, full);
+        else if (!!defs.selection)
+          html += '<input type="checkbox" value="' + data + '"' +
+                (!!kit.settings.selectionHandler ? ' class="jtox-handler" data-handler="' + kit.settings.selectionHandler + '"' : '') +
+                '/>';
+        return html;
+      };
       
-      var html = '<input type="checkbox" value="' + (full.URI || full.uri) + '"' +
-              (!!kit.settings.selectionHandler ? ' class="jtox-handler" data-handler="' + kit.settings.selectionHandler + '"' : '') +
-              '/>';
-              
-      return html + oldRes;
+      col.mRender = newFn;
     }
+    return col;
   },
   
   putControls: function (kit, handlers) {
