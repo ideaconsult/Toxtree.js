@@ -6,7 +6,9 @@
 
 var jToxSubstance = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
-    selectable: false,
+    selectable: true,
+    selectionHandler: null,
+    hasDetails: true,
     showControls: true,
     onLoaded: null,
     
@@ -17,14 +19,16 @@ var jToxSubstance = (function () {
     configuration: { 
       columns : {
         substance: {
-          'Id': { sTitle: 'Id', mData: 'index', sDefaultContent: "-"}, // a placeholder
+          'Id': { sTitle: 'Id', mData: 'URI', sDefaultContent: "-", sWidth: "60px", mRender: function (data, type, full) { 
+            return (type != 'display') ? full.index : '&nbsp;-&nbsp;' + full.index + '&nbsp;-&nbsp;';
+          } },
           'Substance Name': { sTitle: "Substance Name", mData: "name", sDefaultContent: "-" },
-          'Substance UUID': { sTitle: "Substance UUID", mData: "i5uuid", sClass: "shortened", sWidth: "20%", mRender: function (data, type, full) {
+          'Substance UUID': { sTitle: "Substance UUID", mData: "i5uuid", mRender: function (data, type, full) {
             return (type != 'display') ? data : jT.ui.shortenedData(data, "Press to copy the UUID in the clipboard");
           } },
-          'Composition Type': { sTitle: "Composition Type", mData: "substanceType", sDefaultContent: '-' },
+          'Composition Type': { sTitle: "Composition Type", mData: "substanceType", sWidth: "15%", sDefaultContent: '-' },
           'Public name': { sTitle: "Public name", mData: "publicname", sDefaultContent: '-'},
-          'Reference substance UUID': { sTitle: "Reference substance UUID", mData: "referenceSubstance", sClass: "shortened", sWidth: "20%", mRender: function (data, type, full) {
+          'Reference substance UUID': { sTitle: "Reference substance UUID", mData: "referenceSubstance", mRender: function (data, type, full) {
             return (type != 'display') ? 
               data.i5uuid : 
               '<a target="_blank" href="' + data.uri + '">' + jT.ui.shortenedData(data.i5uuid, "Press to copy the UUID in the clipboard") + '</a>';
@@ -61,26 +65,13 @@ var jToxSubstance = (function () {
       var self = this;
       
       // deal if the selection is chosen
-      var colId = self.settings.configuration.columns.substance.Id;
-      colId.sName = '';
-      var idFn = function (data, type, full) {
-        if (type != 'display')
-          return data;
-
-        var res = '';
-        res += '&nbsp;-&nbsp;' + data + '&nbsp;-&nbsp;';
-        if (self.settings.hasDetails)
-          res += '<span class="jtox-details-open ui-icon ui-icon-circle-triangle-e" title="Press to open/close detailed info for this substance"></span>';
-        return res;
-      };
       
-      if (self.settings.selectable) {
-        jT.ui.putActions(self, colId, { selection: true});
-        colId.mRender = jT.ui.addSelection(self, idFn);
-        colId.sWidth = "60px";
-      }
-      else
-        colId.mRender = idFn;
+      var colId = self.settings.configuration.columns.substance.Id;
+      jT.ui.putActions(self, colId, { 
+        selection: self.settings.selectable,
+        details: self.settings.hasDetails
+      });
+      colId.sName = '';
         
       var fnShowDetails = !self.settings.hasDetails ? null : function (row, e) {
         jT.$(e.currentTarget).toggleClass('ui-icon-circle-triangle-e');

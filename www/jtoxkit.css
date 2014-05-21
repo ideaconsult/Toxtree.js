@@ -190,6 +190,9 @@
   font-weight: bold;
   font-size: 1.1em;
 }
+.jtox-substance table td div.shortened {
+  width: 120px;
+}
 .jtox-toolkit table.composition-info.dataTable td,
 .jtox-toolkit table.composition-info.dataTable th {
   border: 0px;

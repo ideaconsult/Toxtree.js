@@ -410,12 +410,22 @@ window.jT.ui = {
         if (type != 'display')
           return html;
           
+        if (!!defs.ignoreOriginal)
+          html = '';
+          
+        // this is inserted BEFORE the original
         if (typeof defs.selection == 'function')
-          html += defs.selection(data, type, full);
+          html = defs.selection(data, type, full) + html;
         else if (!!defs.selection)
-          html += '<input type="checkbox" value="' + data + '"' +
+          html = '<input type="checkbox" value="' + data + '"' +
                 (!!kit.settings.selectionHandler ? ' class="jtox-handler" data-handler="' + kit.settings.selectionHandler + '"' : '') +
-                '/>';
+                '/>' + html;
+                
+        // strange enough - this is inserted AFTER the original
+        if (typeof defs.details == 'function')
+          html += defs.details(data, type, full);
+        else if (!!defs.details)
+          html += '<span class="jtox-details-open ui-icon ui-icon-circle-triangle-e" data-data="' + data +'" title="Press to open/close detailed info for this entry"></span>';
         return html;
       };
       

@@ -1,5 +1,5 @@
 TODO:
-- Docs: change these: addSelection in README to really point to jToxKit.ui
+- Docs: change these: addSelection in README to really point to jToxKit.ui - ignoreOriginal, selection, details
 - jToxComposition - start using showBanner!
 
 IDEAS?
