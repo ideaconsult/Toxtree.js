@@ -8,7 +8,7 @@ var jToxComposition = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     selectable: false,    // whether to show selection checkbox on each row
     showBanner: true,     // whether to show a banner of composition info before each compounds-table
-    sDom: "rt<Ffp>",   // compounds (ingredients) table sDom
+    sDom: "rt<Ffp>",      // compounds (ingredients) table sDom
     onLoaded: null,
     
     /* compositionUri */
@@ -127,7 +127,12 @@ var jToxComposition = (function () {
           for (var i in substances) {
             var panel = jT.getTemplate('#jtox-composition');
             self.rootElement.appendChild(panel);
-            ccLib.fillTree(jT.$('.composition-info', panel)[0], substances[i]);
+            
+            if (self.settings.showBanner)
+              ccLib.fillTree(jT.$('.composition-info', panel)[0], substances[i]);
+            else // we need to remove it
+              jT.$('.composition-info', panel).remove();
+            // we need to prepare tables, abyways.
             self.prepareTable(substances[i].composition, panel);
           }
           
