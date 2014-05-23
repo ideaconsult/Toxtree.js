@@ -1445,7 +1445,6 @@ var jToxDataset = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     shortStars: false,
     maxStars: 10,
-    selectable: false,
     selectionHandler: null,
     sDom: "<Fif>rt",
     onLoaded: null,
@@ -1497,8 +1496,8 @@ var jToxDataset = (function () {
         self.settings.configuration.columns.dataset.Stars.sWidth = "40px";
       
       // deal if the selection is chosen
-      if (self.settings.selectable) {
-        jT.ui.putActions(self, self.settings.configuration.columns.dataset.Id, { selection: true });
+      if (!!self.settings.selectionHandler || !!self.settings.onDetails) {
+        jT.ui.putActions(self, self.settings.configuration.columns.dataset.Id, { selection: self.settings.selectionHandler, details: !!self.settings.onDetails });
         self.settings.configuration.columns.dataset.Id.sWidth = "60px";
       }
       
@@ -1560,7 +1559,6 @@ var jToxDataset = (function () {
 
 var jToxModel = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
-    selectable: false,
     selectionHandler: null,
     maxStars: 10,
     algorithmLink: true,
@@ -1646,8 +1644,8 @@ var jToxModel = (function () {
       
       var cat = self.settings.algorithms ? 'algorithm' : 'model';
       // deal if the selection is chosen
-      if (self.settings.selectable) {
-        jT.ui.putActions(self, self.settings.configuration.columns[cat].Id, { selection: true});
+      if (!!self.settings.selectionHandler || !!self.settings.onDetails) {
+        jT.ui.putActions(self, self.settings.configuration.columns[cat].Id, { selection: self.settings.selectionHandler, details: !!self.settings.onDetails});
         self.settings.configuration.columns[cat].Id.sWidth = "60px";
       }
       
@@ -1739,15 +1737,13 @@ var jToxModel = (function () {
 
 var jToxSubstance = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
-    selectable: true,
-    selectionHandler: null,
-    hasDetails: true,
     showControls: true,
+    selectionHandler: null,
     onLoaded: null,
-    
+    onDetails: null,
+  
     pageStart: 0,
     pageSize: 10,
-    maxLength: 0,     // the initial value - most probably will be 
     /* substanceUri */
     configuration: { 
       columns : {
@@ -1801,17 +1797,11 @@ var jToxSubstance = (function () {
       
       var colId = self.settings.configuration.columns.substance.Id;
       jT.ui.putActions(self, colId, { 
-        selection: self.settings.selectable,
-        details: self.settings.hasDetails
+        selection: self.settings.selectionHandler,
+        details: !!self.settings.onDetails
       });
       colId.sName = '';
         
-      var fnShowDetails = !self.settings.hasDetails ? null : function (row, e) {
-        jT.$(e.currentTarget).toggleClass('ui-icon-circle-triangle-e');
-        jT.$(e.currentTarget).toggleClass('ui-icon-circle-triangle-w');
-        alert('Show/hide details'); 
-      };
-      
       jT.ui.putControls(self, { 
         nextPage: function () { self.nextPage(); },
         prevPage: function () { self.prevPage(); },
@@ -1828,8 +1818,13 @@ var jToxSubstance = (function () {
         "sDom": "rt",
         "aoColumns": jT.ui.processColumns(self, 'substance'),
         "fnCreatedRow": function( nRow, aData, iDataIndex ) {
-          if (self.settings.hasDetails)
-            jT.$('.jtox-details-open', nRow).on('click', function(e) {  fnShowDetails(nRow, e); });
+          if (!!self.settings.onDetails)
+            jT.$('.jtox-details-toggle', nRow).on('click', function(e) {  
+              var root = jT.ui.toggleDetails(e, nRow);
+              if (!!root) {
+                ccLib.fireCallback(self.settings.onDetails, self, root, jT.$(this).data('data'), e);
+              }
+            });
         },
         "bServerSide": false,
 				"oLanguage": {
@@ -1898,9 +1893,9 @@ var jToxSubstance = (function () {
 
 var jToxComposition = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
-    selectable: false,    // whether to show selection checkbox on each row
-    showBanner: true,     // whether to show a banner of composition info before each compounds-table
-    sDom: "rt<Ffp>",      // compounds (ingredients) table sDom
+    selectionHandler: null,   // selection handler, if needed for selection checkbox, which will be inserted if this is non-null
+    showBanner: true,         // whether to show a banner of composition info before each compounds-table
+    sDom: "rt<Ffp>",          // compounds (ingredients) table sDom
     onLoaded: null,
     
     /* compositionUri */
@@ -1953,8 +1948,8 @@ var jToxComposition = (function () {
       
       // deal if the selection is chosen
       var colId = self.settings.configuration.columns.composition.Name;
-      if (self.settings.selectable) {
-        jT.ui.putActions(self, colId, { selection: true});
+      if (!!self.settings.selectionHandler) {
+        jT.ui.putActions(self, colId, { selection: self.settings.selectionHandler});
         colId.sWidth = "60px";
       }
         
@@ -2969,39 +2964,7 @@ window.jT.ui = {
       return '<span class="ui-icon ui-icon-star jtox-inline" title="' + title + '"></span>' + stars;
     }
   },
-  
-  putActions: function (kit, col, defs) {
-    if (!!defs && !jQuery.isEmptyObject(defs)) {
-      var oldFn = col.mRender;
-      var newFn = function (data, type, full) {
-        var html = oldFn(data, type, full);
-        if (type != 'display')
-          return html;
-          
-        if (!!defs.ignoreOriginal)
-          html = '';
-          
-        // this is inserted BEFORE the original
-        if (typeof defs.selection == 'function')
-          html = defs.selection(data, type, full) + html;
-        else if (!!defs.selection)
-          html = '<input type="checkbox" value="' + data + '"' +
-                (!!kit.settings.selectionHandler ? ' class="jtox-handler" data-handler="' + kit.settings.selectionHandler + '"' : '') +
-                '/>' + html;
-                
-        // strange enough - this is inserted AFTER the original
-        if (typeof defs.details == 'function')
-          html += defs.details(data, type, full);
-        else if (!!defs.details)
-          html += '<span class="jtox-details-open ui-icon ui-icon-circle-triangle-e" data-data="' + data +'" title="Press to open/close detailed info for this entry"></span>';
-        return html;
-      };
-      
-      col.mRender = newFn;
-    }
-    return col;
-  },
-  
+    
   putControls: function (kit, handlers) {
     var pane = jT.$('.jtox-controls', kit.rootElement)[0];
     if (kit.settings.showControls) {
@@ -3019,6 +2982,77 @@ window.jT.ui = {
     }
     else // ok - hide me
       pane.style.display = "none";
+  },
+
+  putActions: function (kit, col, defs) {
+    if (!!defs && !jQuery.isEmptyObject(defs)) {
+      var oldFn = col.mRender;
+      var newFn = function (data, type, full) {
+        var html = oldFn(data, type, full);
+        if (type != 'display')
+          return html;
+          
+        if (!!defs.ignoreOriginal)
+          html = '';
+          
+        // this is inserted BEFORE the original, starting with given PRE-content
+        if (typeof defs.pre == 'function')
+          html = defs.pre(data, type, full) + html;
+        else if (!!defs.pre)
+          html = defs.pre + html;
+          
+        if (typeof defs.selection == 'function')
+          html = defs.selection(data, type, full) + html;
+        else if (!!defs.selection)
+          html = '<input type="checkbox" value="' + data + '"' +
+                (typeof defs.selection == 'string' ? ' class="jtox-handler" data-handler="' + defs.selection + '"' : '') +
+                '/>' + html;
+                
+        // strange enough - this is inserted AFTER the original
+        if (typeof defs.details == 'function')
+          html += defs.details(data, type, full);
+        else if (!!defs.details)
+          html += '<span class="jtox-details-toggle ui-icon ui-icon-circle-triangle-e" data-data="' + data +'" title="Press to open/close detailed info for this entry"></span>';
+
+        // post content adding
+        if (typeof defs.post == 'function')
+          html += defs.post(data, type, full);
+        else if (!!defs.post)
+          html += defs.post;
+        return html;
+      };
+      
+      col.mRender = newFn;
+    }
+    return col;
+  },
+  
+  toggleDetails: function (event, row) {
+    self.$(event.currentTarget).toggleClass('ui-icon-circle-triangle-e');
+    self.$(event.currentTarget).toggleClass('ui-icon-circle-triangle-w');
+    self.$(event.currentTarget).toggleClass('jtox-openned');
+    if (!row)
+      row = self.$(event.currentTarget).parents('tr')[0];
+
+    var cell = self.$(event.currentTarget).parents('td')[0];
+    
+    if (self.$(event.currentTarget).hasClass('jtox-openned')) {
+      var detRow = document.createElement('tr');
+      var detCell = document.createElement('td');
+      detRow.appendChild(detCell);
+      self.$(detCell).addClass('jtox-details');
+      
+      detCell.setAttribute('colspan', self.$(row).children().length - 1);
+      row.parentNode.insertBefore(detRow, row.nextElementSibling);
+
+      cell.setAttribute('rowspan', '2');
+      return detCell;
+    }
+    else {
+      cell.removeAttribute('rowspan');
+      self.$(self.$(row).next()).remove();
+      return null;
+    }
   }
 };
 

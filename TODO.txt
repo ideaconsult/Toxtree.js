@@ -1,6 +1,6 @@
 TODO:
-- Docs: change these: addSelection in README to really point to jToxKit.ui - ignoreOriginal, selection, details
 - Integration of jToxSubstance and jToxComposition into ui-query
+- 
 
 IDEAS?
 - (global) extractFeature(dataset, featureId) - return an array of values of that feature for each entry in the dataset. (Can be used for diagram)

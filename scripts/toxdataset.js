@@ -8,7 +8,6 @@ var jToxDataset = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     shortStars: false,
     maxStars: 10,
-    selectable: false,
     selectionHandler: null,
     sDom: "<Fif>rt",
     onLoaded: null,
@@ -60,8 +59,8 @@ var jToxDataset = (function () {
         self.settings.configuration.columns.dataset.Stars.sWidth = "40px";
       
       // deal if the selection is chosen
-      if (self.settings.selectable) {
-        jT.ui.putActions(self, self.settings.configuration.columns.dataset.Id, { selection: true });
+      if (!!self.settings.selectionHandler || !!self.settings.onDetails) {
+        jT.ui.putActions(self, self.settings.configuration.columns.dataset.Id, { selection: self.settings.selectionHandler, details: !!self.settings.onDetails });
         self.settings.configuration.columns.dataset.Id.sWidth = "60px";
       }
       

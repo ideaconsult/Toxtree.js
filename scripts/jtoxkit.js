@@ -401,39 +401,7 @@ window.jT.ui = {
       return '<span class="ui-icon ui-icon-star jtox-inline" title="' + title + '"></span>' + stars;
     }
   },
-  
-  putActions: function (kit, col, defs) {
-    if (!!defs && !jQuery.isEmptyObject(defs)) {
-      var oldFn = col.mRender;
-      var newFn = function (data, type, full) {
-        var html = oldFn(data, type, full);
-        if (type != 'display')
-          return html;
-          
-        if (!!defs.ignoreOriginal)
-          html = '';
-          
-        // this is inserted BEFORE the original
-        if (typeof defs.selection == 'function')
-          html = defs.selection(data, type, full) + html;
-        else if (!!defs.selection)
-          html = '<input type="checkbox" value="' + data + '"' +
-                (!!kit.settings.selectionHandler ? ' class="jtox-handler" data-handler="' + kit.settings.selectionHandler + '"' : '') +
-                '/>' + html;
-                
-        // strange enough - this is inserted AFTER the original
-        if (typeof defs.details == 'function')
-          html += defs.details(data, type, full);
-        else if (!!defs.details)
-          html += '<span class="jtox-details-open ui-icon ui-icon-circle-triangle-e" data-data="' + data +'" title="Press to open/close detailed info for this entry"></span>';
-        return html;
-      };
-      
-      col.mRender = newFn;
-    }
-    return col;
-  },
-  
+    
   putControls: function (kit, handlers) {
     var pane = jT.$('.jtox-controls', kit.rootElement)[0];
     if (kit.settings.showControls) {
@@ -451,6 +419,77 @@ window.jT.ui = {
     }
     else // ok - hide me
       pane.style.display = "none";
+  },
+
+  putActions: function (kit, col, defs) {
+    if (!!defs && !jQuery.isEmptyObject(defs)) {
+      var oldFn = col.mRender;
+      var newFn = function (data, type, full) {
+        var html = oldFn(data, type, full);
+        if (type != 'display')
+          return html;
+          
+        if (!!defs.ignoreOriginal)
+          html = '';
+          
+        // this is inserted BEFORE the original, starting with given PRE-content
+        if (typeof defs.pre == 'function')
+          html = defs.pre(data, type, full) + html;
+        else if (!!defs.pre)
+          html = defs.pre + html;
+          
+        if (typeof defs.selection == 'function')
+          html = defs.selection(data, type, full) + html;
+        else if (!!defs.selection)
+          html = '<input type="checkbox" value="' + data + '"' +
+                (typeof defs.selection == 'string' ? ' class="jtox-handler" data-handler="' + defs.selection + '"' : '') +
+                '/>' + html;
+                
+        // strange enough - this is inserted AFTER the original
+        if (typeof defs.details == 'function')
+          html += defs.details(data, type, full);
+        else if (!!defs.details)
+          html += '<span class="jtox-details-toggle ui-icon ui-icon-circle-triangle-e" data-data="' + data +'" title="Press to open/close detailed info for this entry"></span>';
+
+        // post content adding
+        if (typeof defs.post == 'function')
+          html += defs.post(data, type, full);
+        else if (!!defs.post)
+          html += defs.post;
+        return html;
+      };
+      
+      col.mRender = newFn;
+    }
+    return col;
+  },
+  
+  toggleDetails: function (event, row) {
+    self.$(event.currentTarget).toggleClass('ui-icon-circle-triangle-e');
+    self.$(event.currentTarget).toggleClass('ui-icon-circle-triangle-w');
+    self.$(event.currentTarget).toggleClass('jtox-openned');
+    if (!row)
+      row = self.$(event.currentTarget).parents('tr')[0];
+
+    var cell = self.$(event.currentTarget).parents('td')[0];
+    
+    if (self.$(event.currentTarget).hasClass('jtox-openned')) {
+      var detRow = document.createElement('tr');
+      var detCell = document.createElement('td');
+      detRow.appendChild(detCell);
+      self.$(detCell).addClass('jtox-details');
+      
+      detCell.setAttribute('colspan', self.$(row).children().length - 1);
+      row.parentNode.insertBefore(detRow, row.nextElementSibling);
+
+      cell.setAttribute('rowspan', '2');
+      return detCell;
+    }
+    else {
+      cell.removeAttribute('rowspan');
+      self.$(self.$(row).next()).remove();
+      return null;
+    }
   }
 };
 

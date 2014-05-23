@@ -6,9 +6,9 @@
 
 var jToxComposition = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
-    selectable: false,    // whether to show selection checkbox on each row
-    showBanner: true,     // whether to show a banner of composition info before each compounds-table
-    sDom: "rt<Ffp>",      // compounds (ingredients) table sDom
+    selectionHandler: null,   // selection handler, if needed for selection checkbox, which will be inserted if this is non-null
+    showBanner: true,         // whether to show a banner of composition info before each compounds-table
+    sDom: "rt<Ffp>",          // compounds (ingredients) table sDom
     onLoaded: null,
     
     /* compositionUri */
@@ -61,8 +61,8 @@ var jToxComposition = (function () {
       
       // deal if the selection is chosen
       var colId = self.settings.configuration.columns.composition.Name;
-      if (self.settings.selectable) {
-        jT.ui.putActions(self, colId, { selection: true});
+      if (!!self.settings.selectionHandler) {
+        jT.ui.putActions(self, colId, { selection: self.settings.selectionHandler});
         colId.sWidth = "60px";
       }
         

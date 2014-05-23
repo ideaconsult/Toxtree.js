@@ -16,6 +16,7 @@
 	<link rel="stylesheet" href="tests/jquery.dataTables.css">
 
 	<link rel="stylesheet" href="styles/toxcompound.css">
+	<link rel="stylesheet" href="styles/toxcomposition.css">
 	<link rel="stylesheet" href="styles/toxsubstance.css">
 	<link rel="stylesheet" href="styles/jtoxkit.css">
 
@@ -26,11 +27,15 @@
   <script src="scripts/common.js"></script>
   <script src="scripts/jtoxkit.js"></script>
   <script src="scripts/toxcompound.js"></script>
+  <script src="scripts/toxcomposition.js"></script>
   <script src="scripts/toxsubstance.js"></script>
   
   <script language="javascript">
     $(document).ready(function(){
-      var ds = new jToxSubstance($(".jtox-toolkit")[0], {crossDomain: true} );
+      var ds = new jToxSubstance($(".jtox-toolkit")[0], {crossDomain: true, selectionHandler: "query", onDetails: function (root, data, event) {
+        var comp = new jToxComposition(root);
+        comp.queryComposition(data + '/composition');
+      } } );
       ds.querySubstance('http://apps.ideaconsult.net:8080/toxbank/substance');
     });
   </script>
@@ -57,8 +62,6 @@
 	    </div>
 	  </div>
 <!-- // end of #jtox-substance ]]-->
-    <div id="jtox-sub-details">
-    </div>
   </div>
 </body>
 </html>

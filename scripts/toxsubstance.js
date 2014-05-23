@@ -6,15 +6,13 @@
 
 var jToxSubstance = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
-    selectable: true,
-    selectionHandler: null,
-    hasDetails: true,
     showControls: true,
+    selectionHandler: null,
     onLoaded: null,
-    
+    onDetails: null,
+  
     pageStart: 0,
     pageSize: 10,
-    maxLength: 0,     // the initial value - most probably will be 
     /* substanceUri */
     configuration: { 
       columns : {
@@ -68,17 +66,11 @@ var jToxSubstance = (function () {
       
       var colId = self.settings.configuration.columns.substance.Id;
       jT.ui.putActions(self, colId, { 
-        selection: self.settings.selectable,
-        details: self.settings.hasDetails
+        selection: self.settings.selectionHandler,
+        details: !!self.settings.onDetails
       });
       colId.sName = '';
         
-      var fnShowDetails = !self.settings.hasDetails ? null : function (row, e) {
-        jT.$(e.currentTarget).toggleClass('ui-icon-circle-triangle-e');
-        jT.$(e.currentTarget).toggleClass('ui-icon-circle-triangle-w');
-        alert('Show/hide details'); 
-      };
-      
       jT.ui.putControls(self, { 
         nextPage: function () { self.nextPage(); },
         prevPage: function () { self.prevPage(); },
@@ -95,8 +87,13 @@ var jToxSubstance = (function () {
         "sDom": "rt",
         "aoColumns": jT.ui.processColumns(self, 'substance'),
         "fnCreatedRow": function( nRow, aData, iDataIndex ) {
-          if (self.settings.hasDetails)
-            jT.$('.jtox-details-open', nRow).on('click', function(e) {  fnShowDetails(nRow, e); });
+          if (!!self.settings.onDetails)
+            jT.$('.jtox-details-toggle', nRow).on('click', function(e) {  
+              var root = jT.ui.toggleDetails(e, nRow);
+              if (!!root) {
+                ccLib.fireCallback(self.settings.onDetails, self, root, jT.$(this).data('data'), e);
+              }
+            });
         },
         "bServerSide": false,
 				"oLanguage": {

@@ -6,7 +6,6 @@
 
 var jToxModel = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
-    selectable: false,
     selectionHandler: null,
     maxStars: 10,
     algorithmLink: true,
@@ -92,8 +91,8 @@ var jToxModel = (function () {
       
       var cat = self.settings.algorithms ? 'algorithm' : 'model';
       // deal if the selection is chosen
-      if (self.settings.selectable) {
-        jT.ui.putActions(self, self.settings.configuration.columns[cat].Id, { selection: true});
+      if (!!self.settings.selectionHandler || !!self.settings.onDetails) {
+        jT.ui.putActions(self, self.settings.configuration.columns[cat].Id, { selection: self.settings.selectionHandler, details: !!self.settings.onDetails});
         self.settings.configuration.columns[cat].Id.sWidth = "60px";
       }
       

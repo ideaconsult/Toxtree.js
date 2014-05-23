@@ -330,6 +330,10 @@ td.jtox-multi table {
   background-size: 19px 19px;
 }
 
+.jtox-toolkit .jtox-details {
+  font-size: 80%;
+}
+
 .jtox-toolkit sup {
   font-size: smaller;
   vertical-align: super;
