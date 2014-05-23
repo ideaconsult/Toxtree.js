@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Skin sensitisation dataset</title>
+
+	<link rel="stylesheet" href="http://apps.ideaconsult.net:8080/ambit2/style/skeleton/base.css" type="text/css">
+	<link rel="stylesheet" href="http://apps.ideaconsult.net:8080/ambit2/style/skeleton/skeleton-fluid.css" type="text/css">
+	<link rel="stylesheet" href="http://apps.ideaconsult.net:8080/ambit2/style/skeleton/layout.css" type="text/css">
+
+    
+    
+  <script type='text/javascript' src='http://apps.ideaconsult.net:8080/ambit2/jquery/jquery-1.7.1.min.js'></script>
+	<script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js'></script>
+	<script type='text/javascript' charset='utf8' src='http://apps.ideaconsult.net:8080/ambit2/jquery/jquery.dataTables-1.9.4.min.js'></script>
+  <script type='text/javascript' src='http://apps.ideaconsult.net:8080/ambit2/jquery/purl.js'></script>
+
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/black-tie/jquery-ui.min.css" type="text/css">
+	<link rel="stylesheet" href="http://apps.ideaconsult.net:8080/ambit2/style/jquery.dataTables.css" type="text/css">
+
+  <link rel="shortcut icon" href="http://apps.ideaconsult.net:8080/ambit2/images/favicon.ico">
+  <script type='text/javascript' src='javascripts/config-dataset-skinsensitisation.js'></script>   
+  <script type='text/javascript' src='http://apps.ideaconsult.net:8080/ambit2/scripts/jtoxkit.js'></script>
+  <link rel="stylesheet" href="http://apps.ideaconsult.net:8080/ambit2/style/jtoxkit.css"/>
+
+	<script type='text/javascript'>
+
+		$(document).ready(function() {
+		var purl = $.url();
+		var dataset_uri = purl.param('dataset_uri')===undefined?'http://apps.ideaconsult.net:8080/biodeg/substanceowner/PRCR-A6103ACB-F2C6-3190-98D2-FF3404F1E36C/dataset':purl.param('dataset_uri');
+	  	var ds = new jToxDataset($(".jtox-toolkit")[0],config_dataset);
+        	ds.queryDataset(dataset_uri);
+	});
+  </script>
+
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  </head>
+  <body>
+
+
+<div class="container" style="margin:0;padding:0;">
+
+<div class="row half-bottom" style="margin-left:10px;margin-right:20px;padding:ppx;">
+	<div class="one column">&nbsp;</div>
+	<div class="fourteen columns">
+	<h3>Skin sensitisation</h3>
+	</div>
+	<div class="one column">&nbsp;</div>
+</div>	
+<div class="row" style="margin-left:5px;margin-right:5px;padding:ppx;">
+
+<div class="sixteen columns ">
+
+<div class="jtox-toolkit" data-kit="dataset" 
+	data-manual-init="yes" 
+	data-show-features="yes" 
+	data-cross-domain="true"	
+	data-show-export="yes" 
+	data-jsonp="true"></div>
+
+
+</div>
+
+<!--container -->
+</div>
+
+<div><center>Powered by <a href="http://www.ideaconsult.net/about">IdeaConsult Ltd</a>'s
+<a href="https://github.com/ideaconsult/Toxtree.js">jToxDataset kit</a>.</center></div>
+
+</div>
+
+    <script src="javascripts/scale.fix.js"></script>
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-32347361-4");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+
+  </body>
+</html>
