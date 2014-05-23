@@ -1760,7 +1760,7 @@ var jToxSubstance = (function () {
           'Reference substance UUID': { sTitle: "Reference substance UUID", mData: "referenceSubstance", mRender: function (data, type, full) {
             return (type != 'display') ? 
               data.i5uuid : 
-              '<a target="_blank" href="' + data.uri + '">' + jT.ui.shortenedData(data.i5uuid, "Press to copy the UUID in the clipboard") + '</a>';
+               jT.ui.shortenedData('<a target="_blank" href="' + data.uri + '">' + data.i5uuid + '</a>', "Press to copy the UUID in the clipboard", data.i5uuid);
           } },
           'Owner': { sTitle: "Owner", mData: "ownerName", sDefaultContent: '-'},
           'Info': { sTitle: "Info", mData: "externalIdentifiers", mRender: function (data, type, full) {
@@ -1800,7 +1800,7 @@ var jToxSubstance = (function () {
         selection: self.settings.selectionHandler,
         details: !!self.settings.onDetails
       });
-      colId.sName = '';
+      colId.sTitle = '';
         
       jT.ui.putControls(self, { 
         nextPage: function () { self.nextPage(); },
@@ -2856,16 +2856,16 @@ window.jT = window.jToxKit = {
 /* UI related functions of jToxKit are put here for more convenient usage
 */
 window.jT.ui = {
-  shortenedData: function (data, message, deflen) {
+  shortenedData: function (content, message, data) {
     var res = '';
     
-    if (ccLib.isNull(deflen))
-      deflen = 5;
-    if (data.toString().length <= deflen) {
-      res += data;
+    if (ccLib.isNull(data))
+      data = content;
+    if (data.toString().length <= 5) {
+      res += content;
     }
     else {
-      res += '<div class="shortened">' + data + '</div>';
+      res += '<div class="shortened">' + content + '</div>';
       if (message != null)
         res += '<span class="ui-icon ui-icon-copy" title="' + message + '" data-uuid="' + data + '"></span>';
     }

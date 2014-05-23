@@ -142,9 +142,9 @@ The `params` parameter (if present) can have the following properties:
 There is a bunch of methods, which are responsible for some pure UI-related stuff within jToxKit. They can be found in `jToxKit.ui` or `jT.ui`, and although most of them are internally used by the kits, here is a short explanation of most important ones:
 
 ```
-jToxKit.ui.shortenedData(data, message, defLen)
+jToxKit.ui.shortenedData(content, message, data)
 ```
-A method for shortenning passed `data` to as many as `defLen` characters (it default to 5 if _null_ is passed), wrap it into a separate `div` block and make it clipboard insertable if `message` is supplied.
+A method for shortenning passed `content`, wrap it into a separate `div` block and make it clipboard insertable if `message` is supplied. The clipboard copied data is `data` or `content` if the first one is null.
 
 ```
 jToxKit.ui.changeTabsIds(root, suffix)
@@ -483,27 +483,14 @@ As usually, columns can be configured. They are wrapped in the `substance` categ
     configuration: { 
       columns : {
         substance: {
-          'Id': { sTitle: 'Id', mData: 'URI', sDefaultContent: "-", sWidth: "60px", mRender: function (data, type, full) { 
-            return (type != 'display') ? full.index : '&nbsp;-&nbsp;' + full.index + '&nbsp;-&nbsp;';
-          } },
+          'Id': { sTitle: 'Id', mData: 'URI', sDefaultContent: "-", sWidth: "60px", mRender: ...},
           'Substance Name': { sTitle: "Substance Name", mData: "name", sDefaultContent: "-" },
-          'Substance UUID': { sTitle: "Substance UUID", mData: "i5uuid", mRender: function (data, type, full) {
-            return (type != 'display') ? data : jT.ui.shortenedData(data, "Press to copy the UUID in the clipboard");
-          } },
+          'Substance UUID': { sTitle: "Substance UUID", mData: "i5uuid", mRender: ...},
           'Composition Type': { sTitle: "Composition Type", mData: "substanceType", sWidth: "15%", sDefaultContent: '-' },
           'Public name': { sTitle: "Public name", mData: "publicname", sDefaultContent: '-'},
-          'Reference substance UUID': { sTitle: "Reference substance UUID", mData: "referenceSubstance", mRender: function (data, type, full) {
-            return (type != 'display') ? 
-              data.i5uuid : 
-              '<a target="_blank" href="' + data.uri + '">' + jT.ui.shortenedData(data.i5uuid, "Press to copy the UUID in the clipboard") + '</a>';
-          } },
+          'Reference substance UUID': { sTitle: "Reference substance UUID", mData: "referenceSubstance", mRender: ...},
           'Owner': { sTitle: "Owner", mData: "ownerName", sDefaultContent: '-'},
-          'Info': { sTitle: "Info", mData: "externalIdentifiers", mRender: function (data, type, full) {
-            var arr = [];
-            for (var i = 0, dl = data.length;i < dl; ++i)
-              arr.push(data[i].type);
-            return arr.join(', ');
-          } }
+          'Info': { sTitle: "Info", mData: "externalIdentifiers", mRender: ...}
         }
       }
     }

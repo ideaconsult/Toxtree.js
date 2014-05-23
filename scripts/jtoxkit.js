@@ -293,16 +293,16 @@ window.jT = window.jToxKit = {
 /* UI related functions of jToxKit are put here for more convenient usage
 */
 window.jT.ui = {
-  shortenedData: function (data, message, deflen) {
+  shortenedData: function (content, message, data) {
     var res = '';
     
-    if (ccLib.isNull(deflen))
-      deflen = 5;
-    if (data.toString().length <= deflen) {
-      res += data;
+    if (ccLib.isNull(data))
+      data = content;
+    if (data.toString().length <= 5) {
+      res += content;
     }
     else {
-      res += '<div class="shortened">' + data + '</div>';
+      res += '<div class="shortened">' + content + '</div>';
       if (message != null)
         res += '<span class="ui-icon ui-icon-copy" title="' + message + '" data-uuid="' + data + '"></span>';
     }

@@ -32,10 +32,7 @@
   
   <script language="javascript">
     $(document).ready(function(){
-      var ds = new jToxSubstance($(".jtox-toolkit")[0], {crossDomain: true, selectionHandler: "query", onDetails: function (root, data, event) {
-        var comp = new jToxComposition(root);
-        comp.queryComposition(data + '/composition');
-      } } );
+      var ds = new jToxSubstance($(".jtox-toolkit")[0], {crossDomain: true, selectionHandler: "query" } );
       ds.querySubstance('http://apps.ideaconsult.net:8080/toxbank/substance');
     });
   </script>
