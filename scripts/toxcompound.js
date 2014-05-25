@@ -362,7 +362,7 @@ var jToxCompound = (function () {
           cell.removeAttribute('colspan');
       };
       
-      var fnShowDetails = (self.settings.hasDetails ? function(row) {
+      var fnShowDetails = (self.settings.hasDetails ? function(row, event) {
         var cell = jT.$(".jtox-ds-details", row)[0];
         var idx = jT.$(row).data('jtox-index');
         jT.$(row).toggleClass('jtox-detailed-row');
@@ -383,6 +383,7 @@ var jToxCompound = (function () {
           
           var detDiv = document.createElement('div');
           varCell.appendChild(detDiv);
+          ccLib.fireCallback(self.settings.onDetails, self, root, full, event);
           
           var img = new Image();
           img.onload = function(e) {
@@ -478,7 +479,7 @@ var jToxCompound = (function () {
         "fnCreatedRow": function( nRow, aData, iDataIndex ) {
           // attach the click handling
           if (self.settings.hasDetails)
-            jT.$('.jtox-details-open', nRow).on('click', function(e) {  fnShowDetails(nRow); });
+            jT.$('.jtox-details-open', nRow).on('click', function(e) { fnShowDetails(nRow, e); });
           jT.$(nRow).data('jtox-index', iDataIndex);
         },
         "oLanguage" : {
@@ -498,6 +499,7 @@ var jToxCompound = (function () {
           nRow.id = 'jtox-var-' + self.instanceNo + '-' + iDataIndex;
           jT.$(nRow).addClass('jtox-row');
           jT.$(nRow).data('jtox-index', iDataIndex);
+          ccLib.fireCallback(self.settings.onRow, self, nRow, aData, iDataIndex);
         },
         "fnDrawCallback": function(oSettings) {
           // this is for synchro-sorting the two tables

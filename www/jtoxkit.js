@@ -981,7 +981,7 @@ var jToxCompound = (function () {
           cell.removeAttribute('colspan');
       };
       
-      var fnShowDetails = (self.settings.hasDetails ? function(row) {
+      var fnShowDetails = (self.settings.hasDetails ? function(row, event) {
         var cell = jT.$(".jtox-ds-details", row)[0];
         var idx = jT.$(row).data('jtox-index');
         jT.$(row).toggleClass('jtox-detailed-row');
@@ -1002,6 +1002,7 @@ var jToxCompound = (function () {
           
           var detDiv = document.createElement('div');
           varCell.appendChild(detDiv);
+          ccLib.fireCallback(self.settings.onDetails, self, root, full, event);
           
           var img = new Image();
           img.onload = function(e) {
@@ -1097,7 +1098,7 @@ var jToxCompound = (function () {
         "fnCreatedRow": function( nRow, aData, iDataIndex ) {
           // attach the click handling
           if (self.settings.hasDetails)
-            jT.$('.jtox-details-open', nRow).on('click', function(e) {  fnShowDetails(nRow); });
+            jT.$('.jtox-details-open', nRow).on('click', function(e) { fnShowDetails(nRow, e); });
           jT.$(nRow).data('jtox-index', iDataIndex);
         },
         "oLanguage" : {
@@ -1117,6 +1118,7 @@ var jToxCompound = (function () {
           nRow.id = 'jtox-var-' + self.instanceNo + '-' + iDataIndex;
           jT.$(nRow).addClass('jtox-row');
           jT.$(nRow).data('jtox-index', iDataIndex);
+          ccLib.fireCallback(self.settings.onRow, self, nRow, aData, iDataIndex);
         },
         "fnDrawCallback": function(oSettings) {
           // this is for synchro-sorting the two tables
@@ -1739,8 +1741,8 @@ var jToxSubstance = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     showControls: true,
     selectionHandler: null,
-    onLoaded: null,
     onDetails: null,
+    onLoaded: null,
   
     pageStart: 0,
     pageSize: 10,
@@ -1818,13 +1820,14 @@ var jToxSubstance = (function () {
         "sDom": "rt",
         "aoColumns": jT.ui.processColumns(self, 'substance'),
         "fnCreatedRow": function( nRow, aData, iDataIndex ) {
-          if (!!self.settings.onDetails)
+          if (!!self.settings.onDetails) {
             jT.$('.jtox-details-toggle', nRow).on('click', function(e) {  
               var root = jT.ui.toggleDetails(e, nRow);
               if (!!root) {
                 ccLib.fireCallback(self.settings.onDetails, self, root, jT.$(this).data('data'), e);
               }
             });
+          }
         },
         "bServerSide": false,
 				"oLanguage": {

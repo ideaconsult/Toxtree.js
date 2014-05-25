@@ -8,8 +8,8 @@ var jToxSubstance = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     showControls: true,
     selectionHandler: null,
-    onLoaded: null,
     onDetails: null,
+    onLoaded: null,
   
     pageStart: 0,
     pageSize: 10,
@@ -87,13 +87,14 @@ var jToxSubstance = (function () {
         "sDom": "rt",
         "aoColumns": jT.ui.processColumns(self, 'substance'),
         "fnCreatedRow": function( nRow, aData, iDataIndex ) {
-          if (!!self.settings.onDetails)
+          if (!!self.settings.onDetails) {
             jT.$('.jtox-details-toggle', nRow).on('click', function(e) {  
               var root = jT.ui.toggleDetails(e, nRow);
               if (!!root) {
                 ccLib.fireCallback(self.settings.onDetails, self, root, jT.$(this).data('data'), e);
               }
             });
+          }
         },
         "bServerSide": false,
 				"oLanguage": {
