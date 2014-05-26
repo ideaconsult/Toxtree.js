@@ -636,6 +636,7 @@ var jToxCompound = (function () {
     "metricFeature": "http://www.opentox.org/api/1.1#Similarity",   // This is the default metric feature, if no other is specified
     "onLoaded": null,         // invoked when a set of compound is loaded.
     "onPrepared": null,       // invoked when the initial call for determining the tabs/columns is ready
+    "onDetails": null,        // invoked when a details pane is openned
     "fnAccumulate": function(fId, oldVal, newVal, features) {
       if (ccLib.isNull(newVal))
         return oldVal;
@@ -707,46 +708,44 @@ var jToxCompound = (function () {
 
       // These are instance-wide pre-definitions of default baseFeatures as described below.
       "baseFeatures": {
-      	// and one for unified way of processing diagram
-      	"http://www.opentox.org/api/1.1#Diagram": {title: "Diagram", search: false,
+      	// and one for unified way of processing diagram. This can be used as template too
+      	"http://www.opentox.org/api/1.1#Diagram": {
+      	  title: "Diagram", 
+      	  search: false,
       	  process: function(entry, fId, features) {
             entry.compound.diagramUri = entry.compound.URI.replace(/(.+)(\/conformer.*)/, "$1") + "?media=image/png";
       	  },
-      	  render: function(col, fId){
-      	    col["mData"] = "compound.diagramUri";
-            col["mRender"] = function(data, type, full) {
-              return (type != "display") ? "-" : '<a target="_blank" href="' + full.compound.URI + '"><img src="' + data + '" class="jtox-ds-smalldiagram"/></a>';
-            };
-            col["sClass"] = "paddingless";
-            col["sWidth"] = "125px";
-            return col;
-        	},
+      	  data: "compound.diagramUri",
+      	  column: { sClass: "paddingless", sWidth: "125px"},
+      	  render: function(data, type, full) {
+            return (type != "display") ? "-" : '<a target="_blank" href="' + full.compound.URI + '"><img src="' + data + '" class="jtox-ds-smalldiagram"/></a>';
+          },
         	visibility: "main"
       	},
-      	"http://www.opentox.org/api/1.1#Similarity": {title: "Similarity", location: "compound.metric", search: true, used: true},
+      	"http://www.opentox.org/api/1.1#Similarity": {title: "Similarity", data: "compound.metric", search: true, used: true},
       }
     }
   };
 
-  /* define the standard features-synonymes, working with 'sameAs' property. Beside the title we define the 'location' property
+  /* define the standard features-synonymes, working with 'sameAs' property. Beside the title we define the 'data' property
   as well which is used in processEntry() to location value(s) from given (synonym) properties into specific property of the compound entry itself.
-  'location' can be an array, which results in adding value to several places.
+  'data' can be an array, which results in adding value to several places.
   */
   var baseFeatures = {
-    "http://www.opentox.org/api/1.1#REACHRegistrationDate" : { title: "REACH Date", location: "compound.reachdate", accumulate: true, basic: true},
-    "http://www.opentox.org/api/1.1#CASRN" : { title: "CAS", location: "compound.cas", accumulate: true, basic: true},
-  	"http://www.opentox.org/api/1.1#ChemicalName" : { title: "Name", location: "compound.name", accumulate: true, basic: true},
-  	"http://www.opentox.org/api/1.1#TradeName" : {title: "Trade Name", location: "compound.tradename", accumulate: true, basic: true},
-  	"http://www.opentox.org/api/1.1#IUPACName": {title: "IUPAC Name", location: ["compound.name", "compound.iupac"], accumulate: true, basic: true},
-  	"http://www.opentox.org/api/1.1#EINECS": {title: "EINECS", location: "compound.einecs", accumulate: true, basic: true},
-    "http://www.opentox.org/api/1.1#InChI": {title: "InChI", location: "compound.inchi", shorten: true, accumulate: true, basic: true},
-  	"http://www.opentox.org/api/1.1#InChI_std": {title: "InChI", location: "compound.inchi", shorten: true, accumulate: true, used: true, basic: true},
-    "http://www.opentox.org/api/1.1#InChIKey": {title: "InChI Key", location: "compound.inchikey", accumulate: true, basic: true},
-  	"http://www.opentox.org/api/1.1#InChIKey_std": {title: "InChI Key", location: "compound.inchikey", accumulate: true, used: true, basic: true},
-    "http://www.opentox.org/api/1.1#InChI_AuxInfo": {title: "InChI Aux", location: "compound.inchi", accumulate: true, used: true, basic: true},
-  	"http://www.opentox.org/api/1.1#InChI_AuxInfo_std": {title: "InChI Aux", location: "compound.inchi", accumulate: true, used:true, basic: true},
-  	"http://www.opentox.org/api/1.1#IUCLID5_UUID": {title: "IUCLID5 UUID", location: "compound.i5uuid", shorten: true, accumulate: true, basic: true},
-  	"http://www.opentox.org/api/1.1#SMILES": {title: "SMILES", location: "compound.smiles", shorten: true, accumulate: true, basic: true},
+    "http://www.opentox.org/api/1.1#REACHRegistrationDate" : { title: "REACH Date", data: "compound.reachdate", accumulate: true, basic: true},
+    "http://www.opentox.org/api/1.1#CASRN" : { title: "CAS", data: "compound.cas", accumulate: true, basic: true},
+  	"http://www.opentox.org/api/1.1#ChemicalName" : { title: "Name", data: "compound.name", accumulate: true, basic: true},
+  	"http://www.opentox.org/api/1.1#TradeName" : {title: "Trade Name", data: "compound.tradename", accumulate: true, basic: true},
+  	"http://www.opentox.org/api/1.1#IUPACName": {title: "IUPAC Name", data: ["compound.name", "compound.iupac"], accumulate: true, basic: true},
+  	"http://www.opentox.org/api/1.1#EINECS": {title: "EINECS", data: "compound.einecs", accumulate: true, basic: true},
+    "http://www.opentox.org/api/1.1#InChI": {title: "InChI", data: "compound.inchi", shorten: true, accumulate: true, basic: true},
+  	"http://www.opentox.org/api/1.1#InChI_std": {title: "InChI", data: "compound.inchi", shorten: true, accumulate: true, used: true, basic: true},
+    "http://www.opentox.org/api/1.1#InChIKey": {title: "InChI Key", data: "compound.inchikey", accumulate: true, basic: true},
+  	"http://www.opentox.org/api/1.1#InChIKey_std": {title: "InChI Key", data: "compound.inchikey", accumulate: true, used: true, basic: true},
+    "http://www.opentox.org/api/1.1#InChI_AuxInfo": {title: "InChI Aux", data: "compound.inchi", accumulate: true, used: true, basic: true},
+  	"http://www.opentox.org/api/1.1#InChI_AuxInfo_std": {title: "InChI Aux", data: "compound.inchi", accumulate: true, used:true, basic: true},
+  	"http://www.opentox.org/api/1.1#IUCLID5_UUID": {title: "IUCLID5 UUID", data: "compound.i5uuid", shorten: true, accumulate: true, basic: true},
+  	"http://www.opentox.org/api/1.1#SMILES": {title: "SMILES", data: "compound.smiles", shorten: true, accumulate: true, basic: true},
   	"http://www.opentox.org/api/dblinks#CMS": {title: "CMS", accumulate: true, basic: true},
   	"http://www.opentox.org/api/dblinks#ChEBI": {title: "ChEBI", accumulate: true, basic: true},
   	"http://www.opentox.org/api/dblinks#Pubchem": {title: "PubChem", accumulate: true, basic: true},
@@ -833,7 +832,7 @@ var jToxCompound = (function () {
       var emptyList = [];
       var idx = 0;
       for (var gr in self.groups) {
-        var grId = "jtox-ds-" + gr.replace(/\s/g, "_") + "-" + self.instanceNo;
+        var grId = "jtox-ds-" + gr.replace(/\s/g, "_") + "-" + self.instanceNo + (isMain ? '' : '-details');
         var tabLi = createATab(grId, gr.replace(/_/g, " "));
         
         // now prepare the content...
@@ -916,13 +915,11 @@ var jToxCompound = (function () {
       }
     },
     
-    featureValue: function (fId, data) {
+    featureValue: function (fId, data, type) {
       var self = this;
       var feature = self.features[fId];
-      if (feature.location !== undefined)
-        return ccLib.getJsonValue(data, jT.$.isArray(feature.location) ? feature.location[0] : feature.location);
-      else
-        return data.values[fId];
+      var val = (feature.data !== undefined) ? (ccLib.getJsonValue(data, jT.$.isArray(feature.data) ? feature.data[0] : feature.data)) : data.values[fId];
+      return (typeof feature.render == 'function') ? feature.render(val, !!type ? type : 'filter', data) : val;
     },
     
     featureUri: function (fId) {
@@ -1002,7 +999,6 @@ var jToxCompound = (function () {
           
           var detDiv = document.createElement('div');
           varCell.appendChild(detDiv);
-          ccLib.fireCallback(self.settings.onDetails, self, root, full, event);
           
           var img = new Image();
           img.onload = function(e) {
@@ -1014,7 +1010,7 @@ var jToxCompound = (function () {
                 if (id != null) {
                   fEl = jT.getTemplate('#jtox-one-detail');
                   parent.appendChild(fEl);
-                  ccLib.fillTree(fEl, {title: name, value: self.featureValue(id, full), uri: self.featureUri(id)});
+                  ccLib.fillTree(fEl, {title: name, value: self.featureValue(id, full, 'details'), uri: self.featureUri(id)});
                 }
                 return fEl;
               },
@@ -1024,6 +1020,7 @@ var jToxCompound = (function () {
                 return tabTable;  
               }
             );
+            ccLib.fireCallback(self.settings.onDetails, self, detDiv, full, event);
           };
           img.src = full.compound.diagramUri;
           cell.appendChild(img);
@@ -1055,23 +1052,27 @@ var jToxCompound = (function () {
             "sDefaultContent": "-",
           };
           
-          if (feature.location !== undefined)
-            col["mData"] = feature.location;
+          if (typeof feature.column == 'function')
+            col = feature.column.call(self, col, fId);
+          else if (!ccLib.isNull(feature.column))
+            col = jT.$.extend(col, feature.column);
+          
+          if (feature.data !== undefined)
+            col["mData"] = feature.data;
           else {
             col["mData"] = 'values';
             col["mRender"] = (function(featureId) { return function(data, type, full) { var val = data[featureId]; return ccLib.isEmpty(val) ? '-' : val }; })(fId);
           }
           
-          // some special cases, like diagram
-          if (feature.render !== undefined) 
-            col = ccLib.fireCallback(feature.render, self, col, fId);
-          
+          // other convenient cases
           if (!!feature.shorten) {
-            col["mRender"] = function(data, type, full) {
-              return (type != "display") ? '' + data : jT.ui.shortenedData(data, "Press to copy the value in the clipboard");
-            };
+            col["mRender"] = function(data, type, full) { return (type != "display") ? '' + data : jT.ui.shortenedData(data, "Press to copy the value in the clipboard"); };
             col["sWidth"] = "75px";
           }
+
+          // finally - this one.          
+          if (feature.render !== undefined)
+            col["mRender"] = feature.render;
           
           // finally - assign column switching to the checkbox of main tab.
           if (level == 1)
@@ -1359,8 +1360,8 @@ var jToxCompound = (function () {
       var newVal = entry.values[fid];
       
       // if applicable - location the feature value to a specific location whithin the entry
-      if (!!feature.accumulate && newVal !== undefined && feature.location !== undefined) {
-        var accArr = feature.location;
+      if (!!feature.accumulate && newVal !== undefined && feature.data !== undefined) {
+        var accArr = feature.data;
         if (!jT.$.isArray(accArr))
           accArr = [accArr];
         
@@ -1407,7 +1408,7 @@ var jToxCompound = (function () {
     for (var fid in features) {
       
       var sameAs = cls.findSameAs(fid, features);
-      // now merge with this one... it copies everything that we've added, if we've reached to it. Including 'location'
+      // now merge with this one... it copies everything that we've added, if we've reached to it. Including 'data'
       features[fid] = jT.$.extend(features[fid], features[sameAs], { originalId: fid, originalTitle: features[fid].title });
     }
     

@@ -107,6 +107,10 @@
     	tEl.innerHTML = tEl.innerHTML.replace(/(.+)\((\d+)\/(\d+)(.*)?/, '$1(' + v + '/$3$4');;
     }
     
+    function onDetailedRow(row, data, index) {
+      alert ("Detailed row for data:" + JSON.stringify(data));
+    }
+    
     $(document).ready(function(){
       var toggleBar = function () {
         $(this).parents('#sidebar').toggleClass('hidden');
@@ -155,7 +159,7 @@
         </div>
       </div>
     </div>
-	  <div id="browser" class="jtox-toolkit" data-kit="compound" data-remember-checks="true"></div>
+	  <div id="browser" class="jtox-toolkit" data-kit="compound" data-remember-checks="true" data-hide-empty="true" data-on-details="onDetailedRow"></div>
   </div>
 </body>
 </html>
