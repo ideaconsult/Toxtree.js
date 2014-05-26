@@ -272,38 +272,36 @@ Another aspect that can be configured from there is the list of possible exports
 ]
 ```
 
-Here are all possible options / settings for each feature:
+And now, we've finally got to explaining each feature's configuration options:
 
 ```
 "baseFeatures": {
 	"<featureId": {
-		title: "<readable title>", 
-		location: "<location in data entry to store locationd values during processing>",
+		title: "<readable title>",
+		data: "<location in data entry of the value of that feature>",
 		accumulate: true | false, // whether value of this feature need to be accumulated
 		search: true | false, // is this feature searchable
 		used: true | false, // put true if you want to make sure it won't show up on Other tab
 		visibility: none | all | main | details,
-		process: "function name | definition to be called during feature preparation",
-		render: "<function name | definition to be called when dataTables columns are created>",
+		column: <object to be merged with dataTable column definition | function definition>
+		process: <function name | definition to be called during feature preparation>,
+		render: <function definition - used for rendering feature values (also - as mRender)>,
 	},
 	...
 }
 ```
 
-The properties that need more explanation are _location_, _accumulate_, _process_, _visibility_ and _render_. The first one is used to determine where in the data entry the value for this feature is stored and/or should be written. For example in those two:
+All of them are optional, and it is good to remember that these are merged with feature definitions as they arrive from the server.
 
-```
-"http://www.opentox.org/api/1.1#CASRN" : { title: "CAS", location: "compound.cas"},
-"http://www.opentox.org/api/1.1#TradeName" : {title: "Trade Name", location: "compound.tradename"}
-```
-
-This property shows that all features that are _sameAs_ **CASRN** (or **TradeName**) should location their values in `compound.cas`. This is the place that later the values will be searched too. The second property - `accumulate` determines whether such accumulation (via `fnAccumulate` function) should happen at all, or just the rendering engine will search for the value in the specified location.
-
-The third property - `process` is used during dataset pre-processing and is of form `function process(entry, featureId, features)` and is called for each feature in the set.
-
-The fourth one - `visibility` determines where this feature should be shown out: either on general tabs only (value of `main`), or in detailed info tabs only (value of `details`), or in both - value of `all` or _undefined_, or not shown at all - `none`.
-
-The last property - `render` gives wider possibilities while preparing the table - it identifies a function of the following format: `function render(column, featureId)`, where _column_ is the column definition for this feature built so far (most probably - _sTitle_ put, etc.). This is dataTable column definition, that can be altered in any desired way, includin it's _mRender_ property. 
+- **`title`**, _string_: The title of this feature as it'll appear in the column titles;
+- **`data`**, _string_: A "path" within a compound entry to the value of this feature, i.e. - location within the object. For example: `"http://www.opentox.org/api/1.1#CASRN" : { title: "CAS", data: "compound.cas"}` feature's (and all that have it as `sameAs`!) value can be found in `compound.cas`. This property (_data_) can also be an array - see the description of _accumulate_ about this.
+- **`accumulate`**, _boolean_: This one is used in conjuction with the previous one. During dataset pre-processing, the desired final value for a feature can be formed in arbitrary way from compound's entry. For example, we might want to have several (different) features that we know are semantically equal (like **Name**, **TradeName**) to accumulate their values in one and the same location within compound's entry. Marking _accumulate_ to `true` instructs the automatic entry processing to do so - the location is given in `data`. Thus, _data_ can be an array - if we want to accumulate to several places.
+- **`search`**, _boolean_: Whether this feature is searchable during table filtering. Default is _true_.
+- **`used`**, _boolean_: In the process of grouping features, this one is used to mark when a feature is already placed in some group. You can use it if you want to keep a feature away from going into any (default) group. Default: _false_.
+- **`visibility`**, _none_ | _all_ | _main_ | _details_: Where do you want to have this feature shown - either on feature-selection tab only (_main_, example: _#Diagram_), in detailed view, tabs only (_details_) on both (_all_) or neither (_none_). Default: _all_.
+- **`column`**, _object_ or _function_: This is a normal _dataTable_'s column definition that will be merged with automatically built one, if present. If function is passed - it is expected to with this definition: `function(column, featureId)` and should return the new column definition. Default: _null_.
+- **`render`**, _function_: The value render function for this feature. It has the dataTable's `mRender` syntax: `function (data, type, full)` and it is, actually used for that purpose, if present (taking precedence over _mRender_ property of `column` object). There is one difference - one more _type_ of rendering is given: _details_, which gives the configurator the ability to have different rendering for that special purpose - value of feature within details pane.
+- **`process`**, _function_: This one is used during dataset preprocessing and is called for each entry and feature (if given at all). It's definition should be of this form: `function process(entry, featureId, features)`. Default: _null_.
 
 In the full configuration, shown below example of using last two can be seen for _Diagram_ property.
 
