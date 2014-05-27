@@ -1,4 +1,6 @@
 TODO:
+- Make all tables react adequately on failure on network / calls
+- 
 - Integration of jToxSubstance and jToxComposition into ui-query
 
 IDEAS?
