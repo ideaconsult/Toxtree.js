@@ -281,6 +281,7 @@ And now, we've finally got to explaining each feature's configuration options:
 		data: "<location in data entry of the value of that feature>",
 		accumulate: true | false, // whether value of this feature need to be accumulated
 		search: true | false, // is this feature searchable
+		basic: true | false, // is it a basic, feature with custom behavior?
 		used: true | false, // put true if you want to make sure it won't show up on Other tab
 		visibility: none | all | main | details,
 		column: <object to be merged with dataTable column definition | function definition>
@@ -297,6 +298,7 @@ All of them are optional, and it is good to remember that these are merged with 
 - **`data`**, _string_: A "path" within a compound entry to the value of this feature, i.e. - location within the object. For example: `"http://www.opentox.org/api/1.1#CASRN" : { title: "CAS", data: "compound.cas"}` feature's (and all that have it as `sameAs`!) value can be found in `compound.cas`. This property (_data_) can also be an array - see the description of _accumulate_ about this.
 - **`accumulate`**, _boolean_: This one is used in conjuction with the previous one. During dataset pre-processing, the desired final value for a feature can be formed in arbitrary way from compound's entry. For example, we might want to have several (different) features that we know are semantically equal (like **Name**, **TradeName**) to accumulate their values in one and the same location within compound's entry. Marking _accumulate_ to `true` instructs the automatic entry processing to do so - the location is given in `data`. Thus, _data_ can be an array - if we want to accumulate to several places.
 - **`search`**, _boolean_: Whether this feature is searchable during table filtering. Default is _true_.
+- **`basic`**, _boolean_: Whether this is _basic_ feature, which has it's custom grouping and handling. For example, _Other_ group deafault function ignores these. Default: _false_.
 - **`used`**, _boolean_: In the process of grouping features, this one is used to mark when a feature is already placed in some group. You can use it if you want to keep a feature away from going into any (default) group. Default: _false_.
 - **`visibility`**, _none_ | _all_ | _main_ | _details_: Where do you want to have this feature shown - either on feature-selection tab only (_main_, example: _#Diagram_), in detailed view, tabs only (_details_) on both (_all_) or neither (_none_). Default: _all_.
 - **`column`**, _object_ or _function_: This is a normal _dataTable_'s column definition that will be merged with automatically built one, if present. If function is passed - it is expected to with this definition: `function(column, featureId)` and should return the new column definition. Default: _null_.

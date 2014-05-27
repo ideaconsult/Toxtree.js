@@ -44,6 +44,7 @@ var config_dataset = {
 		  "visibility": "details",
 			"title": "Composition",
 			"data": "compound.URI",
+			"basic": true,
 			"render" : function(data, type, full) {
         return (type != "details") ? "-" : '<span class="jtox-details-composition" data-URI="' + data + '"></span>';
       }
@@ -64,11 +65,6 @@ var config_dataset = {
       "http://www.opentox.org/api/1.1#InChIKey",
       "http://www.opentox.org/api/1.1#InChI",
       "http://www.opentox.org/api/1.1#REACHRegistrationDate"
-	  ],
-	  "Other": [
-	    "http://www.wikipathways.org/index.php/Pathway",
-	    "http://www.opentox.org/echaEndpoints.owl#Carcinogenicity",
-	    "http://www.opentox.org/echaEndpoints.owl#Mutagenicity"
 	  ],
     "Composition": [ "http://www.opentox.org/api/1.1#CompositionInfo" ]
 	},
