@@ -53,6 +53,7 @@ var config_dataset = {
   "groups": {
     "Identifiers" : [
       "http://www.opentox.org/api/1.1#Diagram", 
+      "#DetailsTableRow",
       "http://www.opentox.org/api/1.1#CASRN", 
       "http://www.opentox.org/api/1.1#EINECS",
       "http://www.opentox.org/api/1.1#IUCLID5_UUID"

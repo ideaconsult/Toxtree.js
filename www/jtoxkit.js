@@ -239,6 +239,15 @@ var ccLib = {
     }
   },
   
+  positionTo: function (el, parent) {
+    var ps = { left: 0, top: 0 };
+    for (;!!el && el != parent; el = el.offsetParent) {
+      ps.left += el.offsetLeft;
+      ps.top += el.offsetTop;
+    }
+    return ps;
+  },
+  
   addParameter: function (url, param) {
     return url + (("&?".indexOf(url.charAt(url.length - 1)) == -1) ?  (url.indexOf('?') > 0 ? "&" : "?") : '') + param;
   },
@@ -651,7 +660,8 @@ var jToxCompound = (function () {
     "configuration": {
       "groups": {
         "Identifiers" : [
-          "http://www.opentox.org/api/1.1#Diagram", 
+          "http://www.opentox.org/api/1.1#Diagram",
+          "#DetailsTableRow",
           "http://www.opentox.org/api/1.1#CASRN", 
           "http://www.opentox.org/api/1.1#EINECS",
           "http://www.opentox.org/api/1.1#IUCLID5_UUID"
@@ -723,6 +733,16 @@ var jToxCompound = (function () {
           },
         	visibility: "main"
       	},
+      	"#DetailsTableRow": {
+      	  title: "Diagram", 
+      	  search: false,
+      	  data: "compound.URI",
+      	  basic: true,
+      	  column: { sClass: "jtox-hidden jtox-ds-details paddingless", sWidth: "0px"},
+        	visibility: "details",
+        	render: function(data, type, full) { return ''; }
+      	},
+      	
       	"http://www.opentox.org/api/1.1#Similarity": {title: "Similarity", data: "compound.metric", search: true, used: true},
       }
     }
@@ -905,7 +925,7 @@ var jToxCompound = (function () {
       
       // now show the whole stuff and mark the disabled tabs
       all.style.display = "block";
-      return jT.$(all).tabs({ collapsible: isMain, disabled: emptyList, heightStyle: isMain ? "content" : (self.settings.detailsHeight || "fill") });
+      return jT.$(all).tabs({ collapsible: isMain, disabled: emptyList, heightStyle: isMain ? "content" : (self.settings.detailsHeight == 'auto' ? 'auto' : 'fill') });
     },
     
     equalizeTables: function () {
@@ -949,8 +969,7 @@ var jToxCompound = (function () {
                   : '');
           }
         },
-        { "sClass": "jtox-hidden", "mData": "index", "sDefaultContent": "-", "bSortable": true, "mRender": function(data, type, full) { return ccLib.isNull(self.orderList) ? 0 : self.orderList[data]; } }, // column used for ordering
-        { "sClass": "jtox-hidden jtox-ds-details paddingless", "mData": "index", "sDefaultContent": "-", "mRender": function(data, type, full) { return ''; } } // details column
+        { "sClass": "jtox-hidden", "mData": "index", "sDefaultContent": "-", "bSortable": true, "mRender": function(data, type, full) { return ccLib.isNull(self.orderList) ? 0 : self.orderList[data]; } } // column used for ordering
       );
       
       varCols.push({ "sClass": "jtox-hidden jtox-ds-details paddingless", "mData": "index", "mRender": function(data, type, full) { return ''; }  });
@@ -993,45 +1012,56 @@ var jToxCompound = (function () {
         var iconCell = jT.$('.jtox-details-open', row);
         jT.$(iconCell).toggleClass('ui-icon-circle-triangle-e');
         jT.$(iconCell).toggleClass('ui-icon-circle-triangle-w');
+        
+        var detDiv = jT.$('.jtox-details-box', self.rootElement)[0];
 
         if (toShow) {
           // i.e. we need to show it - put the full sized diagram in the fixed part and the tabs in the variable one...
           var full = self.dataset.dataEntry[idx];
           
-          var detDiv = document.createElement('div');
-          varCell.appendChild(detDiv);
+          var width = jT.$(cell).width() + jT.$('.jtox-ds-variable', self.rootElement).width();
+          jT.$(detDiv).width(width);
+          var ps = ccLib.positionTo(cell, detDiv.parentNode);
+          detDiv.style.left = ps.left + 'px';
+          detDiv.style.top = ps.top + 'px';
+
+          if (!ccLib.isNull(self.settings.detailsHeight)) {
+            if (parseInt(self.settings.detailsHeight) > 0)
+              jT.$(detDiv).height(self.settings.detailsHeight);
+            else if (self.settings.detailsHeight == 'fill')
+              jT.$(detDiv).height(jT.$(cell).height() * 2);
+          }
+
+          jT.$(detDiv).toggleClass('jtox-hidden');
           
-          var img = new Image();
-          img.onload = function(e) {
-            self.equalizeTables();
-            jT.$(detDiv).height(varCell.parentNode.clientHeight - 1);
-            self.prepareTabs(detDiv, false, 
-              function (id, name, parent) {
-                var fEl = null;
-                if (id != null) {
-                  fEl = jT.getTemplate('#jtox-one-detail');
-                  parent.appendChild(fEl);
-                  ccLib.fillTree(fEl, {title: name, value: self.featureValue(id, full, 'details'), uri: self.featureUri(id)});
-                }
-                return fEl;
-              },
-              function (id, parent) {
-                var tabTable = jT.getTemplate('#jtox-details-table');
-                parent.appendChild(tabTable);
-                return tabTable;  
+          self.prepareTabs(detDiv, false, 
+            function (id, name, parent) {
+              var fEl = null;
+              if (id != null) {
+                fEl = jT.getTemplate('#jtox-one-detail');
+                parent.appendChild(fEl);
+                ccLib.fillTree(fEl, {title: name, value: self.featureValue(id, full, 'details'), uri: self.featureUri(id)});
               }
-            );
-            ccLib.fireCallback(self.settings.onDetails, self, detDiv, full, event);
-          };
-          img.src = full.compound.diagramUri;
-          cell.appendChild(img);
+              return fEl;
+            },
+            function (id, parent) {
+              var tabTable = jT.getTemplate('#jtox-details-table');
+              parent.appendChild(tabTable);
+              return tabTable;  
+            }
+          );
+          
+          jT.$(cell).height(detDiv.offsetHeight);
+          ccLib.fireCallback(self.settings.onDetails, self, detDiv, full, event);
         }
         else {
           // i.e. we need to hide
+          jT$(detDiv).toggleClass('jtox-hidden');
           jT.$(cell).empty();
           jT.$(varCell).empty();
-          self.equalizeTables();
         }
+        
+        self.equalizeTables();
       } : null); // fnShowDetails definition end
 
       // make a query for all checkboxes in the main tab, so they can be traversed in parallel with the features and 
@@ -1120,7 +1150,6 @@ var jToxCompound = (function () {
           nRow.id = 'jtox-var-' + self.instanceNo + '-' + iDataIndex;
           jT.$(nRow).addClass('jtox-row');
           jT.$(nRow).data('jtox-index', iDataIndex);
-          ccLib.fireCallback(self.settings.onRow, self, nRow, aData, iDataIndex);
         },
         "fnDrawCallback": function(oSettings) {
           // this is for synchro-sorting the two tables
@@ -3132,6 +3161,7 @@ jT.templates['all-compound']  =
 "	      <input type=\"text\" class=\"filterbox\" placeholder=\"Filter...\" />" +
 "	    </div>" +
 "	    <div class=\"jtox-ds-tables\">" +
+"	      <div class=\"jtox-details-box jtox-hidden\"></div>" +
 "	      <div class=\"jtox-ds-fixed\">" +
 "	        <table></table>" +
 "	      </div><div class=\"jtox-ds-variable\">" +

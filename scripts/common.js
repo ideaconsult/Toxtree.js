@@ -239,6 +239,15 @@ var ccLib = {
     }
   },
   
+  positionTo: function (el, parent) {
+    var ps = { left: 0, top: 0 };
+    for (;!!el && el != parent; el = el.offsetParent) {
+      ps.left += el.offsetLeft;
+      ps.top += el.offsetTop;
+    }
+    return ps;
+  },
+  
   addParameter: function (url, param) {
     return url + (("&?".indexOf(url.charAt(url.length - 1)) == -1) ?  (url.indexOf('?') > 0 ? "&" : "?") : '') + param;
   },
