@@ -31,31 +31,14 @@ var config_dataset = {
 		  "visibility": "details",
 			"title": "Composition",
 			"data": "compound.URI",
+			"column": { bVisible: false },
 			"basic": true,
 			"render" : function(data, type, full) {
         return (type != "details") ? "-" : '<span class="jtox-details-composition" data-URI="' + data + '"></span>';
       }
 		}
   },
-  "groups": {
-    "Identifiers" : [
-      "http://www.opentox.org/api/1.1#Diagram", 
-      "#DetailedInfoRow",
-      "http://www.opentox.org/api/1.1#CASRN", 
-      "http://www.opentox.org/api/1.1#EINECS",
-      "http://www.opentox.org/api/1.1#IUCLID5_UUID"
-    ],
-    "Names": [
-      "http://www.opentox.org/api/1.1#ChemicalName",
-      "http://www.opentox.org/api/1.1#TradeName",
-      "http://www.opentox.org/api/1.1#IUPACName",
-      "http://www.opentox.org/api/1.1#SMILES",
-      "http://www.opentox.org/api/1.1#InChIKey",
-      "http://www.opentox.org/api/1.1#InChI",
-      "http://www.opentox.org/api/1.1#REACHRegistrationDate"
-	  ],
-    "Substances": [ "http://www.opentox.org/api/1.1#CompositionInfo" ]
-	},
+  "groups": createGroups,
 	"columns": {
   	"dataset": {
     	'Info': { bVisible: false }

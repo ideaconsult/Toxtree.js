@@ -123,6 +123,39 @@
       } } );
     }
     
+    function createGroups(miniset, kit) {
+      var groups = {
+        "Identifiers" : [
+          "http://www.opentox.org/api/1.1#Diagram", 
+          "#DetailedInfoRow",
+          "http://www.opentox.org/api/1.1#CASRN", 
+          "http://www.opentox.org/api/1.1#EINECS",
+          "http://www.opentox.org/api/1.1#IUCLID5_UUID"
+        ],
+        "Names": [
+          "http://www.opentox.org/api/1.1#ChemicalName",
+          "http://www.opentox.org/api/1.1#TradeName",
+          "http://www.opentox.org/api/1.1#IUPACName",
+          "http://www.opentox.org/api/1.1#SMILES",
+          "http://www.opentox.org/api/1.1#InChIKey",
+          "http://www.opentox.org/api/1.1#InChI",
+          "http://www.opentox.org/api/1.1#REACHRegistrationDate"
+    	  ]
+    	};
+    	for (var fId in miniset.feature) {
+      	var src = miniset.feature[fId].source;
+      	if (!src || !src.type || src.type.toLowerCase() != 'model')
+      	  continue;
+      	 src = src.URI.substr(src.URI.lastIndexOf('/') + 1);
+      	 if (groups[src] === undefined)
+      	  groups[src] = [];
+      	 groups[src].push(fId);
+    	}
+    	groups["Substances"] = [ "http://www.opentox.org/api/1.1#CompositionInfo" ];
+    	groups["Calculated"] = null;
+    	return groups;
+    }
+    
     $(document).ready(function(){
       var toggleBar = function () {
         $(this).parents('#sidebar').toggleClass('hidden');
