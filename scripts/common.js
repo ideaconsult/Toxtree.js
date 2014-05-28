@@ -240,7 +240,8 @@ var ccLib = {
   },
   
   positionTo: function (el, parent) {
-    var ps = { left: 0, top: 0 };
+    var ps = { left: -parent.offsetLeft, top: -parent.offsetTop };
+    parent = parent.offsetParent;
     for (;!!el && el != parent; el = el.offsetParent) {
       ps.left += el.offsetLeft;
       ps.top += el.offsetTop;

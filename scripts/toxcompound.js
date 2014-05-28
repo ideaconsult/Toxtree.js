@@ -33,7 +33,7 @@ var jToxCompound = (function () {
       "groups": {
         "Identifiers" : [
           "http://www.opentox.org/api/1.1#Diagram",
-          "#DetailsTableRow",
+          "#DetailedInfoRow",
           "http://www.opentox.org/api/1.1#CASRN", 
           "http://www.opentox.org/api/1.1#EINECS",
           "http://www.opentox.org/api/1.1#IUCLID5_UUID"
@@ -105,7 +105,7 @@ var jToxCompound = (function () {
           },
         	visibility: "main"
       	},
-      	"#DetailsTableRow": {
+      	"#DetailedInfoRow": {
       	  title: "Diagram", 
       	  search: false,
       	  data: "compound.URI",
@@ -305,6 +305,16 @@ var jToxCompound = (function () {
       if (!self.suspendEqualization && self.fixTable != null && self.varTable != null) {
         ccLib.equalizeHeights(self.fixTable.tHead, self.varTable.tHead);
         ccLib.equalizeHeights(self.fixTable.tBodies[0], self.varTable.tBodies[0]);
+
+        // now we need to equalize openned details boxes, if any
+        var tabRoot = jT.$('.jtox-ds-tables', self.rootElement)[0];
+        jT.$('.jtox-details-box', self.rootElement).each(function (i) {
+          var cell = jT.$(this).data('rootCell');
+          if (!!cell) {
+            var ps = ccLib.positionTo(cell, tabRoot);
+            this.style.top = ps.top + 'px';
+          }
+        });
       }
     },
     
@@ -372,6 +382,9 @@ var jToxCompound = (function () {
       
       var fnShowDetails = (self.settings.hasDetails ? function(row, event) {
         var cell = jT.$(".jtox-ds-details", row)[0];
+        if (!cell)
+          return; // that means you've forgotten to add #DetailedInfoRow feature somewhere.
+          
         var idx = jT.$(row).data('jtox-index');
         jT.$(row).toggleClass('jtox-detailed-row');
         var toShow = jT.$(row).hasClass('jtox-detailed-row');
@@ -385,15 +398,17 @@ var jToxCompound = (function () {
         jT.$(iconCell).toggleClass('ui-icon-circle-triangle-e');
         jT.$(iconCell).toggleClass('ui-icon-circle-triangle-w');
         
-        var detDiv = jT.$('.jtox-details-box', self.rootElement)[0];
-
         if (toShow) {
           // i.e. we need to show it - put the full sized diagram in the fixed part and the tabs in the variable one...
           var full = self.dataset.dataEntry[idx];
-          
-          var width = jT.$(cell).width() + jT.$('.jtox-ds-variable', self.rootElement).width();
+
+          var detDiv = document.createElement('div');
+          detDiv.className = 'jtox-details-box';
+
+          var tabRoot = jT.$('.jtox-ds-tables', self.rootElement)[0];
+          var width = jT.$(cell).width() + jT.$('.jtox-ds-variable', tabRoot).width();
           jT.$(detDiv).width(width);
-          var ps = ccLib.positionTo(cell, detDiv.parentNode);
+          var ps = ccLib.positionTo(cell, tabRoot);
           detDiv.style.left = ps.left + 'px';
           detDiv.style.top = ps.top + 'px';
 
@@ -404,7 +419,7 @@ var jToxCompound = (function () {
               jT.$(detDiv).height(jT.$(cell).height() * 2);
           }
 
-          jT.$(detDiv).toggleClass('jtox-hidden');
+          tabRoot.appendChild(detDiv);
           
           self.prepareTabs(detDiv, false, 
             function (id, name, parent) {
@@ -425,12 +440,12 @@ var jToxCompound = (function () {
           
           jT.$(cell).height(detDiv.offsetHeight);
           ccLib.fireCallback(self.settings.onDetails, self, detDiv, full, event);
+          jT.$(cell).data('detailsDiv', detDiv);
+          jT.$(detDiv).data('rootCell', cell);
         }
         else {
           // i.e. we need to hide
-          jT$(detDiv).toggleClass('jtox-hidden');
-          jT.$(cell).empty();
-          jT.$(varCell).empty();
+          jT.$(cell).data('detailsDiv').remove();
         }
         
         self.equalizeTables();
