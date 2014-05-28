@@ -1,18 +1,5 @@
 var config_dataset = {
   "baseFeatures": {
-    "http://www.opentox.org/api/1.1#Diagram": {
-      "title" : "Structure diagram",
-      "data": "compound.diagramUri",
-      "column": { "sClass": "paddingless", "sWidth": "150px"},
-      "render" : function(data, type, full) {
-        return (type != "display") ? "-" :
-      	  (
-//	                	  '<input type="checkbox" name="cmp" value="'+full.compound.URI+'"> '+
-      	  '<a target="_blank" href="' + full.compound.URI + '"><img src="' + data + '" class="jtox-ds-smalldiagram"/></a>'
-      	  //'<a target="_blank" href="' + full.compound.URI + '"><img src="http://localhost:8080/ambit2/model/3?media=image/png&dataset_uri=' + full.compound.URI + '" class="jtox-ds-smalldiagram"/></a>'
-      	  );
-      }
-    },
 		"http://www.wikipathways.org/index.php/Pathway" :  {
 			"title": "Wiki Pathways",
 			"data" : "compound.wikipathway",

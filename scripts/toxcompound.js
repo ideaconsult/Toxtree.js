@@ -95,15 +95,15 @@ var jToxCompound = (function () {
       	"http://www.opentox.org/api/1.1#Diagram": {
       	  title: "Diagram", 
       	  search: false,
+        	visibility: "main",
       	  process: function(entry, fId, features) {
             entry.compound.diagramUri = entry.compound.URI.replace(/(.+)(\/conformer.*)/, "$1") + "?media=image/png";
       	  },
       	  data: "compound.diagramUri",
       	  column: { sClass: "paddingless", sWidth: "125px"},
       	  render: function(data, type, full) {
-            return (type != "display") ? "-" : '<a target="_blank" href="' + full.compound.URI + '"><img src="' + data + '" class="jtox-ds-smalldiagram"/></a>';
-          },
-        	visibility: "main"
+            return (type != "display") ? "-" : '<div class="jtox-diagram borderless"><span class="ui-icon ui-icon-zoomin"></span><a target="_blank" href="' + full.compound.URI + '"><img src="' + data + '" class="jtox-smalldiagram"/></a></div>';
+          }
       	},
       	"#DetailedInfoRow": {
       	  title: "Diagram", 
@@ -111,7 +111,7 @@ var jToxCompound = (function () {
       	  data: "compound.URI",
       	  basic: true,
       	  column: { sClass: "jtox-hidden jtox-ds-details paddingless", sWidth: "0px"},
-        	visibility: "details",
+        	visibility: "none",
         	render: function(data, type, full) { return ''; }
       	},
       	
@@ -317,7 +317,8 @@ var jToxCompound = (function () {
             var ps = ccLib.positionTo(cell, tabRoot);
             this.style.top = ps.top + 'px';
             this.style.left = ps.left + 'px';
-            this.style.width = (jT.$(cell).width() + varWidth) + 'px';
+            var cellW = jT.$(cell).parents('.dataTables_wrapper').width() - cell.offsetLeft;
+            this.style.width = (cellW + varWidth) + 'px';
             this.style.display = 'block';
 
             var rowH = jT.$(cell).parents('tr').height();
@@ -428,9 +429,6 @@ var jToxCompound = (function () {
           var tabRoot = jT.$('.jtox-ds-tables', self.rootElement)[0];
           var width = jT.$(cell).width() + jT.$('.jtox-ds-variable', tabRoot).width();
           jT.$(detDiv).width(width);
-          var ps = ccLib.positionTo(cell, tabRoot);
-          detDiv.style.left = ps.left + 'px';
-          detDiv.style.top = ps.top + 'px';
 
           if (ccLib.isNull(self.settings.detailsHeight) || self.settings.detailsHeight == 'fill')
             jT.$(detDiv).height(jT.$(cell).height() * 2);
@@ -450,7 +448,8 @@ var jToxCompound = (function () {
               return fEl;
             },
             function (id, parent) {
-              var tabTable = jT.getTemplate('#jtox-details-table');
+              var tabTable = document.createElement('table');
+              tabTable.className = 'jtox-details-table';
               parent.appendChild(tabTable);
               return tabTable;  
             }
@@ -539,6 +538,12 @@ var jToxCompound = (function () {
           if (self.settings.hasDetails)
             jT.$('.jtox-details-open', nRow).on('click', function(e) { fnShowDetails(nRow, e); });
           jT.$(nRow).data('jtox-index', iDataIndex);
+          jT.$('.jtox-diagram span.ui-icon', nRow).on('click', function () { 
+            jT.$(this).toggleClass('ui-icon-zoomin').toggleClass('ui-icon-zoomout');
+            jT.$('img', this.parentNode).toggleClass('jtox-smalldiagram'); 
+            jT.$(self.fixTable).dataTable().fnAdjustColumnSizing();
+            self.equalizeTables();
+          });
         },
         "oLanguage" : {
           "sEmptyTable" : '<span id="jtox-ds-message-' + self.instanceNo + '">Loading data...</span>',
