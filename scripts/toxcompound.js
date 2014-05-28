@@ -423,7 +423,7 @@ var jToxCompound = (function () {
           var full = self.dataset.dataEntry[idx];
 
           var detDiv = document.createElement('div');
-          detDiv.className = 'jtox-details-box';
+          detDiv.className = 'jtox-details-box jtox-details';
 
           var tabRoot = jT.$('.jtox-ds-tables', self.rootElement)[0];
           var width = jT.$(cell).width() + jT.$('.jtox-ds-variable', tabRoot).width();
