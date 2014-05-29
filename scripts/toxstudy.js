@@ -247,10 +247,10 @@ var jToxStudy = (function () {
           if (col == null)
             return null;
           
-          if (study.parameters[p] !== undefined && study.parameters[p] != null){
+          if (!ccLib.isNull(study.parameters[p])){
             col["mRender"] = study.parameters[p].loValue === undefined ?
               function (data, type, full) { return formatUnits(data, full[p + " unit"]); } : 
-              function (data, type, full) { return formatLoHigh(data.parameters[p], type); };
+              function (data, type, full) { return formatLoHigh(data, type); };
           }
           
           return col;
@@ -445,12 +445,12 @@ var jToxStudy = (function () {
         jT.$(theTable).dataTable().fnAddData(onec);
         jT.$(theTable).colResizable({ minWidth: 30, liveDrag: true });
         jT.$(theTable).parents('.jtox-study').addClass('folded');
+
+        // we need to fix columns height's because of multi-cells
+        jT.$('#' + theTable.id + ' .jtox-multi').each(function(index){
+          this.style.height = '' + this.offsetHeight + 'px';
+        });
       }
-      
-      // we need to fix columns height's because of multi-cells
-      jT.$('#' + theTable.id + ' .jtox-multi').each(function(index){
-        this.style.height = '' + this.offsetHeight + 'px';
-      });
     },
         
     querySummary: function(summaryURI) {
