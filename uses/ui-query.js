@@ -74,6 +74,7 @@ $(document).ready(function(){
   };
   $('#sidebar span.ui-icon').on('click', toggleBar);
   $('#sidebar div.side-title').on('click', toggleBar);
+  $('#sidebar').on('mouseover', function () { $(this).removeClass('hidden'); }).on('mouseout', function () { $(this).addClass('hidden');});
   
   $('#sidebar a.select-all').on('click', function () {
     $('input[type="checkbox"]', this.parentNode).each(function () { this.checked = true;});

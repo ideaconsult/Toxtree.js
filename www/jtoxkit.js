@@ -636,6 +636,7 @@ var jToxSearch = (function () {
 var jToxCompound = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     "showTabs": true,         // should we show tabs with groups, or not
+    "tabsFolded": false,      // should present the feature-selection tabs folded initially
     "showExport": true,       // should we add export tab up there
     "showControls": true,     // should we show the pagination/navigation controls.
     "hideEmpty": false,       // whether to hide empty groups instead of making them inactive
@@ -933,7 +934,12 @@ var jToxCompound = (function () {
       
       // now show the whole stuff and mark the disabled tabs
       all.style.display = "block";
-      return jT.$(all).tabs({ collapsible: isMain, disabled: emptyList, heightStyle: isMain ? "content" : (self.settings.detailsHeight == 'auto' ? 'auto' : 'fill') });
+      return jT.$(all).tabs({ 
+        collapsible: isMain, 
+        active: (self.settings.tabsFolded && isMain) ? false : 0, 
+        disabled: emptyList, 
+        heightStyle: isMain ? "content" : (self.settings.detailsHeight == 'auto' ? 'auto' : 'fill') 
+      });
     },
     
     equalizeTables: function () {

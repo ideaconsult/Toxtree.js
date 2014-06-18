@@ -1,12 +1,11 @@
 TODO:
-- Make all kits react adequately on failure on network / calls
 - feature values in details should be more detailed
-- default mode for feature selection tabs is closed
-- deferred re-query (postpone)
-- diagrams in composition compound listing
-- onhover, auto show/hide side panel
-- make ui-query inline script and css in separate files.
 - hide features with empty values in deatiled view
+
+- diagrams in composition compound listing
+
+- Make all kits react adequately on failure on network / calls
+- deferred re-query (postpone)
 
 IDEAS?
 - (global) extractFeature(dataset, featureId) - return an array of values of that feature for each entry in the dataset. (Can be used for diagram)
