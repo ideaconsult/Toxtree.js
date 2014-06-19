@@ -1918,8 +1918,8 @@ var jToxCompound = (function () {
         if (!!dataset) {
           self.feature = dataset.feature;
           cls.processFeatures(self.feature, self.settings.configuration.baseFeatures);
-          dataset.feature = self.feature;
           self.prepareGroups(dataset);
+          self.feature = dataset.feature;
           if (self.settings.showTabs) {
             // tabs feature building
             var nodeFn = function (id, name, parent) {
