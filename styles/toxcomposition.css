@@ -9,3 +9,7 @@
   width: 20%;
   text-align: right;
 }
+
+.jtox-toolkit table.composition-table td {
+  vertical-align: top;
+}

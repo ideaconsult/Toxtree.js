@@ -298,6 +298,514 @@ var ccLib = {
 function ccNonEmptyFilter(v) {
   return v !== undefined && v != null && v != '';  
 }
+window.jT = window.jToxKit = {
+	templateRoot: null,
+
+	/* A single place to hold all necessary queries. Parameters are marked with {id} and formatString() (common.js) is used
+	to prepare the actual URLs
+	*/
+	queries: {
+		taskPoll: { method: 'GET', service: "/task/{id}" },
+	},
+	
+	templates: { },        // html2js routine will fill up this variable
+	tools: { },        // additional, external tools added with html2js
+
+	/* SETTINGS. The following parametes can be passed in settings object to jT.init(), or as data-XXX - with the same names. Values set here are the defaults.
+	*/
+	settings: {
+	  plainText: false,               // whether to expect result as plain text, and not JSON. Used in special cases like ketcher.
+  	jsonp: false,                   // whether to use JSONP approach, instead of JSON.
+  	crossDomain: false,             // should it expect cross-domain capabilities for the queries.
+  	baseUrl: null,                  // the baseUrl for the server that loaded the page.
+  	fullUrl: null,                  // the url as it is on loading the page - this is parsed one, i.e. parseUrl() processed.
+  	timeout: 15000,                 // the timeout an call to the server should be wait before the attempt is considered error.
+  	pollDelay: 200,                 // after how many milliseconds a new attempt should be made during task polling.
+  	onConnect: function(s){ },		  // function (service): called when a server request is started - for proper visualization. Part of settings.
+  	onSuccess: function(s, c, m) { },	// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
+  	onError: function (s, c, m) { if (!!console && !!console.log) console.log("jToxKit call error (" + c + "): " + m + " from request: [" + s + "]"); },		// function (code, mess): called on server reques error. Part of settings.
+  },
+	
+	// form the "default" baseUrl if no other is supplied
+	formBaseUrl: function(url) {
+    return !!url.host ? url.protocol + "://" + url.host + (url.port.length > 0 ? ":" + url.port : '') + '/' + url.segments[0] : null;
+	},
+    
+  // initializes one kit, based on the kit name passed, either as params, or found within data-XXX parameters of the element
+  initKit: function(element) {
+    var self = this;
+
+  	var dataParams = self.$(element).data();
+    
+  	if (!dataParams.manualInit) {
+    	var kit = dataParams.kit;
+    	var topSettings = self.$.extend(true, {}, self.settings);
+
+    	// we need to traverse up, to collect some parent's settings...
+    	self.$(self.$(element).parents('.jtox-toolkit').toArray().reverse()).each(function(){
+      	if (!self.$(this).hasClass('jtox-widget')) {
+        	topSettings = self.$.extend(true, topSettings, self.$(this).data());
+      	}
+    	});
+    	
+      dataParams = self.$.extend(true, topSettings, dataParams);
+
+  	  // the real initialization function
+      var realInit = function (params) {
+      	if (!kit)
+      		return null;
+        // add jTox if it is missing AND there is not existing object/function with passed name. We can initialize ketcher and others like this too.
+      	if (!window[kit] && kit.indexOf('jTox') != 0)
+    	  	kit = 'jTox' + kit.charAt(0).toUpperCase() + kit.slice(1);
+    
+      	var fn = window[kit];
+      	if (typeof fn == 'function') {
+      	  var obj = new fn(element, params);
+          if (fn.kits === undefined)
+            fn.kits = [];
+          fn.kits.push(obj);
+          return obj;
+      	}
+        else if (typeof fn == "object" && typeof fn.init == "function")
+          return fn.init(element, params);
+        else
+          console.log("jToxError: trying to initialize unexistend jTox kit: " + kit);
+
+        return null;
+      };
+
+  	  // first, get the configuration, if such is passed
+  	  if (!ccLib.isNull(dataParams.configFile)) {
+  	    // we'll use a trick here so the baseUrl parameters set so far to take account... thus passing 'fake' kit instance
+  	    // as the first parameter of jT.call();
+    	  self.call({ settings: dataParams}, dataParams.configFile, function(config){
+      	  if (!!config)
+      	    dataParams['configuration'] = self.$.extend(true, dataParams['configuration'], config);
+          jT.$(element).data('jtKit', realInit(dataParams));
+    	  });
+  	  }
+  	  else {
+  	    if (!ccLib.isNull(dataParams.configuration) && typeof dataParams.configuration == "string" && !ccLib.isNull(window[dataParams.configuration]))
+  	      dataParams.configuration = window[dataParams.configuration];
+    	  
+        jT.$(element).data('jtKit', realInit(dataParams));
+  	  }
+    }
+  },
+  
+  // the jToxKit initialization routine, which scans all elements, marked as 'jtox-toolkit' and initializes them
+	init: function(root) {
+  	var self = this;
+  	
+  	if (!root) {
+    	self.initTemplates();
+  
+      // make this handler for UUID copying. Once here - it's live, so it works for all tables in the future
+      self.$(document).on('click', '.jtox-toolkit span.ui-icon-copy', function () { ccLib.copyToClipboard(self.$(this).data('uuid')); return false;});
+      // install the click handler for fold / unfold
+      self.$(document).on('click', '.jtox-foldable>.title', function() { self.$(this).parent().toggleClass('folded'); });
+      // install diagram zooming handlers
+      self.$(document).on('click', '.jtox-diagram span.ui-icon', function () { 
+        self.$(this).toggleClass('ui-icon-zoomin').toggleClass('ui-icon-zoomout');
+        self.$('img', this.parentNode).toggleClass('jtox-smalldiagram'); 
+      });
+      
+      // scan the query parameter for settings
+  		var url = self.settings.fullUrl = ccLib.parseURL(document.location);
+  		var queryParams = url.params;
+  		if (!queryParams.baseUrl)
+  		  queryParams.baseUrl = self.formBaseUrl(url);
+  	
+      self.settings = self.$.extend(true, self.settings, queryParams); // merge with defaults
+      root = document;
+  	}
+
+  	// now scan all insertion divs
+  	self.$('.jtox-toolkit', root).each(function(i) { self. initKit(this); });
+	},
+	
+	kit: function (element) {
+  	return $(element).data('jtKit');
+	},
+	
+	parentKit: function(name, element) {
+    var query = null;
+    if (typeof name == 'string')
+      name = window[name];
+    self.$(element).parents('.jtox-toolkit').each(function() {
+      var kit = jT.kit(this);
+      if (!kit)
+        return;
+      if (kit instanceof name)
+        query = kit;
+    });
+    
+    return query;
+  },
+	
+	initTemplates: function() {
+	  var self = this;
+
+    var root = jT.$('.jtox-template')[0];
+    if (!root) {
+    	root = document.createElement('div');
+    	root.className = 'jtox-template';
+    	document.body.appendChild(root);
+    }
+    
+	  var html = root.innerHTML;
+  	for (var t in self.templates) {
+    	html += self.templates[t];
+  	}
+  	
+  	root.innerHTML = html;
+  	self.templateRoot = root;
+	},
+	
+	getTemplate: function(selector) {
+  	var el = jT.$(selector, this.templateRoot)[0];
+  	if (!!el){
+    	var el = el.cloneNode(true);
+      el.removeAttribute('id');
+    }
+    return el;
+	},
+	
+	insertTool: function (name, root) {
+	  var html = this.tools[name];
+	  if (!ccLib.isNull(html)) {
+  	  root.innerHTML = html;
+  	  this.init(root); // since we're pasting as HTML - we need to make re-traverse and initiazaltion of possible jTox kits.
+    }
+    return root;
+	},
+  
+	/* Poll a given taskId and calls the callback when a result from the server comes - 
+	be it "running", "completed" or "error" - the callback is always called.
+	*/
+	pollTask : function(kit, task, callback) {
+		var self = this;
+		if (task === undefined || task.task === undefined || task.task.length < 1){
+			console.log("Wrong task passed for polling: " + JSON.stringify(task));
+			return;
+		}
+		task = task.task[0];
+		ccLib.fireCallback(callback, kit, task);
+		if (task.completed == -1){ // i.e. - running
+			setTimeout(function(){
+				self.call(kit, task.result, function(newTask){
+					self.pollTask(newTask, callback);
+				});
+			}, self.pollDelay);
+		}
+		else if (task.error){ // additionally call the error handler
+		  ccLib.fireCallback(self.settings.onError, self, '-1', task.error);
+		}
+	},
+	
+	/* Deduce the baseUrl from a given Url - either if it is full url, of fallback to jToxKit's if it is local
+	Passed is the first "non-base" component of the path...
+	*/
+	grabBaseUrl: function(url){
+    if (!ccLib.isNull(url) && url.indexOf('http') == 0)
+      return this.formBaseUrl(ccLib.parseURL(url));
+    else
+      return this.settings.baseUrl;
+	},
+
+  /* Grab the paging information from the given URL and place it into the settings of passed
+  kit, as <kit>.settings.pageStart and <kit>.settings.pageSize. Pay attention that it is 'pageStart' 
+  and not 'pageNo'.
+  */
+  grabPaging: function (kit, url) {
+    var urlObj = ccLib.parseURL(url);
+    if (urlObj.params['pagesize'] !== undefined) {
+      var sz = parseInt(urlObj.params['pagesize']);
+      if (sz > 0)
+        kit.settings.pageSize = sz;
+      url = ccLib.removeParameter(url, 'pagesize');
+    }
+    
+    if (urlObj.params['page'] !== undefined) {
+      var beg = parseInt(urlObj.params['page']);
+      if (beg >= 0)
+        kit.settings.pageStart = beg * kit.settings.pageSize;
+      url = ccLib.removeParameter(url, 'page');
+    }
+    
+    return url;
+  },
+	
+	/* Makes a server call for provided service, with settings form the given kit and calls 'callback' at the end - always.
+	The 'params', if passed, can have following attributes:
+		'method': the HTTP method to be used
+		'data': the data to be passed to the server with the request.
+	*/
+	call: function (kit, service, params, callback){
+		if (typeof params != 'object') {
+			callback = params; // the params parameters is obviously omitted
+			params = {};
+		}
+		else if (params == null)
+		  params = {};
+		
+	  var settings = jT.$.extend({}, this.settings, params);
+		if (kit == null)
+		  kit = this;
+		else 
+  		settings = jT.$.extend(settings, kit.settings);
+
+		ccLib.fireCallback(settings.onConnect, kit, service);
+		  
+		var accType = settings.plainText ? "text/plain" : (settings.jsonp ? "application/x-javascript" : "application/json");
+		
+		if (!params.data){
+			params.data = {};
+			if (settings.jsonp)
+				params.data.media = accType;
+				
+			if (!params.method)
+				params.method = 'GET';
+		}
+		else if (!params.method)
+				params.method = 'POST';
+
+		// on some queries, like tasks, we DO have baseUrl at the beginning
+		if (service.indexOf("http") != 0)
+			service = settings.baseUrl + service;
+			
+		// now make the actual call
+		jT.$.ajax(service, {
+			dataType: params.dataType || (settings.plainText ? "text": (settings.jsonp ? 'jsonp' : 'json')),
+			headers: { Accept: accType },
+			crossDomain: settings.crossDomain || settings.jsonp,
+			timeout: settings.timeout,
+			type: params.method,
+			data: params.data,
+			jsonp: settings.jsonp ? 'callback' : false,
+			error: function(jhr, status, error){
+			  ccLib.fireCallback(settings.onError, kit, service, status, error);
+				callback(null, jhr);
+			},
+			success: function(data, status, jhr){
+			  ccLib.fireCallback(settings.onSuccess, kit, service, status, jhr.statusText);
+				callback(data, jhr);
+			}
+		});
+	}
+};
+
+/* UI related functions of jToxKit are put here for more convenient usage
+*/
+window.jT.ui = {
+  shortenedData: function (content, message, data) {
+    var res = '';
+    
+    if (ccLib.isNull(data))
+      data = content;
+    if (data.toString().length <= 5) {
+      res += content;
+    }
+    else {
+      res += '<div class="shortened">' + content + '</div>';
+      if (message != null)
+        res += '<span class="ui-icon ui-icon-copy" title="' + message + '" data-uuid="' + data + '"></span>';
+    }
+    return res;
+  },
+  
+  changeTabsIds: function (root, suffix) {
+    jT.$('ul li a', root).each(function() {
+      var id = jT.$(this).attr('href').substr(1);
+      var el = document.getElementById(id);
+      id += suffix;
+      el.id = id;
+      jT.$(this).attr('href', '#' + id);
+    })  
+  },
+  
+  modifyColDef: function (kit, col, category, group) {
+    if (col.sTitle === undefined || col.sTitle == null)
+      return null;
+      
+	  var name = col.sTitle.toLowerCase();
+	  
+	  // helper function for retrieving col definition, if exists. Returns empty object, if no.          
+	  var getColDef = function (cat) {
+	    var catCol = kit.settings.configuration.columns[cat];
+	    if (!ccLib.isNull(catCol)) {
+	      if (!!group) {
+	        catCol = catCol[group];
+  	      if (!ccLib.isNull(catCol))
+  	        catCol = catCol[name];
+        }
+        else
+	        catCol = catCol[name];
+	    }
+	
+	    if (ccLib.isNull(catCol))
+	      catCol = {};
+	    return catCol;
+	  };
+	  // now form the default column, if existing and the category-specific one...
+	  // extract column redefinitions and merge them all.
+	  col = jT.$.extend(col, (!!group ? getColDef('_') : {}), getColDef(category));
+	  return ccLib.isNull(col.bVisible) || col.bVisible ? col : null;
+  },
+  
+  sortColDefs: function (colDefs) {
+	  colDefs.sort(function(a, b) {
+	    var valA = ccLib.isNull(a.iOrder) ? 0 : a.iOrder;
+	    var valB = ccLib.isNull(b.iOrder) ? 0 : b.iOrder;
+	    return valA - valB;
+	  });
+  },
+  
+  processColumns: function (kit, category) {
+    var colDefs = [];
+    var catList = kit.settings.configuration.columns[category];
+    for (var name in catList) {
+      var col = this.modifyColDef(kit, catList[name], category);
+      if (col != null)
+        colDefs.push(col);
+    }
+      
+    this.sortColDefs(colDefs);
+    return colDefs;
+  },
+  
+  queryInfo: function (aoData) {
+    var info = {};
+    for (var i = 0, dl = aoData.length; i < dl; ++i)
+      info[aoData[i].name] = aoData[i].value;
+  
+    if (info.iSortingCols > 0) {
+      info.iSortDirection = info.sSortDir_0.toLowerCase();
+      info.sSortData = info["mDataProp_" + info.iSortCol_0];
+    }
+    else {
+      info.iSortDirection = 0;
+      info.sSortData = "";
+    }
+    
+    return info;
+  },
+  
+  putStars: function (kit, stars, title) {
+    if (!kit.settings.shortStars) {
+      var res = '<div title="' + title + '">';
+      for (var i = 0;i < kit.settings.maxStars;++i) {
+        res += '<span class="ui-icon ui-icon-star jtox-inline';
+        if (i >= stars)
+          res += ' transparent';
+        res += '"></span>';
+      }
+      return res + '</div>';
+    }
+    else { // i.e. short version
+      return '<span class="ui-icon ui-icon-star jtox-inline" title="' + title + '"></span>' + stars;
+    }
+  },
+    
+  putControls: function (kit, handlers) {
+    var pane = jT.$('.jtox-controls', kit.rootElement)[0];
+    if (kit.settings.showControls) {
+      ccLib.fillTree(pane, { "pagesize": kit.settings.pageSize });
+      jT.$('.next-field', pane).on('click', handlers.nextPage);
+      jT.$('.prev-field', pane).on('click', handlers.prevPage);
+      jT.$('select', pane).on('change', handlers.sizeChange)
+      var pressTimeout = null;
+      jT.$('input', pane).on('keydown', function(e) {
+        var el = this;
+        if (pressTimeout != null)
+          clearTimeout(pressTimeout);
+        pressTimeout = setTimeout(function () { handlers.filter.apply(el, [e]); }, 350);
+      });
+    }
+    else // ok - hide me
+      pane.style.display = "none";
+  },
+
+  putActions: function (kit, col, defs) {
+    if (!!defs && !jQuery.isEmptyObject(defs)) {
+      var oldFn = col.mRender;
+      var newFn = function (data, type, full) {
+        var html = oldFn(data, type, full);
+        if (type != 'display')
+          return html;
+          
+        if (!!defs.ignoreOriginal)
+          html = '';
+          
+        // this is inserted BEFORE the original, starting with given PRE-content
+        if (typeof defs.pre == 'function')
+          html = defs.pre(data, type, full) + html;
+        else if (!!defs.pre)
+          html = defs.pre + html;
+          
+        if (typeof defs.selection == 'function')
+          html = defs.selection(data, type, full) + html;
+        else if (!!defs.selection)
+          html = '<input type="checkbox" value="' + data + '"' +
+                (typeof defs.selection == 'string' ? ' class="jtox-handler" data-handler="' + defs.selection + '"' : '') +
+                '/>' + html;
+                
+        // strange enough - this is inserted AFTER the original
+        if (typeof defs.details == 'function')
+          html += defs.details(data, type, full);
+        else if (!!defs.details)
+          html += '<span class="jtox-details-toggle ui-icon ui-icon-circle-triangle-e" data-data="' + data +'" title="Press to open/close detailed info for this entry"></span>';
+
+        // post content adding
+        if (typeof defs.post == 'function')
+          html += defs.post(data, type, full);
+        else if (!!defs.post)
+          html += defs.post;
+        return html;
+      };
+      
+      col.mRender = newFn;
+    }
+    return col;
+  },
+  
+  toggleDetails: function (event, row) {
+    self.$(event.currentTarget).toggleClass('ui-icon-circle-triangle-e');
+    self.$(event.currentTarget).toggleClass('ui-icon-circle-triangle-w');
+    self.$(event.currentTarget).toggleClass('jtox-openned');
+    if (!row)
+      row = self.$(event.currentTarget).parents('tr')[0];
+
+    var cell = self.$(event.currentTarget).parents('td')[0];
+    
+    if (self.$(event.currentTarget).hasClass('jtox-openned')) {
+      var detRow = document.createElement('tr');
+      var detCell = document.createElement('td');
+      detRow.appendChild(detCell);
+      self.$(detCell).addClass('jtox-details');
+      
+      detCell.setAttribute('colspan', self.$(row).children().length - 1);
+      row.parentNode.insertBefore(detRow, row.nextElementSibling);
+
+      cell.setAttribute('rowspan', '2');
+      return detCell;
+    }
+    else {
+      cell.removeAttribute('rowspan');
+      self.$(self.$(row).next()).remove();
+      return null;
+    }
+  }
+};
+
+// we need to do this here - because other tools/libraries could have scheduled themselves on 'ready',
+// so it'll be too late to make this assignment then. Also - we can use jT.$ from now on :-)
+jT.$ = jQuery; // .noConflict();
+
+  	
+jT.$(document).ready(function(){
+  jT.init();
+});
 /* toxquery.js - Universal query widget, that can work with any kit (study or compound) inside
  *
  * Copyright 2012-2014, IDEAconsult Ltd. http://www.ideaconsult.net/
@@ -641,7 +1149,7 @@ var jToxCompound = (function () {
     "showControls": true,     // should we show the pagination/navigation controls.
     "hideEmpty": false,       // whether to hide empty groups instead of making them inactive
     "hasDetails": true,       // whether browser should provide the option for per-item detailed info rows.
-    "hideEmptyDetails": true,// hide feature values, when they are empty (only in detailed view)
+    "hideEmptyDetails": true, // hide feature values, when they are empty (only in detailed view)
     "detailsHeight": "fill",  // what is the tabs' heightStyle used for details row
     "pageSize": 20,           // what is the default (startint) page size.
     "pageStart": 0,           // what is the default startint point for entries retrieval
@@ -1167,11 +1675,11 @@ var jToxCompound = (function () {
           if (self.settings.hasDetails)
             jT.$('.jtox-details-open', nRow).on('click', function(e) { fnShowDetails(nRow, e); });
           jT.$(nRow).data('jtox-index', iDataIndex);
-          jT.$('.jtox-diagram span.ui-icon', nRow).on('click', function () { 
-            jT.$(this).toggleClass('ui-icon-zoomin').toggleClass('ui-icon-zoomout');
-            jT.$('img', this.parentNode).toggleClass('jtox-smalldiagram'); 
-            jT.$(self.fixTable).dataTable().fnAdjustColumnSizing();
-            self.equalizeTables();
+          jT.$('.jtox-diagram span.ui-icon', nRow).on('click', function () {
+            setTimeout(function () {
+              jT.$(self.fixTable).dataTable().fnAdjustColumnSizing();
+              self.equalizeTables();
+            }, 50);
           });
         },
         "oLanguage" : {
@@ -1457,6 +1965,9 @@ var jToxCompound = (function () {
     }    
   }; // end of prototype
   
+  // merge them for future use..
+  cls.baseFeatures = jT.$.extend({}, baseFeatures, defaultSettings.configuration.baseFeatures);
+  
   // some public, static methods
   cls.processEntry = function (entry, features, fnValue) {
     for (var fid in features) {
@@ -1518,6 +2029,7 @@ var jToxCompound = (function () {
       cls.enumSameAs(fid, features, function (feature, id) {
         var sameAs = feature.sameAs;
         feature = jT.$.extend(true, feature, theFeat);
+        theFeat = jT.$.extend(true, theFeat, feature);
         feature.sameAs = sameAs;
       });
     }
@@ -2013,6 +2525,7 @@ var jToxComposition = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     selectionHandler: null,   // selection handler, if needed for selection checkbox, which will be inserted if this is non-null
     showBanner: true,         // whether to show a banner of composition info before each compounds-table
+    showDiagrams: false,      // whether to show diagram for each compound in the composition
     sDom: "rt<Ffp>",          // compounds (ingredients) table sDom
     onLoaded: null,
     
@@ -2053,7 +2566,7 @@ var jToxComposition = (function () {
   };
   
   cls.formatConcentration = function (precision, val, unit) {
-  	return ((precision === undefined || precision === null || "=" == precision ? "" : precision) + val + " " + (unit == null || unit == '' ? '<span class="units">% (w/w)</span>' : unit)).replace(/ /g, "&nbsp;").replace("span&nbsp;", "span ");
+  	return ((!precision || "=" == precision ? "" : precision) + val + " ").replace(/ /g, "&nbsp;") + '<span class="units">' + (unit || '% (w/w)').replace(/ /g, "&nbsp;") + '</span>';
   };
 
   var fnDatasetValue = function (fid, old, value, features){
@@ -2078,6 +2591,19 @@ var jToxComposition = (function () {
           cols[i].sTitle = '';
           break;
         }
+        
+      // if we have showDiagram set to true we need to show it up
+      if (self.settings.showDiagrams) {
+        var diagFeature = jToxCompound.baseFeatures['http://www.opentox.org/api/1.1#Diagram'];
+        cols.push(jT.$.extend({}, diagFeature.column, { 
+          sTitle: 'Structure', 
+          mData: "component", 
+          mRender: function (val, type, full) {
+            diagFeature.process(val);
+            return diagFeature.render(val.compound.diagramUri, type, val);
+          } 
+        }));
+      }
       // READYY! Go and prepare THE table.
       self.table = jT.$('table.composition-table', tab).dataTable({
         "bPaginate": false,
@@ -2121,10 +2647,10 @@ var jToxComposition = (function () {
             theSubs.composition.push(cmp);
             var val = cmp.proportion.typical;
             if (cmp.relation == 'HAS_CONSTITUENT' && (theSubs.maxvalue < val.value || theSubs.name == '')) {
-              theSubs.name = cmp.component.compound['name'] + ' ' + jToxComposition.formatConcentration(val.precision, val.value, val.unit);
+              theSubs.name = cmp.component.compound['name'] + ' (' + jToxComposition.formatConcentration(val.precision, val.value, val.unit) + ')';
               theSubs.maxvalue = val.value;
               val = cmp.proportion.real;
-              theSubs.purity = (val.lowerValue + '-' + val.upperValue + ' ' + (val.unit == null || val.unit == '' ? '<span class="units">% (w/w)</span>' : val.unit)).replace(/ /g, "&nbsp;").replace("span&nbsp;", "span ");
+              theSubs.purity = jToxComposition.formatConcentration(null, val.lowerValue + '-' + val.upperValue, val.unit);
             }
           }
           
@@ -2680,509 +3206,6 @@ var jToxStudy = (function () {
   
   return cls;
 })();
-window.jT = window.jToxKit = {
-	templateRoot: null,
-
-	/* A single place to hold all necessary queries. Parameters are marked with {id} and formatString() (common.js) is used
-	to prepare the actual URLs
-	*/
-	queries: {
-		taskPoll: { method: 'GET', service: "/task/{id}" },
-	},
-	
-	templates: { },        // html2js routine will fill up this variable
-	tools: { },        // additional, external tools added with html2js
-
-	/* SETTINGS. The following parametes can be passed in settings object to jT.init(), or as data-XXX - with the same names. Values set here are the defaults.
-	*/
-	settings: {
-	  plainText: false,               // whether to expect result as plain text, and not JSON. Used in special cases like ketcher.
-  	jsonp: false,                   // whether to use JSONP approach, instead of JSON.
-  	crossDomain: false,             // should it expect cross-domain capabilities for the queries.
-  	baseUrl: null,                  // the baseUrl for the server that loaded the page.
-  	fullUrl: null,                  // the url as it is on loading the page - this is parsed one, i.e. parseUrl() processed.
-  	timeout: 15000,                 // the timeout an call to the server should be wait before the attempt is considered error.
-  	pollDelay: 200,                 // after how many milliseconds a new attempt should be made during task polling.
-  	onConnect: function(s){ },		  // function (service): called when a server request is started - for proper visualization. Part of settings.
-  	onSuccess: function(s, c, m) { },	// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
-  	onError: function (s, c, m) { if (!!console && !!console.log) console.log("jToxKit call error (" + c + "): " + m + " from request: [" + s + "]"); },		// function (code, mess): called on server reques error. Part of settings.
-  },
-	
-	// form the "default" baseUrl if no other is supplied
-	formBaseUrl: function(url) {
-    return !!url.host ? url.protocol + "://" + url.host + (url.port.length > 0 ? ":" + url.port : '') + '/' + url.segments[0] : null;
-	},
-    
-  // initializes one kit, based on the kit name passed, either as params, or found within data-XXX parameters of the element
-  initKit: function(element) {
-    var self = this;
-
-  	var dataParams = self.$(element).data();
-    
-  	if (!dataParams.manualInit) {
-    	var kit = dataParams.kit;
-    	var topSettings = self.$.extend(true, {}, self.settings);
-
-    	// we need to traverse up, to collect some parent's settings...
-    	self.$(self.$(element).parents('.jtox-toolkit').toArray().reverse()).each(function(){
-      	if (!self.$(this).hasClass('jtox-widget')) {
-        	topSettings = self.$.extend(true, topSettings, self.$(this).data());
-      	}
-    	});
-    	
-      dataParams = self.$.extend(true, topSettings, dataParams);
-
-  	  // the real initialization function
-      var realInit = function (params) {
-      	if (!kit)
-      		return null;
-        // add jTox if it is missing AND there is not existing object/function with passed name. We can initialize ketcher and others like this too.
-      	if (!window[kit] && kit.indexOf('jTox') != 0)
-    	  	kit = 'jTox' + kit.charAt(0).toUpperCase() + kit.slice(1);
-    
-      	var fn = window[kit];
-      	if (typeof fn == 'function') {
-      	  var obj = new fn(element, params);
-          if (fn.kits === undefined)
-            fn.kits = [];
-          fn.kits.push(obj);
-          return obj;
-      	}
-        else if (typeof fn == "object" && typeof fn.init == "function")
-          return fn.init(element, params);
-        else
-          console.log("jToxError: trying to initialize unexistend jTox kit: " + kit);
-
-        return null;
-      };
-
-  	  // first, get the configuration, if such is passed
-  	  if (!ccLib.isNull(dataParams.configFile)) {
-  	    // we'll use a trick here so the baseUrl parameters set so far to take account... thus passing 'fake' kit instance
-  	    // as the first parameter of jT.call();
-    	  self.call({ settings: dataParams}, dataParams.configFile, function(config){
-      	  if (!!config)
-      	    dataParams['configuration'] = self.$.extend(true, dataParams['configuration'], config);
-          jT.$(element).data('jtKit', realInit(dataParams));
-    	  });
-  	  }
-  	  else {
-  	    if (!ccLib.isNull(dataParams.configuration) && typeof dataParams.configuration == "string" && !ccLib.isNull(window[dataParams.configuration]))
-  	      dataParams.configuration = window[dataParams.configuration];
-    	  
-        jT.$(element).data('jtKit', realInit(dataParams));
-  	  }
-    }
-  },
-  
-  // the jToxKit initialization routine, which scans all elements, marked as 'jtox-toolkit' and initializes them
-	init: function(root) {
-  	var self = this;
-  	
-  	if (!root) {
-    	self.initTemplates();
-  
-      // make this handler for UUID copying. Once here - it's live, so it works for all tables in the future
-      self.$(document).on('click', '.jtox-toolkit span.ui-icon-copy', function () { ccLib.copyToClipboard(self.$(this).data('uuid')); return false;});
-      // install the click handler for fold / unfold
-      self.$(document).on('click', '.jtox-foldable>.title', function() { self.$(this).parent().toggleClass('folded'); });
-
-      // scan the query parameter for settings
-  		var url = self.settings.fullUrl = ccLib.parseURL(document.location);
-  		var queryParams = url.params;
-  		if (!queryParams.baseUrl)
-  		  queryParams.baseUrl = self.formBaseUrl(url);
-  	
-      self.settings = self.$.extend(true, self.settings, queryParams); // merge with defaults
-      root = document;
-  	}
-
-  	// now scan all insertion divs
-  	self.$('.jtox-toolkit', root).each(function(i) { self. initKit(this); });
-	},
-	
-	kit: function (element) {
-  	return $(element).data('jtKit');
-	},
-	
-	parentKit: function(name, element) {
-    var query = null;
-    if (typeof name == 'string')
-      name = window[name];
-    self.$(element).parents('.jtox-toolkit').each(function() {
-      var kit = jT.kit(this);
-      if (!kit)
-        return;
-      if (kit instanceof name)
-        query = kit;
-    });
-    
-    return query;
-  },
-	
-	initTemplates: function() {
-	  var self = this;
-
-    var root = jT.$('.jtox-template')[0];
-    if (!root) {
-    	root = document.createElement('div');
-    	root.className = 'jtox-template';
-    	document.body.appendChild(root);
-    }
-    
-	  var html = root.innerHTML;
-  	for (var t in self.templates) {
-    	html += self.templates[t];
-  	}
-  	
-  	root.innerHTML = html;
-  	self.templateRoot = root;
-	},
-	
-	getTemplate: function(selector) {
-  	var el = jT.$(selector, this.templateRoot)[0];
-  	if (!!el){
-    	var el = el.cloneNode(true);
-      el.removeAttribute('id');
-    }
-    return el;
-	},
-	
-	insertTool: function (name, root) {
-	  var html = this.tools[name];
-	  if (!ccLib.isNull(html)) {
-  	  root.innerHTML = html;
-  	  this.init(root); // since we're pasting as HTML - we need to make re-traverse and initiazaltion of possible jTox kits.
-    }
-    return root;
-	},
-  
-	/* Poll a given taskId and calls the callback when a result from the server comes - 
-	be it "running", "completed" or "error" - the callback is always called.
-	*/
-	pollTask : function(kit, task, callback) {
-		var self = this;
-		if (task === undefined || task.task === undefined || task.task.length < 1){
-			console.log("Wrong task passed for polling: " + JSON.stringify(task));
-			return;
-		}
-		task = task.task[0];
-		ccLib.fireCallback(callback, kit, task);
-		if (task.completed == -1){ // i.e. - running
-			setTimeout(function(){
-				self.call(kit, task.result, function(newTask){
-					self.pollTask(newTask, callback);
-				});
-			}, self.pollDelay);
-		}
-		else if (task.error){ // additionally call the error handler
-		  ccLib.fireCallback(self.settings.onError, self, '-1', task.error);
-		}
-	},
-	
-	/* Deduce the baseUrl from a given Url - either if it is full url, of fallback to jToxKit's if it is local
-	Passed is the first "non-base" component of the path...
-	*/
-	grabBaseUrl: function(url){
-    if (!ccLib.isNull(url) && url.indexOf('http') == 0)
-      return this.formBaseUrl(ccLib.parseURL(url));
-    else
-      return this.settings.baseUrl;
-	},
-
-  /* Grab the paging information from the given URL and place it into the settings of passed
-  kit, as <kit>.settings.pageStart and <kit>.settings.pageSize. Pay attention that it is 'pageStart' 
-  and not 'pageNo'.
-  */
-  grabPaging: function (kit, url) {
-    var urlObj = ccLib.parseURL(url);
-    if (urlObj.params['pagesize'] !== undefined) {
-      var sz = parseInt(urlObj.params['pagesize']);
-      if (sz > 0)
-        kit.settings.pageSize = sz;
-      url = ccLib.removeParameter(url, 'pagesize');
-    }
-    
-    if (urlObj.params['page'] !== undefined) {
-      var beg = parseInt(urlObj.params['page']);
-      if (beg >= 0)
-        kit.settings.pageStart = beg * kit.settings.pageSize;
-      url = ccLib.removeParameter(url, 'page');
-    }
-    
-    return url;
-  },
-	
-	/* Makes a server call for provided service, with settings form the given kit and calls 'callback' at the end - always.
-	The 'params', if passed, can have following attributes:
-		'method': the HTTP method to be used
-		'data': the data to be passed to the server with the request.
-	*/
-	call: function (kit, service, params, callback){
-		if (typeof params != 'object') {
-			callback = params; // the params parameters is obviously omitted
-			params = {};
-		}
-		else if (params == null)
-		  params = {};
-		
-	  var settings = jT.$.extend({}, this.settings, params);
-		if (kit == null)
-		  kit = this;
-		else 
-  		settings = jT.$.extend(settings, kit.settings);
-
-		ccLib.fireCallback(settings.onConnect, kit, service);
-		  
-		var accType = settings.plainText ? "text/plain" : (settings.jsonp ? "application/x-javascript" : "application/json");
-		
-		if (!params.data){
-			params.data = {};
-			if (settings.jsonp)
-				params.data.media = accType;
-				
-			if (!params.method)
-				params.method = 'GET';
-		}
-		else if (!params.method)
-				params.method = 'POST';
-
-		// on some queries, like tasks, we DO have baseUrl at the beginning
-		if (service.indexOf("http") != 0)
-			service = settings.baseUrl + service;
-			
-		// now make the actual call
-		jT.$.ajax(service, {
-			dataType: params.dataType || (settings.plainText ? "text": (settings.jsonp ? 'jsonp' : 'json')),
-			headers: { Accept: accType },
-			crossDomain: settings.crossDomain || settings.jsonp,
-			timeout: settings.timeout,
-			type: params.method,
-			data: params.data,
-			jsonp: settings.jsonp ? 'callback' : false,
-			error: function(jhr, status, error){
-			  ccLib.fireCallback(settings.onError, kit, service, status, error);
-				callback(null, jhr);
-			},
-			success: function(data, status, jhr){
-			  ccLib.fireCallback(settings.onSuccess, kit, service, status, jhr.statusText);
-				callback(data, jhr);
-			}
-		});
-	}
-};
-
-/* UI related functions of jToxKit are put here for more convenient usage
-*/
-window.jT.ui = {
-  shortenedData: function (content, message, data) {
-    var res = '';
-    
-    if (ccLib.isNull(data))
-      data = content;
-    if (data.toString().length <= 5) {
-      res += content;
-    }
-    else {
-      res += '<div class="shortened">' + content + '</div>';
-      if (message != null)
-        res += '<span class="ui-icon ui-icon-copy" title="' + message + '" data-uuid="' + data + '"></span>';
-    }
-    return res;
-  },
-  
-  changeTabsIds: function (root, suffix) {
-    jT.$('ul li a', root).each(function() {
-      var id = jT.$(this).attr('href').substr(1);
-      var el = document.getElementById(id);
-      id += suffix;
-      el.id = id;
-      jT.$(this).attr('href', '#' + id);
-    })  
-  },
-  
-  modifyColDef: function (kit, col, category, group) {
-    if (col.sTitle === undefined || col.sTitle == null)
-      return null;
-      
-	  var name = col.sTitle.toLowerCase();
-	  
-	  // helper function for retrieving col definition, if exists. Returns empty object, if no.          
-	  var getColDef = function (cat) {
-	    var catCol = kit.settings.configuration.columns[cat];
-	    if (!ccLib.isNull(catCol)) {
-	      if (!!group) {
-	        catCol = catCol[group];
-  	      if (!ccLib.isNull(catCol))
-  	        catCol = catCol[name];
-        }
-        else
-	        catCol = catCol[name];
-	    }
-	
-	    if (ccLib.isNull(catCol))
-	      catCol = {};
-	    return catCol;
-	  };
-	  // now form the default column, if existing and the category-specific one...
-	  // extract column redefinitions and merge them all.
-	  col = jT.$.extend(col, (!!group ? getColDef('_') : {}), getColDef(category));
-	  return ccLib.isNull(col.bVisible) || col.bVisible ? col : null;
-  },
-  
-  sortColDefs: function (colDefs) {
-	  colDefs.sort(function(a, b) {
-	    var valA = ccLib.isNull(a.iOrder) ? 0 : a.iOrder;
-	    var valB = ccLib.isNull(b.iOrder) ? 0 : b.iOrder;
-	    return valA - valB;
-	  });
-  },
-  
-  processColumns: function (kit, category) {
-    var colDefs = [];
-    var catList = kit.settings.configuration.columns[category];
-    for (var name in catList) {
-      var col = this.modifyColDef(kit, catList[name], category);
-      if (col != null)
-        colDefs.push(col);
-    }
-      
-    this.sortColDefs(colDefs);
-    return colDefs;
-  },
-  
-  queryInfo: function (aoData) {
-    var info = {};
-    for (var i = 0, dl = aoData.length; i < dl; ++i)
-      info[aoData[i].name] = aoData[i].value;
-  
-    if (info.iSortingCols > 0) {
-      info.iSortDirection = info.sSortDir_0.toLowerCase();
-      info.sSortData = info["mDataProp_" + info.iSortCol_0];
-    }
-    else {
-      info.iSortDirection = 0;
-      info.sSortData = "";
-    }
-    
-    return info;
-  },
-  
-  putStars: function (kit, stars, title) {
-    if (!kit.settings.shortStars) {
-      var res = '<div title="' + title + '">';
-      for (var i = 0;i < kit.settings.maxStars;++i) {
-        res += '<span class="ui-icon ui-icon-star jtox-inline';
-        if (i >= stars)
-          res += ' transparent';
-        res += '"></span>';
-      }
-      return res + '</div>';
-    }
-    else { // i.e. short version
-      return '<span class="ui-icon ui-icon-star jtox-inline" title="' + title + '"></span>' + stars;
-    }
-  },
-    
-  putControls: function (kit, handlers) {
-    var pane = jT.$('.jtox-controls', kit.rootElement)[0];
-    if (kit.settings.showControls) {
-      ccLib.fillTree(pane, { "pagesize": kit.settings.pageSize });
-      jT.$('.next-field', pane).on('click', handlers.nextPage);
-      jT.$('.prev-field', pane).on('click', handlers.prevPage);
-      jT.$('select', pane).on('change', handlers.sizeChange)
-      var pressTimeout = null;
-      jT.$('input', pane).on('keydown', function(e) {
-        var el = this;
-        if (pressTimeout != null)
-          clearTimeout(pressTimeout);
-        pressTimeout = setTimeout(function () { handlers.filter.apply(el, [e]); }, 350);
-      });
-    }
-    else // ok - hide me
-      pane.style.display = "none";
-  },
-
-  putActions: function (kit, col, defs) {
-    if (!!defs && !jQuery.isEmptyObject(defs)) {
-      var oldFn = col.mRender;
-      var newFn = function (data, type, full) {
-        var html = oldFn(data, type, full);
-        if (type != 'display')
-          return html;
-          
-        if (!!defs.ignoreOriginal)
-          html = '';
-          
-        // this is inserted BEFORE the original, starting with given PRE-content
-        if (typeof defs.pre == 'function')
-          html = defs.pre(data, type, full) + html;
-        else if (!!defs.pre)
-          html = defs.pre + html;
-          
-        if (typeof defs.selection == 'function')
-          html = defs.selection(data, type, full) + html;
-        else if (!!defs.selection)
-          html = '<input type="checkbox" value="' + data + '"' +
-                (typeof defs.selection == 'string' ? ' class="jtox-handler" data-handler="' + defs.selection + '"' : '') +
-                '/>' + html;
-                
-        // strange enough - this is inserted AFTER the original
-        if (typeof defs.details == 'function')
-          html += defs.details(data, type, full);
-        else if (!!defs.details)
-          html += '<span class="jtox-details-toggle ui-icon ui-icon-circle-triangle-e" data-data="' + data +'" title="Press to open/close detailed info for this entry"></span>';
-
-        // post content adding
-        if (typeof defs.post == 'function')
-          html += defs.post(data, type, full);
-        else if (!!defs.post)
-          html += defs.post;
-        return html;
-      };
-      
-      col.mRender = newFn;
-    }
-    return col;
-  },
-  
-  toggleDetails: function (event, row) {
-    self.$(event.currentTarget).toggleClass('ui-icon-circle-triangle-e');
-    self.$(event.currentTarget).toggleClass('ui-icon-circle-triangle-w');
-    self.$(event.currentTarget).toggleClass('jtox-openned');
-    if (!row)
-      row = self.$(event.currentTarget).parents('tr')[0];
-
-    var cell = self.$(event.currentTarget).parents('td')[0];
-    
-    if (self.$(event.currentTarget).hasClass('jtox-openned')) {
-      var detRow = document.createElement('tr');
-      var detCell = document.createElement('td');
-      detRow.appendChild(detCell);
-      self.$(detCell).addClass('jtox-details');
-      
-      detCell.setAttribute('colspan', self.$(row).children().length - 1);
-      row.parentNode.insertBefore(detRow, row.nextElementSibling);
-
-      cell.setAttribute('rowspan', '2');
-      return detCell;
-    }
-    else {
-      cell.removeAttribute('rowspan');
-      self.$(self.$(row).next()).remove();
-      return null;
-    }
-  }
-};
-
-// we need to do this here - because other tools/libraries could have scheduled themselves on 'ready',
-// so it'll be too late to make this assignment then. Also - we can use jT.$ from now on :-)
-jT.$ = jQuery; // .noConflict();
-
-  	
-jT.$(document).ready(function(){
-  jT.init();
-});
 jT.templates['widget-search']  = 
 "    <div id=\"jtox-search\" class=\"jtox-search\">" +
 "      <form>" +

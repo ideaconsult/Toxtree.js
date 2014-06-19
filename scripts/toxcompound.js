@@ -12,7 +12,7 @@ var jToxCompound = (function () {
     "showControls": true,     // should we show the pagination/navigation controls.
     "hideEmpty": false,       // whether to hide empty groups instead of making them inactive
     "hasDetails": true,       // whether browser should provide the option for per-item detailed info rows.
-    "hideEmptyDetails": true,// hide feature values, when they are empty (only in detailed view)
+    "hideEmptyDetails": true, // hide feature values, when they are empty (only in detailed view)
     "detailsHeight": "fill",  // what is the tabs' heightStyle used for details row
     "pageSize": 20,           // what is the default (startint) page size.
     "pageStart": 0,           // what is the default startint point for entries retrieval
@@ -538,11 +538,11 @@ var jToxCompound = (function () {
           if (self.settings.hasDetails)
             jT.$('.jtox-details-open', nRow).on('click', function(e) { fnShowDetails(nRow, e); });
           jT.$(nRow).data('jtox-index', iDataIndex);
-          jT.$('.jtox-diagram span.ui-icon', nRow).on('click', function () { 
-            jT.$(this).toggleClass('ui-icon-zoomin').toggleClass('ui-icon-zoomout');
-            jT.$('img', this.parentNode).toggleClass('jtox-smalldiagram'); 
-            jT.$(self.fixTable).dataTable().fnAdjustColumnSizing();
-            self.equalizeTables();
+          jT.$('.jtox-diagram span.ui-icon', nRow).on('click', function () {
+            setTimeout(function () {
+              jT.$(self.fixTable).dataTable().fnAdjustColumnSizing();
+              self.equalizeTables();
+            }, 50);
           });
         },
         "oLanguage" : {
@@ -828,6 +828,9 @@ var jToxCompound = (function () {
     }    
   }; // end of prototype
   
+  // merge them for future use..
+  cls.baseFeatures = jT.$.extend({}, baseFeatures, defaultSettings.configuration.baseFeatures);
+  
   // some public, static methods
   cls.processEntry = function (entry, features, fnValue) {
     for (var fid in features) {
@@ -889,6 +892,7 @@ var jToxCompound = (function () {
       cls.enumSameAs(fid, features, function (feature, id) {
         var sameAs = feature.sameAs;
         feature = jT.$.extend(true, feature, theFeat);
+        theFeat = jT.$.extend(true, theFeat, feature);
         feature.sameAs = sameAs;
       });
     }

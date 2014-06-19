@@ -167,3 +167,27 @@
 .jtox-toolkit span.units {
   font-size: 80%;
 }
+
+.jtox-diagram {
+  position: relative;
+}
+
+.jtox-diagram img {
+  border: 0px;
+}
+
+.jtox-diagram span.ui-icon {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  display: none; 
+}
+
+.jtox-diagram:hover span.ui-icon {
+  display: block;
+}
+
+img.jtox-smalldiagram {
+  width: 125px;
+  height: 125px;
+}

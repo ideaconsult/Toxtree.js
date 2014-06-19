@@ -8,6 +8,7 @@ var jToxComposition = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     selectionHandler: null,   // selection handler, if needed for selection checkbox, which will be inserted if this is non-null
     showBanner: true,         // whether to show a banner of composition info before each compounds-table
+    showDiagrams: false,      // whether to show diagram for each compound in the composition
     sDom: "rt<Ffp>",          // compounds (ingredients) table sDom
     onLoaded: null,
     
@@ -48,7 +49,7 @@ var jToxComposition = (function () {
   };
   
   cls.formatConcentration = function (precision, val, unit) {
-  	return ((precision === undefined || precision === null || "=" == precision ? "" : precision) + val + " " + (unit == null || unit == '' ? '<span class="units">% (w/w)</span>' : unit)).replace(/ /g, "&nbsp;").replace("span&nbsp;", "span ");
+  	return ((!precision || "=" == precision ? "" : precision) + val + " ").replace(/ /g, "&nbsp;") + '<span class="units">' + (unit || '% (w/w)').replace(/ /g, "&nbsp;") + '</span>';
   };
 
   var fnDatasetValue = function (fid, old, value, features){
@@ -73,6 +74,19 @@ var jToxComposition = (function () {
           cols[i].sTitle = '';
           break;
         }
+        
+      // if we have showDiagram set to true we need to show it up
+      if (self.settings.showDiagrams) {
+        var diagFeature = jToxCompound.baseFeatures['http://www.opentox.org/api/1.1#Diagram'];
+        cols.push(jT.$.extend({}, diagFeature.column, { 
+          sTitle: 'Structure', 
+          mData: "component", 
+          mRender: function (val, type, full) {
+            diagFeature.process(val);
+            return diagFeature.render(val.compound.diagramUri, type, val);
+          } 
+        }));
+      }
       // READYY! Go and prepare THE table.
       self.table = jT.$('table.composition-table', tab).dataTable({
         "bPaginate": false,
@@ -116,10 +130,10 @@ var jToxComposition = (function () {
             theSubs.composition.push(cmp);
             var val = cmp.proportion.typical;
             if (cmp.relation == 'HAS_CONSTITUENT' && (theSubs.maxvalue < val.value || theSubs.name == '')) {
-              theSubs.name = cmp.component.compound['name'] + ' ' + jToxComposition.formatConcentration(val.precision, val.value, val.unit);
+              theSubs.name = cmp.component.compound['name'] + ' (' + jToxComposition.formatConcentration(val.precision, val.value, val.unit) + ')';
               theSubs.maxvalue = val.value;
               val = cmp.proportion.real;
-              theSubs.purity = (val.lowerValue + '-' + val.upperValue + ' ' + (val.unit == null || val.unit == '' ? '<span class="units">% (w/w)</span>' : val.unit)).replace(/ /g, "&nbsp;").replace("span&nbsp;", "span ");
+              theSubs.purity = jToxComposition.formatConcentration(null, val.lowerValue + '-' + val.upperValue, val.unit);
             }
           }
           

@@ -104,7 +104,12 @@ window.jT = window.jToxKit = {
       self.$(document).on('click', '.jtox-toolkit span.ui-icon-copy', function () { ccLib.copyToClipboard(self.$(this).data('uuid')); return false;});
       // install the click handler for fold / unfold
       self.$(document).on('click', '.jtox-foldable>.title', function() { self.$(this).parent().toggleClass('folded'); });
-
+      // install diagram zooming handlers
+      self.$(document).on('click', '.jtox-diagram span.ui-icon', function () { 
+        self.$(this).toggleClass('ui-icon-zoomin').toggleClass('ui-icon-zoomout');
+        self.$('img', this.parentNode).toggleClass('jtox-smalldiagram'); 
+      });
+      
       // scan the query parameter for settings
   		var url = self.settings.fullUrl = ccLib.parseURL(document.location);
   		var queryParams = url.params;
