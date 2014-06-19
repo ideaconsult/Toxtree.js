@@ -1620,6 +1620,10 @@ var jToxCompound = (function () {
           }
             
           var feature = self.feature[fId];
+          if (feature.visibility == 'details')
+            return;
+            
+          // now we now we should show this one.
           var col = {
             "sTitle": feature.title.replace(/_/g, ' ') + (ccLib.isNull(feature.units) ? "" : feature.units),
             "sDefaultContent": "-",

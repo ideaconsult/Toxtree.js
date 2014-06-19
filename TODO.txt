@@ -2,6 +2,7 @@ TODO:
 
 - BUG: try selecting different page size, when a detailed row is openned
 
+- ToxTree ui page using existing stuff.
 - Make all kits react adequately on failure on network / calls
 - deferred re-query (postpone)
 

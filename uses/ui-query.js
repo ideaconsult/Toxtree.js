@@ -50,18 +50,23 @@ function createGroups(miniset, kit) {
   	var src = miniset.feature[fId].source;
   	if (!src || !src.type || src.type.toLowerCase() != 'model')
   	  continue;
-  	 src = src.URI.substr(src.URI.lastIndexOf('/') + 1);
-  	 if (groups[src] === undefined)
-  	  groups[src] = [];
-  	 groups[src].push(fId);
+    src = src.URI.substr(src.URI.lastIndexOf('/') + 1);
+    if (groups[src] === undefined)
+      groups[src] = [];
+    if (fId.indexOf('explanation') > 0)
+      miniset.feature[fId].visibility = "details";
+    groups[src].push(fId);
 	}
 	groups["Substances"] = [ "http://www.opentox.org/api/1.1#CompositionInfo" ];
 	groups["Calculated"] = null;
 	groups["Other"] = function (name, miniset) {
     var arr = [];
     for (var f in miniset.feature) {
-      if (!miniset.feature[f].used && !miniset.feature[f].basic)
+      if (!miniset.feature[f].used && !miniset.feature[f].basic) {
         arr.push(f);
+        if (f.indexOf('#explanation') > 0)
+          miniset.feature[f].visibility = "details";
+      }
     }
     return arr;
   }
