@@ -584,6 +584,9 @@ var jToxCompound = (function () {
 
     updateTables: function() {
       var self = this;
+      if (self.settings.hasDetails) 
+        $('div.jtox-details-box', self.rootElement).remove();
+
       self.filterEntries(jT.$('.jtox-controls input', self.rootElement).val());
     },
     
