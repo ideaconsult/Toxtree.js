@@ -30,8 +30,8 @@
   <script language="javascript">
     $(document).ready(function(){
       window['ds'] = new jToxCompound($(".jtox-toolkit")[0], {crossDomain: true, rememberChecks: true, hideEmpty: true } );
-/*       window.ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/dataset/18?feature_uris[]=http://apps.ideaconsult.net:8080/toxbank/model/6/predicted"); */
-      window.ds.queryDataset("https://apps.ideaconsult.net/enanomapper/query/compound/search/all?type=auto&search=%5BAu%5D&page=0&pagesize=1");
+/*       ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/dataset/18?feature_uris[]=http://apps.ideaconsult.net:8080/toxbank/model/6/predicted"); */
+      ds.queryDataset("https://apps.ideaconsult.net/enanomapper/query/compound/search/all?type=auto&search=%5BAu%5D&page=0&pagesize=1");
 /*       ds.queryDataset("http://apps.ideaconsult.net:8080/ambit2/dataset/1945542");  */
 /*       ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/query/similarity?search=c1ccccc1O&threshold=0.5"); */
 /*       ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/compound/8666?feature_uris[]=http://apps.ideaconsult.net:8080/toxbank/model/2/predicted");  */
@@ -79,16 +79,6 @@
       <div class="jtox-inline jtox-exportlist"></div>
     </div>
 <!-- // end of #jtox-ds-export ]]-->
-<!--[[ jT.templates['compound-one-detail'] -->
-    <table>
-      <tbody>
-        <tr id="jtox-one-detail">
-          <th class="right"><span class="data-field" data-field="title"> ? </span><sup><a target="_blank" class="data-field attribute" data-attribute="href" data-field="uri">?</a></sup></th>
-          <td class="left data-field" data-field="value"> ? </td>
-        </tr>
-      </tbody>
-    </table>
-<!-- // end of #jtox-one-detail ]]-->
   </div>
 </body>
 </html>

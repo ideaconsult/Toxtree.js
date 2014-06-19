@@ -163,3 +163,7 @@
 .jtox-toolkit .float-right {
 	float: right !important;
 }
+
+.jtox-toolkit span.units {
+  font-size: 80%;
+}

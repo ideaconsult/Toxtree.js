@@ -1,4 +1,6 @@
 TODO:
+
+- BUG: try selecting different page size, when a detailed row is openned
 - feature values in details should be more detailed
 - hide features with empty values in deatiled view
 

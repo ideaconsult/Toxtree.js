@@ -25,10 +25,6 @@ div.jtox-study.unloaded table {
   display: none;
 }
 
-.jtox-toolkit span.units {
-  font-size: 80%;
-}
-
 div.jtox-study.folded {
   padding-bottom: 5px;
 }

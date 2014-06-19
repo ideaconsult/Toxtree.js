@@ -641,6 +641,7 @@ var jToxCompound = (function () {
     "showControls": true,     // should we show the pagination/navigation controls.
     "hideEmpty": false,       // whether to hide empty groups instead of making them inactive
     "hasDetails": true,       // whether browser should provide the option for per-item detailed info rows.
+    "hideEmptyDetails": true,// hide feature values, when they are empty (only in detailed view)
     "detailsHeight": "fill",  // what is the tabs' heightStyle used for details row
     "pageSize": 20,           // what is the default (startint) page size.
     "pageStart": 0,           // what is the default startint point for entries retrieval
@@ -762,11 +763,11 @@ var jToxCompound = (function () {
   	"http://www.opentox.org/api/1.1#IUPACName": {title: "IUPAC Name", data: ["compound.name", "compound.iupac"], accumulate: true, basic: true},
   	"http://www.opentox.org/api/1.1#EINECS": {title: "EINECS", data: "compound.einecs", accumulate: true, basic: true},
     "http://www.opentox.org/api/1.1#InChI": {title: "InChI", data: "compound.inchi", shorten: true, accumulate: true, basic: true},
-  	"http://www.opentox.org/api/1.1#InChI_std": {title: "InChI", data: "compound.inchi", shorten: true, accumulate: true, used: true, basic: true},
+  	"http://www.opentox.org/api/1.1#InChI_std": {title: "InChI", data: "compound.inchi", shorten: true, accumulate: true, sameAs: "http://www.opentox.org/api/1.1#InChI", basic: true},
     "http://www.opentox.org/api/1.1#InChIKey": {title: "InChI Key", data: "compound.inchikey", accumulate: true, basic: true},
-  	"http://www.opentox.org/api/1.1#InChIKey_std": {title: "InChI Key", data: "compound.inchikey", accumulate: true, used: true, basic: true},
-    "http://www.opentox.org/api/1.1#InChI_AuxInfo": {title: "InChI Aux", data: "compound.inchi", accumulate: true, used: true, basic: true},
-  	"http://www.opentox.org/api/1.1#InChI_AuxInfo_std": {title: "InChI Aux", data: "compound.inchi", accumulate: true, used:true, basic: true},
+  	"http://www.opentox.org/api/1.1#InChIKey_std": {title: "InChI Key", data: "compound.inchikey", accumulate: true, sameAs: "http://www.opentox.org/api/1.1#InChIKey", basic: true},
+    "http://www.opentox.org/api/1.1#InChI_AuxInfo": {title: "InChI Aux", data: "compound.inchiaux", accumulate: true, basic: true},
+  	"http://www.opentox.org/api/1.1#InChI_AuxInfo_std": {title: "InChI Aux", data: "compound.inchiaux", accumulate: true, sameAs: "http://www.opentox.org/api/1.1#InChI_AuxInfo", basic: true},
   	"http://www.opentox.org/api/1.1#IUCLID5_UUID": {title: "IUCLID5 UUID", data: "compound.i5uuid", shorten: true, accumulate: true, basic: true},
   	"http://www.opentox.org/api/1.1#SMILES": {title: "SMILES", data: "compound.smiles", shorten: true, accumulate: true, basic: true},
   	"http://www.opentox.org/api/dblinks#CMS": {title: "CMS", accumulate: true, basic: true},
@@ -833,7 +834,7 @@ var jToxCompound = (function () {
     /* make a tab-based widget with features and grouped on tabs. It relies on filled and processed 'self.feature' as well
     as created 'self.groups'.
     */
-    prepareTabs: function (root, isMain, nodeFn, divFn) {
+    prepareTabs: function (root, isMain, groupFn) {
       var self = this;
       
       var all = document.createElement('div');
@@ -851,16 +852,7 @@ var jToxCompound = (function () {
         liEl.appendChild(aEl);
         return liEl;
       };
-      
-      var processCheckEl = function(fEl, fId) {
-        var checkEl = jT.$('input[type="checkbox"]', fEl)[0];
-        if (!checkEl)
-          return;
-        checkEl.value = fId;
-        if (self.settings.rememberChecks)
-          checkEl.checked = (self.featureStates[fId] === undefined || self.featureStates[fId]);
-      };
-      
+            
       var emptyList = [];
       var idx = 0;
       for (var gr in self.groups) {
@@ -872,34 +864,7 @@ var jToxCompound = (function () {
         divEl.id = grId;
         all.appendChild(divEl);
         
-        // .. check if we have something else to add in between
-        if (typeof divFn == 'function')
-          divEl = divFn(gr, divEl); // it's expected to attach it
-
-        // ... and fill it.
-        var grp = self.groups[gr];
-        var empty = true;
-        ccLib.enumObject(self.groups[gr], function (fId, idx, level) {
-          var vis = (self.feature[fId] || {})['visibility'];
-          if (!!vis && (vis == "none" || (!isMain && vis == 'main') || (isMain && vis == "details")))
-            return;
-          empty = false;
-          if (idx == "name") {
-            if (isMain) {
-              var fEl = nodeFn(null, fId, divEl);
-              processCheckEl(fEl, fId);
-            }
-          }
-          else if (!isMain || level == 1) {
-            var title = self.feature[fId].title;
-            if (!ccLib.isNull(title)) {
-              var fEl = nodeFn(fId, title, divEl);
-              processCheckEl(fEl, fId);
-            }
-          }
-        });
-
-        if (empty) {
+        if (groupFn(divEl, gr)) {
           if (self.settings.hideEmpty) {
             jT.$(divEl).remove();
             jT.$(tabLi).remove();
@@ -985,13 +950,14 @@ var jToxCompound = (function () {
       var self = this;
       var feature = self.feature[fId];
       var val = (feature.data !== undefined) ? (ccLib.getJsonValue(data, jT.$.isArray(feature.data) ? feature.data[0] : feature.data)) : data.values[fId];
-      return (typeof feature.render == 'function') ? feature.render(val, !!type ? type : 'filter', data) : val;
+      var res = (typeof feature.render == 'function') ? feature.render(val, !!type ? type : 'filter', data) : val;
+      if (!!feature.units && (type == 'display' || type == 'details'))
+        res += '<span class="units">' + feature.units + '</span>';
+      return res;
     },
     
     featureUri: function (fId) {
-      var self = this;
-      var origId = self.feature[fId].originalId;
-      return ccLib.isNull(origId) ? fId : origId;
+      return this.feature[fId].URI || fId;
     },
     
     prepareTables: function() {
@@ -1063,7 +1029,7 @@ var jToxCompound = (function () {
         
         if (toShow) {
           // i.e. we need to show it - put the full sized diagram in the fixed part and the tabs in the variable one...
-          var full = self.dataset.dataEntry[idx];
+          var entry = self.dataset.dataEntry[idx];
 
           var detDiv = document.createElement('div');
           detDiv.className = 'jtox-details-box jtox-details';
@@ -1079,26 +1045,52 @@ var jToxCompound = (function () {
 
           tabRoot.appendChild(detDiv);
           
-          self.prepareTabs(detDiv, false, 
-            function (id, name, parent) {
-              var fEl = null;
-              if (id != null) {
-                fEl = jT.getTemplate('#jtox-one-detail');
-                parent.appendChild(fEl);
-                ccLib.fillTree(fEl, {title: name, value: self.featureValue(id, full, 'details'), uri: self.featureUri(id)});
+          self.prepareTabs(detDiv, false, function (parent, gr) {
+            var cols = [
+              { sTitle: "Name", mData: 'title', mRender: function (data, type, full) { return '<span>' + data + '</span><sup><a target="_blank" href="' + full.URI + '">?</a></sup>'; } },
+              { sTitle: "Value", mData: 'value', sDefaultContent: "-" },
+              { sTitle: "SameAs", mData: 'sameAs', sDefaultContent: "-" },
+              { sTitle: "Source", mData: 'source', sDefaultContent: "-", mRender: function (data, type, full) { return !data || !data.type ? '-' : '<a target="_blank" href="' + data.URI + '">' + data.type + '</a>'; } }
+            ];
+            
+            var empty = true;              
+            var data = [];
+            ccLib.enumObject(self.groups[gr], function (fId, idx, level) {
+              var feat = jT.$.extend({}, self.feature[fId]);
+              var vis = feat['visibility'];
+              if (!!vis && vis != 'details')
+                return;
+              var title = feat.title;
+              feat.value = self.featureValue(fId, entry, 'details');
+              if (!!title && (!self.settings.hideEmptyDetails || !! feat.value)) {
+                data.push(feat)
+                empty = false;
+                if (!feat.value)
+                  feat.value = '-';
               }
-              return fEl;
-            },
-            function (id, parent) {
+            });
+            
+            if (!empty || !self.settings.hideEmpty) {
+              jT.$(parent).addClass('jtox-details-table');
               var tabTable = document.createElement('table');
-              tabTable.className = 'jtox-details-table';
               parent.appendChild(tabTable);
-              return tabTable;  
+              jT.$(tabTable).dataTable({
+                "bPaginate": true,
+                "bProcessing": true,
+                "bLengthChange": false,
+        				"bAutoWidth": true,
+                "sDom" : "rt<f>",
+                "aoColumns": cols,
+                "bSort": true,
+              });
+              jT.$(tabTable).dataTable().fnAddData(data);
+              jT.$(tabTable).dataTable().fnAdjustColumnSizing();
             }
-          );
+            return empty;
+          });
           
           jT.$(cell).height(detDiv.offsetHeight);
-          ccLib.fireCallback(self.settings.onDetails, self, detDiv, full, event);
+          ccLib.fireCallback(self.settings.onDetails, self, detDiv, entry, event);
           jT.$(cell).data('detailsDiv', detDiv);
           jT.$(detDiv).data('rootCell', cell);
         }
@@ -1237,15 +1229,16 @@ var jToxCompound = (function () {
           
         var grpArr = (typeof grp == "function" || typeof grp == "string") ? ccLib.fireCallback(grp, self, i, miniset) : grp;
         self.groups[i] = [];
-        ccLib.enumObject(grpArr, function(fid, idx) { 
-          var sameAs = cls.findSameAs(fid, self.feature);
-          if (!self.feature[sameAs].used && !self.feature[fid].used)
+        ccLib.enumObject(grpArr, function(fid, idx) {
+          var isUsed = false;
+          cls.enumSameAs(fid, self.feature, function (feature) {
+            isUsed |= feature.used;
+          });
+          if (idx != "name" && !isUsed) {
             self.groups[i].push(fid);
-          if (idx != "name") {
             // these we need to be able to return back to original state.
             self.usedFeatures.push(fid);
-            self.usedFeatures.push(sameAs);
-            self.feature[fid].used = self.feature[sameAs].used = true;
+            self.feature[fid].used = true;
           }
         });
       }
@@ -1405,7 +1398,7 @@ var jToxCompound = (function () {
       
       // remember the _original_ datasetUri and make a call with one size length to retrieve all features...
       self.datasetUri = (datasetUri.indexOf('http') !=0 ? self.settings.baseUrl : '') + datasetUri;
-      
+
       jT.call(self, ccLib.addParameter(self.datasetUri, "page=0&pagesize=1"), function (dataset) {
         if (!!dataset) {
           self.feature = dataset.feature;
@@ -1413,11 +1406,39 @@ var jToxCompound = (function () {
           dataset.feature = self.feature;
           self.prepareGroups(dataset);
           if (self.settings.showTabs) {
-            self.prepareTabs(jT.$('.jtox-ds-features', self.rootElement)[0], true, function (id, name, parent){
+            // tabs feature building
+            var nodeFn = function (id, name, parent) {
               var fEl = jT.getTemplate('#jtox-ds-feature');
               parent.appendChild(fEl);
               ccLib.fillTree(fEl, {title: name.replace(/_/g, ' '), uri: self.featureUri(id)});
+        
+              var checkEl = jT.$('input[type="checkbox"]', fEl)[0];
+              if (!checkEl)
+                return;
+              checkEl.value = id;
+              if (self.settings.rememberChecks)
+                checkEl.checked = (self.featureStates[id] === undefined || self.featureStates[id]);
+        
               return fEl;
+            };
+
+            self.prepareTabs(jT.$('.jtox-ds-features', self.rootElement)[0], true, function (divEl, gr) {
+              var empty = true;
+              ccLib.enumObject(self.groups[gr], function (fId, idx, level) {
+                var vis = (self.feature[fId] || {})['visibility'];
+                if (!!vis && vis != 'main')
+                  return;
+                empty = false;
+                if (idx == "name")
+                  var fEl = nodeFn(null, fId, divEl);
+                else if (level == 1) {
+                  var title = self.feature[fId].title;
+                  if (!ccLib.isNull(title))
+                    nodeFn(fId, title, divEl);
+                }
+              });
+              
+              return empty;
             });
           }
           
@@ -1459,7 +1480,7 @@ var jToxCompound = (function () {
     return entry;
   };
   
-  cls.findSameAs = function (fid, features) {
+  cls.enumSameAs = function (fid, features, callback) {
     // starting from the feature itself move to 'sameAs'-referred features, until sameAs is missing or points to itself
     // This, final feature should be considered "main" and title and others taken from it.
     var feature = features[fid];
@@ -1467,6 +1488,7 @@ var jToxCompound = (function () {
     var retId = fid;
     
     for (;;){
+      ccLib.fireCallback(callback, null, feature, retId);
       if (feature.sameAs === undefined || feature.sameAs == null || feature.sameAs == fid || fid == base + feature.sameAs)
         break;
       if (features[feature.sameAs] !== undefined)
@@ -1488,11 +1510,16 @@ var jToxCompound = (function () {
     if (bases == null)
       bases = baseFeatures;
     features = jT.$.extend(features, bases);
+    
     for (var fid in features) {
-      
-      var sameAs = cls.findSameAs(fid, features);
-      // now merge with this one... it copies everything that we've added, if we've reached to it. Including 'data'
-      features[fid] = jT.$.extend(features[fid], features[sameAs], { originalId: fid, originalTitle: features[fid].title });
+      var theFeat = features[fid];
+      if (!theFeat.URI)
+        theFeat.URI = fid;
+      cls.enumSameAs(fid, features, function (feature, id) {
+        var sameAs = feature.sameAs;
+        feature = jT.$.extend(true, feature, theFeat);
+        feature.sameAs = sameAs;
+      });
     }
     
     return features;
@@ -3244,17 +3271,6 @@ jT.templates['compound-export']  =
 "      <div class=\"jtox-inline jtox-exportlist\"></div>" +
 "    </div>" +
 ""; // end of #jtox-ds-export 
-
-jT.templates['compound-one-detail']  = 
-"    <table>" +
-"      <tbody>" +
-"        <tr id=\"jtox-one-detail\">" +
-"          <th class=\"right\"><span class=\"data-field\" data-field=\"title\"> ? </span><sup><a target=\"_blank\" class=\"data-field attribute\" data-attribute=\"href\" data-field=\"uri\">?</a></sup></th>" +
-"          <td class=\"left data-field\" data-field=\"value\"> ? </td>" +
-"        </tr>" +
-"      </tbody>" +
-"    </table>" +
-""; // end of #jtox-one-detail 
 
 jT.templates['all-dataset']  = 
 "	  <div id=\"jtox-dataset\">" +
