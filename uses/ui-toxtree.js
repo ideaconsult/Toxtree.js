@@ -4,7 +4,7 @@ var tt = {
 };
 
 function onAlgoLoaded(result) {
-	var tEl = $('.title', $(this.rootElement).parents('.jtox-foldable')[0])[0];
+	var tEl = $('#tt-models-panel .title')[0];
 	tEl.innerHTML = tEl.innerHTML.replace(/(.+)\((\d+)\/(\d+)(.*)?/, '$1($2/' + result.algorithm.length + '$4');;
 }
 
@@ -19,7 +19,7 @@ function onSelectedUpdate(el) {
 	tEl.innerHTML = tEl.innerHTML.replace(/(.+)\((\d+)\/(\d+)(.*)?/, '$1(' + v + '/$3$4');;
 }
 
-function onDetailedRow(row, data, index) {
+function onDetailedAlgo(row, data, index) {
 }
 
 var config_toxtree = {
@@ -69,11 +69,11 @@ var config_toxtree = {
 
 $(document).ready(function(){
   $('#tt-models-panel a.select-all').on('click', function () {
-    $('input[type="checkbox"]', this.parentNode).each(function () { this.checked = true;});
+    $('#tt-models-panel input[type="checkbox"]').each(function () { this.checked = true;});
     onSelectedUpdate(this);
   });
   $('#tt-models-panel a.unselect-all').on('click', function () {
-    $('input[type="checkbox"]', this.parentNode).each(function () { this.checked = false;});
+    $('#tt-models-panel input[type="checkbox"]').each(function () { this.checked = false;});
     onSelectedUpdate(this);
   });
   
@@ -86,8 +86,21 @@ $(document).ready(function(){
     "bProcessing": true,
     "bLengthChange": false,
 		"bAutoWidth": true,
-    "sDom" : "<f>rt",
+    "sDom" : "rt<f>",
+    "oLanguage": { sSearch: "Filter:" },
     "aoColumns": jT.ui.processColumns(tt.compoundKit, 'compound'),
     "bSort": true,
   });
+  
+  tt.modelKit = new jToxModel($('#modelKit')[0], $.extend({}, jToxQuery.kits[0].settings, {
+    algorithms: true,
+    shortStars: true,
+    sDom: "rt<f>",
+    oLanguage: { sSearch: "Filter" },
+    selectionHandler: "checked",
+    onLoaded: onAlgoLoaded,
+    onDetails: onDetailedAlgo
+  }));
+  
+  tt.modelKit.listAlgorithms("ToxTree");
 });

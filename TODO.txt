@@ -1,9 +1,7 @@
 TODO:
 
-- jToxCompound - make feature list table as a separate routine
-- jToxCompound - UI-less version - just for information retrieval
-- 
 - ToxTree ui page using existing stuff.
+- make some docs - jToxCompound additions, tableLanguage, etc.
 - Make all kits react adequately on failure on network / calls
 - deferred re-query (postpone)
 

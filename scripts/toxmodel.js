@@ -12,6 +12,7 @@ var jToxModel = (function () {
     algorithms: false,
     onLoaded: null,
     sDom: "<Fif>rt",
+    oLanguage: null,
     loadOnInit: false,
     /* algorithmNeedle */
     /* modelUri */
@@ -103,12 +104,12 @@ var jToxModel = (function () {
 				"bAutoWidth": false,
         "sDom" : self.settings.sDom,
         "aoColumns": jT.ui.processColumns(self, cat),
-				"oLanguage": {
+				"oLanguage": jT.$.extend({
           "sLoadingRecords": "No models found.",
           "sZeroRecords": "No models found.",
           "sEmptyTable": "No models available.",
           "sInfo": "Showing _TOTAL_ model(s) (_START_ to _END_)"
-        }
+        }, self.settings.oLanguage)
       });
       
       jT.$(self.table).dataTable().fnAdjustColumnSizing();

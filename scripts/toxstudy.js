@@ -8,6 +8,7 @@ var jToxStudy = (function () {
   var defaultSettings = {
     tab: null,
     sDom: "rt<Fip>",
+    oLanguage: null,
     // events
     onSummary: null,    // invoked when the summary is loaded
     onComposition: null, // invoked when the 
@@ -297,7 +298,7 @@ var jToxStudy = (function () {
           "bProcessing": true,
           "bLengthChange": false,
   				"bAutoWidth": false,
-          "sDom" : self.settings.sDom || "rt<Fip>",
+          "sDom" : self.settings.sDom,
           "aoColumns": colDefs,
           "fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
             var el = jT.$('.title .data-field', jT.$(this).parents('.jtox-study'))[0];
@@ -308,7 +309,7 @@ var jToxStudy = (function () {
             ccLib.equalizeHeights.apply(window, jT.$('td.jtox-multi table tbody', nRow).toArray());
           },
           
-  				"oLanguage": {
+  				"oLanguage": jT.$.extend({
             "sProcessing": "<img src='" + (jT.settings.baseUrl || self.baseUrl) + "/images/24x24_ambit.gif' border='0'>",
             "sLoadingRecords": "No studies found.",
             "sZeroRecords": "No studies found.",
@@ -321,7 +322,7 @@ var jToxStudy = (function () {
               '<option value="100">100</option>' +
               '<option value="-1">all</option>' +
               '</select> studies.'
-          }
+          }, self.settings.oLanguage)
         });
         
         jT.$(theTable).dataTable().fnAdjustColumnSizing();

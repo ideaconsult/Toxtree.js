@@ -10,6 +10,7 @@ var jToxDataset = (function () {
     maxStars: 10,
     selectionHandler: null,
     sDom: "<Fif>rt",
+    oLanguage: null,
     onLoaded: null,
     loadOnInit: false,
     /* datasetUri */
@@ -71,12 +72,12 @@ var jToxDataset = (function () {
 				"bAutoWidth": false,
         "sDom" : self.settings.sDom,
         "aoColumns": jT.ui.processColumns(self, 'dataset'),
-				"oLanguage": {
+				"oLanguage": jT.$.extend({
           "sLoadingRecords": "No datasets found.",
           "sZeroRecords": "No datasets found.",
           "sEmptyTable": "No datasets available.",
           "sInfo": "Showing _TOTAL_ dataset(s) (_START_ to _END_)"
-        }
+        }, self.settings.oLanguage)
       });
       
       jT.$(self.table).dataTable().fnAdjustColumnSizing();

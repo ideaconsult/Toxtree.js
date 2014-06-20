@@ -1565,7 +1565,7 @@ var jToxCompound = (function () {
           tabRoot.appendChild(detDiv);
           
           self.prepareTabs(detDiv, false, function (parent, gr) {
-            var empty = true;              
+            var empty = true;            
             var data = [];
             ccLib.enumObject(self.groups[gr], function (fId, idx, level) {
               var feat = jT.$.extend({}, self.feature[fId]);
@@ -2085,6 +2085,7 @@ var jToxDataset = (function () {
     maxStars: 10,
     selectionHandler: null,
     sDom: "<Fif>rt",
+    oLanguage: null,
     onLoaded: null,
     loadOnInit: false,
     /* datasetUri */
@@ -2146,12 +2147,12 @@ var jToxDataset = (function () {
 				"bAutoWidth": false,
         "sDom" : self.settings.sDom,
         "aoColumns": jT.ui.processColumns(self, 'dataset'),
-				"oLanguage": {
+				"oLanguage": jT.$.extend({
           "sLoadingRecords": "No datasets found.",
           "sZeroRecords": "No datasets found.",
           "sEmptyTable": "No datasets available.",
           "sInfo": "Showing _TOTAL_ dataset(s) (_START_ to _END_)"
-        }
+        }, self.settings.oLanguage)
       });
       
       jT.$(self.table).dataTable().fnAdjustColumnSizing();
@@ -2203,6 +2204,7 @@ var jToxModel = (function () {
     algorithms: false,
     onLoaded: null,
     sDom: "<Fif>rt",
+    oLanguage: null,
     loadOnInit: false,
     /* algorithmNeedle */
     /* modelUri */
@@ -2294,12 +2296,12 @@ var jToxModel = (function () {
 				"bAutoWidth": false,
         "sDom" : self.settings.sDom,
         "aoColumns": jT.ui.processColumns(self, cat),
-				"oLanguage": {
+				"oLanguage": jT.$.extend({
           "sLoadingRecords": "No models found.",
           "sZeroRecords": "No models found.",
           "sEmptyTable": "No models available.",
           "sInfo": "Showing _TOTAL_ model(s) (_START_ to _END_)"
-        }
+        }, self.settings.oLanguage)
       });
       
       jT.$(self.table).dataTable().fnAdjustColumnSizing();
@@ -2540,6 +2542,7 @@ var jToxComposition = (function () {
     showBanner: true,         // whether to show a banner of composition info before each compounds-table
     showDiagrams: false,      // whether to show diagram for each compound in the composition
     sDom: "rt<Ffp>",          // compounds (ingredients) table sDom
+    oLanguage: {},
     onLoaded: null,
     
     /* compositionUri */
@@ -2624,6 +2627,7 @@ var jToxComposition = (function () {
 				"bAutoWidth": false,
         "bServerSide": false,
         "sDom" : self.settings.sDom,
+        "oLanguage": self.settings.oLanguage,
         "aoColumns": cols,
       });
       
@@ -2703,6 +2707,7 @@ var jToxStudy = (function () {
   var defaultSettings = {
     tab: null,
     sDom: "rt<Fip>",
+    oLanguage: null,
     // events
     onSummary: null,    // invoked when the summary is loaded
     onComposition: null, // invoked when the 
@@ -2992,7 +2997,7 @@ var jToxStudy = (function () {
           "bProcessing": true,
           "bLengthChange": false,
   				"bAutoWidth": false,
-          "sDom" : self.settings.sDom || "rt<Fip>",
+          "sDom" : self.settings.sDom,
           "aoColumns": colDefs,
           "fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
             var el = jT.$('.title .data-field', jT.$(this).parents('.jtox-study'))[0];
@@ -3003,7 +3008,7 @@ var jToxStudy = (function () {
             ccLib.equalizeHeights.apply(window, jT.$('td.jtox-multi table tbody', nRow).toArray());
           },
           
-  				"oLanguage": {
+  				"oLanguage": jT.$.extend({
             "sProcessing": "<img src='" + (jT.settings.baseUrl || self.baseUrl) + "/images/24x24_ambit.gif' border='0'>",
             "sLoadingRecords": "No studies found.",
             "sZeroRecords": "No studies found.",
@@ -3016,7 +3021,7 @@ var jToxStudy = (function () {
               '<option value="100">100</option>' +
               '<option value="-1">all</option>' +
               '</select> studies.'
-          }
+          }, self.settings.oLanguage)
         });
         
         jT.$(theTable).dataTable().fnAdjustColumnSizing();
