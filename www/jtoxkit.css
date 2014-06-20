@@ -187,6 +187,12 @@
   display: block;
 }
 
+.jtox-toolkit a, 
+.jtox-toolkit a:visited,
+.jtox-toolkit a:active {
+  color: inherit;
+}
+
 img.jtox-smalldiagram {
   width: 125px;
   height: 125px;

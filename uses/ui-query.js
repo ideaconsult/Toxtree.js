@@ -1,7 +1,6 @@
 function onSideLoaded(result) {
 	var tEl = $('.title', $(this.rootElement).parents('.jtox-foldable')[0])[0];
-	var set = result.dataset || result.model;
-	tEl.innerHTML = tEl.innerHTML.replace(/(.+)\((\d+)\/(\d+)(.*)?/, '$1($2/' + set.length + '$4');;
+	tEl.innerHTML = tEl.innerHTML.replace(/(.+)\((\d+)\/(\d+)(.*)?/, '$1($2/' + result.algorithm + '$4');;
 }
 
 function onSelectedUpdate(el) {

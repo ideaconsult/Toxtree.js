@@ -6,6 +6,7 @@
 
 var jToxCompound = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
+    "noInterface": false,     // runs in interface-less mode, so that it can be used only for information retrieval.
     "showTabs": true,         // should we show tabs with groups, or not
     "tabsFolded": false,      // should present the feature-selection tabs folded initially
     "showExport": true,       // should we add export tab up there
@@ -118,6 +119,14 @@ var jToxCompound = (function () {
       	},
       	
       	"http://www.opentox.org/api/1.1#Similarity": {title: "Similarity", data: "compound.metric", search: true, used: true},
+      },
+      "columns": {
+        "compound": {
+          "Name": { sTitle: "Name", mData: 'title', mRender: function (data, type, full) { return '<span>' + data + '</span><sup><a target="_blank" href="' + full.URI + '">?</a></sup>'; } },
+          "Value": { sTitle: "Value", mData: 'value', sDefaultContent: "-" },
+          "SameAs": { sTitle: "SameAs", mData: 'sameAs', sDefaultContent: "-" },
+          "Source": { sTitle: "Source", mData: 'source', sDefaultContent: "-", mRender: function (data, type, full) { return !data || !data.type ? '-' : '<a target="_blank" href="' + data.URI + '">' + data.type + '</a>'; } }
+        }
       }
     }
   };
@@ -182,14 +191,16 @@ var jToxCompound = (function () {
       self.orderList = [];
       self.usedFeatures = [];
       
-      self.rootElement.appendChild(jT.getTemplate('#jtox-compound'));
-      
-      jT.ui.putControls(self, { 
-        nextPage: function () { self.nextPage(); },
-        prevPage: function () { self.prevPage(); },
-        sizeChange: function() { self.queryEntries(self.settings.pageStart, parseInt(jT.$(this).val())); },
-        filter: function () { self.updateTables() }
-      });
+      if (!self.settings.noInterface) {
+        self.rootElement.appendChild(jT.getTemplate('#jtox-compound'));
+        
+        jT.ui.putControls(self, { 
+          nextPage: function () { self.nextPage(); },
+          prevPage: function () { self.prevPage(); },
+          sizeChange: function() { self.queryEntries(self.settings.pageStart, parseInt(jT.$(this).val())); },
+          filter: function () { self.updateTables() }
+        });
+      }
     },
     
     clearDataset: function () {
@@ -417,13 +428,6 @@ var jToxCompound = (function () {
           tabRoot.appendChild(detDiv);
           
           self.prepareTabs(detDiv, false, function (parent, gr) {
-            var cols = [
-              { sTitle: "Name", mData: 'title', mRender: function (data, type, full) { return '<span>' + data + '</span><sup><a target="_blank" href="' + full.URI + '">?</a></sup>'; } },
-              { sTitle: "Value", mData: 'value', sDefaultContent: "-" },
-              { sTitle: "SameAs", mData: 'sameAs', sDefaultContent: "-" },
-              { sTitle: "Source", mData: 'source', sDefaultContent: "-", mRender: function (data, type, full) { return !data || !data.type ? '-' : '<a target="_blank" href="' + data.URI + '">' + data.type + '</a>'; } }
-            ];
-            
             var empty = true;              
             var data = [];
             ccLib.enumObject(self.groups[gr], function (fId, idx, level) {
@@ -451,7 +455,7 @@ var jToxCompound = (function () {
                 "bLengthChange": false,
         				"bAutoWidth": true,
                 "sDom" : "rt<f>",
-                "aoColumns": cols,
+                "aoColumns": jT.ui.processColumns(self, 'compound'),
                 "bSort": true,
               });
               jT.$(tabTable).dataTable().fnAddData(data);
@@ -708,7 +712,7 @@ var jToxCompound = (function () {
       if (qSize < self.settings.pageSize) // we've reached the end!!
         self.entriesCount = qStart + qSize;
       
-      if (self.settings.showControls){
+      if (self.settings.showControls && !self.settings.noInterface){
         var pane = jT.$('.jtox-controls', self.rootElement)[0];
         ccLib.fillTree(pane, {
           "pagestart": qStart + 1,
@@ -748,10 +752,11 @@ var jToxCompound = (function () {
         if (!!dataset){
           // then, preprocess the dataset
           self.dataset = cls.processDataset(dataset, self.feature, self.settings.fnAccumulate, self.settings.pageStart);
-
-          // ok - go and update the table, filtering the entries, if needed            
-          self.updateTables();
-
+          if (!self.settings.noInterface) {
+            // ok - go and update the table, filtering the entries, if needed            
+            self.updateTables();
+          }
+  
           // finally - go and update controls if they are visible
           self.updateControls(qStart, dataset.dataEntry.length);
 
@@ -781,48 +786,49 @@ var jToxCompound = (function () {
         if (!!dataset) {
           self.feature = dataset.feature;
           cls.processFeatures(self.feature, self.settings.configuration.baseFeatures);
-          self.prepareGroups(dataset);
-          self.feature = dataset.feature;
-          if (self.settings.showTabs) {
-            // tabs feature building
-            var nodeFn = function (id, name, parent) {
-              var fEl = jT.getTemplate('#jtox-ds-feature');
-              parent.appendChild(fEl);
-              ccLib.fillTree(fEl, {title: name.replace(/_/g, ' '), uri: self.featureUri(id)});
-        
-              var checkEl = jT.$('input[type="checkbox"]', fEl)[0];
-              if (!checkEl)
-                return;
-              checkEl.value = id;
-              if (self.settings.rememberChecks)
-                checkEl.checked = (self.featureStates[id] === undefined || self.featureStates[id]);
-        
-              return fEl;
-            };
-
-            self.prepareTabs(jT.$('.jtox-ds-features', self.rootElement)[0], true, function (divEl, gr) {
-              var empty = true;
-              ccLib.enumObject(self.groups[gr], function (fId, idx, level) {
-                var vis = (self.feature[fId] || {})['visibility'];
-                if (!!vis && vis != 'main')
-                  return;
-                empty = false;
-                if (idx == "name")
-                  var fEl = nodeFn(null, fId, divEl);
-                else if (level == 1) {
-                  var title = self.feature[fId].title;
-                  if (!ccLib.isNull(title))
-                    nodeFn(fId, title, divEl);
-                }
-              });
-              
-              return empty;
-            });
-          }
+          if (!self.settings.noInterface) {
+            self.prepareGroups(dataset);
+            if (self.settings.showTabs) {
+              // tabs feature building
+              var nodeFn = function (id, name, parent) {
+                var fEl = jT.getTemplate('#jtox-ds-feature');
+                parent.appendChild(fEl);
+                ccLib.fillTree(fEl, {title: name.replace(/_/g, ' '), uri: self.featureUri(id)});
           
-          self.prepareTables(); // prepare the tables - we need features to build them - we have them!
-          self.equalizeTables(); // to make them nicer, while waiting...
-          ccLib.fireCallback(self.settings.onPrepared, self, dataset);
+                var checkEl = jT.$('input[type="checkbox"]', fEl)[0];
+                if (!checkEl)
+                  return;
+                checkEl.value = id;
+                if (self.settings.rememberChecks)
+                  checkEl.checked = (self.featureStates[id] === undefined || self.featureStates[id]);
+          
+                return fEl;
+              };
+  
+              self.prepareTabs(jT.$('.jtox-ds-features', self.rootElement)[0], true, function (divEl, gr) {
+                var empty = true;
+                ccLib.enumObject(self.groups[gr], function (fId, idx, level) {
+                  var vis = (self.feature[fId] || {})['visibility'];
+                  if (!!vis && vis != 'main')
+                    return;
+                  empty = false;
+                  if (idx == "name")
+                    var fEl = nodeFn(null, fId, divEl);
+                  else if (level == 1) {
+                    var title = self.feature[fId].title;
+                    if (!ccLib.isNull(title))
+                      nodeFn(fId, title, divEl);
+                  }
+                });
+                
+                return empty;
+              });
+            }
+            
+            self.prepareTables(); // prepare the tables - we need features to build them - we have them!
+            self.equalizeTables(); // to make them nicer, while waiting...
+            ccLib.fireCallback(self.settings.onPrepared, self, dataset);
+          }
           self.queryEntries(self.settings.pageStart, self.settings.pageSize); // and make the query for actual data
         }
       });

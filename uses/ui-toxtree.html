@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+
+  <title>ToxTree web interface</title>
+  <link rel="stylesheet" href="../tests/base.css"/>
+	<link rel="stylesheet" href="../tests/skeleton-fluid.css"/>
+	<link rel="stylesheet" href="../tests/layout.css"/>
+	<link rel="stylesheet" href="../tests/jquery-ui.css"/>
+	<link rel="stylesheet" href="../tests/jquery.dataTables.css"/>
+	<link rel="stylesheet" href="../tests/ambit2.css"/>
+
+	<link rel="stylesheet" href="../www/jtoxkit.css"/>
+	<link rel="stylesheet" href="../www/ketcher.css"/>
+	<link rel="stylesheet" href="ui-toxtree.css"/>
+
+  <script src="oecdcategories.js"></script>
+
+  <script src="../tests/jquery.js"></script>
+  <script src="../tests/jquery.base64.min.js"></script>
+  <script src="../tests/jquery-migrate-1.2.1.min.js"></script>
+  <script src="../tests/colResizable-1.3.min.js"></script>
+  <script src="../tests/jquery-ui.min.js"></script>
+  <script src="../tests/jquery.dataTables-1.9.4.min.js"></script>
+
+  <script src="../www/jtoxkit.js"></script>
+  <script src="../www/ketcher.js"></script>
+  <script src="ui-toxtree.js"></script>
+</head>
+<body>
+  <div class="jtox-toolkit" data-kit="query" data-cross-domain="true" data-configuration="config_toxtree" data-base-url="http://apps.ideaconsult.net:8080/biodeg">
+    <div id="searchbar" class="jtox-toolkit jtox-widget" data-kit="search"></div>
+    <div id="tt-browser-panel">
+			<div class="tt-features">
+  			<h5>Available structure attributes</h5>
+  			<div class="jtox-toolkit" data-kit="compound" data-no-interface="yes"></div>
+  		  <div class="tt-feature-table">
+  			  <table></table>
+  		  </div>
+			</div>
+			<div class="tt-diagram">
+			  <h5>Structure diagram</h5>
+        <img class="toxtree-diagram" alt="Compoung diagram"/>
+      </div>
+    </div>
+    <div id="tt-models-panel">
+      <div class="title"><h5>Algorithms (0/0)</h5></div>
+      <div class="content">
+        <a href="#" class="select-all">select all</a>&nbsp;<a href="#" class="unselect-all">unselect all</a>
+        <input id="algo-filter" type="search" placeholder="Filter algorithms..."/>
+        <div class="jtox-toolkit jtox-widget" data-kit="model" data-short-stars="true" data-s-dom="rt" data-selection-handler="checked" data-on-loaded="onAlgoLoaded" data-algorithms="true" data-algorithm-needle="ToxTree" data-load-on-init="true" data-on-details="onDetailedAlgo"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,19 @@
+#tt-browser-panel {
+  width: 33%;
+  min-width: 250px;
+  display: inline-block;
+  margin: 0px;
+  vertical-align: top;
+}
+
+#tt-models-panel {
+  width: 66%;
+  display: inline-block;
+  margin: 0px;
+  vertical-align: top;
+}
+
+#algo-filter {
+  float: right;
+  vertical-align: baseline;
+}
