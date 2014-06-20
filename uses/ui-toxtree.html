@@ -39,23 +39,19 @@
     <div id="tt-browser-panel">
 			<div class="tt-features">
   			<h5>Available structure attributes</h5>
-  			<div class="jtox-toolkit" data-kit="compound" data-no-interface="yes"></div>
-  		  <div class="tt-feature-table">
-  			  <table></table>
-  		  </div>
+  			<div class="jtox-toolkit" data-kit="compound" data-no-interface="yes" data-on-loaded="onCompoundsLoaded"></div>
 			</div>
-			<div class="tt-diagram">
+			<div id="tt-diagram">
 			  <h5>Structure diagram</h5>
         <img class="toxtree-diagram" alt="Compoung diagram"/>
       </div>
     </div>
     <div id="tt-models-panel">
-      <div class="title"><h5>Algorithms (0/0)</h5></div>
-      <div class="content">
-        <a href="#" class="select-all">select all</a>&nbsp;<a href="#" class="unselect-all">unselect all</a>
-        <input id="algo-filter" type="search" placeholder="Filter algorithms..."/>
-        <div class="jtox-toolkit jtox-widget" data-kit="model" data-short-stars="true" data-s-dom="rt" data-selection-handler="checked" data-on-loaded="onAlgoLoaded" data-algorithms="true" data-algorithm-needle="ToxTree" data-load-on-init="true" data-on-details="onDetailedAlgo"></div>
+      <div class="title">
+        <div class="jtox-inline"><h5>Algorithms (0/0)</h5></div>
+        <div class="jtox-inline selections"><a href="#" class="select-all">select all</a>&nbsp;<a href="#" class="unselect-all">unselect all</a></div>
       </div>
+      <div class="jtox-toolkit jtox-widget" data-kit="model" data-short-stars="true" data-s-dom="<f>rt" data-selection-handler="checked" data-on-loaded="onAlgoLoaded" data-algorithms="true" data-algorithm-needle="ToxTree" data-load-on-init="true" data-on-details="onDetailedAlgo"></div>
     </div>
   </div>
 </body>

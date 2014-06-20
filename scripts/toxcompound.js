@@ -428,7 +428,7 @@ var jToxCompound = (function () {
           tabRoot.appendChild(detDiv);
           
           self.prepareTabs(detDiv, false, function (parent, gr) {
-            var empty = true;              
+            var empty = true;            
             var data = [];
             ccLib.enumObject(self.groups[gr], function (fId, idx, level) {
               var feat = jT.$.extend({}, self.feature[fId]);

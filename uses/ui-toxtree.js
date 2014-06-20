@@ -1,6 +1,15 @@
+var tt = {
+  compoundKit: null,
+  featureTable: null,
+};
+
 function onAlgoLoaded(result) {
 	var tEl = $('.title', $(this.rootElement).parents('.jtox-foldable')[0])[0];
 	tEl.innerHTML = tEl.innerHTML.replace(/(.+)\((\d+)\/(\d+)(.*)?/, '$1($2/' + result.algorithm.length + '$4');;
+}
+
+function onCompoundsLoaded (result) {
+  
 }
 
 function onSelectedUpdate(el) {
@@ -49,6 +58,7 @@ var config_toxtree = {
     	'Description': { bVisible: false }
   	},
   	"compound": {
+  	  'Source': { bVisible: false },
     	
   	}
 	},
@@ -67,15 +77,17 @@ $(document).ready(function(){
     onSelectedUpdate(this);
   });
   
-  var pressTimeout = null;
-  $('#tt-models-panel input').on('keydown', function(e) {
-    var needle = $(this).val();
-    if (pressTimeout != null)
-      clearTimeout(pressTimeout);
-    pressTimeout = setTimeout(function () { 
-      $(jToxModel.kits[0].table).dataTable().fnFilter(needle);
-    }, 200);
-  });
+  tt.compoundKit = jToxCompound.kits[0];
+  tt.featureTable = document.createElement('table');
+  tt.compoundKit.rootElement.appendChild(tt.featureTable);
   
-  var compKit = jToxCompound.kits[0];
+  jT.$(tt.featureTable).dataTable({
+    "bPaginate": true,
+    "bProcessing": true,
+    "bLengthChange": false,
+		"bAutoWidth": true,
+    "sDom" : "<f>rt",
+    "aoColumns": jT.ui.processColumns(tt.compoundKit, 'compound'),
+    "bSort": true,
+  });
 });

@@ -13,7 +13,23 @@
   vertical-align: top;
 }
 
-#algo-filter {
+#tt-diagram img {
+  min-height: 250px;
+  width: 250px;
+  border: 1px dashed gray;
+  border-radius: 5px;
+  padding: 3px;
+}
+
+.selections {
   float: right;
-  vertical-align: baseline;
+  vertical-align: top;
+}
+
+div.dataTables_filter label {
+  font-size: 80%;
+}
+
+div.dataTables_filter input {
+  margin-bottom: 0px;
 }
