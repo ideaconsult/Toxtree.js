@@ -139,12 +139,6 @@ var jToxStudy = (function () {
       return theCat;
     },
   
-    updateCount: function(str, count) {
-      if (count === undefined)
-        count = 0;
-      return str.replace(/(.+)\s\(([0-9]+)\)/, "$1 (" + count + ")");
-    },
-    
     // modifies the column title, according to configuration and returns "null" if it is marked as "invisible".
     ensureTable: function (tab, study) {
       var self = this;
@@ -302,7 +296,7 @@ var jToxStudy = (function () {
           "aoColumns": colDefs,
           "fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
             var el = jT.$('.title .data-field', jT.$(this).parents('.jtox-study'))[0];
-            el.innerHTML = self.updateCount(el.innerHTML, iTotal);
+            el.innerHTML = jT.ui.updateCounter(el.innerHTML, iTotal);
             return sPre;
           },
           "fnCreatedRow": function( nRow, aData, iDataIndex ) {
@@ -375,7 +369,7 @@ var jToxStudy = (function () {
         if (!!data){
           var cnt = typeSummary[data];
           var el = jT.$(this)[0];
-          el.innerHTML = (self.updateCount(el.innerHTML, cnt));
+          el.innerHTML = jT.ui.updateCounter(el.innerHTML, cnt);
         }
       });
       

@@ -1,7 +1,16 @@
 TODO:
 
-- ToxTree ui page using existing stuff.
-- make some docs - jToxCompound additions, tableLanguage, etc.
+- wrong type passed on first request in ToxTree
+- scrolling on feature table - both X and Y
+- sizing of feature table - so that diagram is at the bottom
+- diagram showing.
+
+- jToxModel.getModel(algorithmUri, callback) routine (including polling task).
+- glue jToxCompound with jToxSearch, jToxQuery,
+- make onDetailedAlgo call the model creation / query...
+- Result column for jToxModel to show prediction results
+
+- make some docs - jToxCompound additions, tableLanguage, etc. updateCounter
 - Make all kits react adequately on failure on network / calls
 - deferred re-query (postpone)
 

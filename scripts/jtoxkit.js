@@ -222,14 +222,14 @@ window.jT = window.jToxKit = {
     if (urlObj.params['pagesize'] !== undefined) {
       var sz = parseInt(urlObj.params['pagesize']);
       if (sz > 0)
-        kit.settings.pageSize = sz;
+        kit.settings.pageSize = kit.pageSize = sz;
       url = ccLib.removeParameter(url, 'pagesize');
     }
     
     if (urlObj.params['page'] !== undefined) {
       var beg = parseInt(urlObj.params['page']);
       if (beg >= 0)
-        kit.settings.pageStart = beg * kit.settings.pageSize;
+        kit.settings.pageStart = kit.pageStart = beg * kit.settings.pageSize;
       url = ccLib.removeParameter(url, 'page');
     }
     
@@ -406,8 +406,29 @@ window.jT.ui = {
       return '<span class="ui-icon ui-icon-star jtox-inline" title="' + title + '"></span>' + stars;
     }
   },
+  
+  updateCounter: function (str, count, total) {
+    var re = null;
+    var add = '';
+    if (total == null) {
+      re = /([^(]*)\(([\d\?]+)\)/;
+      add = '' + count;
+    }
+    else {
+      re = /([^(]*)\(([\d\?]+\/[\d\?\+-]+)\)/;
+      add = '' + count + '/' + total;
+    }
     
-  putControls: function (kit, handlers) {
+    // now the addition    
+    if (!str.match(re))
+      str += ' (' + add + ')';
+    else
+      str = str.replace(re, "$1(" + add + ")");
+    
+    return str;
+  },
+    
+  bindControls: function (kit, handlers) {
     var pane = jT.$('.jtox-controls', kit.rootElement)[0];
     if (kit.settings.showControls) {
       ccLib.fillTree(pane, { "pagesize": kit.settings.pageSize });

@@ -41,6 +41,9 @@
   			<h5>Available structure attributes</h5>
   			<div class="jtox-toolkit" data-kit="compound" data-no-interface="yes" data-on-loaded="onCompoundsLoaded"></div>
 			</div>
+			<div id="tt-controls">
+	      <a class="paginate_disabled_previous prev-field" tabindex="0" role="button">Previous</a><span id="counter-field">Compound ?/?</span><a class="paginate_enabled_next next-field" tabindex="0" role="button">Next</a>
+			</div>
 			<div id="tt-diagram">
 			  <h5>Structure diagram</h5>
         <img class="toxtree-diagram" alt="Compoung diagram"/>
@@ -51,7 +54,7 @@
         <div class="title jtox-inline"><h5>Algorithms (0/0)</h5></div>
         <div class="jtox-inline selections"><a href="#" class="select-all">select all</a>&nbsp;<a href="#" class="unselect-all">unselect all</a></div>
       </div>
-      <div id="modelKit" class="jtox-toolkit jtox-widget" data-kit="model" data-manual-init="true"></div>
+      <div id="modelKit" class="jtox-toolkit jtox-widget" data-kit="model" data-algorithms="true" data-s-dom="rt<f>" data-selection-handler="checked" data-on-loaded="onAlgoLoaded" data-on-detaild="onDetailedAlgo" data-algorithm-needle="ToxTree"></div>
     </div>
   </div>
 </body>

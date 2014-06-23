@@ -162,7 +162,7 @@ jToxKit.ui.putStars(kit, stars, title)
 Put a `stars` number of stars, using provided `kit`'s stars format setting and putting given `title` as hover tooltip.
 
 ```
-jToxKit.ui.putControls(kit, handlers)
+jToxKit.ui.bindControls(kit, handlers)
 ```
 The two most important kits - [jToxCompound](#jtoxcompound) and [jToxSubstance](#jtoxsubstance) have their own paging and filtering mechanism. This function puts the necessary controls _and_ handling so that they start to work. Look at the code for more details.
 

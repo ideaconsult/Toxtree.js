@@ -1,16 +1,23 @@
 #tt-browser-panel {
-  width: 33%;
+  width: 40%;
   min-width: 250px;
+  display: inline-block;
+  margin: 0px;
+  vertical-align: top;
+  overflow: hidden;
+}
+
+#tt-models-panel {
+  width: 59%;
   display: inline-block;
   margin: 0px;
   vertical-align: top;
 }
 
-#tt-models-panel {
-  width: 66%;
-  display: inline-block;
-  margin: 0px;
-  vertical-align: top;
+#tt-diagram {
+  position: relative;
+  text-align: center;
+  overflow: hidden;
 }
 
 #tt-diagram img {
@@ -19,6 +26,25 @@
   border: 1px dashed gray;
   border-radius: 5px;
   padding: 3px;
+}
+
+#tt-controls {
+ display: block;
+ margin: 45px 0px 10px 0px;  
+ width: 100%;
+ position: relative;
+ text-align: center;
+}
+
+#tt-controls a {
+  float: none;  
+}
+
+#counter-field {
+  font-weight: bold;
+  vertical-align: bottom;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 .selections {

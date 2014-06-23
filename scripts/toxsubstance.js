@@ -48,6 +48,9 @@ var jToxSubstance = (function () {
     
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
     
+    self.pageStart = self.settings.pageStart;
+    self.pageSize = self.settings.pageSize;
+    
     self.rootElement.appendChild(jT.getTemplate('#jtox-substance'));
     self.init();
         
@@ -73,10 +76,10 @@ var jToxSubstance = (function () {
         return (type != 'display') ? data : '<a target="_blank" href="' + self.settings.baseUrl + '/substanceowner/' + full.ownerUUID + '/substance">' + data + '</a>';
       };
         
-      jT.ui.putControls(self, { 
+      jT.ui.bindControls(self, { 
         nextPage: function () { self.nextPage(); },
         prevPage: function () { self.prevPage(); },
-        sizeChange: function() { self.queryEntries(self.settings.pageStart, parseInt(jT.$(this).val())); },
+        sizeChange: function() { self.queryEntries(self.pageStart, parseInt(jT.$(this).val())); },
         filter: function () { jT.$(self.table).dataTable().fnFilter(jT.$(this).val()); }
       });
       
@@ -116,7 +119,7 @@ var jToxSubstance = (function () {
         from = 0;
         
       if (!size || size < 0)
-        size = self.settings.pageSize;
+        size = self.pageSize;
         
       var qStart = Math.floor(from / size);
       var qUri = ccLib.addParameter(self.substanceUri, "page=" + qStart + "&pagesize=" + size);
@@ -124,8 +127,8 @@ var jToxSubstance = (function () {
         if (!!result) {
           jT.$(self.table).dataTable().fnClearTable();
         
-          self.settings.pageSize = size;
-          self.settings.pageStart = from;
+          self.pageSize = size;
+          self.pageStart = from;
         
           for (var i = 0, rl = result.substance.length; i < rl; ++i)
             result.substance[i].index = i + from + 1;
@@ -144,7 +147,7 @@ var jToxSubstance = (function () {
       self.substanceUri = jT.grabPaging(self, uri);
       if (ccLib.isNull(self.settings.baseUrl))
         self.settings.baseUrl = jT.grabBaseUrl(uri);
-      self.queryEntries(self.settings.pageStart);
+      self.queryEntries(self.pageStart);
     },   
     
     query: function (uri) {

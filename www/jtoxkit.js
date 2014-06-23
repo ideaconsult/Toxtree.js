@@ -522,14 +522,14 @@ window.jT = window.jToxKit = {
     if (urlObj.params['pagesize'] !== undefined) {
       var sz = parseInt(urlObj.params['pagesize']);
       if (sz > 0)
-        kit.settings.pageSize = sz;
+        kit.settings.pageSize = kit.pageSize = sz;
       url = ccLib.removeParameter(url, 'pagesize');
     }
     
     if (urlObj.params['page'] !== undefined) {
       var beg = parseInt(urlObj.params['page']);
       if (beg >= 0)
-        kit.settings.pageStart = beg * kit.settings.pageSize;
+        kit.settings.pageStart = kit.pageStart = beg * kit.settings.pageSize;
       url = ccLib.removeParameter(url, 'page');
     }
     
@@ -706,8 +706,29 @@ window.jT.ui = {
       return '<span class="ui-icon ui-icon-star jtox-inline" title="' + title + '"></span>' + stars;
     }
   },
+  
+  updateCounter: function (str, count, total) {
+    var re = null;
+    var add = '';
+    if (total == null) {
+      re = /([^(]*)\(([\d\?]+)\)/;
+      add = '' + count;
+    }
+    else {
+      re = /([^(]*)\(([\d\?]+\/[\d\?\+-]+)\)/;
+      add = '' + count + '/' + total;
+    }
     
-  putControls: function (kit, handlers) {
+    // now the addition    
+    if (!str.match(re))
+      str += ' (' + add + ')';
+    else
+      str = str.replace(re, "$1(" + add + ")");
+    
+    return str;
+  },
+    
+  bindControls: function (kit, handlers) {
     var pane = jT.$('.jtox-controls', kit.rootElement)[0];
     if (kit.settings.showControls) {
       ccLib.fillTree(pane, { "pagesize": kit.settings.pageSize });
@@ -1327,14 +1348,16 @@ var jToxCompound = (function () {
       self.suspendEqualization = false;
       self.orderList = [];
       self.usedFeatures = [];
+      self.pageStart = self.settings.pageStart;
+      self.pageSize = self.settings.pageSize;
       
       if (!self.settings.noInterface) {
         self.rootElement.appendChild(jT.getTemplate('#jtox-compound'));
         
-        jT.ui.putControls(self, { 
+        jT.ui.bindControls(self, { 
           nextPage: function () { self.nextPage(); },
           prevPage: function () { self.prevPage(); },
-          sizeChange: function() { self.queryEntries(self.settings.pageStart, parseInt(jT.$(this).val())); },
+          sizeChange: function() { self.queryEntries(self.pageStart, parseInt(jT.$(this).val())); },
           filter: function () { self.updateTables() }
         });
       }
@@ -1479,6 +1502,26 @@ var jToxCompound = (function () {
       return this.feature[fId].URI || fId;
     },
     
+    featureData: function (entry, set) {
+      var self = this;
+      var data = [];
+      ccLib.enumObject(set, function (fId, idx, level) {
+        var feat = jT.$.extend({}, self.feature[fId]);
+        var vis = feat['visibility'];
+        if (!!vis && vis != 'details')
+          return;
+        var title = feat.title;
+        feat.value = self.featureValue(fId, entry, 'details');
+        if (!!title && (!self.settings.hideEmptyDetails || !! feat.value)) {
+          data.push(feat)
+          if (!feat.value)
+            feat.value = '-';
+        }
+      });
+      
+      return data;
+    },
+    
     prepareTables: function() {
       var self = this;
       var varCols = [];
@@ -1565,24 +1608,9 @@ var jToxCompound = (function () {
           tabRoot.appendChild(detDiv);
           
           self.prepareTabs(detDiv, false, function (parent, gr) {
-            var empty = true;            
-            var data = [];
-            ccLib.enumObject(self.groups[gr], function (fId, idx, level) {
-              var feat = jT.$.extend({}, self.feature[fId]);
-              var vis = feat['visibility'];
-              if (!!vis && vis != 'details')
-                return;
-              var title = feat.title;
-              feat.value = self.featureValue(fId, entry, 'details');
-              if (!!title && (!self.settings.hideEmptyDetails || !! feat.value)) {
-                data.push(feat)
-                empty = false;
-                if (!feat.value)
-                  feat.value = '-';
-              }
-            });
+            var data = self.featureData(entry, self.groups[gr]);
             
-            if (!empty || !self.settings.hideEmpty) {
+            if (data.length > 0 || !self.settings.hideEmpty) {
               jT.$(parent).addClass('jtox-details-table');
               var tabTable = document.createElement('table');
               parent.appendChild(tabTable);
@@ -1598,7 +1626,8 @@ var jToxCompound = (function () {
               jT.$(tabTable).dataTable().fnAddData(data);
               jT.$(tabTable).dataTable().fnAdjustColumnSizing();
             }
-            return empty;
+            
+            return data.length == 0;
           });
           
           jT.$(cell).height(detDiv.offsetHeight);
@@ -1619,9 +1648,8 @@ var jToxCompound = (function () {
       // now proceed to enter all other columns
       for (var gr in self.groups) {
         ccLib.enumObject(self.groups[gr], function (fId, idx, level) {
-          if (idx == "name") {
+          if (idx == "name")
             return;
-          }
             
           var feature = self.feature[fId];
           if (feature.visibility == 'details')
@@ -1831,22 +1859,22 @@ var jToxCompound = (function () {
     // These two are shortcuts for calling the queryEntries routine
     nextPage: function() {
       var self = this;
-      if (self.entriesCount == null || self.settings.pageStart + self.settings.pageSize < self.entriesCount)
-        self.queryEntries(self.settings.pageStart + self.settings.pageSize);
+      if (self.entriesCount == null || self.pageStart + self.pageSize < self.entriesCount)
+        self.queryEntries(self.pageStart + self.pageSize);
     },
     
     prevPage: function() {
       var self = this;
-      if (self.settings.pageStart > 0)
-        self.queryEntries(self.settings.pageStart - self.settings.pageSize);
+      if (self.pageStart > 0)
+        self.queryEntries(self.pageStart - self.pageSize);
     },
     
     updateControls: function (qStart, qSize) {
       var self = this;
 
       // first initialize the counters.
-      qStart = self.settings.pageStart = qStart * self.settings.pageSize;
-      if (qSize < self.settings.pageSize) // we've reached the end!!
+      qStart = self.pageStart = qStart * self.pageSize;
+      if (qSize < self.pageSize) // we've reached the end!!
         self.entriesCount = qStart + qSize;
       
       if (self.settings.showControls && !self.settings.noInterface){
@@ -1876,19 +1904,20 @@ var jToxCompound = (function () {
       if (from < 0)
         from = 0;
       if (size == null)
-        size = self.settings.pageSize;
+        size = self.pageSize;
         
       // setup the size, as well
       jT.$('.jtox-controls select', self.rootElement).val(size);
-      self.settings.pageSize = size;
       
       var qStart = Math.floor(from / size);
       var qUri = ccLib.addParameter(self.datasetUri, "page=" + qStart + "&pagesize=" + size);
+      self.dataset = null;
 
       jT.call(self, qUri, function(dataset){
         if (!!dataset){
           // then, preprocess the dataset
-          self.dataset = cls.processDataset(dataset, self.feature, self.settings.fnAccumulate, self.settings.pageStart);
+          self.pageSize = size;
+          self.dataset = cls.processDataset(dataset, self.feature, self.settings.fnAccumulate, self.pageStart);
           if (!self.settings.noInterface) {
             // ok - go and update the table, filtering the entries, if needed            
             self.updateTables();
@@ -1898,7 +1927,7 @@ var jToxCompound = (function () {
           self.updateControls(qStart, dataset.dataEntry.length);
 
           // time to call the supplied function, if any.
-          ccLib.fireCallback(self.settings.onLoaded, self, dataset);
+          ccLib.fireCallback(self.settings.onLoaded, self, dataset, self);
         }
       });
     },
@@ -1964,9 +1993,9 @@ var jToxCompound = (function () {
             
             self.prepareTables(); // prepare the tables - we need features to build them - we have them!
             self.equalizeTables(); // to make them nicer, while waiting...
-            ccLib.fireCallback(self.settings.onPrepared, self, dataset);
+            ccLib.fireCallback(self.settings.onPrepared, self, dataset, self);
           }
-          self.queryEntries(self.settings.pageStart, self.settings.pageSize); // and make the query for actual data
+          self.queryEntries(self.pageStart, self.pageSize); // and make the query for actual data
         }
       });
     },
@@ -2419,6 +2448,9 @@ var jToxSubstance = (function () {
     
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
     
+    self.pageStart = self.settings.pageStart;
+    self.pageSize = self.settings.pageSize;
+    
     self.rootElement.appendChild(jT.getTemplate('#jtox-substance'));
     self.init();
         
@@ -2444,10 +2476,10 @@ var jToxSubstance = (function () {
         return (type != 'display') ? data : '<a target="_blank" href="' + self.settings.baseUrl + '/substanceowner/' + full.ownerUUID + '/substance">' + data + '</a>';
       };
         
-      jT.ui.putControls(self, { 
+      jT.ui.bindControls(self, { 
         nextPage: function () { self.nextPage(); },
         prevPage: function () { self.prevPage(); },
-        sizeChange: function() { self.queryEntries(self.settings.pageStart, parseInt(jT.$(this).val())); },
+        sizeChange: function() { self.queryEntries(self.pageStart, parseInt(jT.$(this).val())); },
         filter: function () { jT.$(self.table).dataTable().fnFilter(jT.$(this).val()); }
       });
       
@@ -2487,7 +2519,7 @@ var jToxSubstance = (function () {
         from = 0;
         
       if (!size || size < 0)
-        size = self.settings.pageSize;
+        size = self.pageSize;
         
       var qStart = Math.floor(from / size);
       var qUri = ccLib.addParameter(self.substanceUri, "page=" + qStart + "&pagesize=" + size);
@@ -2495,8 +2527,8 @@ var jToxSubstance = (function () {
         if (!!result) {
           jT.$(self.table).dataTable().fnClearTable();
         
-          self.settings.pageSize = size;
-          self.settings.pageStart = from;
+          self.pageSize = size;
+          self.pageStart = from;
         
           for (var i = 0, rl = result.substance.length; i < rl; ++i)
             result.substance[i].index = i + from + 1;
@@ -2515,7 +2547,7 @@ var jToxSubstance = (function () {
       self.substanceUri = jT.grabPaging(self, uri);
       if (ccLib.isNull(self.settings.baseUrl))
         self.settings.baseUrl = jT.grabBaseUrl(uri);
-      self.queryEntries(self.settings.pageStart);
+      self.queryEntries(self.pageStart);
     },   
     
     query: function (uri) {
@@ -2838,12 +2870,6 @@ var jToxStudy = (function () {
       return theCat;
     },
   
-    updateCount: function(str, count) {
-      if (count === undefined)
-        count = 0;
-      return str.replace(/(.+)\s\(([0-9]+)\)/, "$1 (" + count + ")");
-    },
-    
     // modifies the column title, according to configuration and returns "null" if it is marked as "invisible".
     ensureTable: function (tab, study) {
       var self = this;
@@ -3001,7 +3027,7 @@ var jToxStudy = (function () {
           "aoColumns": colDefs,
           "fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
             var el = jT.$('.title .data-field', jT.$(this).parents('.jtox-study'))[0];
-            el.innerHTML = self.updateCount(el.innerHTML, iTotal);
+            el.innerHTML = jT.ui.updateCounter(el.innerHTML, iTotal);
             return sPre;
           },
           "fnCreatedRow": function( nRow, aData, iDataIndex ) {
@@ -3074,7 +3100,7 @@ var jToxStudy = (function () {
         if (!!data){
           var cnt = typeSummary[data];
           var el = jT.$(this)[0];
-          el.innerHTML = (self.updateCount(el.innerHTML, cnt));
+          el.innerHTML = jT.ui.updateCounter(el.innerHTML, cnt);
         }
       });
       
