@@ -16,7 +16,7 @@ var jToxQuery = (function () {
     configuration: {
       // this is the main thing to be configured
       handlers: { 
-        query: function (el, query) { query.query(); },
+        query: function (e, query) { query.query(); },
       }
     }
   };
@@ -65,12 +65,12 @@ var jToxQuery = (function () {
       var fireHandler = function (e) {
         var handler = self.settings.configuration.handlers[jT.$(this).data('handler')];
         if (!!handler)
-          ccLib.fireCallback(handler, this, this, self);
+          ccLib.fireCallback(handler, this, e, self);
         else
           console.log("jToxQuery: referring unknown handler: " + jT.$(this).data('handler'));
       };
       
-      jT.$(document).on('change', '.jtox-handler', fireHandler);
+      jT.$(document).on('change', 'input.jtox-handler', fireHandler);
       jT.$(document).on('click', 'button.jtox-handler', fireHandler);
     },
     

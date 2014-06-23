@@ -31,15 +31,19 @@ var config_toxtree = {
 	"columns": {
   	"algorithm": { 
     	'Info': { bVisible: false },
-    	'Description': { bVisible: false }
+    	'Description': { bVisible: false },
+    	'Result': { iOrder: 3, sTitle: "Result", sClass: "tt-model-result", sDefaultContent: "-" }
   	},
   	"compound": {
   	  'Source': { bVisible: false },
-    	
+  	  'Name': { sWidth: "25%" },
+  	  'Value': { sWidth: "55%"},
+  	  'SameAs': { sWidth: "20%'"}
   	}
 	},
 	"handlers": {
-  	"checked": onSelectedUpdate
+  	"checked": onSelectedUpdate,
+  	"query": onQuery,
 	}
 };
 
@@ -64,38 +68,61 @@ var tt = {
   ]
 };
 
-function onAlgoLoaded(result) {
-	var tEl = $('#tt-models-panel .title')[0];
-	tEl.innerHTML = tEl.innerHTML.replace(/(.+)\((\d+)\/(\d+)(.*)?/, '$1($2/' + result.algorithm.length + '$4');;
+function onQuery(e, query) {
+  $(tt.featureTable).dataTable().fnClearTable();
+  $('#tt-diagram img.toxtree-diagram')[0].src = '';
+  query.query();  
 }
 
-function onSelectedUpdate(el) {
+function onAlgoLoaded(result) {
+	var tEl = $('#tt-models-panel .title')[0];
+	$(tEl).data('total', result.algorithm.length);
+	tEl.innerHTML = jT.ui.updateCounter(tEl.innerHTML, 0, result.algorithm.length);
+}
+
+function onSelectedUpdate(e) {
   var par = $('#tt-models-panel')[0];
 	var tEl = $('.title', par)[0];
 	var v = $('input[type="checkbox"]:checked', par).length;
-	tEl.innerHTML = tEl.innerHTML.replace(/(.+)\((\d+)\/(\d+)(.*)?/, '$1(' + v + '/$3$4');;
+	tEl.innerHTML = jT.ui.updateCounter(tEl.innerHTML, v, $(tEl).data('total'));;
 }
 
-function addFeatures(kit) {
-  var features = null
-  if (!kit || kit == tt.mainKit) {
+function addFeatures() {
+  var features = null;
+  var kit = this;
+  if (kit == tt.mainKit) { // Lot more things to be done here...
     kit = tt.mainKit;
     features = tt.coreFeatures;
-    $('#tt-diagram img.toxtree-diagram')[0].src = kit.dataset.dataEntry[tt.compoundIdx].compound.diagramUri;
+    if (kit.dataset.dataEntry[tt.compoundIdx] != null)
+      $('#tt-diagram img.toxtree-diagram')[0].src = kit.dataset.dataEntry[tt.compoundIdx].compound.diagramUri;
 
-    var total = kit.entriesCount;
-    if (total == null)
-      total = kit.pageStart + kit.pageSize + '+';
+    var counter = $('#tt-browser-panel .counter-field')[0];
+    counter.innerHTML = jT.ui.updateCounter(
+      counter.innerHTML, 
+      tt.compoundIdx + kit.pageStart + (kit.dataset.dataEntry[tt.compoundIdx] ? 1 : 0), 
+      kit.entriesCount != null ? kit.entriesCount : kit.pageStart + kit.pageSize + '+'
+    );
     
-    var counter = $('#tt-controls .counter-field')[0];
-    counter.innerHTML = kit.dataset.dataEntry[tt.compoundIdx].compound.name + ' (' + (tt.compoundIdx + kit.pageStart + 1) + '/' + total + ')';
+    if (tt.compoundIdx == 0 && kit.pageStart == 0) // we need to disable prev 
+      $('#tt-browser-panel .prev-field').addClass('paginate_disabled_previous').removeClass('paginate_enabled_previous');
+    else
+      $('#tt-browser-panel .prev-field').removeClass('paginate_disabled_previous').addClass('paginate_enabled_previous');
+      
+    if (kit.entriesCount != null && tt.compoundIdx + kit.pageStart >= kit.entriesCount - 1)
+      $('#tt-browser-panel .next-field').addClass('paginate_disabled_next').removeClass('paginate_enabled_next');
+    else
+      $('#tt-browser-panel .next-field').removeClass('paginate_disabled_next').addClass('paginate_enabled_next');
   }
   else {
     features = Object.keys(kit.dataset.feature);
     // TODO: some preprocessing for other kits? Like grouping row?
   }
   
-  $(tt.featureTable).dataTable().fnAddData(kit.featureData(kit.dataset.dataEntry[tt.compoundIdx], features));
+  if (kit.dataset.dataEntry[tt.compoundIdx] != null) {
+    $(tt.featureTable).dataTable().fnAddData(kit.featureData(kit.dataset.dataEntry[tt.compoundIdx], features));
+    $(tt.featureTable).dataTable().fnAdjustColumnSizing();
+    
+  }
 }
 
 function showCompound(index) {
@@ -105,7 +132,7 @@ function showCompound(index) {
     for (var i in tt.featureKits)
       tt.featureKits[i].prevPage();
   }
-  else if (index >= tt.mainKit.pageSize) {
+  else if (index >= tt.mainKit.dataset.dataEntry.length) {
     tt.compoundIdx = 0;
     tt.mainKit.nextPage();
     for (var i in tt.featureKits)
@@ -114,25 +141,11 @@ function showCompound(index) {
   else { // normal showing up
     tt.compoundIdx = index;
     $(tt.featureTable).dataTable().fnClearTable();
-    addFeatures(null);
+    $('#tt-diagram img.toxtree-diagram')[0].src = '';
+    
+    addFeatures.call(tt.mainKit);
     for (var i in tt.featureKits)
-      addFeatures(tt.featureKits[i]);
-  }
-}
-
-function onCompoundsLoaded (result) {
-  addFeatures(this);
-  // TODO: deal with next/prev and counter fields
-  if (!!tt.mainKit.dataset && tt.mainKit == this) {
-    if (tt.compoundIdx == 0 && this.pageStart == 0) // we need to disable prev 
-      $('#tt-controls .prev-field').addClass('paginate_disabled_previous').removeClass('paginate_enabled_previous');
-    else
-      $('#tt-controls .prev-field').removeClass('paginate_disabled_previous').addClass('paginate_enabled_previous');
-      
-    if (this.entriesCount != null && tt.compoundIdx + this.pageStart == this.entriesCount - 1)
-      $('#tt-controls .next-field').addClass('paginate_disabled_next').removeClass('paginate_enabled_next');
-    else
-      $('#tt-controls .next-field').removeClass('paginate_disabled_next').addClass('paginate_enabled_next');
+      addFeatures.call(tt.featureKits[i]);
   }
 }
 
@@ -142,11 +155,11 @@ function onDetailedAlgo(row, data, index) {
 $(document).ready(function(){
   $('#tt-models-panel a.select-all').on('click', function () {
     $('#tt-models-panel input[type="checkbox"]').each(function () { this.checked = true;});
-    onSelectedUpdate(this);
+    onSelectedUpdate.call(this);
   });
   $('#tt-models-panel a.unselect-all').on('click', function () {
     $('#tt-models-panel input[type="checkbox"]').each(function () { this.checked = false;});
-    onSelectedUpdate(this);
+    onSelectedUpdate.call(this);
   });
   
   tt.mainKit = jToxCompound.kits[0];
@@ -161,12 +174,13 @@ $(document).ready(function(){
     "sDom" : "rt<f>",
     "sScrollX": "100%",
     "sScrollY": "100%",
+    "oLanguage": { sEmptyTable: "No features found for this compound..." },
     "aoColumns": jT.ui.processColumns(tt.mainKit, 'compound'),
     "bSort": true,
   });
   
   tt.modelKit = jToxModel.kits[0];
   
-  $('#tt-controls .prev-field').on('click', function () { if ($(this).hasClass('paginate_enabled_previous')) showCompound(tt.compoundIdx - 1); });
-  $('#tt-controls .next-field').on('click', function () { if ($(this).hasClass('paginate_enabled_next')) showCompound(tt.compoundIdx + 1); });
+  $('#tt-browser-panel .prev-field').on('click', function () { if ($(this).hasClass('paginate_enabled_previous')) showCompound(tt.compoundIdx - 1); });
+  $('#tt-browser-panel .next-field').on('click', function () { if ($(this).hasClass('paginate_enabled_next')) showCompound(tt.compoundIdx + 1); });
 });

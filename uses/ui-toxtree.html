@@ -37,12 +37,10 @@
   <div class="jtox-toolkit" data-kit="query" data-cross-domain="true" data-configuration="config_toxtree" data-base-url="http://apps.ideaconsult.net:8080/biodeg">
     <div id="searchbar" class="jtox-toolkit jtox-widget" data-kit="search"></div>
     <div id="tt-browser-panel">
-			<div class="tt-features">
-  			<h5>Available structure attributes</h5>
-  			<div class="jtox-toolkit" data-kit="compound" data-no-interface="yes" data-on-loaded="onCompoundsLoaded"></div>
-			</div>
-			<div id="tt-controls">
-	      <a class="paginate_disabled_previous prev-field" tabindex="0" role="button">Previous</a><span class="counter-field">Compound (?/?)</span><a class="paginate_disabled_next next-field" tabindex="0" role="button">Next</a>
+			<div id="tt-features">
+  			<div class="jtox-inline"><h5 class="counter-field">Available structure attributes </h5></div>
+  			<div class="jtox-inline tt-controls"><a class="paginate_disabled_previous prev-field" tabindex="0" role="button">Previous</a><a class="paginate_disabled_next next-field" tabindex="0" role="button">Next</a></div>
+  			<div class="jtox-toolkit" data-kit="compound" data-no-interface="yes" data-on-loaded="addFeatures"></div>
 			</div>
 			<div id="tt-diagram">
 			  <h5>Structure diagram</h5>

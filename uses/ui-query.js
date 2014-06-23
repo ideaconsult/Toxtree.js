@@ -5,8 +5,8 @@ function onSideLoaded(result) {
 	tEl.innerHTML = jT.ui.updateCounter(tEl.innerHTML, 0, set.length);
 }
 
-function onSelectedUpdate(el) {
-  var par = $(el).parents('.jtox-foldable')[0];
+function onSelectedUpdate(e) {
+  var par = $(this).parents('.jtox-foldable')[0];
 	var tEl = $('.title', par)[0];
 	var v = $('input[type="checkbox"]:checked', par).length;
 	
@@ -84,12 +84,12 @@ $(document).ready(function(){
   $('#sidebar div.side-title').on('click', toggleBar);
   $('#sidebar').on('mouseover', function () { $(this).removeClass('hidden'); }).on('mouseout', function () { $(this).addClass('hidden');});
   
-  $('#sidebar a.select-all').on('click', function () {
+  $('#sidebar a.select-all').on('click', function (e) {
     $('input[type="checkbox"]', this.parentNode).each(function () { this.checked = true;});
-    onSelectedUpdate(this);
+    onSelectedUpdate.call(this, e);
   });
-  $('#sidebar a.unselect-all').on('click', function () {
+  $('#sidebar a.unselect-all').on('click', function (e) {
     $('input[type="checkbox"]', this.parentNode).each(function () { this.checked = false;});
-    onSelectedUpdate(this);
+    onSelectedUpdate.call(this, e);
   });
 });

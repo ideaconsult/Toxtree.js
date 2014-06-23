@@ -845,7 +845,7 @@ var jToxQuery = (function () {
     configuration: {
       // this is the main thing to be configured
       handlers: { 
-        query: function (el, query) { query.query(); },
+        query: function (e, query) { query.query(); },
       }
     }
   };
@@ -894,12 +894,12 @@ var jToxQuery = (function () {
       var fireHandler = function (e) {
         var handler = self.settings.configuration.handlers[jT.$(this).data('handler')];
         if (!!handler)
-          ccLib.fireCallback(handler, this, this, self);
+          ccLib.fireCallback(handler, this, e, self);
         else
           console.log("jToxQuery: referring unknown handler: " + jT.$(this).data('handler'));
       };
       
-      jT.$(document).on('change', '.jtox-handler', fireHandler);
+      jT.$(document).on('change', 'input.jtox-handler', fireHandler);
       jT.$(document).on('click', 'button.jtox-handler', fireHandler);
     },
     
@@ -1364,8 +1364,9 @@ var jToxCompound = (function () {
     },
     
     clearDataset: function () {
-      if (this.usedFeatures !== undefined) {      
-        jT.$(this.rootElement).empty();
+      if (this.usedFeatures !== undefined) {
+        if (!this.settings.noInterface)     
+          jT.$(this.rootElement).empty();
         for (var i = 0, fl = this.usedFeatures.length; i < fl; ++i) {
           var fid = this.usedFeatures[i];
           this.feature[fid].used = false;
@@ -3282,7 +3283,7 @@ jT.templates['widget-search']  =
 "  			    <select name=\"smarts\" title =\"Predefined functional groups\"></select>" +
 "  			  </div>" +
 "  			  <div class=\"jtox-inline\">" +
-"            <input type=\"text\" name=\"searchbox\" class=\"jtox-handler\"/>" +
+"            <input type=\"text\" name=\"searchbox\"/>" +
 "            <button name=\"searchbutton\" class=\"jtox-handler\" title=\"Search/refresh\" data-handler=\"query\"><span class=\"ui-icon ui-icon-search\"/></button>" +
 "            <button name=\"drawbutton\" title=\"Draw the (sub)structure\"><span class=\"ui-icon ui-icon-pencil\"/></button>" +
 "  			  </div>" +

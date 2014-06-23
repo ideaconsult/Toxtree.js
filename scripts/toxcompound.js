@@ -206,8 +206,9 @@ var jToxCompound = (function () {
     },
     
     clearDataset: function () {
-      if (this.usedFeatures !== undefined) {      
-        jT.$(this.rootElement).empty();
+      if (this.usedFeatures !== undefined) {
+        if (!this.settings.noInterface)     
+          jT.$(this.rootElement).empty();
         for (var i = 0, fl = this.usedFeatures.length; i < fl; ++i) {
           var fid = this.usedFeatures[i];
           this.feature[fid].used = false;
