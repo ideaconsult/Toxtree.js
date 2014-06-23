@@ -1872,31 +1872,23 @@ var jToxCompound = (function () {
     
     updateControls: function (qStart, qSize) {
       var self = this;
-
-      // first initialize the counters.
-      qStart = self.pageStart = qStart * self.pageSize;
-      if (qSize < self.pageSize) // we've reached the end!!
-        self.entriesCount = qStart + qSize;
+      var pane = jT.$('.jtox-controls', self.rootElement)[0];
+      ccLib.fillTree(pane, {
+        "pagestart": qStart + 1,
+        "pageend": qStart + qSize,
+      });
       
-      if (self.settings.showControls && !self.settings.noInterface){
-        var pane = jT.$('.jtox-controls', self.rootElement)[0];
-        ccLib.fillTree(pane, {
-          "pagestart": qStart + 1,
-          "pageend": qStart + qSize,
-        });
+      var nextBut = jT.$('.next-field', pane);
+      if (self.entriesCount == null || qStart + qSize < self.entriesCount)
+        jT.$(nextBut).addClass('paginate_enabled_next').removeClass('paginate_disabled_next');
+      else
+        jT.$(nextBut).addClass('paginate_disabled_next').removeClass('paginate_enabled_next');
         
-        var nextBut = jT.$('.next-field', pane);
-        if (self.entriesCount == null || qStart + qSize < self.entriesCount)
-          jT.$(nextBut).addClass('paginate_enabled_next').removeClass('paginate_disabled_next');
-        else
-          jT.$(nextBut).addClass('paginate_disabled_next').removeClass('paginate_enabled_next');
-          
-        var prevBut = jT.$('.prev-field', pane);
-        if (qStart > 0)
-          jT.$(prevBut).addClass('paginate_enabled_previous').removeClass('paginate_disabled_previous');
-        else
-          jT.$(prevBut).addClass('paginate_disabled_previous').removeClass('paginate_enabled_previous');
-      }
+      var prevBut = jT.$('.prev-field', pane);
+      if (qStart > 0)
+        jT.$(prevBut).addClass('paginate_enabled_previous').removeClass('paginate_disabled_previous');
+      else
+        jT.$(prevBut).addClass('paginate_disabled_previous').removeClass('paginate_enabled_previous');
     },
     
     // make the actual query for the (next) portion of data.
@@ -1916,16 +1908,21 @@ var jToxCompound = (function () {
 
       jT.call(self, qUri, function(dataset){
         if (!!dataset){
-          // then, preprocess the dataset
+          // first, arrange the page markers
           self.pageSize = size;
+          qStart = self.pageStart = qStart * size;
+          if (dataset.dataEntry.length < size) // we've reached the end!!
+            self.entriesCount = qStart + dataset.dataEntry.length;
+          
+          // then process the dataset
           self.dataset = cls.processDataset(dataset, self.feature, self.settings.fnAccumulate, self.pageStart);
           if (!self.settings.noInterface) {
             // ok - go and update the table, filtering the entries, if needed            
             self.updateTables();
+            if (self.settings.showControls)
+              // finally - go and update controls if they are visible
+              self.updateControls(qStart, dataset.dataEntry.length);
           }
-  
-          // finally - go and update controls if they are visible
-          self.updateControls(qStart, dataset.dataEntry.length);
 
           // time to call the supplied function, if any.
           ccLib.fireCallback(self.settings.onLoaded, self, dataset, self);
