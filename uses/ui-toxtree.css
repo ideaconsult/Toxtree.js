@@ -40,7 +40,7 @@
   float: none;  
 }
 
-#counter-field {
+#tt-controls .counter-field {
   font-weight: bold;
   vertical-align: bottom;
   margin-left: 20px;

@@ -1,9 +1,6 @@
 TODO:
 
-- wrong type passed on first request in ToxTree
-- scrolling on feature table - both X and Y
 - sizing of feature table - so that diagram is at the bottom
-- diagram showing.
 
 - jToxModel.getModel(algorithmUri, callback) routine (including polling task).
 - glue jToxCompound with jToxSearch, jToxQuery,

@@ -49,7 +49,7 @@ var tt = {
   modelKit: null,
   compoundIdx: 0,
   compoundSet: {},
-  featureKits: [],
+  featureKits: {},
   coreFeatures: [
     "http://www.opentox.org/api/1.1#CASRN", 
     "http://www.opentox.org/api/1.1#EINECS",
@@ -81,6 +81,14 @@ function addFeatures(kit) {
   if (!kit || kit == tt.mainKit) {
     kit = tt.mainKit;
     features = tt.coreFeatures;
+    $('#tt-diagram img.toxtree-diagram')[0].src = kit.dataset.dataEntry[tt.compoundIdx].compound.diagramUri;
+
+    var total = kit.entriesCount;
+    if (total == null)
+      total = kit.pageStart + kit.pageSize + '+';
+    
+    var counter = $('#tt-controls .counter-field')[0];
+    counter.innerHTML = kit.dataset.dataEntry[tt.compoundIdx].compound.name + ' (' + (tt.compoundIdx + kit.pageStart + 1) + '/' + total + ')';
   }
   else {
     features = Object.keys(kit.dataset.feature);
@@ -115,9 +123,16 @@ function showCompound(index) {
 function onCompoundsLoaded (result) {
   addFeatures(this);
   // TODO: deal with next/prev and counter fields
-  if (!!tt.mainKit.dataset) {
-    
-    
+  if (!!tt.mainKit.dataset && tt.mainKit == this) {
+    if (tt.compoundIdx == 0 && this.pageStart == 0) // we need to disable prev 
+      $('#tt-controls .prev-field').addClass('paginate_disabled_previous').removeClass('paginate_enabled_previous');
+    else
+      $('#tt-controls .prev-field').removeClass('paginate_disabled_previous').addClass('paginate_enabled_previous');
+      
+    if (this.entriesCount != null && tt.compoundIdx + this.pageStart == this.entriesCount - 1)
+      $('#tt-controls .next-field').addClass('paginate_disabled_next').removeClass('paginate_enabled_next');
+    else
+      $('#tt-controls .next-field').removeClass('paginate_disabled_next').addClass('paginate_enabled_next');
   }
 }
 
@@ -152,6 +167,6 @@ $(document).ready(function(){
   
   tt.modelKit = jToxModel.kits[0];
   
-  $('#tt-controls .prev-field').on('click', function () { showCompound(tt.compoundIdx - 1); });
-  $('#tt-controls .next-field').on('click', function () { showCompound(tt.compoundIdx + 1); });
+  $('#tt-controls .prev-field').on('click', function () { if ($(this).hasClass('paginate_enabled_previous')) showCompound(tt.compoundIdx - 1); });
+  $('#tt-controls .next-field').on('click', function () { if ($(this).hasClass('paginate_enabled_next')) showCompound(tt.compoundIdx + 1); });
 });
