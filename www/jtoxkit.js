@@ -2582,7 +2582,7 @@ var jToxComposition = (function () {
     showBanner: true,         // whether to show a banner of composition info before each compounds-table
     showDiagrams: false,      // whether to show diagram for each compound in the composition
     sDom: "rt<Ffp>",          // compounds (ingredients) table sDom
-    oLanguage: {},
+    oLanguage: null,
     onLoaded: null,
     
     /* compositionUri */
@@ -2667,7 +2667,7 @@ var jToxComposition = (function () {
 				"bAutoWidth": false,
         "bServerSide": false,
         "sDom" : self.settings.sDom,
-        "oLanguage": self.settings.oLanguage,
+        "oLanguage": jT.$.extend(true, {}, self.settings.oLanguage),
         "aoColumns": cols,
       });
       

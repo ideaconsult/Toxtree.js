@@ -23,10 +23,10 @@ function onDetailedRow(row, data, index) {
   $(el).addClass('paddingless');
   var div = document.createElement('div');
   el.appendChild(div);
-  var ds = new jToxSubstance(div, {crossDomain: true, substanceUri: uri, showControls: false, onDetails: function (root, data, event) {
+  var ds = new jToxSubstance(div, $.extend(true, {}, this.settings, {crossDomain: true, substanceUri: uri, showControls: false, onDetails: function (root, data, event) {
     var comp = new jToxStudy(root, this.settings);
     comp.querySubstance(data);
-  } } );
+  } } ) );
 }
 
 function createGroups(miniset, kit) {
