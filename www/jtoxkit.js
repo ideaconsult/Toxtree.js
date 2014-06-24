@@ -710,6 +710,8 @@ window.jT.ui = {
   updateCounter: function (str, count, total) {
     var re = null;
     var add = '';
+    if (count == null)
+      count = 0;
     if (total == null) {
       re = /([^(]*)\(([\d\?]+)\)/;
       add = '' + count;
@@ -2816,10 +2818,7 @@ var jToxStudy = (function () {
             if (!!study) {
               jT.$(table).removeClass('unloaded folded');
               jT.$(table).addClass('loaded');
-/*
-              if (study.study[0].protocol.category.code == issue_study.study[0].protocol.category.code)
-                study = issue_study;
-*/
+
               self.processStudies(panel, study.study, false);
               ccLib.fireCallback(self.settings.onStudy, self, study.study);
             }
@@ -2877,7 +2876,7 @@ var jToxStudy = (function () {
 	      var defaultColumns = [
 	        { "sTitle": "Name", "sClass": "center middle", "sWidth": "20%", "mData": "protocol.endpoint" }, // The name (endpoint)
 	        { "sTitle": "Endpoint", "sClass": "center middle jtox-multi", "sWidth": "15%", "mData": "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, "endpoint");  } },   // Effects columns
-	        { "sTitle": "Result", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, function (data, type) { return formatLoHigh(data.result, type) }); } },
+	        { "sTitle": "Result", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, function (data, type) { return formatValue(data.result, type) }); } },
 	        { "sTitle": "Text", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, function (data, type) { return !!data.result.textValue  ? data.result.textValue : '-'; }); } },
 	        { "sTitle": "Guideline", "sClass": "center middle", "sWidth": "15%", "mData": "protocol.guideline", "mRender" : "[,]", "sDefaultContent": "-"  },    // Protocol columns
 	        { "sTitle": "Owner", "sClass": "center middle shortened", "sWidth": "15%", "mData": "citation.owner", "sDefaultContent": "-" },
@@ -2919,9 +2918,14 @@ var jToxStudy = (function () {
         };
         
         // some value formatting functions
-        var formatLoHigh = function (data, type) {
+        var formatValue = function (data, unit, type) {
           var out = "";
-          if (!ccLib.isNull(data)) {
+          if (typeof data == 'string') {
+            out += ccLib.trim(data).replace(/ /g, "&nbsp;");
+            if (!!unit)
+              out += '&nbsp;<span class="units">' + unit.replace(/ /g, "&nbsp;") + '</span>';
+          }
+          else if (typeof data == 'object' && data != null) {
             data.loValue = ccLib.trim(data.loValue);
             data.upValue = ccLib.trim(data.upValue);
             if (!ccLib.isEmpty(data.loValue) && !ccLib.isEmpty(data.upValue)) {
@@ -2943,19 +2947,16 @@ var jToxStudy = (function () {
                 out += '-';
             }
             
+            out = out.replace(/ /g, "&nbsp;");
             data.unit = ccLib.trim(data.unit);
             if (!ccLib.isNull(data.unit))
-              out += ' <span class="units">' + data.unit + '</span>';
+              out += '&nbsp;<span class="units">' + data.unit.replace(/ /g, "&nbsp;") + '</span>';
           }
-          return out.replace(/ /g, "&nbsp;").replace("span&nbsp;", "span ");
+          else
+            out += '-';
+          return out;
         };
         
-        var formatUnits = function(data, unit) {
-          data = ccLib.trim(data);
-          unit = ccLib.trim(unit);
-          return !ccLib.isNull(data) ? (data + (!!unit ? '&nbsp;<span class="units">' + unit + '</span>': "")) : "-";
-        };
-
         putDefaults(0, 1, "main");
         
         // use it to put parameters...
@@ -2974,10 +2975,7 @@ var jToxStudy = (function () {
           if (col == null)
             return null;
           
-          col["mRender"] = (!ccLib.isNull(study.parameters[p]) && study.parameters[p].loValue !== undefined) ?
-            function (data, type, full) { return formatLoHigh(data, type); } :
-            function (data, type, full) { return formatUnits(data, full[p + " unit"]); };
-          
+          col["mRender"] = function (data, type, full) { return formatValue(data, full[p + " unit"], type); };
           return col;
         });
         // .. and conditions
@@ -2992,11 +2990,11 @@ var jToxStudy = (function () {
           if (col == null)
             return null;
           
-          var rnFn = (!ccLib.isNull(study.effects[0].conditions[c]) && study.effects[0].conditions[c].loValue !== undefined) ? 
-            function(data, type) { return formatLoHigh(data.conditions[c], type); } :
-            function(data, type) { return formatUnits(data.conditions[c],  data.conditions[c + " unit"]); };
-            
-          col["mRender"] = function(data, type, full) { return self.renderMulti(data, type, full, rnFn); };
+          col["mRender"] = function(data, type, full) {
+            return self.renderMulti(data, type, full, function(data, type) { 
+              return formatValue(data.conditions[c], data.conditions[c + " unit"], type); 
+            }); 
+          };
           return col;
         });
         

@@ -410,6 +410,8 @@ window.jT.ui = {
   updateCounter: function (str, count, total) {
     var re = null;
     var add = '';
+    if (count == null)
+      count = 0;
     if (total == null) {
       re = /([^(]*)\(([\d\?]+)\)/;
       add = '' + count;

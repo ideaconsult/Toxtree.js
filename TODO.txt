@@ -1,5 +1,7 @@
 TODO:
 
+- make compositions default details in jToxSubstance
+
 - sizing of feature table - so that diagram is at the bottom
 
 - jToxModel.getModel(algorithmUri, callback) routine (including polling task).
