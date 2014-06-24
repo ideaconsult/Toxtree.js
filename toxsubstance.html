@@ -25,14 +25,12 @@
   <script src="tests/jquery.dataTables.js"></script>
 
   <script src="scripts/common.js"></script>
-  <script src="scripts/jtoxkit.js"></script>
-  <script src="scripts/toxcompound.js"></script>
-  <script src="scripts/toxcomposition.js"></script>
+  <script src="www/jtoxkit.js"></script>
   <script src="scripts/toxsubstance.js"></script>
   
   <script language="javascript">
     $(document).ready(function(){
-      var ds = new jToxSubstance($(".jtox-toolkit")[0], {crossDomain: true, selectionHandler: "query" } );
+      var ds = new jToxSubstance($(".jtox-toolkit")[0], {crossDomain: true, selectionHandler: "query", embedComposition: true, showDiagrams: true } );
       ds.querySubstance('http://apps.ideaconsult.net:8080/toxbank/substance');
     });
   </script>

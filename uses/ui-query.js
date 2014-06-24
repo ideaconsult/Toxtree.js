@@ -24,7 +24,7 @@ function onDetailedRow(row, data, index) {
   var div = document.createElement('div');
   el.appendChild(div);
   var ds = new jToxSubstance(div, {crossDomain: true, substanceUri: uri, showControls: false, onDetails: function (root, data, event) {
-    var comp = new jToxStudy(root);
+    var comp = new jToxStudy(root, this.settings);
     comp.querySubstance(data);
   } } );
 }

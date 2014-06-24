@@ -6,10 +6,11 @@
 
 var jToxSubstance = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
-    showControls: true,
-    selectionHandler: null,
-    onDetails: null,
-    onLoaded: null,
+    showControls: true,       // show navigation controls or not
+    selectionHandler: null,   // if given - this will be the name of the handler, which will be invoked by jToxQuery when the attached selection box has changed...
+    embedComposition: false,  // embed composition listing as details for each substance - it valid only if onDetails is not given.
+    onDetails: null,          // called when a details row is about to be openned. If null - no details handler is attached at all.
+    onLoaded: null,           // called when the set of substances (for this page) is loaded.
   
     pageStart: 0,
     pageSize: 10,
@@ -47,6 +48,13 @@ var jToxSubstance = (function () {
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even when manually initialized
     
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
+    
+    if (self.settings.embedComposition && self.settings.onDetails == null) {
+      self.settings.onDetails = function (root, data, event) {
+        var comp = new jToxComposition(root, self.settings);
+        comp.queryComposition(data + '/composition');
+      };
+    }
     
     self.pageStart = self.settings.pageStart;
     self.pageSize = self.settings.pageSize;
