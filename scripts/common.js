@@ -166,6 +166,22 @@ var ccLib = {
     }
   },
   
+  populateData: function (root, template, data) {
+    if (data == null || typeof data != 'object')
+      return;
+      
+    var temp = $(template)[0];
+    var oldDisp = root.style.display;
+    root.style.display = 'none';
+    for (var i = 0, dl = data.length; i < dl; ++i) {
+      var el = temp.cloneNode(true);
+      root.appendChild(el);
+      this.fillTree(el, data[i]);
+    }
+    
+    root.style.display = oldDisp;
+  },
+  
   // Prepare a form so that non-empty fields are checked before submit and accumuater fields
   // are accumulated. Call it after you've set submit behavior, etc.
   prepareForm: function (form) {

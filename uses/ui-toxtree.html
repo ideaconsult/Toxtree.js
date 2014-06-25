@@ -40,19 +40,38 @@
 			<div id="tt-features">
   			<div class="jtox-inline"><h5 class="counter-field">Available structure attributes </h5></div>
   			<div class="jtox-inline tt-controls"><a class="paginate_disabled_previous prev-field" tabindex="0" role="button">Previous</a><a class="paginate_disabled_next next-field" tabindex="0" role="button">Next</a></div>
-  			<div class="jtox-toolkit" data-kit="compound" data-no-interface="yes" data-on-loaded="addFeatures"></div>
+  			<div class="jtox-toolkit jtox-panel" data-kit="compound" data-no-interface="true" data-on-loaded="addFeatures"></div>
 			</div>
-			<div id="tt-diagram">
+			<div id="tt-diagram" class="jtox-panel">
 			  <h5>Structure diagram</h5>
         <img class="toxtree-diagram" alt="Compoung diagram"/>
       </div>
     </div>
     <div id="tt-models-panel">
       <div>
-        <div class="title jtox-inline"><h5>Algorithms (0/0)</h5></div>
+        <div class="title jtox-inline"><h5>Toxicity prediction modules (0/0)</h5></div>
         <div class="jtox-inline selections"><a href="#" class="select-all">select all</a>&nbsp;<a href="#" class="unselect-all">unselect all</a></div>
       </div>
-      <div id="modelKit" class="jtox-toolkit jtox-widget" data-kit="model" data-algorithms="true" data-s-dom="rt<f>" data-selection-handler="checked" data-on-loaded="onAlgoLoaded" data-on-detaild="onDetailedAlgo" data-algorithm-needle="ToxTree"></div>
+      <div class="jtox-toolkit jtox-widget" data-kit="model" data-algorithms="true" data-no-interface="true" data-on-loaded="onAlgoLoaded" data-algorithm-needle="ToxTree"></div>
+    </div>
+  </div>
+  <div class="jtox-template">
+    <div id="tt-feature" class="tt-feature">
+      <div class="data-field tt-name" data-field="title"></div>
+      <div class="data-field tt-value" data-field="value"></div>
+    </div>
+    <div id="tt-algorithm" class="tt-algorithm jtox-foldable folded">
+      <div class="title" >
+        <a target="_blank" class="data-field attribute" data-field="uri" data-attribute="href"><span class="ui-icon ui-icon-link jtox-inline"></span></a>
+        <span class="data-field" data-field="name">?</span>
+        <div class="jtox-inline float-right">
+          <input type="checkbox"/>Auto
+          <!-- auto checkbox & rub button -->
+        </div>
+      </div>
+      <div class="content">
+        <table class="jtox-study-table content"></table>
+      </div>
     </div>
   </div>
 </body>

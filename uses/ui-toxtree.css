@@ -1,3 +1,7 @@
+div.tt-algorithm div.jtox-inline.float-right {
+  margin-right: 20px;
+}
+
 #tt-browser-panel {
   width: 40%;
   min-width: 250px;
@@ -23,10 +27,10 @@
 
 #tt-diagram img {
   min-height: 250px;
-  width: 250px;
-  border: 1px dashed gray;
-  border-radius: 5px;
-  padding: 3px;
+  min-width: 250px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 5px;
 }
 
 #tt-browser-panel .tt-controls {
@@ -43,10 +47,17 @@
   vertical-align: top;
 }
 
-div.dataTables_filter label {
-  font-size: 80%;
+.tt-name {
+  display: inline-block;
+  width: 40%;
+  box-sizing: border-box;
+  padding: 2px;
 }
 
-div.dataTables_filter input {
-  margin-bottom: 0px;
+.tt-value {
+  padding: 2px 0px 2px 0px;
+  border-left: 1px solid #999;
+  word-break: none;
+  word-wrap: none;
+  display: inline-block;
 }

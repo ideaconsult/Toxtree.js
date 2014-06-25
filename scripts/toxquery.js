@@ -134,7 +134,7 @@ var jToxSearch = (function () {
       var hideArr = self.settings.hideOptions.split(',');
       for (var i = 0; i < hideArr.length; ++i) {
         jT.$('#search' + hideArr[i], self.rootElement).remove();
-        jT.$('label[for=search' + hideArr[i] + ']', self.rootElement).remove();
+        jT.$('label[for="search' + hideArr[i] + '"]', self.rootElement).remove();
       }
     }
 

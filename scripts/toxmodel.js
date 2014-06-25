@@ -149,7 +149,7 @@ var jToxModel = (function () {
         jT.$(self.table).dataTable().fnClearTable();
       jT.call(self, uri, function (result) {
         if (!!result) {
-          self.algorithms = result.algorithm;
+          self.algorithm = result.algorithm;
           if (!self.settings.noInterface)
             jT.$(self.table).dataTable().fnAddData(result.algorithm);
           ccLib.fireCallback(self.settings.onLoaded, self, result);

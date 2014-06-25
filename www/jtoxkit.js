@@ -166,6 +166,22 @@ var ccLib = {
     }
   },
   
+  populateData: function (root, template, data) {
+    if (data == null || typeof data != 'object')
+      return;
+      
+    var temp = $(template)[0];
+    var oldDisp = root.style.display;
+    root.style.display = 'none';
+    for (var i = 0, dl = data.length; i < dl; ++i) {
+      var el = temp.cloneNode(true);
+      root.appendChild(el);
+      this.fillTree(el, data[i]);
+    }
+    
+    root.style.display = oldDisp;
+  },
+  
   // Prepare a form so that non-empty fields are checked before submit and accumuater fields
   // are accumulated. Call it after you've set submit behavior, etc.
   prepareForm: function (form) {
@@ -706,6 +722,25 @@ window.jT.ui = {
     return colDefs;
   },
   
+  columnData: function (cols, data, type) {
+    var out = new Array(data.length);
+    if (type == null)
+      type = 'display';
+    for (var i = 0, dl = data.length; i < dl; ++i) {
+      var entry = {};
+      var d = data[i];
+      for (var c = 0, cl = cols.length; c < cl; ++c) {
+        var col = cols[c];
+        var val = ccLib.getJsonValue(d, col.mData) || col.sDefaultValue;
+        entry[col.sTitle] = typeof col.mRender != 'function' ? val : col.mRender(val, type, d);
+      }
+      
+      out[i] = entry;
+    }
+    
+    return out;
+  },
+  
   queryInfo: function (aoData) {
     var info = {};
     for (var i = 0, dl = aoData.length; i < dl; ++i)
@@ -997,7 +1032,7 @@ var jToxSearch = (function () {
       var hideArr = self.settings.hideOptions.split(',');
       for (var i = 0; i < hideArr.length; ++i) {
         jT.$('#search' + hideArr[i], self.rootElement).remove();
-        jT.$('label[for=search' + hideArr[i] + ']', self.rootElement).remove();
+        jT.$('label[for="search' + hideArr[i] + '"]', self.rootElement).remove();
       }
     }
 
@@ -2430,7 +2465,7 @@ var jToxModel = (function () {
         jT.$(self.table).dataTable().fnClearTable();
       jT.call(self, uri, function (result) {
         if (!!result) {
-          self.algorithms = result.algorithm;
+          self.algorithm = result.algorithm;
           if (!self.settings.noInterface)
             jT.$(self.table).dataTable().fnAddData(result.algorithm);
           ccLib.fireCallback(self.settings.onLoaded, self, result);
