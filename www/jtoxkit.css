@@ -1,5 +1,6 @@
 /* jtoxkit.css - Styling for all jToxKit parts
 */
+.jtox-panel,
 .jtox-foldable {
 	background: #eee; /* Old browsers */
 	background: -moz-linear-gradient(top, rgba(255,255,255,.5) 0%, rgba(200,200,200,.5) 100%); /* FF3.6+ */
@@ -13,7 +14,9 @@
   border-left: 1px solid #ccc; 
   -moz-border-radius: 7px;
   -webkit-border-radius: 7px;
-  border-radius: 7px; 
+  border-radius: 7px;
+  padding-top: 7px;
+  padding-bottom: 3px;
 }
 
 .jtox-foldable:hover {

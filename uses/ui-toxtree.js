@@ -42,18 +42,15 @@ var config_toxtree = {
   	}
 	},
 	"handlers": {
-  	"checked": onSelectedUpdate,
   	"query": onQuery,
 	}
 };
 
 var tt = {
-  mainKit: null,
-  featureTable: null,
+  browserKit: null,
   modelKit: null,
+  featuresList: null,
   compoundIdx: 0,
-  compoundSet: {},
-  featureKits: {},
   coreFeatures: [
     "http://www.opentox.org/api/1.1#CASRN", 
     "http://www.opentox.org/api/1.1#EINECS",
@@ -69,32 +66,62 @@ var tt = {
 };
 
 function onQuery(e, query) {
-  $(tt.featureTable).dataTable().fnClearTable();
+  $(tt.featuresList).empty();
   $('#tt-diagram img.toxtree-diagram')[0].src = '';
   query.query();  
 }
 
-function onAlgoLoaded(result) {
+function onSelectedUpdate(e) {
 	var tEl = $('#tt-models-panel .title')[0];
-	$(tEl).data('total', result.algorithm.length);
-	tEl.innerHTML = jT.ui.updateCounter(tEl.innerHTML, 0, result.algorithm.length);
+	var v = $('input[type="checkbox"]:checked', tt.modelKit.rootElement).length;
+	tEl.innerHTML = jT.ui.updateCounter(tEl.innerHTML, v, tt.modelKit.algorithm.length);;
 }
 
-function onSelectedUpdate(e) {
-  var par = $('#tt-models-panel')[0];
-	var tEl = $('.title', par)[0];
-	var v = $('input[type="checkbox"]:checked', par).length;
-	tEl.innerHTML = jT.ui.updateCounter(tEl.innerHTML, v, $(tEl).data('total'));;
+function runPrediction(el, compoundUri, algorithmUri) {
+  // TODO it here!
+  console.log("Run prediction for compoundUri: " + compoundUri + ", algorithmUri: " + algorithmUri);  
+}
+
+function onAlgoLoaded(result) {
+  ccLib.populateData(tt.modelKit.rootElement, '#tt-algorithm', result.algorithm);
+  $('input[type="checkbox"]', tt.modelKit.rootElement).on('click', function (e) {
+    onSelectedUpdate(e);
+    e.stopPropagation();
+  });
+  $('input[type="button"]', tt.modelKit.rootElement).on('click', function (e) {
+    if (!$(this).hasClass('loaded')) {
+      var ael = $('a', $(this).parents('.title')[0])[0];
+      runPrediction(this, tt.browserKit.dataset.dataEntry[tt.compoundIdx].compound.URI, ael.href);
+      e.stopPropagation();
+    }
+  });
+
+  onSelectedUpdate(null);
+}
+
+function resizeFeatures(e) {
+  var timer = null;
+  if (timer != null)
+    clearTimeout(timer);
+  var timer = setTimeout(function () {
+    var bropane = $('#tt-browser-panel')[0];
+    bropane.style.height = bropane.parentNode.offsetHeight + 'px';
+    var bottom = $('#tt-diagram')[0].offsetTop;
+    var top = tt.featuresList.offsetTop;
+    tt.featuresList.style.height = (bottom - top) + 'px';
+  }, 100);
 }
 
 function addFeatures() {
   var features = null;
   var kit = this;
-  if (kit == tt.mainKit) { // Lot more things to be done here...
-    kit = tt.mainKit;
+  if (kit == tt.browserKit) { // Lot more things to be done here...
+    kit = tt.browserKit;
     features = tt.coreFeatures;
-    if (kit.dataset.dataEntry[tt.compoundIdx] != null)
+    if (kit.dataset.dataEntry[tt.compoundIdx] != null) {
       $('#tt-diagram img.toxtree-diagram')[0].src = kit.dataset.dataEntry[tt.compoundIdx].compound.diagramUri;
+      resizeFeatures();
+    }
 
     var counter = $('#tt-browser-panel .counter-field')[0];
     counter.innerHTML = jT.ui.updateCounter(
@@ -119,37 +146,28 @@ function addFeatures() {
   }
   
   if (kit.dataset.dataEntry[tt.compoundIdx] != null) {
-    $(tt.featureTable).dataTable().fnAddData(kit.featureData(kit.dataset.dataEntry[tt.compoundIdx], features));
-    $(tt.featureTable).dataTable().fnAdjustColumnSizing();
-    
+    var data = kit.featureData(kit.dataset.dataEntry[tt.compoundIdx], features);
+    ccLib.populateData(tt.featuresList, '#tt-feature', data);
   }
 }
 
 function showCompound(index) {
-  if (index < 0 && tt.mainKit.pageStart > 0) { // we might need a reload...
-    tt.compoundIdx = tt.mainKit.pageSize - 1;
-    tt.mainKit.prevPage();
-    for (var i in tt.featureKits)
-      tt.featureKits[i].prevPage();
+  if (index < 0 && tt.browserKit.pageStart > 0) { // we might need a reload...
+    tt.compoundIdx = tt.browserKit.pageSize - 1;
+    tt.browserKit.prevPage();
   }
-  else if (index >= tt.mainKit.dataset.dataEntry.length) {
+  else if (index >= tt.browserKit.dataset.dataEntry.length) {
     tt.compoundIdx = 0;
-    tt.mainKit.nextPage();
-    for (var i in tt.featureKits)
-      tt.featureKits[i].nextPage();
+    tt.browserKit.nextPage();
   }
   else { // normal showing up
     tt.compoundIdx = index;
-    $(tt.featureTable).dataTable().fnClearTable();
+    $(tt.featuresList).empty();
     $('#tt-diagram img.toxtree-diagram')[0].src = '';
+    resizeFeatures();
     
-    addFeatures.call(tt.mainKit);
-    for (var i in tt.featureKits)
-      addFeatures.call(tt.featureKits[i]);
+    addFeatures.call(tt.browserKit);
   }
-}
-
-function onDetailedAlgo(row, data, index) {
 }
 
 $(document).ready(function(){
@@ -162,25 +180,14 @@ $(document).ready(function(){
     onSelectedUpdate.call(this);
   });
   
-  tt.mainKit = jToxCompound.kits[0];
-  tt.featureTable = document.createElement('table');
-  tt.mainKit.rootElement.appendChild(tt.featureTable);
-  
-  jT.$(tt.featureTable).dataTable({
-    "bPaginate": true,
-    "bProcessing": true,
-    "bLengthChange": false,
-		"bAutoWidth": true,
-    "sDom" : "rt<f>",
-    "sScrollX": "100%",
-    "sScrollY": "100%",
-    "oLanguage": { sEmptyTable: "No features found for this compound..." },
-    "aoColumns": jT.ui.processColumns(tt.mainKit, 'compound'),
-    "bSort": true,
-  });
-  
+  tt.browserKit = jToxCompound.kits[0];
   tt.modelKit = jToxModel.kits[0];
+  tt.featuresList = $('#tt-features .list')[0];
   
   $('#tt-browser-panel .prev-field').on('click', function () { if ($(this).hasClass('paginate_enabled_previous')) showCompound(tt.compoundIdx - 1); });
   $('#tt-browser-panel .next-field').on('click', function () { if ($(this).hasClass('paginate_enabled_next')) showCompound(tt.compoundIdx + 1); });
+  $('#tt-diagram .title').on('click', resizeFeatures);
+  
+  $(window).on('resize', resizeFeatures);
+  resizeFeatures(null);
 });

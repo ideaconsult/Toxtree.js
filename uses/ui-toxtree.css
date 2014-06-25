@@ -1,11 +1,8 @@
-#tt-browser-panel {
-  width: 40%;
-  min-width: 250px;
-  display: inline-block;
-  margin: 0px;
-  margin-left: 5px;
-  vertical-align: top;
-  overflow: hidden;
+div.tt-bigpane {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin-left: 5px;  
 }
 
 #tt-models-panel {
@@ -15,18 +12,42 @@
   vertical-align: top;
 }
 
-#tt-diagram {
+#tt-models-panel .selections {
+  float: right;
+  vertical-align: top;
+}
+
+div.tt-algorithm div.jtox-inline.float-right {
+  margin-right: 20px;
+}
+
+#tt-browser-panel {
   position: relative;
+  width: 40%;
+  min-width: 250px;
+  display: inline-block;
+  margin: 0px;
+  vertical-align: top;
+  overflow: hidden;
+}
+
+#tt-diagram {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
   text-align: center;
   overflow: hidden;
+  width: 100%;
+  height: auto;
+  box-sizing: border-box;
 }
 
 #tt-diagram img {
   min-height: 250px;
-  width: 250px;
-  border: 1px dashed gray;
-  border-radius: 5px;
-  padding: 3px;
+  min-width: 250px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 5px;
 }
 
 #tt-browser-panel .tt-controls {
@@ -34,19 +55,31 @@
   float: right;
 }
 
-#tt-browser-panel .jtox-toolkit {
+#tt-features .list {
   overflow: scroll;
+  box-sizing: border-box;
 }
 
-.selections {
-  float: right;
-  vertical-align: top;
+#tt-features .tt-feature {
+  width: 100%;
+  white-space: nowrap;
 }
 
-div.dataTables_filter label {
-  font-size: 80%;
+.tt-name {
+  display: inline-block;
+  width: 40%;
+  box-sizing: border-box;
+  padding: 2px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: auto;
 }
 
-div.dataTables_filter input {
-  margin-bottom: 0px;
+.tt-value {
+  padding: 2px 0px 2px 5px;
+  border-left: 1px solid #999;
+  white-space: nowrap;
+  display: inline-block;
+  overflow: visible;
+  position: relative;
 }

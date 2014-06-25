@@ -381,6 +381,25 @@ window.jT.ui = {
     return colDefs;
   },
   
+  columnData: function (cols, data, type) {
+    var out = new Array(data.length);
+    if (type == null)
+      type = 'display';
+    for (var i = 0, dl = data.length; i < dl; ++i) {
+      var entry = {};
+      var d = data[i];
+      for (var c = 0, cl = cols.length; c < cl; ++c) {
+        var col = cols[c];
+        var val = ccLib.getJsonValue(d, col.mData) || col.sDefaultValue;
+        entry[col.sTitle] = typeof col.mRender != 'function' ? val : col.mRender(val, type, d);
+      }
+      
+      out[i] = entry;
+    }
+    
+    return out;
+  },
+  
   queryInfo: function (aoData) {
     var info = {};
     for (var i = 0, dl = aoData.length; i < dl; ++i)
