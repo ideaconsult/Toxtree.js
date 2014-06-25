@@ -9,6 +9,7 @@ var jToxComposition = (function () {
     selectionHandler: null,   // selection handler, if needed for selection checkbox, which will be inserted if this is non-null
     showBanner: true,         // whether to show a banner of composition info before each compounds-table
     showDiagrams: false,      // whether to show diagram for each compound in the composition
+    noInterface: false,       // run in interface-less mode - just data retrieval and callback calling.
     sDom: "rt<Ffp>",          // compounds (ingredients) table sDom
     oLanguage: null,
     onLoaded: null,
@@ -140,16 +141,18 @@ var jToxComposition = (function () {
           }
           
           // now make the actual filling
-          for (var i in substances) {
-            var panel = jT.getTemplate('#jtox-composition');
-            self.rootElement.appendChild(panel);
-            
-            if (self.settings.showBanner)
-              ccLib.fillTree(jT.$('.composition-info', panel)[0], substances[i]);
-            else // we need to remove it
-              jT.$('.composition-info', panel).remove();
-            // we need to prepare tables, abyways.
-            self.prepareTable(substances[i].composition, panel);
+          if (!self.settings.noInterface) {
+            for (var i in substances) {
+              var panel = jT.getTemplate('#jtox-composition');
+              self.rootElement.appendChild(panel);
+              
+              if (self.settings.showBanner)
+                ccLib.fillTree(jT.$('.composition-info', panel)[0], substances[i]);
+              else // we need to remove it
+                jT.$('.composition-info', panel).remove();
+              // we need to prepare tables, abyways.
+              self.prepareTable(substances[i].composition, panel);
+            }
           }
           
           ccLib.fireCallback(self.settings.onLoaded, self, json.composition);

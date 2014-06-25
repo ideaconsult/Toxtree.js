@@ -350,6 +350,13 @@ window.jT = window.jToxKit = {
   	onSuccess: function(s, c, m) { },	// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
   	onError: function (s, c, m) { if (!!console && !!console.log) console.log("jToxKit call error (" + c + "): " + m + " from request: [" + s + "]"); },		// function (code, mess): called on server reques error. Part of settings.
   },
+  
+  // these are used in setting inheritance, so that non-inheritable settings are blanked...
+  blankSettings: {
+    onDetails: null,
+    noInterface: false,
+    selectionHandler: null
+  },
 	
 	// form the "default" baseUrl if no other is supplied
 	formBaseUrl: function(url) {
@@ -373,7 +380,7 @@ window.jT = window.jToxKit = {
       	}
     	});
     	
-      dataParams = self.$.extend(true, topSettings, dataParams);
+      dataParams = self.$.extend(true, topSettings, self.blankSettings, dataParams);
 
   	  // the real initialization function
       var realInit = function (params) {
@@ -2135,13 +2142,14 @@ var jToxCompound = (function () {
 
 var jToxDataset = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
-    shortStars: false,
-    maxStars: 10,
-    selectionHandler: null,
-    sDom: "<Fif>rt",
-    oLanguage: null,
-    onLoaded: null,
-    loadOnInit: false,
+    shortStars: false,        // whether to show a star and number (short star) or maxStars with actual number highlighted.
+    maxStars: 10,             // the maximal number of stars when in longStars mode
+    selectionHandler: null,   // selection handler to be attached on checkbox, for jToxQuery integration
+    noInterface: false,       // run in interface-less mode, with data retrieval and callback calling only
+    sDom: "<Fif>rt",          // passed with dataTable settings upon creation
+    oLanguage: null,          // passed with dataTable settings upon creation
+    onLoaded: null,           // callback called when the is available
+    loadOnInit: false,        // whether to make an (empty) call when initialized. 
     /* datasetUri */
     configuration: { 
       columns : {
@@ -2170,7 +2178,8 @@ var jToxDataset = (function () {
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
     
     self.rootElement.appendChild(jT.getTemplate('#jtox-dataset'));
-    self.init();
+    if (!self.settings.noInterface)
+      self.init();
         
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
     if (self.settings.datasetUri != undefined || self.settings.loadOnInit)
@@ -2219,10 +2228,13 @@ var jToxDataset = (function () {
       else if (!self.settings.baseUrl)
         self.settings.baseUrl = jT.grabBaseUrl(uri);
       
-      jT.$(self.table).dataTable().fnClearTable();
+      if (!self.settings.noInterface)
+        jT.$(self.table).dataTable().fnClearTable();
       jT.call(self, uri, function (result) {
+        self.dataset = result.dataset;
         if (!!result) {
-          jT.$(self.table).dataTable().fnAddData(result.dataset);
+          if (!self.settings.noInterface)
+            jT.$(self.table).dataTable().fnAddData(result.dataset);
           ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
       });
@@ -2252,14 +2264,16 @@ var jToxDataset = (function () {
 
 var jToxModel = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
-    selectionHandler: null,
-    maxStars: 10,
-    algorithmLink: true,
-    algorithms: false,
-    onLoaded: null,
-    sDom: "<Fif>rt",
-    oLanguage: null,
-    loadOnInit: false,
+    shortStars: false,        // whether to show a star and a number (short version) or all maxStars with actual number of them highlighed
+    maxStars: 10,             // a total possible number of stars - see above description
+    noInterface: false,       // run in interface-less mode - only data retrieval and callback calling.
+    selectionHandler: null,   // jToxQuery handler to be attached on each entry's checkbox
+    algorithmLink: true,      // when showing algorithms, whether to make it's id a link to an (external) full info page
+    algorithms: false,        // ask for algorithms, not models
+    onLoaded: null,           // callback to be called when data has arrived.
+    sDom: "<Fif>rt",          // merged to dataTable's settings, when created
+    oLanguage: null,          // merged to dataTable's settings, when created
+    loadOnInit: false,        // whether to make a (blank) request upon loading
     /* algorithmNeedle */
     /* modelUri */
     configuration: { 
@@ -2302,7 +2316,8 @@ var jToxModel = (function () {
     self.models = null;
     
     self.rootElement.appendChild(jT.getTemplate('#jtox-model'));
-    self.init();
+    if (!self.settings.noInterface)
+      self.init();
         
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
     if (self.settings.modelUri !== undefined || self.settings.algorithmNeedle !== undefined || self.settings.loadOnInit)
@@ -2369,11 +2384,13 @@ var jToxModel = (function () {
         self.settings.baseUrl = jT.grabBaseUrl(uri);
 
       self.modelUri = uri;
-      jT.$(self.table).dataTable().fnClearTable();
+      if (!self.settings.noInterface)
+        jT.$(self.table).dataTable().fnClearTable();
       jT.call(self, uri, function (result) {
         if (!!result) {
           self.models = result.model;
-          jT.$(self.table).dataTable().fnAddData(result.model);
+          if (!self.settings.noInterface)
+            jT.$(self.table).dataTable().fnAddData(result.model);
           ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
       });
@@ -2386,10 +2403,13 @@ var jToxModel = (function () {
       var uri = self.settings.baseUrl + '/algorithm';
       if (!!needle)
         uri = ccLib.addParameter(uri, 'search=' + needle);
+      if (!self.settings.noInterface)
+        jT.$(self.table).dataTable().fnClearTable();
       jT.call(self, uri, function (result) {
         if (!!result) {
           self.algorithms = result.algorithm;
-          jT.$(self.table).dataTable().fnAddData(result.algorithm);
+          if (!self.settings.noInterface)
+            jT.$(self.table).dataTable().fnAddData(result.algorithm);
           ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
       });
@@ -2434,6 +2454,7 @@ var jToxSubstance = (function () {
     showControls: true,       // show navigation controls or not
     selectionHandler: null,   // if given - this will be the name of the handler, which will be invoked by jToxQuery when the attached selection box has changed...
     embedComposition: null,   // embed composition listing as details for each substance - it valid only if onDetails is not given.
+    noInterface: false,       // run in interface-less mode - only data retrieval and callback calling.
     onDetails: null,          // called when a details row is about to be openned. If null - no details handler is attached at all.
     onLoaded: null,           // called when the set of substances (for this page) is loaded.
   
@@ -2473,19 +2494,21 @@ var jToxSubstance = (function () {
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even when manually initialized
     
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
-    
-    if (self.settings.embedComposition && self.settings.onDetails == null) {
-      self.settings.onDetails = function (root, data, event) {
-        var comp = new jToxComposition(root, jT.$.extend({}, self.settings, (typeof self.settings.embedComposition == 'object' ? self.settings.embedComposition : { onDetails: null, selectionHandler: null })));
-        comp.queryComposition(data + '/composition');
-      };
-    }
-    
+
     self.pageStart = self.settings.pageStart;
     self.pageSize = self.settings.pageSize;
     
-    self.rootElement.appendChild(jT.getTemplate('#jtox-substance'));
-    self.init();
+    if (!self.settings.noInterface) {
+      if (self.settings.embedComposition && self.settings.onDetails == null) {
+        self.settings.onDetails = function (root, data, event) {
+          var comp = new jToxComposition(root, jT.$.extend({}, self.settings, (typeof self.settings.embedComposition == 'object' ? self.settings.embedComposition : jT.blankSettings)));
+          comp.queryComposition(data + '/composition');
+        };
+      }
+
+      self.rootElement.appendChild(jT.getTemplate('#jtox-substance'));
+      self.init();
+    }    
         
     // finally, if provided - make the query
     if (!!self.settings.substanceUri)
@@ -2508,13 +2531,17 @@ var jToxSubstance = (function () {
       self.settings.configuration.columns.substance['Owner'].mRender = function (data, type, full) {
         return (type != 'display') ? data : '<a target="_blank" href="' + self.settings.baseUrl + '/substanceowner/' + full.ownerUUID + '/substance">' + data + '</a>';
       };
-        
-      jT.ui.bindControls(self, { 
-        nextPage: function () { self.nextPage(); },
-        prevPage: function () { self.prevPage(); },
-        sizeChange: function() { self.queryEntries(self.pageStart, parseInt(jT.$(this).val())); },
-        filter: function () { jT.$(self.table).dataTable().fnFilter(jT.$(this).val()); }
-      });
+      
+      if (self.settings.showControls) {
+        jT.ui.bindControls(self, { 
+          nextPage: function () { self.nextPage(); },
+          prevPage: function () { self.prevPage(); },
+          sizeChange: function() { self.queryEntries(self.pageStart, parseInt(jT.$(this).val())); },
+          filter: function () { jT.$(self.table).dataTable().fnFilter(jT.$(this).val()); }
+        });
+      }
+      else
+        jT.$('.jtox-controls', self.rootElement).remove();
       
       // READYY! Go and prepare THE table.
       self.table = jT.$('table', self.rootElement).dataTable({
@@ -2558,16 +2585,19 @@ var jToxSubstance = (function () {
       var qUri = ccLib.addParameter(self.substanceUri, "page=" + qStart + "&pagesize=" + size);
       jT.call(self, qUri, function (result) {
         if (!!result) {
-          jT.$(self.table).dataTable().fnClearTable();
-        
           self.pageSize = size;
           self.pageStart = from;
         
           for (var i = 0, rl = result.substance.length; i < rl; ++i)
             result.substance[i].index = i + from + 1;
-          jT.$(self.table).dataTable().fnAddData(result.substance);
-          
-          self.updateControls(qStart, result.substance.length);
+
+          self.substance = result.substance;
+          if (!self.settings.noInterface) {
+            jT.$(self.table).dataTable().fnClearTable();
+            jT.$(self.table).dataTable().fnAddData(result.substance);
+            
+            self.updateControls(qStart, result.substance.length);
+          }
 
           // time to call the supplied function, if any.
           ccLib.fireCallback(self.settings.onLoaded, self, result);
@@ -2606,6 +2636,7 @@ var jToxComposition = (function () {
     selectionHandler: null,   // selection handler, if needed for selection checkbox, which will be inserted if this is non-null
     showBanner: true,         // whether to show a banner of composition info before each compounds-table
     showDiagrams: false,      // whether to show diagram for each compound in the composition
+    noInterface: false,       // run in interface-less mode - just data retrieval and callback calling.
     sDom: "rt<Ffp>",          // compounds (ingredients) table sDom
     oLanguage: null,
     onLoaded: null,
@@ -2737,16 +2768,18 @@ var jToxComposition = (function () {
           }
           
           // now make the actual filling
-          for (var i in substances) {
-            var panel = jT.getTemplate('#jtox-composition');
-            self.rootElement.appendChild(panel);
-            
-            if (self.settings.showBanner)
-              ccLib.fillTree(jT.$('.composition-info', panel)[0], substances[i]);
-            else // we need to remove it
-              jT.$('.composition-info', panel).remove();
-            // we need to prepare tables, abyways.
-            self.prepareTable(substances[i].composition, panel);
+          if (!self.settings.noInterface) {
+            for (var i in substances) {
+              var panel = jT.getTemplate('#jtox-composition');
+              self.rootElement.appendChild(panel);
+              
+              if (self.settings.showBanner)
+                ccLib.fillTree(jT.$('.composition-info', panel)[0], substances[i]);
+              else // we need to remove it
+                jT.$('.composition-info', panel).remove();
+              // we need to prepare tables, abyways.
+              self.prepareTable(substances[i].composition, panel);
+            }
           }
           
           ccLib.fireCallback(self.settings.onLoaded, self, json.composition);
@@ -3235,7 +3268,7 @@ var jToxStudy = (function () {
       var self = this;
       
       var compoRoot = jT.$('.jtox-compo-tab', self.rootElement)[0];
-      var ds = new jToxComposition(compoRoot, jT.$.extend({}, self.settings, { onDetails: null, selectionHandler: null }));
+      var ds = new jToxComposition(compoRoot, jT.$.extend({}, self.settings, jT.blankSettings));
       ds.queryComposition(compositionURI);
     },
     

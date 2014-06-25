@@ -1,8 +1,9 @@
 TODO:
 
-- use ccLib.extendNew for settings inheritance.
-- jT.ui.customTable(root, selector, data)
-- foldable diagram pane - above the feature table
+- add dataset radio button for search panel, hidable, autocompleted.
+- use ui-widget and ui-widget-header for foldable stuff
+- add populateData(root, template, data) tool in ccLib
+
 - hiding search pane
 - foldable table view of the same information - at the bottom.
 - old-style UI

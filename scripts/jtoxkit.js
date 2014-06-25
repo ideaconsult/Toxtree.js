@@ -25,6 +25,13 @@ window.jT = window.jToxKit = {
   	onSuccess: function(s, c, m) { },	// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
   	onError: function (s, c, m) { if (!!console && !!console.log) console.log("jToxKit call error (" + c + "): " + m + " from request: [" + s + "]"); },		// function (code, mess): called on server reques error. Part of settings.
   },
+  
+  // these are used in setting inheritance, so that non-inheritable settings are blanked...
+  blankSettings: {
+    onDetails: null,
+    noInterface: false,
+    selectionHandler: null
+  },
 	
 	// form the "default" baseUrl if no other is supplied
 	formBaseUrl: function(url) {
@@ -48,7 +55,7 @@ window.jT = window.jToxKit = {
       	}
     	});
     	
-      dataParams = self.$.extend(true, topSettings, dataParams);
+      dataParams = self.$.extend(true, topSettings, self.blankSettings, dataParams);
 
   	  // the real initialization function
       var realInit = function (params) {

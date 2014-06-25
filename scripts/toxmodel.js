@@ -6,14 +6,16 @@
 
 var jToxModel = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
-    selectionHandler: null,
-    maxStars: 10,
-    algorithmLink: true,
-    algorithms: false,
-    onLoaded: null,
-    sDom: "<Fif>rt",
-    oLanguage: null,
-    loadOnInit: false,
+    shortStars: false,        // whether to show a star and a number (short version) or all maxStars with actual number of them highlighed
+    maxStars: 10,             // a total possible number of stars - see above description
+    noInterface: false,       // run in interface-less mode - only data retrieval and callback calling.
+    selectionHandler: null,   // jToxQuery handler to be attached on each entry's checkbox
+    algorithmLink: true,      // when showing algorithms, whether to make it's id a link to an (external) full info page
+    algorithms: false,        // ask for algorithms, not models
+    onLoaded: null,           // callback to be called when data has arrived.
+    sDom: "<Fif>rt",          // merged to dataTable's settings, when created
+    oLanguage: null,          // merged to dataTable's settings, when created
+    loadOnInit: false,        // whether to make a (blank) request upon loading
     /* algorithmNeedle */
     /* modelUri */
     configuration: { 
@@ -56,7 +58,8 @@ var jToxModel = (function () {
     self.models = null;
     
     self.rootElement.appendChild(jT.getTemplate('#jtox-model'));
-    self.init();
+    if (!self.settings.noInterface)
+      self.init();
         
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
     if (self.settings.modelUri !== undefined || self.settings.algorithmNeedle !== undefined || self.settings.loadOnInit)
@@ -123,11 +126,13 @@ var jToxModel = (function () {
         self.settings.baseUrl = jT.grabBaseUrl(uri);
 
       self.modelUri = uri;
-      jT.$(self.table).dataTable().fnClearTable();
+      if (!self.settings.noInterface)
+        jT.$(self.table).dataTable().fnClearTable();
       jT.call(self, uri, function (result) {
         if (!!result) {
           self.models = result.model;
-          jT.$(self.table).dataTable().fnAddData(result.model);
+          if (!self.settings.noInterface)
+            jT.$(self.table).dataTable().fnAddData(result.model);
           ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
       });
@@ -140,10 +145,13 @@ var jToxModel = (function () {
       var uri = self.settings.baseUrl + '/algorithm';
       if (!!needle)
         uri = ccLib.addParameter(uri, 'search=' + needle);
+      if (!self.settings.noInterface)
+        jT.$(self.table).dataTable().fnClearTable();
       jT.call(self, uri, function (result) {
         if (!!result) {
           self.algorithms = result.algorithm;
-          jT.$(self.table).dataTable().fnAddData(result.algorithm);
+          if (!self.settings.noInterface)
+            jT.$(self.table).dataTable().fnAddData(result.algorithm);
           ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
       });

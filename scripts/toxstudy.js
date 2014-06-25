@@ -471,7 +471,7 @@ var jToxStudy = (function () {
       var self = this;
       
       var compoRoot = jT.$('.jtox-compo-tab', self.rootElement)[0];
-      var ds = new jToxComposition(compoRoot, jT.$.extend({}, self.settings, { onDetails: null, selectionHandler: null }));
+      var ds = new jToxComposition(compoRoot, jT.$.extend({}, self.settings, jT.blankSettings));
       ds.queryComposition(compositionURI);
     },
     

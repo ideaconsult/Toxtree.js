@@ -9,6 +9,7 @@ var jToxSubstance = (function () {
     showControls: true,       // show navigation controls or not
     selectionHandler: null,   // if given - this will be the name of the handler, which will be invoked by jToxQuery when the attached selection box has changed...
     embedComposition: null,   // embed composition listing as details for each substance - it valid only if onDetails is not given.
+    noInterface: false,       // run in interface-less mode - only data retrieval and callback calling.
     onDetails: null,          // called when a details row is about to be openned. If null - no details handler is attached at all.
     onLoaded: null,           // called when the set of substances (for this page) is loaded.
   
@@ -48,19 +49,21 @@ var jToxSubstance = (function () {
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even when manually initialized
     
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
-    
-    if (self.settings.embedComposition && self.settings.onDetails == null) {
-      self.settings.onDetails = function (root, data, event) {
-        var comp = new jToxComposition(root, jT.$.extend({}, self.settings, (typeof self.settings.embedComposition == 'object' ? self.settings.embedComposition : { onDetails: null, selectionHandler: null })));
-        comp.queryComposition(data + '/composition');
-      };
-    }
-    
+
     self.pageStart = self.settings.pageStart;
     self.pageSize = self.settings.pageSize;
     
-    self.rootElement.appendChild(jT.getTemplate('#jtox-substance'));
-    self.init();
+    if (!self.settings.noInterface) {
+      if (self.settings.embedComposition && self.settings.onDetails == null) {
+        self.settings.onDetails = function (root, data, event) {
+          var comp = new jToxComposition(root, jT.$.extend({}, self.settings, (typeof self.settings.embedComposition == 'object' ? self.settings.embedComposition : jT.blankSettings)));
+          comp.queryComposition(data + '/composition');
+        };
+      }
+
+      self.rootElement.appendChild(jT.getTemplate('#jtox-substance'));
+      self.init();
+    }    
         
     // finally, if provided - make the query
     if (!!self.settings.substanceUri)
@@ -83,13 +86,17 @@ var jToxSubstance = (function () {
       self.settings.configuration.columns.substance['Owner'].mRender = function (data, type, full) {
         return (type != 'display') ? data : '<a target="_blank" href="' + self.settings.baseUrl + '/substanceowner/' + full.ownerUUID + '/substance">' + data + '</a>';
       };
-        
-      jT.ui.bindControls(self, { 
-        nextPage: function () { self.nextPage(); },
-        prevPage: function () { self.prevPage(); },
-        sizeChange: function() { self.queryEntries(self.pageStart, parseInt(jT.$(this).val())); },
-        filter: function () { jT.$(self.table).dataTable().fnFilter(jT.$(this).val()); }
-      });
+      
+      if (self.settings.showControls) {
+        jT.ui.bindControls(self, { 
+          nextPage: function () { self.nextPage(); },
+          prevPage: function () { self.prevPage(); },
+          sizeChange: function() { self.queryEntries(self.pageStart, parseInt(jT.$(this).val())); },
+          filter: function () { jT.$(self.table).dataTable().fnFilter(jT.$(this).val()); }
+        });
+      }
+      else
+        jT.$('.jtox-controls', self.rootElement).remove();
       
       // READYY! Go and prepare THE table.
       self.table = jT.$('table', self.rootElement).dataTable({
@@ -133,16 +140,19 @@ var jToxSubstance = (function () {
       var qUri = ccLib.addParameter(self.substanceUri, "page=" + qStart + "&pagesize=" + size);
       jT.call(self, qUri, function (result) {
         if (!!result) {
-          jT.$(self.table).dataTable().fnClearTable();
-        
           self.pageSize = size;
           self.pageStart = from;
         
           for (var i = 0, rl = result.substance.length; i < rl; ++i)
             result.substance[i].index = i + from + 1;
-          jT.$(self.table).dataTable().fnAddData(result.substance);
-          
-          self.updateControls(qStart, result.substance.length);
+
+          self.substance = result.substance;
+          if (!self.settings.noInterface) {
+            jT.$(self.table).dataTable().fnClearTable();
+            jT.$(self.table).dataTable().fnAddData(result.substance);
+            
+            self.updateControls(qStart, result.substance.length);
+          }
 
           // time to call the supplied function, if any.
           ccLib.fireCallback(self.settings.onLoaded, self, result);
