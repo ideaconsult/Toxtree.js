@@ -17,6 +17,31 @@ var ccLib = {
     return base;
   },
 
+  extendNew: function (base) {
+    var deep = false;
+    var arr = null;
+    if (typeof base == 'boolean') {
+      deep = base;
+      base = arguments[1];
+      arr = Array.prototype.slice.call(arguments, 1);
+    }
+    else
+      arr = arguments;
+    
+    for (var i = 1, al = arr.length;i < al; ++i) {
+      var obj = arr[i];
+      if (typeof obj != 'object')
+        continue;
+      for (var key in obj) {
+        if (!base.hasOwnProperty(key)) 
+          base[key] = (typeof obj[key] == 'object') ? window.jQuery.extend({}, obj[key]) : obj[key];
+        else if (deep && typeof base[key] == 'object' && typeof obj[key] == 'object')
+          this.extendNew(true, base[key], obj[key]);
+      }
+    }
+    return base;
+  },
+  
   fireCallback: function (callback, self) {
     if (!jQuery.isArray(callback))
       callback = [callback];

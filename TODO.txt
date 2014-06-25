@@ -1,7 +1,11 @@
 TODO:
 
-- make compositions default details in jToxSubstance
-
+- use ccLib.extendNew for settings inheritance.
+- jT.ui.customTable(root, selector, data)
+- foldable diagram pane - above the feature table
+- hiding search pane
+- foldable table view of the same information - at the bottom.
+- old-style UI
 - sizing of feature table - so that diagram is at the bottom
 
 - jToxModel.getModel(algorithmUri, callback) routine (including polling task).

@@ -17,6 +17,31 @@ var ccLib = {
     return base;
   },
 
+  extendNew: function (base) {
+    var deep = false;
+    var arr = null;
+    if (typeof base == 'boolean') {
+      deep = base;
+      base = arguments[1];
+      arr = Array.prototype.slice.call(arguments, 1);
+    }
+    else
+      arr = arguments;
+    
+    for (var i = 1, al = arr.length;i < al; ++i) {
+      var obj = arr[i];
+      if (typeof obj != 'object')
+        continue;
+      for (var key in obj) {
+        if (!base.hasOwnProperty(key)) 
+          base[key] = (typeof obj[key] == 'object') ? window.jQuery.extend({}, obj[key]) : obj[key];
+        else if (deep && typeof base[key] == 'object' && typeof obj[key] == 'object')
+          this.extendNew(true, base[key], obj[key]);
+      }
+    }
+    return base;
+  },
+  
   fireCallback: function (callback, self) {
     if (!jQuery.isArray(callback))
       callback = [callback];
@@ -2408,7 +2433,7 @@ var jToxSubstance = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     showControls: true,       // show navigation controls or not
     selectionHandler: null,   // if given - this will be the name of the handler, which will be invoked by jToxQuery when the attached selection box has changed...
-    embedComposition: false,  // embed composition listing as details for each substance - it valid only if onDetails is not given.
+    embedComposition: null,   // embed composition listing as details for each substance - it valid only if onDetails is not given.
     onDetails: null,          // called when a details row is about to be openned. If null - no details handler is attached at all.
     onLoaded: null,           // called when the set of substances (for this page) is loaded.
   
@@ -2451,7 +2476,7 @@ var jToxSubstance = (function () {
     
     if (self.settings.embedComposition && self.settings.onDetails == null) {
       self.settings.onDetails = function (root, data, event) {
-        var comp = new jToxComposition(root, self.settings);
+        var comp = new jToxComposition(root, jT.$.extend({}, self.settings, (typeof self.settings.embedComposition == 'object' ? self.settings.embedComposition : { onDetails: null, selectionHandler: null })));
         comp.queryComposition(data + '/composition');
       };
     }
@@ -3210,7 +3235,7 @@ var jToxStudy = (function () {
       var self = this;
       
       var compoRoot = jT.$('.jtox-compo-tab', self.rootElement)[0];
-      var ds = new jToxComposition(compoRoot, self.settings);
+      var ds = new jToxComposition(compoRoot, jT.$.extend({}, self.settings, { onDetails: null, selectionHandler: null }));
       ds.queryComposition(compositionURI);
     },
     
