@@ -49,6 +49,7 @@ var config_toxtree = {
 var tt = {
   browserKit: null,
   modelKit: null,
+  featuresList: null,
   compoundIdx: 0,
   coreFeatures: [
     "http://www.opentox.org/api/1.1#CASRN", 
@@ -65,7 +66,7 @@ var tt = {
 };
 
 function onQuery(e, query) {
-  $(tt.browserKit.rootElement).empty();
+  $(tt.featuresList).empty();
   $('#tt-diagram img.toxtree-diagram')[0].src = '';
   query.query();  
 }
@@ -98,6 +99,18 @@ function onAlgoLoaded(result) {
   onSelectedUpdate(null);
 }
 
+function resizeFeatures(e) {
+  var timer = null;
+  if (timer != null)
+    clearTimeout(timer);
+  var timer = setTimeout(function () {
+    var bropane = $('#tt-browser-panel')[0];
+    bropane.style.height = bropane.parentNode.offsetHeight + 'px';
+    var bottom = $('#tt-diagram')[0].offsetTop;
+    var top = tt.featuresList.offsetTop;
+    tt.featuresList.style.height = (bottom - top) + 'px';
+  }, 100);
+}
 
 function addFeatures() {
   var features = null;
@@ -105,8 +118,10 @@ function addFeatures() {
   if (kit == tt.browserKit) { // Lot more things to be done here...
     kit = tt.browserKit;
     features = tt.coreFeatures;
-    if (kit.dataset.dataEntry[tt.compoundIdx] != null)
+    if (kit.dataset.dataEntry[tt.compoundIdx] != null) {
       $('#tt-diagram img.toxtree-diagram')[0].src = kit.dataset.dataEntry[tt.compoundIdx].compound.diagramUri;
+      resizeFeatures();
+    }
 
     var counter = $('#tt-browser-panel .counter-field')[0];
     counter.innerHTML = jT.ui.updateCounter(
@@ -132,7 +147,7 @@ function addFeatures() {
   
   if (kit.dataset.dataEntry[tt.compoundIdx] != null) {
     var data = kit.featureData(kit.dataset.dataEntry[tt.compoundIdx], features);
-    ccLib.populateData(kit.rootElement, '#tt-feature', data);
+    ccLib.populateData(tt.featuresList, '#tt-feature', data);
   }
 }
 
@@ -147,14 +162,12 @@ function showCompound(index) {
   }
   else { // normal showing up
     tt.compoundIdx = index;
-    $(tt.browserKit.rootElement).empty();
+    $(tt.featuresList).empty();
     $('#tt-diagram img.toxtree-diagram')[0].src = '';
+    resizeFeatures();
     
     addFeatures.call(tt.browserKit);
   }
-}
-
-function onDetailedAlgo(row, data, index) {
 }
 
 $(document).ready(function(){
@@ -169,7 +182,12 @@ $(document).ready(function(){
   
   tt.browserKit = jToxCompound.kits[0];
   tt.modelKit = jToxModel.kits[0];
+  tt.featuresList = $('#tt-features .list')[0];
   
   $('#tt-browser-panel .prev-field').on('click', function () { if ($(this).hasClass('paginate_enabled_previous')) showCompound(tt.compoundIdx - 1); });
   $('#tt-browser-panel .next-field').on('click', function () { if ($(this).hasClass('paginate_enabled_next')) showCompound(tt.compoundIdx + 1); });
+  $('#tt-diagram .title').on('click', resizeFeatures);
+  
+  $(window).on('resize', resizeFeatures);
+  resizeFeatures(null);
 });

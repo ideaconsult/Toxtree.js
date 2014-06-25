@@ -35,30 +35,36 @@
 </head>
 <body>
   <div class="jtox-toolkit" data-kit="query" data-cross-domain="true" data-configuration="config_toxtree" data-base-url="http://apps.ideaconsult.net:8080/biodeg">
-    <div id="searchbar" class="jtox-toolkit jtox-widget" data-kit="search"></div>
-    <div id="tt-browser-panel">
-			<div id="tt-features">
-  			<div class="jtox-inline"><h5 class="counter-field">Available structure attributes </h5></div>
-  			<div class="jtox-inline tt-controls"><a class="paginate_disabled_previous prev-field" tabindex="0" role="button">Previous</a><a class="paginate_disabled_next next-field" tabindex="0" role="button">Next</a></div>
-  			<div class="jtox-toolkit jtox-panel" data-kit="compound" data-no-interface="true" data-on-loaded="addFeatures"></div>
-			</div>
-			<div id="tt-diagram" class="jtox-panel">
-			  <h5>Structure diagram</h5>
-        <img class="toxtree-diagram" alt="Compoung diagram"/>
+    <div id="tt-searchbar" class="jtox-toolkit jtox-widget" data-kit="search"></div>
+    <div class="tt-bigpane">
+      <div id="tt-browser-panel">
+  			<div id="tt-features">
+    			<div class="jtox-inline"><h5 class="counter-field">Available structure attributes </h5></div>
+    			<div class="jtox-inline tt-controls"><a class="paginate_disabled_previous prev-field" tabindex="0" role="button">Previous</a><a class="paginate_disabled_next next-field" tabindex="0" role="button">Next</a></div>
+    			<div class="list jtox-panel"></div>
+    		</div>
+  			<div id="tt-diagram" class="jtox-foldable">
+  			  <h5 class="title">Structure diagram</h5>
+  			  <div class="content">
+            <img class="toxtree-diagram" alt="Compoung diagram"/>
+  			  </div>
+        </div>
+      </div>
+      <div id="tt-models-panel">
+        <div>
+          <div class="title jtox-inline"><h5>Toxicity prediction modules (0/0)</h5></div>
+          <div class="jtox-inline selections"><a href="#" class="select-all">select all</a>&nbsp;<a href="#" class="unselect-all">unselect all</a></div>
+        </div>
+        <div class="jtox-toolkit jtox-widget" data-kit="model" data-algorithms="true" data-no-interface="true" data-on-loaded="onAlgoLoaded" data-algorithm-needle="ToxTree"></div>
       </div>
     </div>
-    <div id="tt-models-panel">
-      <div>
-        <div class="title jtox-inline"><h5>Toxicity prediction modules (0/0)</h5></div>
-        <div class="jtox-inline selections"><a href="#" class="select-all">select all</a>&nbsp;<a href="#" class="unselect-all">unselect all</a></div>
-      </div>
-      <div class="jtox-toolkit jtox-widget" data-kit="model" data-algorithms="true" data-no-interface="true" data-on-loaded="onAlgoLoaded" data-algorithm-needle="ToxTree"></div>
+    <div class="tt-bigpane">
+      <div class="jtox-toolkit" data-kit="compound" data-has-details="false" data-show-tabs="false" data-on-loaded="addFeatures"></div>
     </div>
   </div>
   <div class="jtox-template">
     <div id="tt-feature" class="tt-feature">
-      <div class="data-field tt-name" data-field="title"></div>
-      <div class="data-field tt-value" data-field="value"></div>
+      <div class="data-field tt-name" data-field="title"></div><div class="data-field tt-value" data-field="value"></div>
     </div>
     <div id="tt-algorithm" class="tt-algorithm jtox-foldable folded">
       <div class="title" >

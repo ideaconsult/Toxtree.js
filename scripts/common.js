@@ -175,6 +175,7 @@ var ccLib = {
     root.style.display = 'none';
     for (var i = 0, dl = data.length; i < dl; ++i) {
       var el = temp.cloneNode(true);
+      el.removeAttribute('id');
       root.appendChild(el);
       this.fillTree(el, data[i]);
     }

@@ -16,6 +16,7 @@
   -webkit-border-radius: 7px;
   border-radius: 7px;
   padding-top: 7px;
+  padding-bottom: 3px;
 }
 
 .jtox-foldable:hover {
