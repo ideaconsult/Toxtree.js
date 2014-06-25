@@ -132,8 +132,10 @@ var jToxSearch = (function () {
     // go for buttonset preparation, starting with hiding / removing passed ones
     if (!!self.settings.hideOptions) {
       var hideArr = self.settings.hideOptions.split(',');
-      for (var i = 0; i < hideArr.length; ++i)
+      for (var i = 0; i < hideArr.length; ++i) {
         jT.$('#search' + hideArr[i], self.rootElement).remove();
+        jT.$('label[for=search' + hideArr[i] + ']', self.rootElement).remove();
+      }
     }
 
     jT.$(form.searchbox)
@@ -149,7 +151,9 @@ var jToxSearch = (function () {
       self.setAuto();
     });
     
+    var hasAutocomplete = false;
     if (jT.$('#searchurl', self.rootElement).length > 0) {
+      hasAutocomplete = true;
       jT.$(form.searchbox).autocomplete({
         minLength: 2,
         open: function() { jT.$( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" ); },
@@ -177,11 +181,13 @@ var jToxSearch = (function () {
       self.search.queryType = this.value;
       if (this.value == 'url') {
         jT.$(form.drawbutton).addClass('hidden');
-        jT.$(form.searchbox).autocomplete('enable');
+        if (hasAutocomplete)
+          jT.$(form.searchbox).autocomplete('enable');
       }
       else {
         jT.$(form.drawbutton).removeClass('hidden');
-        jT.$(form.searchbox).autocomplete('disable');
+        if (hasAutocomplete)
+          jT.$(form.searchbox).autocomplete('disable');
       }
     };
     
