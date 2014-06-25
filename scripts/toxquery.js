@@ -155,7 +155,7 @@ var jToxSearch = (function () {
         open: function() { jT.$( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" ); },
         close: function() { jT.$( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" ); },
         source: function (request, response) {
-          jT.call(self, '/dataset', function (result) {
+          jT.call(self, '/dataset?search=^' + request.term, function (result) {
             response(!result ? [] : $.map( result.dataset, function( item ) {
               var pos =  item.URI.lastIndexOf("/"),
                   shortURI = (pos >= 0) ? "D" + item.URI.substring(pos+1) + ": " : "";
