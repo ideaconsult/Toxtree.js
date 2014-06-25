@@ -1,6 +1,5 @@
 TODO:
 
-- add dataset radio button for search panel, hidable, autocompleted.
 - use ui-widget and ui-widget-header for foldable stuff
 - add populateData(root, template, data) tool in ccLib
 

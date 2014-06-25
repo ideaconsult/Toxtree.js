@@ -100,8 +100,9 @@ var jToxQuery = (function () {
 */
 var jToxSearch = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
-    defaultSmiles: '50-00-0',
-    smartsList: 'funcgroups',
+    defaultSmiles: '50-00-0',     // which is the default search string, if empty one is provided
+    smartsList: 'funcgroups',     // which global JS variable to seek for smartsList
+    hideOptions: '',              // comma separated list of search options to hide
     configuration: {
       handlers: { }
     }
@@ -123,21 +124,18 @@ var jToxSearch = (function () {
     self.rootElement.appendChild(jT.getTemplate('#jtox-search'));
     self.queryKit = jT.parentKit(jToxQuery, self.rootElement);
     
-    self.search = { mol: "", type: ""};
+    self.search = { mol: "", type: "", queryType: "auto"};
     
     var form = jT.$('form', self.rootElement)[0];
     form.onsubmit = function () { return false; }
+    
+    // go for buttonset preparation, starting with hiding / removing passed ones
+    if (!!self.settings.hideOptions) {
+      var hideArr = self.settings.hideOptions.split(',');
+      for (var i = 0; i < hideArr.length; ++i)
+        jT.$('#search' + hideArr[i], self.rootElement).remove();
+    }
 
-    var radios = jT.$('.jq-buttonset', root).buttonset();
-    var onTypeClicked = function () {
-      form.searchbox.placeholder = jT.$(this).data('placeholder');
-      jT.$('.search-pane .dynamic').addClass('hidden');
-      jT.$('.search-pane .' + this.id).removeClass('hidden');
-    };
-    
-    jT.$('.jq-buttonset input', root).on('change', onTypeClicked);
-    ccLib.fireCallback(onTypeClicked, jT.$('.jq-buttonset input', root)[0]);
-    
     jT.$(form.searchbox)
     .on('focus', function () {
       var gap = jT.$(form).width() - jT.$(radios).width() - 30 - jT.$('.search-pane').width();
@@ -148,12 +146,48 @@ var jToxSearch = (function () {
       jT.$(this).css('width', '');
     })
     .on('change', function () { // when we change the value here - all, possible MOL caches should be cleared.
-      if (this.value.indexOf('http') > -1)
-        self.setURL();
-      else
-        self.setAuto();
+      self.setAuto();
     });
     
+    if (jT.$('#searchurl', self.rootElement).length > 0) {
+      jT.$(form.searchbox).autocomplete({
+        minLength: 2,
+        open: function() { jT.$( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" ); },
+        close: function() { jT.$( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" ); },
+        source: function (request, response) {
+          jT.call(self, '/dataset', function (result) {
+            response(!result ? [] : $.map( result.dataset, function( item ) {
+              var pos =  item.URI.lastIndexOf("/"),
+                  shortURI = (pos >= 0) ? "D" + item.URI.substring(pos+1) + ": " : "";
+              return {
+                label: shortURI + item.title,
+                value: item.URI
+              };
+            }));
+          });
+        }
+      });
+    }
+
+    var radios = jT.$('.jq-buttonset', root).buttonset();
+    var onTypeClicked = function () {
+      form.searchbox.placeholder = jT.$(this).data('placeholder');
+      jT.$('.search-pane .auto-hide', self.rootElement).addClass('hidden').width(0);
+      jT.$('.search-pane .' + this.id, self.rootElement).removeClass('hidden').width('');
+      self.search.queryType = this.value;
+      if (this.value == 'url') {
+        jT.$(form.drawbutton).addClass('hidden');
+        jT.$(form.searchbox).autocomplete('enable');
+      }
+      else {
+        jT.$(form.drawbutton).removeClass('hidden');
+        jT.$(form.searchbox).autocomplete('disable');
+      }
+    };
+    
+    jT.$('.jq-buttonset input', root).on('change', onTypeClicked);
+    ccLib.fireCallback(onTypeClicked, jT.$('.jq-buttonset input', root)[0]);
+        
     // spend some time to setup the SMARTS groups
     if (!!window[self.settings.smartsList]) {
       var list = window[self.settings.smartsList];
@@ -241,15 +275,10 @@ var jToxSearch = (function () {
     });
 
     // finally - parse the URL-passed parameters and setup the values appropriately.
-    if (!!self.settings.b64search) {
+    if (!!self.settings.b64search)
       self.setMol($.base64.decode(self.settings.b64search));
-    }
-    else if (!!self.settings.search) {
-      if (self.settings.search.indexOf('http') > -1)
-        self.setURL(self.settings.search);
-      else
-        self.setAuto(self.settings.search);
-    }
+    else if (!!self.settings.search)
+      self.setAuto(self.settings.search);
   };
   
   cls.prototype = {
@@ -257,9 +286,9 @@ var jToxSearch = (function () {
     modifyUri: function (uri) {
       var form = jT.$('form', this.rootElement)[0];
       var params = { type: this.search.type };
-      var type = jT.$('input[name="searchtype"]:checked', form).val();
+      var type = this.search.queryType;
       
-      if (type == "auto" && params.type == 'url')
+      if (type == "auto" && params.type == 'auto' && form.searchbox.value.indexOf('http') == 0)
         type = "url";
         
       var res = queries[type] + (uri.indexOf('?') > -1 ? '' : '?') + uri;
@@ -311,18 +340,6 @@ var jToxSearch = (function () {
       box.placeholder = "MOL formula saved_";
       box.value = '';
     },
-    
-    setURL: function (url) {
-      this.search.mol = null;
-      this.search.type = 'url';
-      var box = jT.$('form', this.rootElement)[0].searchbox;
-
-      if (!!this.search.oldplace)
-        box.placeholder = this.search.oldplace;
-        
-      if (url != null)
-        box.value = url;
-    }
   }; // end of prototype
   
   return cls;

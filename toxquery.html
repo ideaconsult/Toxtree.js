@@ -19,7 +19,7 @@
 	<link rel="stylesheet" href="www/ketcher.css"/>
 	<link rel="stylesheet" href="styles/toxquery.css">
 
-  <script src="tests/oecdcategories.js"></script>
+  <script src="uses/oecdcategories.js"></script>
 
   <script src="tests/jquery.js"></script>
   <script src="tests/jquery.base64.min.js"></script>
@@ -51,9 +51,12 @@
   			  <input type="radio" id="searchsmarts" value="smarts" name="searchtype" data-placeholder="Enter SMARTS_">
   			    <label for="searchsmarts" title="Enter or draw a SMARTS query">Substructure</label>
           </input>
+  			  <input type="radio" id="searchurl" value="url" name="searchtype" data-placeholder="Enter Dataset URL_">
+  			    <label for="searchurl" title="Enter dataset URL">Dataset</label>
+          </input>
   			</div>
     		<div class="jtox-inline float-right search-pane">
-  			  <div class="dynamic searchsimilarity hidden jtox-inline">
+  			  <div class="dynamic auto-hide searchsimilarity hidden jtox-inline">
       			<select name='threshold' title ='Tanimoto similarity threshold'>
     					<option value='0.9' selected="selected">0.9</option>
   			   		<option value='0.8' >0.8</option>
@@ -66,13 +69,13 @@
   			   		<option value='0.1' >0.1</option>
       			</select>	
   			  </div>
-  			  <div class="dynamic searchsmarts hidden jtox-inline">
+  			  <div class="dynamic auto-hide searchsmarts hidden jtox-inline">
   			    <select name="smarts" title ="Predefined functional groups"></select>
   			  </div>
   			  <div class="jtox-inline">
             <input type="text" name="searchbox"/>
             <button name="searchbutton" class="jtox-handler" title="Search/refresh" data-handler="query"><span class="ui-icon ui-icon-search"/></button>
-            <button name="drawbutton" title="Draw the (sub)structure"><span class="ui-icon ui-icon-pencil"/></button>
+            <button name="drawbutton" class="dynamic" title="Draw the (sub)structure"><span class="ui-icon ui-icon-pencil"/></button>
   			  </div>
     		</div>
       </form>
