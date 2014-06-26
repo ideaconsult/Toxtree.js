@@ -2,7 +2,7 @@ TODO:
 
 - checkboxes in the table
 
-- make some docs - jToxCompound additions, tableLanguage, etc. updateCounter, noInterface and many others
+- make some docs - jToxCompound additions, tableLanguage, etc. updateCounter, noInterface and many others, extractFeatures, etc.
 - Make all kits react adequately on failure on network / calls
 - deferred re-query (postpone)
 

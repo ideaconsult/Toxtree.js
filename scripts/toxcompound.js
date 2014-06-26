@@ -346,16 +346,18 @@ var jToxCompound = (function () {
       return this.feature[fId].URI || fId;
     },
     
-    featureData: function (entry, set) {
+    featureData: function (entry, set, scope) {
+      if (scope == null)
+        scope = 'details';
       var self = this;
       var data = [];
       ccLib.enumObject(set, function (fId, idx, level) {
         var feat = jT.$.extend({}, self.feature[fId]);
         var vis = feat['visibility'];
-        if (!!vis && vis != 'details')
+        if (!!vis && vis != scope)
           return;
         var title = feat.title;
-        feat.value = self.featureValue(fId, entry, 'details');
+        feat.value = self.featureValue(fId, entry, scope);
         if (!!title && (!self.settings.hideEmptyDetails || !! feat.value)) {
           data.push(feat)
           if (!feat.value)
@@ -673,7 +675,7 @@ var jToxCompound = (function () {
             var feat = self.feature[fId];
             if (feat.search !== undefined && !feat.search)
               return false;
-            var val = self.featureValue(fId, entry);
+            var val = self.featureValue(fId, entry, 'sort');
             return !ccLib.isNull(val) && val.toString().toLowerCase().indexOf(needle) >= 0;
           });
           
@@ -874,6 +876,23 @@ var jToxCompound = (function () {
     }
     
     return entry;
+  };
+  
+  cls.extractFeatures = function (entry, features, callback) {
+    var data = [];
+    jT.$.map(features, function (obj, fId) {
+      var feat = jT.$.extend({}, obj);
+      feat.value = entry.values[fId]
+      if (!!feat.title) {
+        if (ccLib.fireCallback(callback, null, feat, obj, fId)) {
+          if (!feat.value)
+            feat.value = '-';
+          data.push(feat);
+        }
+      }
+    });
+    
+    return data;
   };
   
   cls.enumSameAs = function (fid, features, callback) {

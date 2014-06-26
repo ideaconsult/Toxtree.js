@@ -46,7 +46,7 @@ var ccLib = {
     if (!jQuery.isArray(callback))
       callback = [callback];
       
-    var ret = null;
+    var ret = true;
     for (var i = 0, cl = callback.length; i < cl; ++i) {
       var callone = callback[i];
       if (typeof callone != 'function')
