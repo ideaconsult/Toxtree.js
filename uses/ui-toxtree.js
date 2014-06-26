@@ -27,9 +27,68 @@ var config_toxtree = {
     },
     "checked": function (e, query) {
       // TODO: initiate the single compound browser to work on selected only
-    }
+    },
+    "markAuto": function (e) {
+      $(this).toggleClass('active');
+      onSelectedUpdate(e);
+      e.stopPropagation();
+    },
+    "makeModel": makeModel,
+    "runPredict": function (e) { runPredict.call(this, e); }
 	}
 };
+
+function makeModel(e, callback) {
+  var tEl = $(this).parents('.title')[0];
+  var uri = $('a', tEl)[0].href;
+  $(this).addClass('loading');
+  var el = this;
+  tt.modelKit.getModel(uri, function (result) {
+    if (!!result) {
+      $(el).addClass('active');
+      $(tEl).data('model', result);
+    }
+    $(el).removeClass('loading');
+    ccLib.fireCallback(callback, this, result);
+  });
+  
+  if (e != null)
+    e.stopPropagation();
+}
+
+function runPredict (e, index, callback) {
+  var el = this;
+  if (index == null)
+    index = tt.compoundIdx;
+  
+  if (tt.browserKit.dataset == null || index < 0 || index >= tt.browserKit.dataset.dataEntry.length)
+    return;
+
+  var runIt = function (modelUri) {
+    tt.modelKit.runPrediction(tt.browserKit.dataset.dataEntry[index].compound.URI, modelUri, function (result) {
+      if (!!result) {
+        if (index == tt.compoundIdx)
+          addFeatures(result, "Features");
+      }
+      $(el).removeClass('loading');
+      ccLib.fireCallback(callback, this, result);
+    })
+  };
+  
+  $(this).addClass('loading');
+  var tEl = $(this).parents('.title')[0];
+  if ($(tEl).data('model') == null) {
+    makeModel.call(el.nextElementSibling, null, function (result) { 
+      if (!!result)
+        runIt(result);
+    });
+  }
+  else
+    runIt($(tEl).data('model'));
+  
+  if (e != null)
+    e.stopPropagation();
+}
 
 function formatAlgoName(val) {
   return (val.indexOf('ToxTree: ') == 0) ? val = val.substr(9) : val;
@@ -37,7 +96,7 @@ function formatAlgoName(val) {
 
 function onSelectedUpdate(e) {
 	var tEl = $('#tt-models-panel .title')[0];
-	var v = $('input[type="checkbox"]:checked', tt.modelKit.rootElement).length;
+	var v = $('button.tt-toggle.auto.active', tt.modelKit.rootElement).length;
 	tEl.innerHTML = jT.ui.updateCounter(tEl.innerHTML, v, tt.modelKit.algorithm.length);;
 }
 
@@ -48,18 +107,6 @@ function runPrediction(el, compoundUri, algorithmUri) {
 
 function onAlgoLoaded(result) {
   ccLib.populateData(tt.modelKit.rootElement, '#tt-algorithm', result.algorithm);
-  $('input[type="checkbox"]', tt.modelKit.rootElement).on('click', function (e) {
-    onSelectedUpdate(e);
-    e.stopPropagation();
-  });
-  $('input[type="button"]', tt.modelKit.rootElement).on('click', function (e) {
-    if (!$(this).hasClass('loaded')) {
-      var ael = $('a', $(this).parents('.title')[0])[0];
-      runPrediction(this, tt.browserKit.dataset.dataEntry[tt.compoundIdx].compound.URI, ael.href);
-      e.stopPropagation();
-    }
-  });
-
   onSelectedUpdate(null);
 }
 
@@ -156,11 +203,11 @@ function onTableDetails(idx) {
 
 $(document).ready(function(){
   $('#tt-models-panel a.select-all').on('click', function () {
-    $('#tt-models-panel input[type="checkbox"]').each(function () { this.checked = true;});
+    $('#tt-models-panel button.tt-toggle.auto').addClass('active');
     onSelectedUpdate.call(this);
   });
   $('#tt-models-panel a.unselect-all').on('click', function () {
-    $('#tt-models-panel input[type="checkbox"]').each(function () { this.checked = false;});
+    $('#tt-models-panel button.tt-toggle.auto').removeClass('active');
     onSelectedUpdate.call(this);
   });
   
