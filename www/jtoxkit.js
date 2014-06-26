@@ -2503,8 +2503,34 @@ var jToxModel = (function () {
     },
     
     runPrediction: function (datasetUri, modelUri, callback) {
-      // TODO: make a POST request for prediction for given compound on given model
-      // the callback is returned after the task polling is done.
+      var self = this;
+      var q = ccLib.addParameter(datasetUri, 'feature_uris[]=' + encodeURIComponent(modelUri + '/predicted'));
+      
+      var getResults = function (q, second) {
+        jT.call(self, q, function (result, jhr) {
+          if (!result)
+            ccLib.fireCallback(callback, self, null, jhr);
+          else if (result.dataEntry.length > 0)
+            ccLib.fireCallback(callback, self, result, jhr);
+          else if (!second) { // we need to create it
+            jT.call(self, modelUri, { method: "POST", data: { dataset_uri: datasetUri } }, function (task, jhr) {
+              if (!task)
+                ccLib.fireCallback(callback, self, null, jhr);
+              else
+                jT.pollTask(self, task, function (task, jhr) {
+                  if (!task || !!task.error)
+                    ccLib.fireCallback(callback, self, null, jhr);
+                  else
+                    getResults(task.result, true);
+                });
+            });
+          }
+          else // a recursive attempt has failed again... nope.
+            ccLib.fireCallback(callback, self, null, jhr);
+        });
+      };
+      
+      getResults(q, false);
     },
     
     query: function (uri) {

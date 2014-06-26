@@ -2,9 +2,6 @@ TODO:
 
 - checkboxes in the table
 
-- jToxModel.getModel(algorithmUri, callback) routine (including polling task).
-- glue jToxCompound with jToxSearch, jToxQuery,
-
 - make some docs - jToxCompound additions, tableLanguage, etc. updateCounter, noInterface and many others
 - Make all kits react adequately on failure on network / calls
 - deferred re-query (postpone)
