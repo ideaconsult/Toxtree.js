@@ -83,6 +83,14 @@ body>div {
   height: 100%;
 }
 
+#tt-models-panel .content .tt-explanation {
+  padding: 5px;
+  margin: 5px;
+  background: #fefefe;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+}
+
 div.tt-algorithm div.jtox-inline.float-right {
   margin-right: 20px;
   vertical-align: top;
@@ -100,6 +108,13 @@ div.tt-algorithm div.jtox-inline.float-right {
   padding: 2px;
   font-weight: bold;
   margin: 0px;
+}
+
+.tt-toggle.loading {
+  background: url(../images/waiting_small.gif) center top no-repeat;
+  background-size: 16px 16px;
+  text-fill-color: rgba(0, 0, 0, 0);
+  color: rgba(0, 0, 0, 0);
 }
 
 .tt-toggle:hover,
@@ -152,6 +167,13 @@ div.tt-algorithm div.jtox-inline.float-right {
 #tt-features .tt-feature {
   width: 100%;
   white-space: nowrap;
+}
+
+#tt-features .tt-feature.separator {
+  width: 100%;
+  border-bottom: 1px dashed #999;
+  margin-top: 1px;
+  margin-bottom: 1px;
 }
 
 .tt-name {

@@ -166,7 +166,7 @@ var ccLib = {
     }
   },
   
-  populateData: function (root, template, data) {
+  populateData: function (root, template, data, enumFn) {
     if (data == null || typeof data != 'object')
       return;
       
@@ -178,6 +178,7 @@ var ccLib = {
       el.removeAttribute('id');
       root.appendChild(el);
       this.fillTree(el, data[i]);
+      this.fireCallback(enumFn, el, data[i]);
     }
     
     root.style.display = oldDisp;

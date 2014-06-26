@@ -22,9 +22,7 @@ var tt = {
 var config_toxtree = {
 	"handlers": {
   	"query": function (e, query) {
-      $(tt.featuresList).empty();
-      $('#tt-diagram img.toxtree-diagram')[0].src = '';
-      resizeFeatures(e);
+  	  clearSlate();
       query.query();  
     },
     "checked": function (e, query) {
@@ -72,6 +70,7 @@ function runPredict (e, index, callback) {
       if (!!result) {
         if (index == tt.compoundIdx)
           showPrediction(result, $('a', tEl)[0].href);
+        $(el).addClass('active');
       }
       $(el).removeClass('loading');
       ccLib.fireCallback(callback, this, result);
@@ -92,6 +91,13 @@ function runPredict (e, index, callback) {
     e.stopPropagation();
 }
 
+function runSelected() {
+  $('#tt-models-panel button.tt-toggle.auto.active').each(function () {
+    var el = $('button.tt-toggle.predict', $(this).parent()[0])[0];
+    runPredict.call(el, null);
+  });  
+}
+
 function formatAlgoName(val) {
   return (val.indexOf('ToxTree: ') == 0) ? val = val.substr(9) : val;
 }
@@ -103,6 +109,7 @@ function onSelectedUpdate(e) {
 }
 
 function onAlgoLoaded(result) {
+  $(tt.modelKit.rootElement).empty();
   ccLib.populateData(tt.modelKit.rootElement, '#tt-algorithm', result.algorithm);
   onSelectedUpdate(null);
 }
@@ -120,9 +127,34 @@ function resizeFeatures(e) {
   }, 100);
 }
 
+function addFeatures(data, className) {
+  if (data.length > 0) {
+    var enumFn = null;
+    if (className != null) {
+      enumFn = function () { $(this).addClass(className); };
+      $('.' + className, tt.featuresList).remove();
+    }
+    ccLib.populateData(tt.featuresList, '#tt-feature', data, enumFn);
+    var sep = $('#tt-feature')[0].cloneNode(true);
+    sep.removeAttribute('id');
+    $(sep).addClass('separator').empty();
+    if (className != null)
+      $(sep).addClass(className);
+    tt.featuresList.appendChild(sep);
+  }
+}
+
+function clearSlate() {
+  $(tt.featuresList).empty();
+  $('#tt-diagram img.toxtree-diagram')[0].src = '';
+  resizeFeatures(null);
+  $('#tt-models-panel .tt-algorithm button.predict').removeClass('active');
+  $('#tt-models-panel .tt-algorithm .content .tt-explanation').empty();
+}
+
 function showCompound() {
-  var kit = this;
-  kit = tt.browserKit;
+  var kit = tt.browserKit;
+
   if (kit.dataset.dataEntry[tt.compoundIdx] != null) {
     $('#tt-diagram img.toxtree-diagram')[0].src = kit.dataset.dataEntry[tt.compoundIdx].compound.diagramUri;
     resizeFeatures();
@@ -146,18 +178,29 @@ function showCompound() {
     $('#tt-browser-panel .next-field').removeClass('paginate_disabled_next').addClass('paginate_enabled_next');
 
   var entry = tt.browserKit.dataset.dataEntry[tt.compoundIdx];
-  if (entry != null) {
-    var data = tt.browserKit.featureData(entry, tt.coreFeatures);
-    ccLib.populateData(tt.featuresList, '#tt-feature', data);
-  }
+  if (entry != null)
+    addFeatures(tt.browserKit.featureData(entry, tt.coreFeatures));
 }
 
 function showPrediction(result, algoUri) {
+  for (var idx = 0, al = tt.modelKit.algorithm.length; idx < al; ++idx) {
+    if (tt.modelKit.algorithm[idx].uri == algoUri)
+      break;    
+  }
+  var explanation = null;
   var data = jToxCompound.extractFeatures(result.dataEntry[0], result.feature, function (entry, feature, fId) {
-    return !!entry.value && entry.title.indexOf("#explanation") == -1;
+    if (entry.title.indexOf("#explanation") > -1)
+      explanation = entry.value;
+    else if (!!entry.value) {
+      return true;
+    }
+    return false;
   });
   
-  ccLib.populateData(tt.featuresList, '#tt-feature', data);
+  addFeatures(data, tt.modelKit.algorithm[idx].id);
+  var aEl = $('#tt-models-panel div.tt-algorithm:nth-child(' + (idx + 1) + ')')[0];
+  $('.tt-explanation', aEl).html(explanation);
+  $(aEl).removeClass('folded');
 }
 
 function loadCompound(index) {
@@ -169,12 +212,9 @@ function loadCompound(index) {
     tt.compoundIdx = 0;
     tt.browserKit.nextPage();
   }
-  else { // normal showing up
+  else if (index != tt.compoundIdx) { // normal showing up
     tt.compoundIdx = index;
-    $(tt.featuresList).empty();
-    $('#tt-diagram img.toxtree-diagram')[0].src = '';
-    resizeFeatures();
-    
+    clearSlate();
     showCompound();
   }
 }
@@ -207,6 +247,21 @@ $(document).ready(function(){
   $('#tt-models-panel a.unselect-all').on('click', function () {
     $('#tt-models-panel button.tt-toggle.auto').removeClass('active');
     onSelectedUpdate.call(this);
+  });
+  $('#tt-models-panel a.run-selected').on('click', function () {
+    runSelected();
+  });
+  $('#tt-models-panel a.show-hide').on('click', function () {
+    var alt = $(this).data('other');
+    $(this).data('other', this.innerHTML);
+    this.innerHTML = alt;
+    var set = $('#tt-models-panel button.tt-toggle.auto.active').parents('.tt-algorithm');
+    if (alt == 'show')
+      set.hide();
+    else {
+      set.show();
+      $('#tt-models-panel button.tt-toggle.auto').parents('.tt-algorithm:hidden').show();
+    }
   });
   
   tt.browserKit = jToxCompound.kits[0];
