@@ -1,19 +1,11 @@
 TODO:
 
-- use ui-widget and ui-widget-header for foldable stuff
-- add populateData(root, template, data) tool in ccLib
-
-- hiding search pane
-- foldable table view of the same information - at the bottom.
-- old-style UI
-- sizing of feature table - so that diagram is at the bottom
+- checkboxes in the table
 
 - jToxModel.getModel(algorithmUri, callback) routine (including polling task).
 - glue jToxCompound with jToxSearch, jToxQuery,
-- make onDetailedAlgo call the model creation / query...
-- Result column for jToxModel to show prediction results
 
-- make some docs - jToxCompound additions, tableLanguage, etc. updateCounter
+- make some docs - jToxCompound additions, tableLanguage, etc. updateCounter, noInterface and many others
 - Make all kits react adequately on failure on network / calls
 - deferred re-query (postpone)
 

@@ -1,51 +1,3 @@
-var config_toxtree = {
-  "baseFeatures": {
-		"http://www.wikipathways.org/index.php/Pathway" :  {
-			"title": "Wiki Pathways",
-			"data" : "compound.wikipathway",
-			"accumulate": true,
-			"render" : function(data, type, full) {
-				return (type != "display") ? data : full.compound.wikipathway;
-			}
-		},
-		"http://www.opentox.org/echaEndpoints.owl#Carcinogenicity" : {
-      "title": "Carcinogenicity",
-      "data" : "compound.carcinogenicity",
-      "accumulate": true,
-      "render" : function(data, type, full) {
-        return (type != "display") ? data : (
-                (data=="active")?("<span style='color:red'>"+data+"</span>"):data
-        );
-      }
-    },
-		"http://www.opentox.org/echaEndpoints.owl#Mutagenicity" : {
-			"title": "Mutagenicity",
-      "data" : "compound.mutagenicity",
-			"accumulate": true,
-			"render" : function(data, type, full) {
-        return (type != "display") ? data : (
-				  (data=="active")?("<span style='color:red'>"+data+"</span>"):data);
-      }
-		}
-  },
-	"columns": {
-  	"algorithm": { 
-    	'Info': { bVisible: false },
-    	'Description': { bVisible: false },
-    	'Result': { iOrder: 3, sTitle: "Result", sClass: "tt-model-result", sDefaultContent: "-" }
-  	},
-  	"compound": {
-  	  'Source': { bVisible: false },
-  	  'Name': { sWidth: "25%" },
-  	  'Value': { sWidth: "55%"},
-  	  'SameAs': { sWidth: "20%'"}
-  	}
-	},
-	"handlers": {
-  	"query": onQuery,
-	}
-};
-
 var tt = {
   browserKit: null,
   modelKit: null,
@@ -65,11 +17,20 @@ var tt = {
   ]
 };
 
-function onQuery(e, query) {
-  $(tt.featuresList).empty();
-  $('#tt-diagram img.toxtree-diagram')[0].src = '';
-  query.query();  
-}
+var config_toxtree = {
+	"handlers": {
+  	"query": function (e, query) {
+      $(tt.featuresList).empty();
+      $('#tt-diagram img.toxtree-diagram')[0].src = '';
+      query.query();  
+    },
+    "checked": function (e, query) {
+      // TODO: initiate the single compound browser to work on selected only
+    }
+	}
+};
+
+
 
 function onSelectedUpdate(e) {
 	var tEl = $('#tt-models-panel .title')[0];
@@ -104,11 +65,14 @@ function resizeFeatures(e) {
   if (timer != null)
     clearTimeout(timer);
   var timer = setTimeout(function () {
-    var bropane = $('#tt-browser-panel')[0];
-    bropane.style.height = bropane.parentNode.offsetHeight + 'px';
-    var bottom = $('#tt-diagram')[0].offsetTop;
-    var top = tt.featuresList.offsetTop;
-    tt.featuresList.style.height = (bottom - top) + 'px';
+    var bigpane = $('#tt-bigpane')[0];
+    $(bigpane).height(document.body.offsetHeight - bigpane.offsetTop);
+
+    var bropane = $('#tt-browser-panel');
+    bropane.height(document.body.offsetHeight - bigpane.offsetTop);
+    
+    var listpane = $('#tt-features .list')[0];
+    $(listpane).height(bropane.height() - $('#tt-diagram').height() - listpane.offsetTop - 30); // 30 comes from padding + border styling...
   }, 100);
 }
 
@@ -170,6 +134,26 @@ function showCompound(index) {
   }
 }
 
+function switchView(mode) {
+  if (typeof mode != 'string')
+    mode = $(this).data('mode');
+  $('#sidebar .side-title>div').each(function () {
+    if ($(this).data('mode') == mode)
+      $(this).addClass("pressed");
+    else
+      $(this).removeClass("pressed");
+  });
+  
+  var scroller = $('#tt-bigpane')[0];
+  $(scroller).animate({ scrollTop: (mode == 'single') ? 0 : $('#tt-table')[0].offsetTop }, 300, 'easeOutQuad');
+}
+
+function onTableDetails(idx) {
+  showCompound(idx);
+  switchView('single');
+  return false;  
+}
+
 $(document).ready(function(){
   $('#tt-models-panel a.select-all').on('click', function () {
     $('#tt-models-panel input[type="checkbox"]').each(function () { this.checked = true;});
@@ -187,6 +171,8 @@ $(document).ready(function(){
   $('#tt-browser-panel .prev-field').on('click', function () { if ($(this).hasClass('paginate_enabled_previous')) showCompound(tt.compoundIdx - 1); });
   $('#tt-browser-panel .next-field').on('click', function () { if ($(this).hasClass('paginate_enabled_next')) showCompound(tt.compoundIdx + 1); });
   $('#tt-diagram .title').on('click', resizeFeatures);
+  $('#sidebar .side-title>div').on('click', switchView);
+  switchView('single');
   
   $(window).on('resize', resizeFeatures);
   resizeFeatures(null);

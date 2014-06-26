@@ -22,6 +22,7 @@ var jToxCompound = (function () {
     "onLoaded": null,         // invoked when a set of compound is loaded.
     "onPrepared": null,       // invoked when the initial call for determining the tabs/columns is ready
     "onDetails": null,        // invoked when a details pane is openned
+    "preDetails": null,       // invoked prior of details pane creation to see if it is going to happen at all
     "fnAccumulate": function(fId, oldVal, newVal, features) {
       if (ccLib.isNull(newVal))
         return oldVal;
@@ -420,6 +421,8 @@ var jToxCompound = (function () {
           return; // that means you've forgotten to add #DetailedInfoRow feature somewhere.
           
         var idx = jT.$(row).data('jtox-index');
+        if (self.settings.preDetails != null && !ccLib.fireCallback(self.settings.preDetails, self, idx, cell))
+          return;
         jT.$(row).toggleClass('jtox-detailed-row');
         var toShow = jT.$(row).hasClass('jtox-detailed-row');
 

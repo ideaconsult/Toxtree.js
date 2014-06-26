@@ -1,8 +1,62 @@
-div.tt-bigpane {
+html, body {
+  width: 100%;
+  height: 100%;  
+}
+
+body>div {
+  height: 100%;
+  width: 100%;
+}
+
+#sidebar {
+  position: fixed;
+	background-color: #fafafa;
+	border: 1px solid #ccc;
+  width: 40px;
+  top: 50px;
+  left: -25px;
+	bottom: 0px;
+	z-index: 100;
+	padding: 0px 5px 0px 8px;
+	border-radius: 7px;
+	box-shadow: 3px 3px 7px #999;
+}
+
+#sidebar .side-title {
+  min-width: 400px;
+  float: right;
+  transform-origin: 100% 100%;
+  -webkit-transform-origin: 100% 100%;
+  -moz-transform-origin: 100% 100%;
+  -o-transform-origin: 100% 100%;
+  -ms-transform-origin: 100% 100%;
+	transform: rotate(270deg);
+  -webkit-transform: rotate(270deg);
+  -moz-transform: rotate(270deg);   
+  -o-transform: rotate(270deg);  	
+  -ms-transform: rotate(270deg);  	
+}
+
+#sidebar .side-title>div {
+  display: inline-block;
+  width: 49%;
+  text-align: center;
+  border-radius: 7px;
+}
+
+#sidebar .side-title>div:hover,
+#sidebar .side-title>div.pressed {
+  background: #e6e6e6;
+}
+
+#tt-bigpane {
   position: relative;
   width: 100%;
-  height: 100%;
-  margin-left: 5px;  
+  margin: 0px;
+  box-sizing: border-box;
+  padding-left: 45px;
+  padding-right: 5px;
+  overflow: scroll;
 }
 
 #tt-models-panel {
@@ -15,6 +69,7 @@ div.tt-bigpane {
 #tt-models-panel .selections {
   float: right;
   vertical-align: top;
+  font-size: 90%;
 }
 
 div.tt-algorithm div.jtox-inline.float-right {
@@ -58,6 +113,7 @@ div.tt-algorithm div.jtox-inline.float-right {
 #tt-features .list {
   overflow: scroll;
   box-sizing: border-box;
+  font-size: 90%;
 }
 
 #tt-features .tt-feature {
@@ -82,4 +138,8 @@ div.tt-algorithm div.jtox-inline.float-right {
   display: inline-block;
   overflow: visible;
   position: relative;
+}
+
+#tt-table {
+  font-size: 90%;
 }
