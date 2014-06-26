@@ -362,7 +362,7 @@ window.jT = window.jToxKit = {
   	baseUrl: null,                  // the baseUrl for the server that loaded the page.
   	fullUrl: null,                  // the url as it is on loading the page - this is parsed one, i.e. parseUrl() processed.
   	timeout: 15000,                 // the timeout an call to the server should be wait before the attempt is considered error.
-  	pollDelay: 200,                 // after how many milliseconds a new attempt should be made during task polling.
+  	pollDelay: 250,                 // after how many milliseconds a new attempt should be made during task polling.
   	onConnect: function(s){ },		  // function (service): called when a server request is started - for proper visualization. Part of settings.
   	onSuccess: function(s, c, m) { },	// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
   	onError: function (s, c, m) { if (!!console && !!console.log) console.log("jToxKit call error (" + c + "): " + m + " from request: [" + s + "]"); },		// function (code, mess): called on server reques error. Part of settings.
@@ -532,24 +532,22 @@ window.jT = window.jToxKit = {
 	/* Poll a given taskId and calls the callback when a result from the server comes - 
 	be it "running", "completed" or "error" - the callback is always called.
 	*/
-	pollTask : function(kit, task, callback) {
+	pollTask : function(kit, task, callback, jhr) {
 		var self = this;
 		if (task === undefined || task.task === undefined || task.task.length < 1){
 			console.log("Wrong task passed for polling: " + JSON.stringify(task));
 			return;
 		}
 		task = task.task[0];
-		ccLib.fireCallback(callback, kit, task);
 		if (task.completed == -1){ // i.e. - running
 			setTimeout(function(){
-				self.call(kit, task.result, function(newTask){
-					self.pollTask(newTask, callback);
+				self.call(kit, task.result, function(newTask, jhr){
+					self.pollTask(kit, newTask, callback, jhr);
 				});
-			}, self.pollDelay);
+			}, kit.settings.pollDelay);
 		}
-		else if (task.error){ // additionally call the error handler
-		  ccLib.fireCallback(self.settings.onError, self, '-1', task.error);
-		}
+		else
+  	  ccLib.fireCallback(callback, kit, task, jhr);
 	},
 	
 	/* Deduce the baseUrl from a given Url - either if it is full url, of fallback to jToxKit's if it is local
@@ -2332,6 +2330,7 @@ var jToxModel = (function () {
     selectionHandler: null,   // jToxQuery handler to be attached on each entry's checkbox
     algorithmLink: true,      // when showing algorithms, whether to make it's id a link to an (external) full info page
     algorithms: false,        // ask for algorithms, not models
+    forceCreate: false,       // upon creating a model from algorithm - whether to attempt getting a prepared one, or always create it new
     onLoaded: null,           // callback to be called when data has arrived.
     sDom: "<Fif>rt",          // merged to dataTable's settings, when created
     oLanguage: null,          // merged to dataTable's settings, when created
@@ -2478,10 +2477,32 @@ var jToxModel = (function () {
     },
     
     getModel: function (algoUri, callback) {
-      // TODO: make a request for getting / creating a model for given algorithm
+      var self = this;
+      var createIt = function () {
+        jT.call(self, algoUri, { method: 'POST' }, function (result, jhr) {
+          if (!result)
+            ccLib.fireCallback(callback, self, null, jhr);
+          else
+            jT.pollTask(self, result, function (task, jhr) {
+              ccLib.fireCallback(callback, self, (!kit.error ? task.result : null), jhr);
+            });
+        });
+      };
+      
+      if (self.settings.forceCreate)
+        createIt();
+      else 
+        jT.call(self, self.settings.baseUrl + '/model?algorithm=' + encodeURIComponent(algoUri), function (result, jhr) {
+          if (!result)
+            ccLib.fireCallback(callback, self, null, jhr);
+          else if (result.model.length == 0)
+            createIt();
+          else // we have it!
+            ccLib.fireCallback(callback, self, result.model[0].URI, jhr);
+        });
     },
     
-    runPrediction: function (compoundUri, modelUri, callback) {
+    runPrediction: function (datasetUri, modelUri, callback) {
       // TODO: make a POST request for prediction for given compound on given model
       // the callback is returned after the task polling is done.
     },

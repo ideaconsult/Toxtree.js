@@ -22,6 +22,7 @@ var config_toxtree = {
   	"query": function (e, query) {
       $(tt.featuresList).empty();
       $('#tt-diagram img.toxtree-diagram')[0].src = '';
+      resizeFeatures(e);
       query.query();  
     },
     "checked": function (e, query) {
@@ -30,7 +31,9 @@ var config_toxtree = {
 	}
 };
 
-
+function formatAlgoName(val) {
+  return (val.indexOf('ToxTree: ') == 0) ? val = val.substr(9) : val;
+}
 
 function onSelectedUpdate(e) {
 	var tEl = $('#tt-models-panel .title')[0];
@@ -68,11 +71,8 @@ function resizeFeatures(e) {
     var bigpane = $('#tt-bigpane')[0];
     $(bigpane).height(document.body.offsetHeight - bigpane.offsetTop);
 
-    var bropane = $('#tt-browser-panel');
-    bropane.height(document.body.offsetHeight - bigpane.offsetTop);
-    
     var listpane = $('#tt-features .list')[0];
-    $(listpane).height(bropane.height() - $('#tt-diagram').height() - listpane.offsetTop - 30); // 30 comes from padding + border styling...
+    $(listpane).height($(bigpane).height() - $('#tt-diagram').height() - listpane.offsetTop - 30); // 30 comes from padding + border styling...
   }, 100);
 }
 

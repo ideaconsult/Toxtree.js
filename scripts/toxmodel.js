@@ -12,6 +12,7 @@ var jToxModel = (function () {
     selectionHandler: null,   // jToxQuery handler to be attached on each entry's checkbox
     algorithmLink: true,      // when showing algorithms, whether to make it's id a link to an (external) full info page
     algorithms: false,        // ask for algorithms, not models
+    forceCreate: false,       // upon creating a model from algorithm - whether to attempt getting a prepared one, or always create it new
     onLoaded: null,           // callback to be called when data has arrived.
     sDom: "<Fif>rt",          // merged to dataTable's settings, when created
     oLanguage: null,          // merged to dataTable's settings, when created
@@ -158,10 +159,32 @@ var jToxModel = (function () {
     },
     
     getModel: function (algoUri, callback) {
-      // TODO: make a request for getting / creating a model for given algorithm
+      var self = this;
+      var createIt = function () {
+        jT.call(self, algoUri, { method: 'POST' }, function (result, jhr) {
+          if (!result)
+            ccLib.fireCallback(callback, self, null, jhr);
+          else
+            jT.pollTask(self, result, function (task, jhr) {
+              ccLib.fireCallback(callback, self, (!kit.error ? task.result : null), jhr);
+            });
+        });
+      };
+      
+      if (self.settings.forceCreate)
+        createIt();
+      else 
+        jT.call(self, self.settings.baseUrl + '/model?algorithm=' + encodeURIComponent(algoUri), function (result, jhr) {
+          if (!result)
+            ccLib.fireCallback(callback, self, null, jhr);
+          else if (result.model.length == 0)
+            createIt();
+          else // we have it!
+            ccLib.fireCallback(callback, self, result.model[0].URI, jhr);
+        });
     },
     
-    runPrediction: function (compoundUri, modelUri, callback) {
+    runPrediction: function (datasetUri, modelUri, callback) {
       // TODO: make a POST request for prediction for given compound on given model
       // the callback is returned after the task polling is done.
     },
