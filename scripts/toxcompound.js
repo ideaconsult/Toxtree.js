@@ -738,27 +738,32 @@ var jToxCompound = (function () {
         jT.$(prevBut).addClass('paginate_disabled_previous').removeClass('paginate_enabled_previous');
     },
     
+    queryUri: function (scope) {
+      var self = this;
+      if (scope == null)
+        scope = { from: self.pageStart, size: self.pageSize };
+      if (scope.from < 0)
+        scope.from = 0;
+      if (scope.size == null)
+        scope.size = self.pageSize;
+        
+      return ccLib.addParameter(self.datasetUri, "page=" + Math.floor(scope.from / scope.size) + "&pagesize=" + scope.size);
+    },
+    
     // make the actual query for the (next) portion of data.
     queryEntries: function(from, size) {
       var self = this;
-      if (from < 0)
-        from = 0;
-      if (size == null)
-        size = self.pageSize;
-        
-      // setup the size, as well
-      jT.$('.jtox-controls select', self.rootElement).val(size);
-      
-      var qStart = Math.floor(from / size);
-      var qUri = ccLib.addParameter(self.datasetUri, "page=" + qStart + "&pagesize=" + size);
+      var scope = { 'from': from, 'size': size };
+      var qUri = self.queryUri(scope);
+      jT.$('.jtox-controls select', self.rootElement).val(scope.size);
       self.dataset = null;
 
       jT.call(self, qUri, function(dataset){
         if (!!dataset){
           // first, arrange the page markers
-          self.pageSize = size;
-          qStart = self.pageStart = qStart * size;
-          if (dataset.dataEntry.length < size) // we've reached the end!!
+          self.pageSize = scope.size;
+          var qStart = self.pageStart = Math.floor(scope.from / scope.size) * scope.size;
+          if (dataset.dataEntry.length < self.pageSize) // we've reached the end!!
             self.entriesCount = qStart + dataset.dataEntry.length;
           
           // then process the dataset

@@ -409,61 +409,58 @@ window.jT = window.jToxKit = {
     var self = this;
 
   	var dataParams = self.$(element).data();
-    
-  	if (!dataParams.manualInit) {
-    	var kit = dataParams.kit;
-    	var topSettings = self.$.extend(true, {}, self.settings);
+  	var kit = dataParams.kit;
+  	var topSettings = self.$.extend(true, {}, self.settings);
 
-    	// we need to traverse up, to collect some parent's settings...
-    	self.$(self.$(element).parents('.jtox-toolkit').toArray().reverse()).each(function(){
-      	if (!self.$(this).hasClass('jtox-widget')) {
-        	topSettings = self.$.extend(true, topSettings, self.$(this).data());
-      	}
-    	});
-    	
-      dataParams = self.$.extend(true, topSettings, self.blankSettings, dataParams);
+  	// we need to traverse up, to collect some parent's settings...
+  	self.$(self.$(element).parents('.jtox-toolkit').toArray().reverse()).each(function(){
+    	if (!self.$(this).hasClass('jtox-widget')) {
+      	topSettings = self.$.extend(true, topSettings, self.$(this).data());
+    	}
+  	});
+  	
+    dataParams = self.$.extend(true, topSettings, self.blankSettings, dataParams);
 
-  	  // the real initialization function
-      var realInit = function (params) {
-      	if (!kit)
-      		return null;
-        // add jTox if it is missing AND there is not existing object/function with passed name. We can initialize ketcher and others like this too.
-      	if (!window[kit] && kit.indexOf('jTox') != 0)
-    	  	kit = 'jTox' + kit.charAt(0).toUpperCase() + kit.slice(1);
-    
-      	var fn = window[kit];
-      	if (typeof fn == 'function') {
-      	  var obj = new fn(element, params);
-          if (fn.kits === undefined)
-            fn.kits = [];
-          fn.kits.push(obj);
-          return obj;
-      	}
-        else if (typeof fn == "object" && typeof fn.init == "function")
-          return fn.init(element, params);
-        else
-          console.log("jToxError: trying to initialize unexistend jTox kit: " + kit);
+	  // the real initialization function
+    var realInit = function (params) {
+    	if (!kit)
+    		return null;
+      // add jTox if it is missing AND there is not existing object/function with passed name. We can initialize ketcher and others like this too.
+    	if (!window[kit] && kit.indexOf('jTox') != 0)
+  	  	kit = 'jTox' + kit.charAt(0).toUpperCase() + kit.slice(1);
+  
+    	var fn = window[kit];
+    	if (typeof fn == 'function') {
+    	  var obj = new fn(element, params);
+        if (fn.kits === undefined)
+          fn.kits = [];
+        fn.kits.push(obj);
+        return obj;
+    	}
+      else if (typeof fn == "object" && typeof fn.init == "function")
+        return fn.init(element, params);
+      else
+        console.log("jToxError: trying to initialize unexistend jTox kit: " + kit);
 
-        return null;
-      };
+      return null;
+    };
 
-  	  // first, get the configuration, if such is passed
-  	  if (!ccLib.isNull(dataParams.configFile)) {
-  	    // we'll use a trick here so the baseUrl parameters set so far to take account... thus passing 'fake' kit instance
-  	    // as the first parameter of jT.call();
-    	  self.call({ settings: dataParams}, dataParams.configFile, function(config){
-      	  if (!!config)
-      	    dataParams['configuration'] = self.$.extend(true, dataParams['configuration'], config);
-          jT.$(element).data('jtKit', realInit(dataParams));
-    	  });
-  	  }
-  	  else {
-  	    if (!ccLib.isNull(dataParams.configuration) && typeof dataParams.configuration == "string" && !ccLib.isNull(window[dataParams.configuration]))
-  	      dataParams.configuration = window[dataParams.configuration];
-    	  
+	  // first, get the configuration, if such is passed
+	  if (!ccLib.isNull(dataParams.configFile)) {
+	    // we'll use a trick here so the baseUrl parameters set so far to take account... thus passing 'fake' kit instance
+	    // as the first parameter of jT.call();
+  	  self.call({ settings: dataParams}, dataParams.configFile, function(config){
+    	  if (!!config)
+    	    dataParams['configuration'] = self.$.extend(true, dataParams['configuration'], config);
         jT.$(element).data('jtKit', realInit(dataParams));
-  	  }
-    }
+  	  });
+	  }
+	  else {
+	    if (!ccLib.isNull(dataParams.configuration) && typeof dataParams.configuration == "string" && !ccLib.isNull(window[dataParams.configuration]))
+	      dataParams.configuration = window[dataParams.configuration];
+  	  
+      jT.$(element).data('jtKit', realInit(dataParams));
+	  }
   },
   
   // the jToxKit initialization routine, which scans all elements, marked as 'jtox-toolkit' and initializes them
@@ -494,7 +491,7 @@ window.jT = window.jToxKit = {
   	}
 
   	// now scan all insertion divs
-  	self.$('.jtox-toolkit', root).each(function(i) { self. initKit(this); });
+  	self.$('.jtox-toolkit', root).each(function(i) { if (!jT.$(this).data('manualInit')) self. initKit(this); });
 	},
 	
 	kit: function (element) {
@@ -2011,27 +2008,32 @@ var jToxCompound = (function () {
         jT.$(prevBut).addClass('paginate_disabled_previous').removeClass('paginate_enabled_previous');
     },
     
+    queryUri: function (scope) {
+      var self = this;
+      if (scope == null)
+        scope = { from: self.pageStart, size: self.pageSize };
+      if (scope.from < 0)
+        scope.from = 0;
+      if (scope.size == null)
+        scope.size = self.pageSize;
+        
+      return ccLib.addParameter(self.datasetUri, "page=" + Math.floor(scope.from / scope.size) + "&pagesize=" + scope.size);
+    },
+    
     // make the actual query for the (next) portion of data.
     queryEntries: function(from, size) {
       var self = this;
-      if (from < 0)
-        from = 0;
-      if (size == null)
-        size = self.pageSize;
-        
-      // setup the size, as well
-      jT.$('.jtox-controls select', self.rootElement).val(size);
-      
-      var qStart = Math.floor(from / size);
-      var qUri = ccLib.addParameter(self.datasetUri, "page=" + qStart + "&pagesize=" + size);
+      var scope = { 'from': from, 'size': size };
+      var qUri = self.queryUri(scope);
+      jT.$('.jtox-controls select', self.rootElement).val(scope.size);
       self.dataset = null;
 
       jT.call(self, qUri, function(dataset){
         if (!!dataset){
           // first, arrange the page markers
-          self.pageSize = size;
-          qStart = self.pageStart = qStart * size;
-          if (dataset.dataEntry.length < size) // we've reached the end!!
+          self.pageSize = scope.size;
+          var qStart = self.pageStart = Math.floor(scope.from / scope.size) * scope.size;
+          if (dataset.dataEntry.length < self.pageSize) // we've reached the end!!
             self.entriesCount = qStart + dataset.dataEntry.length;
           
           // then process the dataset

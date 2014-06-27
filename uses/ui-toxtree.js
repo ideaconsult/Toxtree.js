@@ -2,6 +2,7 @@ var tt = {
   browserKit: null,
   modelKit: null,
   featuresList: null,
+  algoMap: {}, // { <id> : { index: <>, results: <>, dom: }
   compoundIdx: 0,
   coreFeatures: [
     "http://www.opentox.org/api/1.1#CASRN", 
@@ -20,6 +21,7 @@ var tt = {
 };
 
 var config_toxtree = {
+  "baseFeatures": {}, // to be expanded upon algorithm loading
 	"handlers": {
   	"query": function (e, query) {
   	  clearSlate();
@@ -35,6 +37,18 @@ var config_toxtree = {
     },
     "makeModel": makeModel,
     "runPredict": function (e) { runPredict.call(this, e); }
+	},
+	"groups" : {
+	  "Identifiers": [
+      "http://www.opentox.org/api/1.1#Diagram",
+      "http://www.opentox.org/api/1.1#CASRN", 
+      "http://www.opentox.org/api/1.1#EINECS",
+      "http://www.opentox.org/api/1.1#IUCLID5_UUID"
+	  ],
+  	"Names" : null,
+  	"Calculated": null,
+  	"Other": null,
+  	"ToxTree": []   // to be expanded upon algorithm loading
 	}
 };
 
@@ -101,6 +115,9 @@ function runSelected() {
 function formatAlgoName(val) {
   return (val.indexOf('ToxTree: ') == 0) ? val = val.substr(9) : val;
 }
+function formatPrediction(val) {
+  return val != null ? val :'-';  
+}
 
 function onSelectedUpdate(e) {
 	var tEl = $('#tt-models-panel .title')[0];
@@ -110,8 +127,33 @@ function onSelectedUpdate(e) {
 
 function onAlgoLoaded(result) {
   $(tt.modelKit.rootElement).empty();
-  ccLib.populateData(tt.modelKit.rootElement, '#tt-algorithm', result.algorithm);
+  var idx = 0;
+  ccLib.populateData(tt.modelKit.rootElement, '#tt-algorithm', result.algorithm, function (data) {
+    tt.algoMap[data.id] = { 
+      index: idx,
+      dom: this,
+      results: {},
+    };
+    
+    config_toxtree.groups.ToxTree.push(data.uri);
+    config_toxtree.baseFeatures[data.uri] = {
+  	  title: formatAlgoName(data.name), 
+  	  search: false,
+  	  data: "compound.index",
+  	  column: { sClass: data.id },
+  	  render: (function (aId) { return function(data, type, full) {
+  	    var val = (tt.algoMap[aId].results[data] || {}).prediction || '-';
+  	    return (type != 'display') ? val : '<div class="tt-table-value">' + val + '</div>';
+        };
+      })(data.id)
+    };
+    idx++;
+  });
+  
   onSelectedUpdate(null);
+  // not it's time to create the browser table
+  jT.initKit($('#tt-table')[0]);
+  tt.browserKit = jToxCompound.kits[0];
 }
 
 var updateTimer = null;
@@ -278,7 +320,6 @@ $(document).ready(function(){
     });
   });
   
-  tt.browserKit = jToxCompound.kits[0];
   tt.modelKit = jToxModel.kits[0];
   tt.featuresList = $('#tt-features .list')[0];
   

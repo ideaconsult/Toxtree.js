@@ -54,11 +54,11 @@
         <div id="tt-models-panel">
           <div>
             <div class="title jtox-inline"><h5>Toxicity prediction modules (0/0)</h5></div>
-            <div class="jtox-inline selections"><a href="#" class="expand-collapse" title="Expand/collapse all algorithm panes" data-other="collapse">expand</a>&nbsp;<a href="#" class="select-unselect" title="(Un)select all algorithms" data-other="unselect">select</a>&nbsp;<a href="#" class="run-selected" title="Run predictions for all selected algorithms">run</a>&nbsp;<a href="#" class="show-hide" data-other="show" title="Hide/show unselected algorithms">hide</a></div>
+            <div class="jtox-inline selections"><a href="#" class="select-unselect" title="(Un)select all algorithms" data-other="unselect">select</a>&nbsp;<a href="#" class="expand-collapse" title="Expand/collapse all algorithm panes" data-other="collapse">expand</a>&nbsp;<a href="#" class="run-selected" title="Run predictions for all selected algorithms">run</a>&nbsp;<a href="#" class="show-hide" data-other="show" title="Hide/show unselected algorithms">hide</a></div>
           </div>
           <div class="jtox-toolkit jtox-widget cc-flex" data-kit="model" data-algorithms="true" data-no-interface="true" data-on-loaded="onAlgoLoaded" data-algorithm-needle="ToxTree"></div>
         </div>
-        <div id="tt-table" class="jtox-toolkit jtox-panel" data-kit="compound" data-pre-details="onTableDetails" data-show-tabs="false" data-on-loaded="showCompound" data-selection-handler="checked"></div>
+        <div id="tt-table" class="jtox-toolkit jtox-panel" data-kit="compound" data-manual-init="true" data-pre-details="onTableDetails" data-show-tabs="false" data-on-loaded="showCompound" data-selection-handler="checked"></div>
       </div>
     </div>
     <div id="sidebar">
@@ -78,7 +78,7 @@
         <a target="_blank" class="data-field attribute" data-field="uri" data-attribute="href"><span class="ui-icon ui-icon-link jtox-inline"></span></a>
         <span class="data-field" data-field="name" data-format="formatAlgoName">?</span>
         <div class="jtox-inline float-right">
-          <button class="tt-toggle jtox-handler predict" data-handler="runPredict" title="Run automatically on new queries">▶︎</button>
+          <button class="tt-toggle jtox-handler predict" data-handler="runPredict" title="Run prediction with the algorithm on current compound">▶︎</button>
           <button class="tt-toggle jtox-handler model" data-handler="makeModel" title="Prepare the model for this algorithm">M</button>
           <button class="tt-toggle jtox-handler auto" data-handler="markAuto" title="Run automatically on new queries">A</button>
         </div>
