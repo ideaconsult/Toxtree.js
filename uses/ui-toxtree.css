@@ -108,6 +108,12 @@ div.tt-algorithm div.jtox-inline.float-right {
   vertical-align: top;
 }
 
+div.tt-algorithm div.tt-classification {
+  margin-left: 5px;
+  margin-top: 5px;
+  text-align: center;
+}
+
 .tt-toggle {
   display: inline-block;
   border: 1px solid #aaa;
@@ -210,4 +216,64 @@ div.tt-algorithm div.jtox-inline.float-right {
 
 #tt-table {
   font-size: 90%;
+}
+
+#tt-table table td.calculated button,
+#tt-table table td.calculated .tt-class .ui-icon {
+  display: none;  
+}
+
+.toxtree-models .class-result {
+	width: 100%;
+	margin-bottom: 10px;
+	display:none;
+	vertical-align: top;
+}
+
+.toxtree-models .predicted .class-result {
+	display: inherit;
+}
+
+div.tt-class  {
+	display: inline-block;
+	text-align: center;
+	border: solid 1px #333;
+	border-radius: 5px;
+	opacity: 0.5;
+	margin-top: 1px;
+	padding: 0px 5px 0px 5px;
+	width: 90%;
+	color: #333;
+	font-size: 90%;
+}
+
+div.tt-class.active {
+	opacity: 1.0;
+	color: #000;
+	font-weight: bold;
+}
+
+div.tt-class span.ui-icon {
+  display: none;
+  float: right;
+}
+
+div.tt-class.active span.ui-icon {
+  display: inline-block;
+}
+
+div.tt-class.toxic {
+	background-color: #e24b4b;
+}
+
+div.tt-class.nontoxic {
+	background-color:#49cb5b;
+}
+
+div.tt-class.inconclusive {
+	background-color: #d0e81a;
+}
+
+div.tt-class.unknown {
+	background-color: #aaaaaa;
 }

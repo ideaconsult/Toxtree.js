@@ -740,6 +740,8 @@ var jToxCompound = (function () {
     
     queryUri: function (scope) {
       var self = this;
+      if (self.datasetUri == null)
+        return null;
       if (scope == null)
         scope = { from: self.pageStart, size: self.pageSize };
       if (scope.from < 0)
@@ -885,17 +887,17 @@ var jToxCompound = (function () {
   
   cls.extractFeatures = function (entry, features, callback) {
     var data = [];
-    jT.$.map(features, function (obj, fId) {
-      var feat = jT.$.extend({}, obj);
-      feat.value = entry.values[fId]
+    for (var fId in features) {
+      var feat = jT.$.extend({}, features[fId]);
+      feat.value = entry.values[fId];
       if (!!feat.title) {
-        if (ccLib.fireCallback(callback, null, feat, obj, fId)) {
+        if (ccLib.fireCallback(callback, null, feat, fId)) {
           if (!feat.value)
             feat.value = '-';
           data.push(feat);
         }
       }
-    });
+    };
     
     return data;
   };

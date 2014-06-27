@@ -25,6 +25,9 @@ var config_toxtree = {
 	"handlers": {
   	"query": function (e, query) {
   	  clearSlate();
+  	  for (var aId in tt.algoMap)
+    	  tt.algoMap[aId].results = {};
+
       query.query();
     },
     "checked": function (e, query) {
@@ -84,7 +87,7 @@ function runPredict (el, algoId, all) {
   var index = null;
   if (all)
     datasetUri = tt.browserKit.queryUri();
-  else {
+  else if (tt.browserKit.dataset != null) {
     index = $(el).data('index');
     if (index == null)
       index = tt.compoundIdx;
@@ -98,7 +101,7 @@ function runPredict (el, algoId, all) {
   var runIt = function (modelUri) {
     tt.modelKit.runPrediction(datasetUri, modelUri, function (result) {
       if (!!result) {
-        showPrediction(result, algoId, all);
+        parsePrediction(result, algoId, index);
         $(el).addClass('active');
       }
       $(el).removeClass('loading');
@@ -126,8 +129,50 @@ function runSelected() {
 function formatAlgoName(val) {
   return (val.indexOf('ToxTree: ') == 0) ? val = val.substr(9) : val;
 }
-function formatPrediction(val) {
-  return val != null ? val :'-';  
+
+function buildCategories(features, values, all) {
+	var cats = [];
+	var regex = /\^\^(\S+)Category/i;
+	var multi = false;
+	
+	for (var fId in values) {
+	  if (features[fId].title.indexOf('#explanation') > -1 || features[fId].source.type.toLowerCase() != 'model')
+	    continue;
+  	var val = values[fId];
+  	var anot = features[fId].annotation;
+  	if (anot.length > 0) {
+  	  if (cats.length > 0)
+  	    multi = true;
+    	for (var i = 0;i < anot.length; ++i) {
+      	if (anot[i].o == val || all)
+      	  cats.push({
+        	  title: anot[i].o.replace(/\s/g, '&nbsp;'),
+        	  toxicity: anot[i].type.replace(regex, '$1').toLowerCase(),
+        	  active: anot[i].o == val
+      	  });
+    	}
+    }
+    else
+      cats.push({
+        title: val,
+        toxicity: 'unknown',
+        active: true
+      });
+	};
+	
+	if (multi)
+	  cats = cats.filter(function (o) { return o.active; });
+
+	return cats;
+}
+
+function formatClassification(root, mapRes, all) {
+  var cats = buildCategories(mapRes.features, mapRes.compound.values, all);
+  ccLib.populateData(root, '#tt-class', cats, function (data) {
+    $(this).addClass(data.toxicity);
+    if (data.active)
+      $(this).addClass('active');
+  });
 }
 
 function onSelectedUpdate(e) {
@@ -160,9 +205,7 @@ function onAlgoLoaded(result) {
   	  column: { sClass: data.id },
   	  render: (function (aId) { return function(data, type, full) {
   	    return (type != 'display') ? data : 
-  	    '<div class="tt-prediction">' +
-  	      '<button class="tt-toggle jtox-handler predict" data-algo-id="' + aId + '" data-index="' + data + '" data-handler="runPredict" title="Run prediction with the algorithm on current compound">▶︎</button>' +
-  	     '</div>';
+  	      '<button class="tt-toggle jtox-handler predict" data-algo-id="' + aId + '" data-index="' + data + '" data-handler="runPredict" title="Run prediction with the algorithm on current compound">▶︎</button>';
         };
       })(data.id)
     };
@@ -244,27 +287,51 @@ function showCompound() {
     addFeatures(tt.browserKit.featureData(entry, tt.coreFeatures));
 }
 
-function showPrediction(result, algoId, all) {
+function showPrediction(algoId) {
+  var map = tt.algoMap[algoId];
+  var mapRes = map.results[tt.compoundIdx];
+  
+  // check if we have results for this guy at all...
+  if (mapRes == null || mapRes.compound == null || mapRes.features == null)
+    return;
+
   var explanation = null;
+  var data = jToxCompound.extractFeatures(mapRes.compound, mapRes.features, function (entry, fId) {
+    if (entry.title.indexOf("#explanation") > -1)
+      explanation = entry.value;
+    else if (!!entry.value)
+      return true;
+    else
+      return false;
+  });
+
+  addFeatures(data, algoId);
+  var aEl = map.dom;
+  if (explanation != null)
+    $('.tt-explanation', aEl).html(explanation.replace(/(\W)(Yes|No)(\W)/g, '$1<span class="answer $2">$2</span>$3'));
+  $('.tt-classification', aEl).empty();
+  
+  formatClassification($('.tt-classification', aEl)[0], mapRes, true);
+  $(aEl).removeClass('folded');
+}
+
+function parsePrediction(result, algoId, index) {
+  var map = tt.algoMap[algoId];
+  
+  var cells = $('#tt-table table td.' + algoId);
   for (var i = 0, rl = result.dataEntry.length; i < rl; ++i) {
-    var compound = result.dataEntry[i];
-    
-    if (!all || i == tt.compoundIdx) {
-      var data = jToxCompound.extractFeatures(compound, result.feature, function (entry, feature, fId) {
-        if (entry.title.indexOf("#explanation") > -1)
-          explanation = entry.value;
-        else if (!!entry.value) {
-          return true;
-        }
-        return false;
-      });
-      addFeatures(data, algoId);
-      var aEl = tt.algoMap[algoId].dom;
-      if (explanation != null)
-        $('.tt-explanation', aEl).html(explanation.replace(/(\W)(Yes|No)(\W)/g, '$1<span class="answer $2">$2</span>$3'));
-      $(aEl).removeClass('folded');
-    }
+    var idx = i + (index || 0);
+    if (map.results[idx] == null)
+      map.results[idx] = {};
+    var mapRes = map.results[idx];
+    mapRes.compound = result.dataEntry[i];
+    mapRes.features = result.feature;
+    formatClassification(cells[idx], mapRes, false);
+    $(cells[idx]).addClass('calculated');
   }
+  
+  if (index == null || index == tt.compoundIdx)
+    showPrediction(algoId);
 }
 
 function loadCompound(index) {
@@ -280,6 +347,8 @@ function loadCompound(index) {
     tt.compoundIdx = index;
     clearSlate();
     showCompound();
+    for (var aId in tt.algoMap)
+      showPrediction(aId);
   }
 }
 

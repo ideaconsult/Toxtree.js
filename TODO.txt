@@ -1,6 +1,8 @@
 TODO:
 
-- result presentation - integrate it in showPrediction
+- fix the table height problems upon running a test and retrieving the result.
+- cleaning on changing the compound or reruning a query
+- redirecting from the a compound into the table to single view mode is not working.
 - checkboxes in the table
 
 - make some docs - jToxCompound additions, tableLanguage, etc. updateCounter, noInterface and many others, extractFeatures, etc. queryUri...
