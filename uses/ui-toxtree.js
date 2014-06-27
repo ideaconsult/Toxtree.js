@@ -152,6 +152,12 @@ function clearSlate() {
   $('#tt-models-panel .tt-algorithm .content .tt-explanation').empty();
 }
 
+function changeImage(part, path) {
+  
+  $('#tt-diagram img.toxtree-diagram')[0].src = tt.browserKit.dataset.dataEntry[tt.compoundIdx].compound.URI + path + '&media=image/png';
+  resizeFeatures(null);    
+}
+
 function showCompound() {
   var kit = tt.browserKit;
 
