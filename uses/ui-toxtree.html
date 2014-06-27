@@ -36,19 +36,13 @@
 <body>
   <div class="jtox-toolkit" data-kit="query" data-cross-domain="true" data-configuration="config_toxtree" data-base-url="http://apps.ideaconsult.net:8080/biodeg">
     <div id="tt-searchbar" class="jtox-toolkit jtox-widget" data-kit="search"></div>
-    <div id="sidebar">
-      <div class="side-title">
-        <div data-mode="table">Table view mode</div>
-        <div data-mode="single">Single view mode</div>
-      </div>
-    </div>
-    <div id="tt-bigpane">
+    <div id="tt-bigpane" class="cc-flex">
       <div>
         <div id="tt-browser-panel">
-    			<div id="tt-features">
+    			<div id="tt-features" class="cc-flex">
       			<div class="jtox-inline"><h5 class="counter-field">Available structure attributes </h5></div>
       			<div class="jtox-inline tt-controls"><a class="paginate_disabled_previous prev-field" tabindex="0" role="button">Previous</a><a class="paginate_disabled_next next-field" tabindex="0" role="button">Next</a></div>
-      			<div class="list jtox-panel"></div>
+      			<div class="list jtox-panel cc-flex"></div>
       		</div>
     			<div id="tt-diagram" class="jtox-foldable">
     			  <h5 class="title">Structure diagram</h5>
@@ -62,9 +56,15 @@
             <div class="title jtox-inline"><h5>Toxicity prediction modules (0/0)</h5></div>
             <div class="jtox-inline selections"><a href="#" class="select-all" title="Select all algorithms">select</a>&nbsp;<a href="#" class="unselect-all" title="Unselect all algorithms">unselect</a>&nbsp;<a href="#" class="run-selected" title="Run predictions for all selected algorithms">run</a>&nbsp;<a href="#" class="show-hide" data-other="show" title="Hide/show unselected algorithms">hide</a></div>
           </div>
-          <div class="jtox-toolkit jtox-widget" data-kit="model" data-algorithms="true" data-no-interface="true" data-on-loaded="onAlgoLoaded" data-algorithm-needle="ToxTree"></div>
+          <div class="jtox-toolkit jtox-widget cc-flex" data-kit="model" data-algorithms="true" data-no-interface="true" data-on-loaded="onAlgoLoaded" data-algorithm-needle="ToxTree"></div>
         </div>
         <div id="tt-table" class="jtox-toolkit jtox-panel" data-kit="compound" data-pre-details="onTableDetails" data-show-tabs="false" data-on-loaded="showCompound" data-selection-handler="checked"></div>
+      </div>
+    </div>
+    <div id="sidebar">
+      <div class="side-title">
+        <div data-mode="table">Table view mode</div>
+        <div data-mode="single">Single view mode</div>
       </div>
     </div>
   </div>

@@ -6,6 +6,7 @@ html, body {
 body>div {
   height: 100%;
   width: 100%;
+  position: relative;
 }
 
 #sidebar {
@@ -80,7 +81,6 @@ body>div {
 
 #tt-models-panel .jtox-toolkit {
   overflow: scroll;
-  height: 100%;
 }
 
 #tt-models-panel .content .tt-explanation {
@@ -139,7 +139,6 @@ div.tt-algorithm div.jtox-inline.float-right {
   position: relative;
   width: 40%;
   height: 100%;
-  min-width: 250px;
   display: inline-block;
   margin: 0px;
   vertical-align: top;
@@ -147,9 +146,6 @@ div.tt-algorithm div.jtox-inline.float-right {
 }
 
 #tt-diagram {
-  position: absolute;
-  bottom: 0px;
-  left: 0px;
   text-align: center;
   overflow: hidden;
   width: 100%;
@@ -168,6 +164,10 @@ div.tt-algorithm div.jtox-inline.float-right {
 #tt-browser-panel .tt-controls {
   vertical-align: bottom;
   float: right;
+}
+
+#tt-features {
+  position: relative;
 }
 
 #tt-features .list {

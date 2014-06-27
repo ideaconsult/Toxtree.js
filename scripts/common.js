@@ -16,7 +16,7 @@ var ccLib = {
     }
     return base;
   },
-
+  
   extendNew: function (base) {
     var deep = false;
     var arr = null;
@@ -205,10 +205,33 @@ var ccLib = {
 				return false;
 		  })
 	  });
-	 },
+  },
+	 
+  flexSize: function (root) {
+    var $ = jQuery;
+    $('.cc-flex', root).each(function () {
+      var el = this;
+      var getter = 'offsetHeight';
+      var setter = 'height';
+      var starter = 'offsetTop';
+      if ($(el).hasClass('horizontal')) {
+        getter = 'offsetWidth';
+        setter = 'width';
+        starter = 'offsetLeft';
+      }
+      
+      var others = el[starter];
+      $(el).parent().children().each(function () {
+        var pos = $(this).css('position');
+        if (el[starter] < this[starter] && pos != 'absolute' && pos != 'fixed')
+          others += this[getter]; 
+      });
+      el.style[setter] = (el.parentNode[getter] - others) + 'px';
+    });
+  },
 	 
 	 // Check if the form is not-empty according to non-empty fields
-	 validateForm: function (form, callback) {
+  validateForm: function (form, callback) {
   	var self = this;
 	  var ok = true;
 	  jQuery('.validate', form).each(function () {
