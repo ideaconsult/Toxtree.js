@@ -98,7 +98,7 @@ function runPredict (el, algoId, all) {
   var runIt = function (modelUri) {
     tt.modelKit.runPrediction(datasetUri, modelUri, function (result) {
       if (!!result) {
-        showPrediction(result, algoId, index);
+        showPrediction(result, algoId, all);
         $(el).addClass('active');
       }
       $(el).removeClass('loading');
@@ -244,22 +244,27 @@ function showCompound() {
     addFeatures(tt.browserKit.featureData(entry, tt.coreFeatures));
 }
 
-function showPrediction(result, algoId) {
+function showPrediction(result, algoId, all) {
   var explanation = null;
-  var data = jToxCompound.extractFeatures(result.dataEntry[0], result.feature, function (entry, feature, fId) {
-    if (entry.title.indexOf("#explanation") > -1)
-      explanation = entry.value;
-    else if (!!entry.value) {
-      return true;
+  for (var i = 0, rl = result.dataEntry.length; i < rl; ++i) {
+    var compound = result.dataEntry[i];
+    
+    if (!all || i == tt.compoundIdx) {
+      var data = jToxCompound.extractFeatures(compound, result.feature, function (entry, feature, fId) {
+        if (entry.title.indexOf("#explanation") > -1)
+          explanation = entry.value;
+        else if (!!entry.value) {
+          return true;
+        }
+        return false;
+      });
+      addFeatures(data, algoId);
+      var aEl = tt.algoMap[algoId].dom;
+      if (explanation != null)
+        $('.tt-explanation', aEl).html(explanation.replace(/(\W)(Yes|No)(\W)/g, '$1<span class="answer $2">$2</span>$3'));
+      $(aEl).removeClass('folded');
     }
-    return false;
-  });
-  
-  addFeatures(data, algoId);
-  var aEl = tt.algoMap[algoId].dom;
-  if (explanation != null)
-    $('.tt-explanation', aEl).html(explanation.replace(/(\W)(Yes|No)(\W)/g, '$1<span class="answer $2">$2</span>$3'));
-  $(aEl).removeClass('folded');
+  }
 }
 
 function loadCompound(index) {
@@ -324,13 +329,21 @@ $(document).ready(function(){
   });
   $('#tt-models-panel a.show-hide').on('click', function () {
     var alt = $(this).data('other');
+    if ($('#tt-models-panel button.tt-toggle.auto.active').length == 0 && alt != 'hide')
+      return;
     $(this).data('other', this.innerHTML);
     this.innerHTML = alt;
     $('#tt-models-panel button.tt-toggle.auto').each(function () {
-      if (alt != 'show') // i.e. we need to show
-        $(this).parents('.tt-algorithm').show();
-      else if (!$(this).hasClass('active'))
-        $(this).parents('.tt-algorithm').hide();
+      var par = $(this).parents('.tt-algorithm');
+      var aId = $(par).data('algoId');
+      if (alt != 'show'){ // i.e. we need to show
+        par.show();
+        $('table .' + aId, tt.browserKit.rootElement).show();
+      }
+      else if (!$(this).hasClass('active')) {
+        par.hide();
+        $('table .' + aId, tt.browserKit.rootElement).hide();
+      }
     });
   });
   

@@ -1,5 +1,6 @@
 TODO:
 
+- result presentation - integrate it in showPrediction
 - checkboxes in the table
 
 - make some docs - jToxCompound additions, tableLanguage, etc. updateCounter, noInterface and many others, extractFeatures, etc. queryUri...
