@@ -243,13 +243,25 @@ function onTableDetails(idx) {
 }
 
 $(document).ready(function(){
-  $('#tt-models-panel a.select-all').on('click', function () {
-    $('#tt-models-panel button.tt-toggle.auto').addClass('active');
+  $('#tt-models-panel a.select-unselect').on('click', function () {
+    var alt = $(this).data('other');
+    $(this).data('other', this.innerHTML);
+    this.innerHTML = alt;
+    if (alt != 'select')
+      $('#tt-models-panel button.tt-toggle.auto').addClass('active');
+    else
+      $('#tt-models-panel button.tt-toggle.auto.active').removeClass('active');
+    
     onSelectedUpdate.call(this);
   });
-  $('#tt-models-panel a.unselect-all').on('click', function () {
-    $('#tt-models-panel button.tt-toggle.auto').removeClass('active');
-    onSelectedUpdate.call(this);
+  $('#tt-models-panel a.expand-collapse').on('click', function () {
+    var alt = $(this).data('other');
+    $(this).data('other', this.innerHTML);
+    this.innerHTML = alt;
+    if (alt != 'collapse')
+      $('#tt-models-panel .tt-algorithm').addClass('folded');
+    else
+      $('#tt-models-panel .tt-algorithm.folded').removeClass('folded');
   });
   $('#tt-models-panel a.run-selected').on('click', function () {
     runSelected();
@@ -258,13 +270,12 @@ $(document).ready(function(){
     var alt = $(this).data('other');
     $(this).data('other', this.innerHTML);
     this.innerHTML = alt;
-    var set = $('#tt-models-panel button.tt-toggle.auto.active').parents('.tt-algorithm');
-    if (alt == 'show')
-      set.hide();
-    else {
-      set.show();
-      $('#tt-models-panel button.tt-toggle.auto').parents('.tt-algorithm:hidden').show();
-    }
+    $('#tt-models-panel button.tt-toggle.auto').each(function () {
+      if (alt != 'show') // i.e. we need to show
+        $(this).parents('.tt-algorithm').show();
+      else if (!$(this).hasClass('active'))
+        $(this).parents('.tt-algorithm').hide();
+    });
   });
   
   tt.browserKit = jToxCompound.kits[0];
