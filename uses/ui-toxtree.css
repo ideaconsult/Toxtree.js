@@ -91,6 +91,18 @@ body>div {
   border-radius: 5px;
 }
 
+#tt-models-panel span.answer {
+  font-weight: bold;
+}
+
+#tt-models-panel span.answer.Yes {
+  color: #7d2020;
+}
+
+#tt-models-panel span.answer.No {
+ color: #0c7908;
+}
+
 div.tt-algorithm div.jtox-inline.float-right {
   margin-right: 20px;
   vertical-align: top;

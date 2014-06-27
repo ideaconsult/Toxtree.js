@@ -205,7 +205,8 @@ function showPrediction(result, algoUri) {
   
   addFeatures(data, tt.modelKit.algorithm[idx].id);
   var aEl = $('#tt-models-panel div.tt-algorithm:nth-child(' + (idx + 1) + ')')[0];
-  $('.tt-explanation', aEl).html(explanation);
+  if (explanation != null)
+    $('.tt-explanation', aEl).html(explanation.replace(/(\W)(Yes|No)(\W)/g, '$1<span class="answer $2">$2</span>$3'));
   $(aEl).removeClass('folded');
 }
 
