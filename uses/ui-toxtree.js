@@ -24,10 +24,7 @@ var config_toxtree = {
   "baseFeatures": {}, // to be expanded upon algorithm loading
 	"handlers": {
   	"query": function (e, query) {
-  	  clearSlate();
-  	  for (var aId in tt.algoMap)
-    	  tt.algoMap[aId].results = {};
-
+  	  clearSlate(true);
       query.query();
     },
     "checked": function (e, query) {
@@ -244,12 +241,21 @@ function addFeatures(data, className) {
   }
 }
 
-function clearSlate() {
+function clearSlate(all) {
   $(tt.featuresList).empty();
   $('#tt-diagram img.toxtree-diagram')[0].src = '';
   updateSize();
   $('#tt-models-panel .tt-algorithm button.predict').removeClass('active');
-  $('#tt-models-panel .tt-algorithm .content .tt-explanation').empty();
+  $('#tt-models-panel .tt-algorithm .tt-explanation').empty();
+  $('#tt-models-panel .tt-algorithm .tt-classification').empty();
+  
+  if (all) {
+    for (var aId in tt.algoMap)
+  	  tt.algoMap[aId].results = {};
+  	 $('.tt-class', tt.browserKit.rootElement).remove();
+  	 $('.calculated', tt.browserKit.rootElement).removeClass('calculated');
+  	 tt.browserKit.equalizeTables();
+  }
 }
 
 function changeImage(part, path) {
@@ -330,6 +336,7 @@ function parsePrediction(result, algoId, index) {
     $(cells[idx]).addClass('calculated');
   }
   
+  tt.browserKit.equalizeTables();
   if (index == null || index == tt.compoundIdx)
     showPrediction(algoId);
 }
@@ -338,10 +345,12 @@ function loadCompound(index) {
   if (index < 0 && tt.browserKit.pageStart > 0) { // we might need a reload...
     tt.compoundIdx = tt.browserKit.pageSize - 1;
     tt.browserKit.prevPage();
+    clearSlate(true);
   }
   else if (index >= tt.browserKit.dataset.dataEntry.length) {
     tt.compoundIdx = 0;
     tt.browserKit.nextPage();
+    clearSlate(true);
   }
   else if (index != tt.compoundIdx) { // normal showing up
     tt.compoundIdx = index;
@@ -414,6 +423,8 @@ $(document).ready(function(){
         $('table .' + aId, tt.browserKit.rootElement).hide();
       }
     });
+    
+    tt.browserKit.equalizeTables();
   });
   
   tt.modelKit = jToxModel.kits[0];
