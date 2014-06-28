@@ -7,6 +7,8 @@ TODO:
 - deferred re-query (postpone)
 
 IDEAS?
+- move classification related objects, CSS, and functions (like formatClassification) to jToxKit
+- 
 
 Assessment:
 - Ability to re-use the built tab/features structures? Additional setting?

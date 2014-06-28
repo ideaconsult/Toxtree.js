@@ -181,6 +181,7 @@ function formatClassification(root, mapRes, all) {
     if (data.active)
       $(this).addClass('active');
   });
+  return cats;
 }
 
 function onSelectedUpdate(e) {
@@ -316,7 +317,7 @@ function showPrediction(algoId) {
   var data = jToxCompound.extractFeatures(mapRes.compound, mapRes.features, function (entry, fId) {
     if (entry.title.indexOf("#explanation") > -1)
       explanation = entry.value;
-    else if (!!entry.value)
+    else if (entry.source.type.toLowerCase() == 'model' && !!entry.value)
       return true;
     else
       return false;
@@ -344,7 +345,8 @@ function parsePrediction(result, algoId, index) {
     mapRes.compound = result.dataEntry[i];
     mapRes.features = result.feature;
     $('.tt-class', cells[idx]).remove();
-    formatClassification(cells[idx], mapRes, false);
+    if (formatClassification(cells[idx], mapRes, false).length == 0)
+      cells[idx].innerHTML = '-';
     $(cells[idx]).addClass('calculated');
   }
   
