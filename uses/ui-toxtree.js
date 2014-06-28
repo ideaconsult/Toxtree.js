@@ -143,6 +143,7 @@ function buildCategories(features, values, all) {
     	for (var i = 0;i < anot.length; ++i) {
       	if (anot[i].o == val || all)
       	  cats.push({
+      	    name: features[fId].title.replace(/\s/g, '&nbsp;'),
         	  title: anot[i].o.replace(/\s/g, '&nbsp;'),
         	  toxicity: anot[i].type.replace(regex, '$1').toLowerCase(),
         	  active: anot[i].o == val
@@ -151,14 +152,24 @@ function buildCategories(features, values, all) {
     }
     else
       cats.push({
+        name: features[fId].title.replace(/\s/g, '&nbsp;'),
         title: val,
         toxicity: 'unknown',
         active: true
       });
 	};
 	
-	if (multi)
-	  cats = cats.filter(function (o) { return o.active; });
+	if (multi) {
+	  var old = cats;
+	  cats = [];
+	  $.map(old, function (o) {
+  	  if (o.active) {
+    	  o.title = o.name + ':&nbsp;' + o.title;
+    	  cats.push(o);
+  	  }
+	  });
+  	
+	}
 
 	return cats;
 }
@@ -332,6 +343,7 @@ function parsePrediction(result, algoId, index) {
     var mapRes = map.results[idx];
     mapRes.compound = result.dataEntry[i];
     mapRes.features = result.feature;
+    $('.tt-class', cells[idx]).remove();
     formatClassification(cells[idx], mapRes, false);
     $(cells[idx]).addClass('calculated');
   }
