@@ -1,6 +1,5 @@
 TODO:
 
-- redirecting from the a compound into the table to single view mode is not working.
 - checkboxes in the table
 
 - make some docs - jToxCompound additions, tableLanguage, etc. updateCounter, noInterface and many others, extractFeatures, etc. queryUri...

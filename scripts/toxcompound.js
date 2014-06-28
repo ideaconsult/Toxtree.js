@@ -419,12 +419,10 @@ var jToxCompound = (function () {
       
       var fnShowDetails = (self.settings.hasDetails ? function(row, event) {
         var cell = jT.$(".jtox-ds-details", row)[0];
-        if (!cell)
-          return; // that means you've forgotten to add #DetailedInfoRow feature somewhere.
-          
         var idx = jT.$(row).data('jtox-index');
-        if (self.settings.preDetails != null && !ccLib.fireCallback(self.settings.preDetails, self, idx, cell))
-          return;
+        
+        if (self.settings.preDetails != null && !ccLib.fireCallback(self.settings.preDetails, self, idx, cell) || !cell)
+          return; // that !cell  means you've forgotten to add #DetailedInfoRow feature somewhere.
         jT.$(row).toggleClass('jtox-detailed-row');
         var toShow = jT.$(row).hasClass('jtox-detailed-row');
 
