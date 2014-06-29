@@ -45,6 +45,10 @@ body>div {
   border-radius: 7px;
 }
 
+.ketcher {
+  margin-left: 45px;
+}
+
 #sidebar .side-title>div:hover,
 #sidebar .side-title>div.pressed {
   background: #e6e6e6;
@@ -243,7 +247,7 @@ div.tt-class  {
 	margin-top: 1px;
 	padding: 0px 5px 0px 5px;
 	width: 95%;
-	color: #333;
+	color: #000;
 	font-size: 90%;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -251,7 +255,6 @@ div.tt-class  {
 
 div.tt-class.active {
 	opacity: 1.0;
-	color: #000;
 	font-weight: bold;
 }
 
