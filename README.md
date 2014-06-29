@@ -11,9 +11,8 @@ Each different front-end is referred as _kit_. Currently available are:
 - `substance` - browser for substances... [more](#jtoxsubstance)
 - `study` - [IUCLID5](http://iuclid.eu/) substance studies visuzalizer... [more](#jtoxstudy)
 - `query` - a wrapper around other kits and widgets, making them work together... [more](#jtoxquery).
-- `tree` - a Web front end to OpenTox services. Currently developed as standalone web front-end and soon-to-be integrated in the kit...[more](#jtoxtree).
 
-The toolkit is intended to be used by non-programmers, and thus it's integration process is rather simple - referring two files and marking a placeholder in HTML of where all the structure to be inserted. However, it relies that certain external libraries like [jQuery](http://www.jquery.com) and some of [jQueryUI](http://www.jqueryui.com) widgets are already included in the page.
+The toolkit is intended to be used by semi-programmers, and thus it's integration process is rather simple - referring two files and marking a placeholder in HTML of where all the structure to be inserted. However, it relies on the fact that certain external libraries like [jQuery](http://www.jquery.com) and some of [jQueryUI](http://www.jqueryui.com) widgets are already included in the page.
 
 
 Integration manual
@@ -34,7 +33,7 @@ In order to use **jToxKit** in your page, you need to implement these steps:
 
 ```
 $(document).ready(function() { 
-  jToxStudy.kits()[0].querySubstance("http://apps.ideaconsult.net:8080/biodeg/substance/IUC4-efdb21bb-e79f-3286-a988-b6f6944d3734");
+  jToxStudy.kits[0].querySubstance("http://apps.ideaconsult.net:8080/biodeg/substance/IUC4-efdb21bb-e79f-3286-a988-b6f6944d3734");
 });
 ```
 
@@ -75,28 +74,30 @@ Although different kits can have different configuration parameters, these are c
 ##### Connection related
 
 - **`kit`**  (attr. `data-kit`), _required_: specifies the exact type of front-end to be inserted. Only one type is allowed (of course!) - currently available kits are explained in the beginning.
-- **`baseUrl`** (attr. `data-base-url`), _optional_: the default server to be used on AJAX requests, if the server is not specified on the call itself.
-- **`crossDomain`** (attr. `data-cross-domain`), _optional_: informs jToxKit to send requests with cross-domain headers. It is fine to be _true_ even for same-server requests, except when Internet Explorer is used. That's why it defaults to *false*.
-- **`jsonp`** (attr. `data-jsonp`), _optional_: whether to use _JSONP_ style queries to the server, instead of asynchronous ones. Mind that _JSONP_ setting does not influence _POST_ requests. If this one is specified `crossDomain=true` is implied. Default is *false*.
-- **`plainText`** (attr. `data-plain-text`), _optional_: if you want AJAX to expect plain text, instead of JSON - set this to true. You rarely need to do so as a setting, it is more likely to need to for specific call, which can be dome via `params` parameters of `jToxKit.call()` method, which is explained later. Default is *false*.
-- **`timeout`** (attr. `data-timeout`), _optional_: the timeout for AJAX requests, in milliseconds. Default is 5000.
-- **`pollDelay`** (attr. `data-poll-delay`), _optional_: certain services involve creating a task on the server and waiting for it to finish - this is the time between poll request, while waiting it to finish. In milliseconds. Default is 200.
+- **`baseUrl`** (attr. `data-base-url`): the default server to be used on AJAX requests, if the server is not specified on the call itself.
+- **`crossDomain`** (attr. `data-cross-domain`): informs jToxKit to send requests with cross-domain headers. It is fine to be _true_ even for same-server requests, except when Internet Explorer is used. That's why it defaults to *false*.
+- **`jsonp`** (attr. `data-jsonp`): whether to use _JSONP_ style queries to the server, instead of asynchronous ones. Mind that _JSONP_ setting does not influence _POST_ requests. If this one is specified `crossDomain=true` is implied. Default is *false*.
+- **`plainText`** (attr. `data-plain-text`): if you want AJAX to expect plain text, instead of JSON - set this to true. You rarely need to do so as a setting, it is more likely to need to for specific call, which can be dome via `params` parameters of `jToxKit.call()` method, which is explained later. Default is *false*.
+- **`timeout`** (attr. `data-timeout`): the timeout for AJAX requests, in milliseconds. Default is 5000.
+- **`pollDelay`** (attr. `data-poll-delay`): certain services involve creating a task on the server and waiting for it to finish - this is the time between poll request, while waiting it to finish. In milliseconds. Default is 200.
 -##### Browsing hints 
 
 ##### Kit events handlers 
 
-- **`onConnect`** (attr. `data-on-connect`), _optional_: a function name, or function to be called just before any AJAX call.
-- **`onSuccess`** (attr. `data-on-success`), _optional_: a function name, or function to be called upon successful complete of a AJAX call.
-- **`onError`** (attr. `data-on-error`), _optional_: a function name, or function to be called when there's an error on AJAX call. The passed _callback_ to `jT.call()` is still called, but with _null_ result.
-- **`onLoaded`** (attr. `data-on-loaded`), _optional_: another kit-specific callback, which is called from the kit itself, when it's main querying result has arrived, be it _dataset_, _model_ or whatever. The callback is called within kit's context (i.e. the kit instance is `this`) and the returned set is passed as first agrument. Default _null_.
-- **`onDetails`** (attr. `data-on-details`), _optional_: If this is not-null, it instructs the kit (_jToxCompound_, _jToxSubstance_, _jToxModel_ or _jToxDataset_) to add expand/collapse icon in the first cell of each row and include the mechanism for handling it. The handler provided here (either as _string_ or _function_) is of formt: `function (root, data, event)`, with _root_ being the details-row, cell, spawning on all but first column, _data_ is the data normally passed to this cell (as of column definition) and _event_ is the click event on the icon, that launched the process. Default: _null_.
+- **`onConnect`** (attr. `data-on-connect`): a function name, or function to be called just before any AJAX call.
+- **`onSuccess`** (attr. `data-on-success`): a function name, or function to be called upon successful complete of a AJAX call.
+- **`onError`** (attr. `data-on-error`): a function name, or function to be called when there's an error on AJAX call. The passed _callback_ to `jT.call()` is still called, but with _null_ result.
+- **`onLoaded`** (attr. `data-on-loaded`): another kit-specific callback, which is called from the kit itself, when it's main querying result has arrived, be it _dataset_, _model_ or whatever. The callback is called within kit's context (i.e. the kit instance is `this`) and the returned set is passed as first agrument. Default _null_.
+- **`onDetails`** (attr. `data-on-details`): If this is not-null, it instructs the kit (_jToxCompound_, _jToxSubstance_, _jToxModel_ or _jToxDataset_) to add expand/collapse icon in the first cell of each row and include the mechanism for handling it. The handler provided here (either as _string_ or _function_) is of formt: `function (root, data, event)`, with _root_ being the details-row, cell, spawning on all but first column, _data_ is the data normally passed to this cell (as of column definition) and _event_ is the click event on the icon, that launched the process. Default: _null_.
 
 ##### Misceleneous
 
-- **`sDom`** (attr. `data-s-dom`). _optional_: a redefinition of sDom setting for dataTables instance. It does not apply for [jToxCompound](#jtoxcompound), because it uses two, synchronized tables and custom filter and pagination controls.
-- **`configuration`** (attr. `data-configuration`), _optional_: a way to provide kit-specific configuration, like columns visibility and/or ordering for _study_ kit. If it is recognized as string value - a global vairbale with this name is used, otherwise - the passed object itself. No default value.
+- **`noInterface`** (attr. `data-no-interface`): Whether to run in interface-less mode, so that the querying mechanism can be used from some other tool(s). Default: _false_.
+- **`sDom`** (attr. `data-s-dom`): a redefinition of sDom setting for dataTables instance. It does not apply for [jToxCompound](#jtoxcompound), because it uses two, synchronized tables and custom filter and pagination controls. Default depends on the actual kit.
+- **`oLanguage`** (attr. `data-o-language`): just like the above - a language definition parameter which is passed upon dataTable's initialization routine. Default is _null_.
+- **`configuration`** (attr. `data-configuration`): a way to provide kit-specific configuration, like columns visibility and/or ordering for _study_ kit. If it is recognized as string value - a global vairbale with this name is used, otherwise - the passed object itself. No default value.
 - **`configFile`** (attr. `data-config-file`) _optional_: Another way to provide configuration for a kit, but this time - providing the name/path of external JSON file, which is downloaded and used as configuration parameter. No default value.
-- **`selectionHandler`** (attr. `data-selection-handler`), _optional_: If present (i.e. not null) it makes the kit (all except _jToxCompound_) show a checkbox in the first column for each entry. The value provided here is used as `data-handler`, i.e. - it gives the name of the handler invoked by encapsulating _jToxQuery_, when the selection changes it's value. Default: _null_.
+- **`selectionHandler`** (attr. `data-selection-handler`): If present (i.e. not null) it makes the kit (all except _jToxCompound_) show a checkbox in the first column for each entry. The value provided here is used as `data-handler`, i.e. - it gives the name of the handler invoked by encapsulating _jToxQuery_, when the selection changes it's value. Default: _null_.
 
 
 As, can be seen, the three connection callbacks can be local for each kit, so it is possible to report connection statuses in the most appropriate for the kit's way. This is also true for Url's, which means that not all kits, needs to communicate with one and the same server.
@@ -108,7 +109,7 @@ There are certain methods that are common for all kits and some kit wrappers - l
 ```
 jToxKit.initKit(element)
 ```
-The actual kit initialization procedure - it determines the kit that need to be used relying on `data-kit` option and creates a new instance, passing the `element` as kit's root.
+The actual kit initialization procedure - it determines the kit that need to be used relying on `data-kit` option and creates a new instance, passing the `element` as kit's root. It is automatically invoked for kits, not marked as `manualInit`, however it can be called from the JS code for such kits and all initialzation and configuration procedure goes as needed.
 
 
 ```
@@ -171,13 +172,18 @@ jToxKit.putActions(kit, col, defs)
 ```
 Alters the given `col`umn's _mRender_ function so that it includes also _selection_ and/or _details_ icons - depending on provided `defs`. Check the code of [jToxSubstance](#jtoxsubstance), [jToxModel](#jtoxmodel) and [jToxDataset](#jtoxdataset) for more details.
 
+```
+jToxKit.updateCounter(str, count, total)
+```
+Update a counter within a given `str`. The counter can be either of this form: `(1/14)`, or just a simple number: `(14)` - which is the case when `total` is not passed. This method find old such form, if exists, and updates it.
+
 
 ### Kit instance common methods
 ```
-<kit class>.kits()
+<kit class>.kits
 ```
-Return a list of all kit instances from this _kit class_. For example:
-`jToxQuery.kits()[0]` returns the first instance of jToxQuery found on the page.
+An array with all kit instances from this _kit class_. For example:
+`jToxQuery.kits[0]` is the first instance of jToxQuery found on the page.
 
 ```
 <kit instance>.modifyUri(uri)
@@ -213,19 +219,21 @@ It has less dependencies, compare to jToxStudy, namely they are:
 
 Parameters that can be passed either with data-XXX attributes or when initialized manually with JavaScript are:
 
-- **`datasetUri`** (attr. `data-dataset-uri`), _optional_: This is the main URL of the dataset, that later is used for feautres query, pagination, etc. If not passed initially, a later call to `queryDataset(datasetUri)` has the same effect. 
-- **`showTabs`** (attr. `data-show-tabs`), _optional_: Determines if the feature enabling / disabling tabs should be visible, or not. Default: *true*.
-- **`showExport`** (attr. `data-show-export`), _optional_: Determines if the **Export** tab should be added to the right of feature-tabs, filled with possible export parameters. If `showTabs` is false, this has not effect, of course. Default: *true*.
-- **`showControls`** (attr. `data-show-controls`), _optional_: Determines whether to show the block with filter and pagination controls, which include: information for current view items, dropdown menu for choosing the page size, next and previous page and filtering box. Default: *true*.
-- **`pageStart`** (attr. `data-page-start`), _optional_:From which item the referenced dataset should be visualized. Counted from 0. Default: *0*.
-- **`pageSize`** (attr. `data-page-size`), _optional_:initial page size for queries - can later be changed either with `queryEntries()` call, or with dropdown menu, if visible. Default: *20*. 
-- **`hideEmpty`** (attr. `data-hide-empty`), _optional_: Determines whether to hide empty group tabs instead of make them inactive. Default: _false_.
-- **`hasDetails`** (attr. `data-has-details`), _optional_: Determines whether a details openning icon and all corresponding functionality, should be shown on each row. Default: _true_.
-- **`detailsHeight`** (attr. `data-details-height`), _optional_: Determines the height of details pane, when openned in pixels (e.g. `"250px"`). When not specified the default height is double the row height upon openning the details.
-- **`rememberChecks`** (attr. `data-remember-checks`), _optional_: Whether to remember feature check states, between different _queryDataset()_ calls. Default: _false_.
-- **`metricFeature`** (attr. `data-metric-feature`), _optional_: The ID of the feature that should be used, when 'metric' field is present in the dataset. Default: *http://www.opentox.org/api/1.1#Similarity*.
-- **`fnAccumulate`** (attr. `data-fn-accumulate`), _optional_: The function that should be called during dataset entries' processing, when several values need to be accumulated in the same place. The format of the function is `function fnlocation(featureId, oldValue, newValue, features)`. The default one is concatenating the passed values as comma-separated string.
-- **`onPrepared`** (attr. `data-on-prepared`), _optional_: A callback which is called when the initial call for determining the columns, tabs etc. has completed. The one-entry dataset is passed as a parameter, the context (i.e. _this_) is the kit itself. Default: _null_.
+- **`datasetUri`** (attr. `data-dataset-uri`): This is the main URL of the dataset, that later is used for feautres query, pagination, etc. If not passed initially, a later call to `queryDataset(datasetUri)` has the same effect. 
+- **`showTabs`** (attr. `data-show-tabs`): Determines if the feature enabling / disabling tabs should be visible, or not. Default: *true*.
+- **`tabsFolded`** (attr. `data-tabe-folded`): If set to _true_ initializes the feature-selection tabs to be initially all closed. Has no meaning when `showTabs` is _false_. Default is _false_.
+- **`showExport`** (attr. `data-show-export`): Determines if the **Export** tab should be added to the right of feature-tabs, filled with possible export parameters. If `showTabs` is false, this has not effect, of course. Default: *true*.
+- **`showControls`** (attr. `data-show-controls`): Determines whether to show the block with filter and pagination controls, which include: information for current view items, dropdown menu for choosing the page size, next and previous page and filtering box. Default: *true*.
+- **`pageStart`** (attr. `data-page-start`):From which item the referenced dataset should be visualized. Counted from 0. Default: *0*.
+- **`pageSize`** (attr. `data-page-size`):initial page size for queries - can later be changed either with `queryEntries()` call, or with dropdown menu, if visible. Default: *20*. 
+- **`hideEmpty`** (attr. `data-hide-empty`): Determines whether to hide empty group tabs instead of make them inactive. Default: _false_.
+- **`hasDetails`** (attr. `data-has-details`): Determines whether a details openning icon and all corresponding functionality, should be shown on each row. Default: _true_.
+- **`detailsHeight`** (attr. `data-details-height`): Determines the height of details pane, when openned in pixels (e.g. `"250px"`). When not specified the default height is double the row height upon openning the details.
+- **`rememberChecks`** (attr. `data-remember-checks`): Whether to remember feature check states, between different _queryDataset()_ calls. Default: _false_.
+- **`metricFeature`** (attr. `data-metric-feature`): The ID of the feature that should be used, when 'metric' field is present in the dataset. Default: *http://www.opentox.org/api/1.1#Similarity*.
+- **`fnAccumulate`** (attr. `data-fn-accumulate`): The function that should be called during dataset entries' processing, when several values need to be accumulated in the same place. The format of the function is `function fnlocation(featureId, oldValue, newValue, features)`. The default one is concatenating the passed values as comma-separated string.
+- **`onPrepared`** (attr. `data-on-prepared`): A callback which is called when the initial call for determining the columns, tabs etc. has completed. The one-entry dataset is passed as a parameter, the context (i.e. _this_) is the kit itself. Default: _null_.
+- **`preDetails`** (attr. `data-pred-details`): A callback which is called just before openning a details pane - if it returns _false_, details is not openned at all. The format is `function preDetails(index, cell)`, where index is data index and cell is the details cell on the row. Defauls is _null_.
 
 
 ##### Configuration
@@ -306,10 +314,18 @@ All of them are optional, and it is good to remember that these are merged with 
 - **`render`**, _function_: The value render function for this feature. It has the dataTable's `mRender` syntax: `function (data, type, full)` and it is, actually used for that purpose, if present (taking precedence over _mRender_ property of `column` object). There is one difference - one more _type_ of rendering is given: _details_, which gives the configurator the ability to have different rendering for that special purpose - value of feature within details pane.
 - **`process`**, _function_: This one is used during dataset preprocessing and is called for each entry and feature (if given at all). It's definition should be of this form: `function process(entry, featureId, features)`. Default: _null_.
 
-In the full configuration, shown below example of using last two can be seen for _Diagram_ property.
+In the full configuration, shown below example of using last two can be seen for _Diagram_ property. The standard `columns` part of the configuration refers to the detailed view, feature table:
 
 ```
 {
+      "columns": {
+        "compound": {
+          "Name": { sTitle: "Name", mData: 'title', mRender: ... },
+          "Value": { sTitle: "Value", mData: 'value', sDefaultContent: "-" },
+          "SameAs": { sTitle: "SameAs", mData: 'sameAs', sDefaultContent: "-" },
+          "Source": { sTitle: "Source", mData: 'source', sDefaultContent: "-", mRender: ... }
+        }
+      },
       "groups": {
         "Identifiers" : [
           "http://www.opentox.org/api/1.1#Diagram", 
@@ -421,6 +437,12 @@ Used extensively during dataset preprocessing. When traversing the dataset, each
 
 
 ```
+jToxCompound.extractFeatures(entry, features, callback)
+```
+A shorthand function which extracts all feature values from the given `entry`, processing them according to `features` definitions passed, filters out those with empty titles, and returns an array of features, with one field added - `value`. On each added entry `callback` is called in this manner `function (feature, featureId)` (after `value` property is set) and if the returned value is _false_ the feature entry is not added at all.
+
+
+```
 <jToxCompound>.queryDataset(datasetUri)
 ```
 The starting point of dataset visualization. This function makes a separate call for feature-retrieving, preprocesses them (as described above), prepares the visuzalization table, showing or hiding, whatever is needed and calls `processEntries` for actual dataset entries' retrieval. Cannot be called several times within same instance.
@@ -429,6 +451,13 @@ The starting point of dataset visualization. This function makes a separate call
 <jToxCompound>.queryEntries(start, size)
 ```
 The actual dataset entries retrieving function. It makes call to get entries from the already set up dataset, starting from `start`-th one and asking for `size` of them. All pagination UI elements are updated, if not hidden.
+
+
+```
+<jToxCompound>.equalizeTables()
+```
+A UI-related, function which takes care the two tables - fixed and variable parts, to be with equally sized rows - it is handy when some manual changing of values within the table cells is performed from outside. Normally it is not necessary to call it, because all details openning, filtering, etc. takes care to call it internally.
+
 
 ```
 <jToxCompound>.nextPage()
@@ -451,10 +480,11 @@ This kit is responsible for substance browsing, pretty much the same way _jToxCo
 
 The kit has the following parameters:
 
-- **`showControls`** (attr. `data-show-controls`), _optional_: Determines whether to show the block with filter and pagination controls, which include: information for current view items, dropdown menu for choosing the page size, next and previous page and filtering box. Default: *true*.
-- **`pageStart`** (attr. `data-page-start`), _optional_: From which item the referenced substance set should be visualized. Counted from 0. Default: *0*.
-- **`pageSize`** (attr. `data-page-size`), _optional_: Initial page size for queries - can later be changed either with `queryEntries()` call, or with dropdown menu, if visible. Default: *10*. 
-- **`substanceUri`** (attr. `data-substance-uri`), _optional_: The uri that should be queried for retrieving the list of substances. If present the query is made upon initialization, if not - `querySubstance()` can be used for later call.
+- **`showControls`** (attr. `data-show-controls`): Determines whether to show the block with filter and pagination controls, which include: information for current view items, dropdown menu for choosing the page size, next and previous page and filtering box. Default: *true*.
+- **`embedComposition`** (attr. `data-embed-composition`): Instructs the kit to embed a _jToxComposition_ instance as the substance detailed view. If an _object_ is passed - it is merged with _jToxSubstance_'s options and used during _jToxComposition_'s instance initialization. The _embedComposition_ option has no meaning if `onDetails` is passed. Default is _null_.
+- **`pageStart`** (attr. `data-page-start`): From which item the referenced substance set should be visualized. Counted from 0. Default: *0*.
+- **`pageSize`** (attr. `data-page-size`): Initial page size for queries - can later be changed either with `queryEntries()` call, or with dropdown menu, if visible. Default: *10*. 
+- **`substanceUri`** (attr. `data-substance-uri`): The uri that should be queried for retrieving the list of substances. If present the query is made upon initialization, if not - `querySubstance()` can be used for later call.
 
 ##### Methods
 
@@ -525,12 +555,12 @@ These are needed in the same page in order for _jToxStudy_ to work. It has some 
 
 Not quite a lot yet, mainly event handlers:
 
-- **`substanceUri`** (attr. `data-substance-uri`), _optional_: This is the URL of the substance in question. If it is passed during _jToxStudy_ initialization a call to `jToxStudy.querySubstance(uri)` is made. In either case upon successful substance info retrieval automatic calls to `jToxStudy.querySummary(uri)` and `jToxStudy.queryComposition(uri)` are made.
-- **`tab`** (attr. `data-tab`), _optional_: Specifying which study top-category should be preloaded upon page loading. It can be either _encodeURIComponent()_ encoded, or spaces replaced with underscore.
-- **`onLoaded`** (attr. `data-on-loaded`), _optional_: This one is invoked when the general information for the substance is loaded - before all supplmentary info is even queries (like composition, studies, etc.). As usual the context (i.e. _this_) is the kit itself, and the passed parameter is the substance data retrieved from the server. Default: _null_.
-- **`onSummary`** (attr. `data-on-summary`), _optional_: Inkoved when study summary information arrives from the server. Passed as parameter, within kit's context (i.e. _this_). Default: _null_.
-- **`onComposition`** (attr. `data-on-composition`), _optional_: Invoked when the composition info for that substance arrives from the server. It is passed as a parameter within kit's context (i.e. _this_). Default: _null_.
-- **`onStudy`** (attr. `data-on-study`), _optional_: This one is invoked when a set of studies for certain category arrives from the server. The array of studies is passed as a parameter, again within kit's context (i.e. _this_). Default: _null_.
+- **`substanceUri`** (attr. `data-substance-uri`): This is the URL of the substance in question. If it is passed during _jToxStudy_ initialization a call to `jToxStudy.querySubstance(uri)` is made. In either case upon successful substance info retrieval automatic calls to `jToxStudy.querySummary(uri)` and `jToxStudy.queryComposition(uri)` are made.
+- **`tab`** (attr. `data-tab`): Specifying which study top-category should be preloaded upon page loading. It can be either _encodeURIComponent()_ encoded, or spaces replaced with underscore.
+- **`onLoaded`** (attr. `data-on-loaded`): This one is invoked when the general information for the substance is loaded - before all supplmentary info is even queries (like composition, studies, etc.). As usual the context (i.e. _this_) is the kit itself, and the passed parameter is the substance data retrieved from the server. Default: _null_.
+- **`onSummary`** (attr. `data-on-summary`): Inkoved when study summary information arrives from the server. Passed as parameter, within kit's context (i.e. _this_). Default: _null_.
+- **`onComposition`** (attr. `data-on-composition`): Invoked when the composition info for that substance arrives from the server. It is passed as a parameter within kit's context (i.e. _this_). Default: _null_.
+- **`onStudy`** (attr. `data-on-study`): This one is invoked when a set of studies for certain category arrives from the server. The array of studies is passed as a parameter, again within kit's context (i.e. _this_). Default: _null_.
 
 ##### Configuration
 
@@ -618,11 +648,11 @@ The dataset(s) browsing kit - if [jToxCompound](#jtoxcompound) is browsing entri
 
 There are few things that can be setup from outside:
 
-- **`maxStars`** (attr. `data-max-stars`), _optional_: How many stars are considered maximum, when building the long version of ratings. Default: _10_.
-- **`shortStars`** (attr. `data-short-stars`), _optional_: Whether to show show star rating notation, i.e. - one star and the number of stars next to it, opposed to the long (default) version - always showing the maximum number of stars, with given number of them - highlighted. Default is _false_.
-- **`loadOnInit`** (attr. `data-load-on-init`), _optional_: Whether to make an initial query even when _datasetUri_ is not specified. Default is _false_.
-- **`sDom`** (attr. `data-s-dom`), _optional_: The redefinition of _sDom_ attribute for the table. Default _"\<Fif\>rt"_.
-- **`datasetUri`** (attr. `data-dataset-uri`), _optional_: The address to query for list of datasets. If none is bassed the standard `<baseURL>/dataset` is used.
+- **`maxStars`** (attr. `data-max-stars`): How many stars are considered maximum, when building the long version of ratings. Default: _10_.
+- **`shortStars`** (attr. `data-short-stars`): Whether to show show star rating notation, i.e. - one star and the number of stars next to it, opposed to the long (default) version - always showing the maximum number of stars, with given number of them - highlighted. Default is _false_.
+- **`loadOnInit`** (attr. `data-load-on-init`): Whether to make an initial query even when _datasetUri_ is not specified. Default is _false_.
+- **`sDom`** (attr. `data-s-dom`): The redefinition of _sDom_ attribute for the table. Default _"\<Fif\>rt"_.
+- **`datasetUri`** (attr. `data-dataset-uri`): The address to query for list of datasets. If none is bassed the standard `<baseURL>/dataset` is used.
 
 
 ##### Methods
@@ -681,14 +711,15 @@ The model(s) and algorithm(s) browsing kit - pretty similar to [jToxDataet](#jto
 
 There are few things that can be setup from outside:
 
-- **`algorithmLink`** (attr. `data-algorithm-link`), _optional_: Determines whether to add a link for viewing models filtered on specific algorithm. It'll put a link on each row and make a new request for the whole page. Other way of filtering will be to use the _dataTable_'s filter box, which won't navigate to a different page. Default: _false_.
-- **`algorithms`** (attr. `data-algorithms`), _optional_: Whether to list available algorithms, rather than available models. Default: _false_.
-- **`maxStars`** (attr. `data-max-stars`), _optional_: How many stars are considered maximum, when building the long version of ratings. Default: _10_.
-- **`shortStars`** (attr. `data-short-stars`), _optional_: Whether to show show star rating notation, i.e. - one star and the number of stars next to it, opposed to the long (default) version - always showing the maximum number of stars, with given number of them - highlighted. Default is _false_.
-- **`loadOnInit`** (attr. `data-load-on-init`), _optional_: Whether to make an initial query even when _modelUri_ or _algorithmNeedle_ are not specified. Default is _false_.
-- **`sDom`** (attr. `data-s-dom`), _optional_: The redefinition of _sDom_ attribute for the table. Default _"\<Fif\>rt"_.
-- **`modelUri`** (attr. `data-model-uri`), _optional_: The address to query for list of models. If none is bassed the standard `<baseURL>/model` is used.
-- **`algorithmNeedle`** (attr. `data-algorithms-needle`), _optional_: If algorithms listing mode is selected (`algorithms` = _true_) - this is the needle to be used when listing them. Default: _null_.
+- **`algorithmLink`** (attr. `data-algorithm-link`): Determines whether to add a link for viewing models filtered on specific algorithm. It'll put a link on each row and make a new request for the whole page. Other way of filtering will be to use the _dataTable_'s filter box, which won't navigate to a different page. Default: _false_.
+- **`algorithms`** (attr. `data-algorithms`): Whether to list available algorithms, rather than available models. Default: _false_.
+- **`maxStars`** (attr. `data-max-stars`): How many stars are considered maximum, when building the long version of ratings. Default: _10_.
+- **`shortStars`** (attr. `data-short-stars`): Whether to show show star rating notation, i.e. - one star and the number of stars next to it, opposed to the long (default) version - always showing the maximum number of stars, with given number of them - highlighted. Default is _false_.
+- **`loadOnInit`** (attr. `data-load-on-init`): Whether to make an initial query even when _modelUri_ or _algorithmNeedle_ are not specified. Default is _false_.
+- **`sDom`** (attr. `data-s-dom`): The redefinition of _sDom_ attribute for the table. Default _"\<Fif\>rt"_.
+- **`modelUri`** (attr. `data-model-uri`): The address to query for list of models. If none is bassed the standard `<baseURL>/model` is used.
+- **`algorithmNeedle`** (attr. `data-algorithms-needle`): If algorithms listing mode is selected (`algorithms` = _true_) - this is the needle to be used when listing them. Default: _null_.
+- **`forceCreate`** (attr. `data-force-create`): When creating a model from an algorithm, the kit usually tries to obtain one from the server, and only if that fails it makes a _create model_ query, unless this option is specified, which instructs the kit to directly try to create a new one. Dedault _false_.
 
 
 ##### Methods
@@ -716,6 +747,19 @@ This is a shortcut to either _listModels()_ or _listAlgorithms()_ method, depend
 <jToxModel>.modifyUri(uri)
 ```
 The required method for this kit to be part of [jToxQuery](#jtoxquery) kit. What it does is to scan all input boxes, which means `selectable` should be set to _true_, and add `feature_uris[]=<selected uri>` parameter to the given `uri` for each of selected models.
+
+
+```
+<jToxModel>.getModel(algoUri, callback)
+```
+Gets or creates a model for given algorithm. If _forceCreate_ is not specified in the options it first asks the server for such model, only if that fails - it makes a _PUSH_ request to create a new one, then polls the given task. In any case - the `callback` is called after all is done - either with the _modelURI_, or with _null_ if everything fails. This is the first parameter, the second is jQuery's ajax, `jhr` parameter.
+
+
+```
+<jToxModel>.runPrediction(datasetUri, modelUri, callback)
+```
+Instructs the server to run a prediction of `modelUri` onto given `datasetUri` and calls `callback` when all is done with object in _dataset_ format as first parameter (or _null_, on fail) and jQuery's ajax `jhr` parameter as second. Again - the method first asks the server if it has preditions for this model and dataset cached, and if not - it initiates a task for prediction, polls it until is done and only then invokes the `callback`.
+
 
 ##### Configuration
 
@@ -780,11 +824,11 @@ There are two ways to enrich this list of handlers - pass proper _configuration_
 
 There are few things that can be setup from outside:
 
-- **`scanDom`** (attr. `data-scan-dom`), _optional_: It can be used to stop _jToxQuery_ from scanning it's sub-elements to discover and built the _widgets_ list. Default: _true_.
+- **`scanDom`** (attr. `data-scan-dom`): It can be used to stop _jToxQuery_ from scanning it's sub-elements to discover and built the _widgets_ list. Default: _true_.
 
-- **`dom`**, _optional_: It can't be passed with data attribute, because it is an objet with two properties: `widgets` and `kit`, which can contain the DOM elements, which are roots of _widgets_ and the _main kit_ of jToxQuery. This can be used, when you want to specify them yourself, like the case when they are not _under_ the jToxQuery's root. Default _null_.
-- **`initialQuery`** (atrt. `data-initial-query`), _optional_: Whether to make a initiate a query immediately after all (sub)kits are initialized. Default is _false_.
-- **`service`** (attr. `data-service`), _optional: The initial serivce/uri string to be used, when building the final URI for calling. See `query()` method for more information.
+- **`dom`**: It can't be passed with data attribute, because it is an objet with two properties: `widgets` and `kit`, which can contain the DOM elements, which are roots of _widgets_ and the _main kit_ of jToxQuery. This can be used, when you want to specify them yourself, like the case when they are not _under_ the jToxQuery's root. Default _null_.
+- **`initialQuery`** (atrt. `data-initial-query`): Whether to make a initiate a query immediately after all (sub)kits are initialized. Default is _false_.
+- **`service`** (attr. `data-service`): The initial serivce/uri string to be used, when building the final URI for calling. See `query()` method for more information.
 
 
 ##### Methods
@@ -822,13 +866,6 @@ uri = widget.modifyUri(uri);
 ```
 
 The initial value of `uri` is the passed `service` or empty one. After the uri is build this way, a call to main kit's `query()` is made and voilah!
-
-
-<a name="jtoxtree"></a> jToxTree kit
-------------------------------------
-
-A special usage of jToxQuery for ToxTree purposes along with decision tree visualziation.
-**IMPORTANT!:** Not yet implemented as part of *jToxKit*.
 
 
 How is made and how to build?
@@ -970,209 +1007,3 @@ jT.insertTool('ketcher', jT.$('#ketcher-test')[0]);
 ```
 
 Any additional initialization that the particular tool needs, has to be called separately.
-
-
-
-OLD: Toxtree.js
-==========
-
-Web version of ToxTree (http://toxtree.sf.net) front-end for toxicity
-predictions, using the OpenTox API (http://www.opentox.org). It is the front end
-only, it relies on existing server installation of OpenTox.
-
-It is a pure AJAX-based solution, with single HTML page as an entry point and
-utilization of asynchronous HTTP requests for obtaining all information, which
-is then dynamically laid out on the page.
-
-*Toxtree.js* is relatively UI-independent framework for querying OpenTox server
-for compounds information and running toxicity predictions on it, using any of
-server-provided algorithms (models) for such predictions.
-
-#### Loading
-
-As a single page interface, it can be loaded from any place, including locally.
-To make this possible the location of the server to be used should be provided
-as URL parameter:
-
-`
-file:///.../toxtree.html?server=http://apps.ideaconsult.net:8080/ambit2&search=caffeine
-`
-
-As can be seen from the example - the root of OpenTox installation should be
-provided in `server` parameter and it'll be prepended to all future requests.
-The other thing that can be seen is the `search` parameter, which can be used to
-initiate immediate query for provided compound.
-
-The provided query string can be any compound identifier (CAS, Name, EINECS) or
-SMILES or InChl - it will be handled properly.
-
-#### Files description
-
-Although one file is important - `toxtree.js` - several are necessary for
-completing the interface:
-
--   [toxtman.js] (scripts/toxman.js) - implementation of ToxMan object, with
-    it's functions, communication, etc. All ToxTree relatd logic lives here. -
-    [toxtree.html] (toxtree.html) - the interface itself, with all necessary
-    elements to be used and filled. - [toxtree.js] (scripts/toxtree.js) - a
-    small script for initializing ToxMan and providing necessary bindings - like
-    pressing the Query button and call of ToxMan.query(). - [common.js]
-    (scripts/common.js) - some helper functions, mainly for automatic filling of
-    passed json data into a DOM tree. - [toxtree.css] (styles/toxtree.css) - all
-    styles for *toxtree.html*, only `template` is used in *toxtree.js* - known
-    to mark template rows and providing invisiblity, and toxicity categories
-    `toxic`, `nontoxic`, `inconclusive`, `unknown` and `active` to mark which is
-    the predicted one. - [jquery.js] (scripts/jquery.js) - jQuery library. -
-    [dataset.js] (scripts/dataset.js) - Small library to make Element.dataset
-    available for nice browsers like Internet Explorer. - Skeleton stylesheets -
-    [base.css] (styles/base.css), [layout.css] (styles/layout.css) and
-    [skeleton.css] (styles/skeleton.css).
-
-Actually *toxtree.html*, *toxtree.js* and *toxtree.css* can be seen as an
-example of using *toxtree.js*
-
-#### Configure UI elements
-
-To achieve it's UI independency *Toxtree.js* relies on certain structure of the
-HTML that includes it and it "navigates" in it, searching for elements with
-certain classes. All elements can be manually provided to *Toxtree.js* upon
-initialization, which is explained in [Initialization settings]
-(#Initialization_settings). However, if not provided all elements are searched
-in the DOM. All key elements can be prepended with a random `prefix` which is
-passed to the initialization routine, enabling existence of several ToxTree
-structures in the same DOM. All listed names are class names and all lists (like
-feature list) rely on the same structure:
-
--   `row-blank` marks an empty row, which should be multiplied dynamically with
-    reported data. It can be marked with `template` too to stay hidden when it's
-    empty - it'll be removed. - `row-header` marks an empty header row, which
-    occupies all columns of the list and can be filled dynamically too. Used
-    only in *feature list*. - `body` marks the element which should be filled
-    with cloned *row-blank*s or *row-header*s, as direct children. It is not
-    necessary to be parent of *row-blank* (or *row-header*) when they stay
-    empty, but it'll become their parent upon filling the data.
-
-After we've discussed list declaration basics, we can move to main ToxTree
-elements:
-
--   `<prefix>-features` marks the element which is the root of features list. -
-    `<prefix>-diagram` marks an image element that should be used to present the
-    compound diagram. - `<prefix>-models` marks the element which is the root of
-    list of models. There are several sub-elements that may exist here, which
-    are *not* prepended with prefix (they are searched as sub-elements of the
-    root): - `auto` marks the checkbox which determines whether this model
-    should be run automatically on each new query. - `run` marks the button that
-    initiates the prediction, so that toxtree.js can attach on its `onclick`
-    event. - `explanation` marks an element which will be filled with complete
-    textual information, reported from the model on successful prediction. -
-    `class-result` the root element for filling all reported classification
-    classes - just like `body` class for lists. - `class-blank` a blank element
-    for a classification class - to be filled up there.
-
-These are all elements that participate in building the UI. Few of them can be
-provided during initialization, which is explained in the next chapter.
-
-#### Initialization settings
-
-ToxTree is initialized one of its functions - `init(settings)`. We'll explain
-the *settings* parameter here:
-
--   `server` - a link to OpenTox root. If not present the URL is parsed to
-    search for *server* query parameter. It it is still not found - the calling
-    *host* is considered. - `jsonp` - true / false to setup whether this method
-    should be used to avoid Cross Domain security restrictions. If the server is
-    not configured to provide the necessary header - this should be used,
-    although some functionality will not be available - creation of new
-    prediction models. - `forceCreate` - If set to *true* forces creation of a
-    model and prediction on each prediction request, skipping the attempt to get
-    an already existing one on the server. - `timeout` - the connection timeout,
-    after which the request will be considered failed. In milliseconds. -
-    `pollDelay` - how much time to wait between request while waiting a certain
-    server task to be finished. In milliseconds. - `onconnect` - a handler
-    `function(url)` to be invoked at the beginning of each server request. -
-    `onerror` - a handler `function(code, message)` to be invoked when a request
-    fails. - `onsuccess` - a handler `function(code, message)` to be invoked on
-    successful server request.
-
-These were connection-related settings. Now the UI-related ones.
-
--   `prefix` which is to be used when searching for certain UI elements as
-    described above. - `onmodeladd` a handler `function (row, idx)` which is
-    called when a new prediction model is added to the UI. `row` is the cloned
-    blank row and `idx` is the model's index in *ToxMan*'s list. - `onrun` a
-    handler `function(row, idx, event)` which is called when a prediction is
-    run. The additional `event` parameter is from the original event that
-    initiated the fun - button click, for example. - `onpredicted` a handler
-    `function(row, idx)` called when the prediction is completed and the results
-    are just about to be filled. - `onclear` a handler `function (row, idx)`
-    called just after a row of prediction results was cleared. - `elements` an
-    object containing all key UI elements to be used, as described above:
-    `featureList`,`featureRow`, `featureHeader`, `diagramImage`, `modelList` and
-    `modelRow`.
-
- Toxtree.js API
----------------
-
-All communication with *ToxMan* is done using a short list of functions and few
-member-variables:
-
-``` ToxMan.currentDataset ```
-
-Holds the dataset, as reported from server from the current query. Refer to
-OpenTox JSON API for the dataset structure.
-
-``` ToxMan.models ```
-
-An array of available prediction models, as reported from server. Each element
-has OpenTox's structure, with two changes - from `name` the provided prefix is
-removed (most likely - *ToxTree* ) and `index` is added - it corresponds to the
-index in this array. It is filled from `ToxMan.listModels()`.
-
-``` ToxMan.queryParams ```
-
-Paramets in the URL which loaded the page. For example `server` and `search` can
-be found here.
-
-``` ToxMan.inQuery ```
-
-A simple flag showing whether we're in a query process now. Attempting to call
-query while this is 'true' is ignored.
-
-``` ToxMan.init(settings) ```
-
-We've already explained the parameter of that one. This is the first function to
-be called - it initializes the server string, searches and fills the elements in
-the UI, etc. Nothing else will work if this is not called prior it.
-
-``` ToxMan.listModels() ```
-
-This is most likely the second function to be called, because it fills the UI
-with all models supported from the server. Need to be called once and the list
-is stored in `ToxMan.models`. The provided `onmodeladd` handler is called for
-each reported model.
-
-``` ToxMan.query(needle) ```
-
-The starting point of each prediction - a query for certain compound. The needle
-is provided as Identifier (CAS, Name, EINECS) or SMILES or InChl - it is
-directly send to the server as is provided here. On success - the `featureList`
-and `diagramImage` are filled.
-
-``` ToxMan.clear() ```
-
-Clears all result from query and predictions - bring the interface to it's
-initial state. The provided `onclear` handler is called for each model row.
-
-``` ToxMan.runPrediction(index) ```
-
-Runs a prediction on the compound from the current query, identified by `index`
-in the `ToxMan.models` list. The provided `onrun` handler function is called
-immediately and `onpredicted` handler is called after the results arrived and
-just before they are filled in the UI.
-
-``` ToxMan.runAutos() ```
-
-A convenient function which walks on each prediction model row and make a call
-to `ToxMan.runPrediction()` if it's *auto* checkbox is marked.
-
-

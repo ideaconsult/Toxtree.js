@@ -41,9 +41,10 @@ var jToxDataset = (function () {
     
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
     
-    self.rootElement.appendChild(jT.getTemplate('#jtox-dataset'));
-    if (!self.settings.noInterface)
+    if (!self.settings.noInterface) {
+      self.rootElement.appendChild(jT.getTemplate('#jtox-dataset'));
       self.init();
+    }
         
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
     if (self.settings.datasetUri != undefined || self.settings.loadOnInit)

@@ -58,9 +58,10 @@ var jToxModel = (function () {
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
     self.models = null;
     
-    self.rootElement.appendChild(jT.getTemplate('#jtox-model'));
-    if (!self.settings.noInterface)
+    if (!self.settings.noInterface) {
+      self.rootElement.appendChild(jT.getTemplate('#jtox-model'));
       self.init();
+    }
         
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
     if (self.settings.modelUri !== undefined || self.settings.algorithmNeedle !== undefined || self.settings.loadOnInit)

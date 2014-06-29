@@ -1,8 +1,8 @@
 TODO:
 
-- checkboxes in the table
+- ToxTree: checkboxes in the table
+- ToxTree: fix onresize reaction.
 
-- make some docs - jToxCompound additions, tableLanguage, etc. updateCounter, noInterface and many others, extractFeatures, etc. queryUri...
 - Make all kits react adequately on failure on network / calls
 - deferred re-query (postpone)
 

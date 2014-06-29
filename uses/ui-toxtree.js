@@ -196,7 +196,6 @@ function onDataLoaded(result) {
 }
 
 function onAlgoLoaded(result) {
-  $(tt.modelKit.rootElement).empty();
   var idx = 0;
   ccLib.populateData(tt.modelKit.rootElement, '#tt-algorithm', result.algorithm, function (data) {
     tt.algoMap[data.id] = { 
@@ -450,6 +449,6 @@ $(document).ready(function(){
   $('#sidebar .side-title>div').on('click', switchView);
   switchView('single');
   
-  $(window).on('resize', function () { updateSize(null); });
+  $(window).on('resize', function () { updateSize(); });
   updateSize();
 });
