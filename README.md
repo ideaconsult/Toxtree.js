@@ -11,6 +11,8 @@ Each different front-end is referred as _kit_. Currently available are:
 - `substance` - browser for substances... [more](#jtoxsubstance)
 - `study` - [IUCLID5](http://iuclid.eu/) substance studies visuzalizer... [more](#jtoxstudy)
 - `query` - a wrapper around other kits and widgets, making them work together... [more](#jtoxquery).
+- `search` - the search banner, integrating with jToxQuery, providing different search methods... [more](#jtoxsearch).
+
 
 The toolkit is intended to be used by semi-programmers, and thus it's integration process is rather simple - referring two files and marking a placeholder in HTML of where all the structure to be inserted. However, it relies on the fact that certain external libraries like [jQuery](http://www.jquery.com) and some of [jQueryUI](http://www.jqueryui.com) widgets are already included in the page.
 
@@ -866,6 +868,50 @@ uri = widget.modifyUri(uri);
 ```
 
 The initial value of `uri` is the passed `service` or empty one. After the uri is build this way, a call to main kit's `query()` is made and voilah!
+
+
+<a name="jtoxsearch"></a> jToxSearch kit
+--------------------------------------
+
+A universal search banner kit, which integrates with [jToxQuery](#jToxQuery) to provide different ways of querying the main componenta, wrapped with jToxQuery. There are four search methods currently: `auto`, `similarity`, `smarts` and `url`, which are presented with different buttons.
+
+It also provides integration with [ketcher](http://scitouch.net/opensource/ketcher) compound editor, ensuring bi-directional connection between the drawing and the search needle field.
+
+##### Parameters
+
+There are few things that can be setup from outside:
+
+- **`defaultNeedle`** (attr. `data-default-needle`): Since empty searches are not allowed, this is the default search needle to be used. Default is _50-00-0_.
+- **`smartsList`** (attr. `data-smarts-list`): The hierarchy for SMARTS, need to be defined outside - this is either the list object itself (when kit is manually initialized), or the name of a global variable containing the list. Default is _funcgroups_.
+- **`hideOptions`** (attr. `data-hide-options`): Comma separated list of search options to be hidden - they are described above: `auto`, `similarity`, `smarts` and `url`. Default is _null_, i.e. - show everything.
+- **`contextUri`** (attr. `data-context-uri`): When you need to limit the search to certain context, like - search only within a given dataset - this is the way to do it, by prividing here the _URI_ which will be added as `dataset_uri` parameter on each query. Default is _null_.
+
+##### Methods
+
+There are just a few method of these kit:
+
+```
+<jToxQuery>.setAuto(needle)
+```
+Sets the search `needle`, also resetting the search method to `auto`.
+
+
+```
+<jToxQuery>.setMol(mol)
+```
+Sets the search needle to `mol`, by remebering the given data, also resetting the search method to `mol`.
+
+
+```
+<jToxQuery>.getNeedle()
+```
+Returns the current search needle - be it, as displayed in the _search box_, or as stores _mol_ compound structure definition.
+
+
+```
+<jToxQuery>.makeQuery(needle)
+```
+Initiates a query, by asking the wrapping jToxQuery kit, for the main component providing the queries. If `needle` is supplies - it makes a `setAuto()` call first, i.e. - resets the method to auto and the searching needle.
 
 
 How is made and how to build?
