@@ -48,8 +48,8 @@ window.jT = window.jToxKit = {
 
   	// we need to traverse up, to collect some parent's settings...
   	self.$(self.$(element).parents('.jtox-toolkit').toArray().reverse()).each(function(){
-    	if (!self.$(this).hasClass('jtox-widget')) {
-      	topSettings = self.$.extend(true, topSettings, self.$(this).data());
+    	if (!self.$(this).hasClass('jtox-widget') && self.kit(this) != null) {
+      	topSettings = self.$.extend(true, topSettings, self.kit(this).settings);
     	}
   	});
   	
@@ -90,8 +90,10 @@ window.jT = window.jToxKit = {
   	  });
 	  }
 	  else {
-	    if (!ccLib.isNull(dataParams.configuration) && typeof dataParams.configuration == "string" && !ccLib.isNull(window[dataParams.configuration]))
-	      dataParams.configuration = window[dataParams.configuration];
+	    if (!!dataParams.configuration && typeof dataParams.configuration == "string" && !!window[dataParams.configuration]) {
+	      var config = window[dataParams.configuration];
+	      dataParams.configuration = (typeof config != 'function' ? config : config(kit));
+	     }
   	  
       jT.$(element).data('jtKit', realInit(dataParams));
 	  }

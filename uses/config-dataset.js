@@ -1,4 +1,4 @@
-var config_dataset = {
+jTConfig.dataset = {
   "baseFeatures": {
 		"http://www.wikipathways.org/index.php/Pathway" :  {
 			"title": "Wiki Pathways",

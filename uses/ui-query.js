@@ -1,3 +1,5 @@
+var jTConfig = {};
+
 function onSideLoaded(result) {
 	var tEl = $('.title', $(this.rootElement).parents('.jtox-foldable')[0])[0];
 	var set = (result.model || result.dataset);
@@ -13,8 +15,14 @@ function onSelectedUpdate(e) {
 	tEl.innerHTML = jT.ui.updateCounter(tEl.innerHTML, v, $(tEl).data('total'));
 }
 
+function jTConfigurator(kit) {
+  return jTConfig.dataset;
+}
+
 function onDetailedRow(row, data, event) {
-  var el = $('.jtox-details-composition', row);
+  var el = $('.jtox-details-composition', row)[0];
+  if (!el)
+    return;
   var uri = $(el).data('uri');
   uri = this.settings.baseUrl + '/substance?compound_uri=' + encodeURIComponent(uri);
   el = $(el).parents('table')[0];
