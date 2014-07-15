@@ -25,7 +25,7 @@
   <script src="../tests/jquery.js"></script>
   <script src="../tests/jquery.base64.min.js"></script>
   <script src="../tests/jquery-migrate-1.2.1.min.js"></script>
-  <script src="../tests/colResizable-1.3.min.js"></script>
+<!--   <script src="../tests/colResizable-1.3.min.js"></script> -->
   <script src="../tests/jquery-ui.min.js"></script>
   <script src="../tests/jquery.dataTables-1.9.4.min.js"></script>
 
@@ -34,17 +34,17 @@
   <script src="ui-toxtree.js"></script>
 </head>
 <body>
-  <div class="jtox-toolkit" data-kit="query" data-cross-domain="true" data-configuration="config_toxtree" data-base-url="http://apps.ideaconsult.net:8080/biodeg">
-    <div id="tt-searchbar" class="jtox-toolkit jtox-widget" data-kit="search"></div>
+  <div class="jtox-toolkit" data-kit="query" data-cross-domain="true" data-configuration="config_toxtree" data-base-url="http://apps.ideaconsult.net:8080/data">
+    <div id="tt-searchbar" class="jtox-toolkit jtox-widget cc-fixed" data-kit="search"></div>
     <div id="tt-bigpane" class="cc-flex">
       <div>
         <div id="tt-browser-panel">
     			<div id="tt-features" class="cc-flex">
-      			<div class="jtox-inline"><h5 class="counter-field">Available structure attributes </h5></div>
+      			<div class="jtox-inline cc-fixed"><h5 class="counter-field">Available structure attributes </h5></div>
       			<div class="jtox-inline tt-controls"><a class="paginate_disabled_previous prev-field" tabindex="0" role="button">Previous</a><a class="paginate_disabled_next next-field" tabindex="0" role="button">Next</a></div>
       			<div class="list jtox-panel cc-flex"></div>
       		</div>
-    			<div id="tt-diagram" class="jtox-foldable">
+    			<div id="tt-diagram" class="jtox-foldable cc-fixed">
     			  <h5 class="title">Structure diagram</h5>
     			  <div class="content">
               <img class="toxtree-diagram" alt="Compoung diagram"/>
@@ -52,7 +52,7 @@
           </div>
         </div>
         <div id="tt-models-panel">
-          <div>
+          <div class="cc-fixed">
             <div class="title jtox-inline"><h5>Toxicity prediction modules (0/0)</h5></div>
             <div class="jtox-inline selections"><a href="#" class="select-unselect" title="(Un)select all algorithms" data-other="unselect">select</a>&nbsp;<a href="#" class="expand-collapse" title="Expand/collapse all algorithm panes" data-other="collapse">expand</a>&nbsp;<a href="#" class="run-selected" title="Run predictions for all selected algorithms">run</a>&nbsp;<a href="#" class="show-hide" data-other="show" title="Hide/show unselected algorithms">hide</a></div>
           </div>

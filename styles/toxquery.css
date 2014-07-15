@@ -1,12 +1,19 @@
 /* toxtstudy.css - Styling for toxstudy engine
 */
 
-.jtox-search .search-pane input {
+.jtox-search input[type="text"] {
   min-width: 380px;
   height: 20px;
   -moz-transition: width 0.3s ease-out;
   -webkit-transition: width 0.3s ease-out;
   transition: width 0.3s ease-out;
+  margin-bottom: 0px
+}
+
+#searchcontext input {
+  height: auto;
+  width: 99%;
+  box-sizing: border-box;
 }
 
 .jtox-search .search-pane .jtox-inline input,
@@ -22,13 +29,22 @@
   height: 26px;
 }
 
-.jtox-search .jq-buttonset {
-  margin: 4px;
+.jtox-search form {
+  margin: 0px;
+}
+
+.jtox-search form>div {
+  margin: 2px 4px 4px 4px;
+  box-sizing: border-box;
+}
+
+.jtox-search form div.jq-buttonset {
+  margin-top: 6px;
 }
 
 .jtox-search .search-pane button {
   vertical-align: top;
-  margin-top: 2px;
+  margin-bottom: 0px;
 }
 
 .jtox-search .searchsimilarity select {

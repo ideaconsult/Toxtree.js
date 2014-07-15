@@ -139,10 +139,18 @@ var jToxSearch = (function () {
       }
     }
 
+    if (!!form.searchcontext) {
+      form.searchcontext.value = self.settings.contextUri;
+      $(form.searchcontext).on('change', function (e) {
+        self.settings.contextUri = this.value;
+      });
+    }
+
     jT.$(form.searchbox)
     .on('focus', function () {
       var gap = jT.$(form).width() - jT.$(radios).width() - 30 - jT.$('.search-pane').width();
-      var oldSize = $(this).width();
+      var oldSize = $(this).data('oldSize') || $(this).width();
+      $(this).data('oldSize', oldSize);
       jT.$(this).css('width', '' + (oldSize + gap) + 'px');
     })
     .on('blur', function () {

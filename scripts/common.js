@@ -211,22 +211,16 @@ var ccLib = {
     var $ = jQuery;
     $('.cc-flex', root).each(function () {
       var el = this;
-      var getter = 'offsetHeight';
-      var setter = 'height';
-      var starter = 'offsetTop';
-      if ($(el).hasClass('horizontal')) {
-        getter = 'offsetWidth';
-        setter = 'width';
-        starter = 'offsetLeft';
-      }
-      
-      var others = el[starter];
-      $(el).parent().children().each(function () {
-        var pos = $(this).css('position');
-        if (el[starter] < this[starter] && pos != 'absolute' && pos != 'fixed')
-          others += this[getter]; 
+      var sum = 0;
+      var horiz = $(el).hasClass('horizontal');
+      $('.cc-fixed', el.offsetParent).each (function () {
+        for (var fixed = this; fixed != el.offsetParent; fixed = fixed.parentNode)
+          if ($(fixed).hasClass('cc-flex'))
+            break;
+        if (fixed == el.offsetParent)
+          sum += horiz ? this.offsetWidth : this.offsetHeight;
       });
-      el.style[setter] = (el.parentNode[getter] - others) + 'px';
+      el.style[horiz ? 'width' : 'height'] = (this.offsetParent[horiz ? 'clientWidth' : 'clientHeight'] - sum) + 'px';
     });
   },
 	 

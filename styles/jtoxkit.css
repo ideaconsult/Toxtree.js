@@ -138,6 +138,11 @@
   border-bottom: 0px !important;
 }
 
+.cc-flex, cc-fixed {
+  box-sizing: border-box;
+  position: relative;
+}
+
 /* Make table helper elements, like paging, filter, etc. in one line...
 */
 .jtox-toolkit .dataTables_filter label input,

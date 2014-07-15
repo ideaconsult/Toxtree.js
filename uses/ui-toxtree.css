@@ -14,7 +14,7 @@ body>div {
 	background-color: #fafafa;
 	border: 1px solid #ccc;
   width: 40px;
-  top: 50px;
+  top: 80px;
   left: -25px;
 	bottom: 0px;
 	z-index: 100;
@@ -61,6 +61,7 @@ body>div {
   box-sizing: border-box;
   padding-left: 45px;
   padding-right: 5px;
+  padding-top: 20px;
   overflow: scroll;
 }
 

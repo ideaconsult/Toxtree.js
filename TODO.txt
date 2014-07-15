@@ -1,7 +1,10 @@
 TODO:
 
-- ToxTree: checkboxes in the table
+- ToxTree (jToxSearch) add contextUri field
+- ccLib: fixes on flexSize function
 - ToxTree: fix onresize reaction.
+
+- ToxTree: checkboxes in the table
 
 - Make all kits react adequately on failure on network / calls
 - deferred re-query (postpone)
