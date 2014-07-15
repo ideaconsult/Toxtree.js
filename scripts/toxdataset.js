@@ -19,7 +19,7 @@ var jToxDataset = (function () {
       columns : {
         dataset: {
           'Id': { iOrder: 0, sTitle: "Id", mData: "URI", sWidth: "50px", mRender: function (data, type, full) {
-            var num = parseInt(data.match(/http:\/\/.*\/dataset\/(\d+).*/)[1]);
+            var num = parseInt(data.match(/https{0,1}:\/\/.*\/dataset\/(\d+).*/)[1]);
             if (type != 'display')
               return num;
             return '<a target="_blank" href="' + data + '"><span class="ui-icon ui-icon-link jtox-inline"></span> D' + num + '</a>';
@@ -96,12 +96,14 @@ var jToxDataset = (function () {
       if (!self.settings.noInterface)
         jT.$(self.table).dataTable().fnClearTable();
       jT.call(self, uri, function (result) {
-        self.dataset = result.dataset;
         if (!!result) {
+          self.dataset = result.dataset;
           if (!self.settings.noInterface)
             jT.$(self.table).dataTable().fnAddData(result.dataset);
           ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
+        else
+          self.dataset = null;
       });
     },
     

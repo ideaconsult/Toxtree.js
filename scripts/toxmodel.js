@@ -64,7 +64,7 @@ var jToxModel = (function () {
     }
         
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
-    if (self.settings.modelUri !== undefined || self.settings.algorithmNeedle !== undefined || self.settings.loadOnInit)
+    if (self.settings.modelUri != null || self.settings.algorithmNeedle != null || self.settings.loadOnInit)
       self.query();
   };
   
@@ -80,7 +80,7 @@ var jToxModel = (function () {
         }
 
         self.settings.configuration.columns.model.Algorithm.mRender = function (data, type, full) { 
-          var name = data.URI.match(/http:\/\/.*\/algorithm\/(\w+).*/)[1];
+          var name = data.URI.match(/https{0,1}:\/\/.*\/algorithm\/(\w+).*/)[1];
           if (type != 'display')
             return name;
           var res = '<a target="_blank" href="' + data.URI + '">' + 

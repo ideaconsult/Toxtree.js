@@ -56,8 +56,12 @@ var jToxSubstance = (function () {
     if (!self.settings.noInterface) {
       if (self.settings.embedComposition && self.settings.onDetails == null) {
         self.settings.onDetails = function (root, data, event) {
-          var comp = new jToxComposition(root, jT.$.extend({}, self.settings, (typeof self.settings.embedComposition == 'object' ? self.settings.embedComposition : jT.blankSettings)));
-          comp.queryComposition(data + '/composition');
+          new jToxComposition(root, jT.$.extend(
+            {}, 
+            self.settings, 
+            (typeof self.settings.embedComposition == 'object' ? self.settings.embedComposition : jT.blankSettings), 
+            { compositionUri : data + '/composition' }
+          ));
         };
       }
 

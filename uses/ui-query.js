@@ -13,7 +13,7 @@ function onSelectedUpdate(e) {
 	tEl.innerHTML = jT.ui.updateCounter(tEl.innerHTML, v, $(tEl).data('total'));
 }
 
-function onDetailedRow(row, data, index) {
+function onDetailedRow(row, data, event) {
   var el = $('.jtox-details-composition', row);
   var uri = $(el).data('uri');
   uri = this.settings.baseUrl + '/substance?compound_uri=' + encodeURIComponent(uri);
@@ -24,8 +24,7 @@ function onDetailedRow(row, data, index) {
   var div = document.createElement('div');
   el.appendChild(div);
   var ds = new jToxSubstance(div, $.extend(true, {}, this.settings, {crossDomain: true, selectionHandler: null, substanceUri: uri, showControls: false, onDetails: function (root, data, event) {
-    var comp = new jToxStudy(root, this.settings);
-    comp.querySubstance(data);
+    new jToxStudy(root, $.extend({}, this.settings, {substanceUri: data}));
   } } ) );
 }
 

@@ -71,7 +71,7 @@ var jToxStudy = (function () {
     });
     
     // when all handlers are setup - make a call, if needed.    
-    if (self.settings['substanceUri'] !== undefined) {
+    if (self.settings['substanceUri'] != null) {
       self.querySubstance(self.settings['substanceUri']);
     }
   };
@@ -468,11 +468,7 @@ var jToxStudy = (function () {
     },
     
     insertComposition: function(compositionURI) {
-      var self = this;
-      
-      var compoRoot = jT.$('.jtox-compo-tab', self.rootElement)[0];
-      var ds = new jToxComposition(compoRoot, jT.$.extend({}, self.settings, jT.blankSettings));
-      ds.queryComposition(compositionURI);
+      new jToxComposition(jT.$('.jtox-compo-tab', this.rootElement)[0], jT.$.extend({}, this.settings, jT.blankSettings, {'compositionUri': compositionURI}));
     },
     
     querySubstance: function(substanceURI) {
@@ -481,7 +477,6 @@ var jToxStudy = (function () {
       // re-initialize us on each of these calls.
       self.baseUrl = ccLib.isNull(self.settings.baseUrl) ? jT.grabBaseUrl(substanceURI) : self.settings.baseUrl;
       
-      var rootTab = jT.$('.jtox-substance', self.rootElement)[0];
       jT.call(self, substanceURI, function(substance){
         if (!!substance && !!substance.substance && substance.substance.length > 0){
           substance = substance.substance[0];
@@ -500,7 +495,7 @@ var jToxStudy = (function () {
           jT.call(self, substance.referenceSubstance.uri, function (dataset){
             if (!!dataset) {
               jToxCompound.processDataset(dataset, null, fnDatasetValue);
-              ccLib.fillTree(rootTab, dataset.dataEntry[0]);
+              ccLib.fillTree(jT.$('.jtox-substance', self.rootElement)[0], dataset.dataEntry[0]);
             }
           });
            

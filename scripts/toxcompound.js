@@ -173,7 +173,7 @@ var jToxCompound = (function () {
       self.featureStates = {};
 
     // finally make the query, if Uri is provided      
-    if (self.settings['datasetUri'] !== undefined){
+    if (self.settings['datasetUri'] != null){
       self.queryDataset(self.settings['datasetUri']);
     }
   };
