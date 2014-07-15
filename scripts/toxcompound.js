@@ -569,6 +569,9 @@ var jToxCompound = (function () {
         }
       }))[0];
 
+      if (varCols.length == 1) // i.e. we _don't_ have other then hidden ID column.. add blank one.
+        varCols.push({ "sClass": "center", "mData": "index", "mRender": function(data, type, full) { return type != 'display' ? data : '...'; }  });
+
       self.varTable = (jT.$(".jtox-ds-variable table", self.rootElement).dataTable({
         "bPaginate": false,
         "bLengthChange": false,
