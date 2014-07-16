@@ -378,6 +378,34 @@ window.jT.ui = {
     return colDefs;
   },
   
+  inlineRenderer: function (location, breed, holder) {
+    if (breed == "select")
+      return function (data, type, full) {
+        return type != 'display' ? (data || '') : '<select class="jt-inlineedit" data-data="' + location + '" value="' + (data || '') + '">' + (!holder ? '' : '<option value="">' + holder + '</option>') + '</select>';
+      };
+    else if (breed == "checkbox") // we use holder as 'isChecked' value
+      return function (data, type, full) {
+        return type != 'display' ? (data || '') : '<input type="checkbox" class="jt-inlineedit" data-data="' + location + '"' + (((!!holder && data == holder) || !!data) ? 'checked="true"' : '') + '"/>';
+      };
+    else if (breed =="text")
+      return function (data, type, full) {
+        return type != 'display' ? (data || '') : '<input type="' + breed + '" class="jt-inlineedit" data-data="' + location + '" value="' + (data || '') + '"' + (!holder ? '' : ' placeholder="' + holder + '"') + '/>';
+      };
+  },
+  
+  inlineRowFn: function (on) {
+    return function( nRow, aData, iDataIndex ) {
+      $('.jt-inlineedit', nRow).on('change', on.change).on('keydown', jT.ui.enterBlur);
+      $('.jt-inlineremove', nRow).on('click', on.remove);
+      $('.jt-inlineadd', nRow).on('click', on.add);
+    }
+  },
+  
+  enterBlur: function (e) {
+    if (e.keyCode == 13)
+      this.blur();
+  },
+  
   columnData: function (cols, data, type) {
     var out = new Array(data.length);
     if (type == null)
