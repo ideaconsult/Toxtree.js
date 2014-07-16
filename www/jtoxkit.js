@@ -3444,7 +3444,9 @@ var jToxStudy = (function () {
     },
     
     insertComposition: function(compositionURI) {
-      new jToxComposition(jT.$('.jtox-compo-tab', this.rootElement)[0], jT.$.extend({}, this.settings, jT.blankSettings, {'compositionUri': compositionURI}));
+      var compRoot = jT.$('.jtox-compo-tab', this.rootElement)[0];
+      jT.$(compRoot).empty();
+      new jToxComposition(compRoot, jT.$.extend({}, this.settings, jT.blankSettings, {'compositionUri': compositionURI}));
     },
     
     querySubstance: function(substanceURI) {
@@ -3690,7 +3692,7 @@ jT.templates['all-studies']  =
 "	        </thead>" +
 "	      </table>" +
 "	    </div>" +
-"	    <div id=\"jtox-compo-tab\" class=\"jtox-compo-tab unloaded\"></div>" +
+"	    <div id=\"jtox-compo-tab\" class=\"jtox-compo-tab\"></div>" +
 "	    <div id=\"jtox-pchem\" class=\"jtox-study-tab P-CHEM\">" +
 "	    	<div class=\"float-right\">" +
 "	      	<button class=\"expand-all\">Expand all</button><button class=\"collapse-all\">Collapse all</button>" +

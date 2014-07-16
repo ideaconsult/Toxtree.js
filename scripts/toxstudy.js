@@ -468,7 +468,9 @@ var jToxStudy = (function () {
     },
     
     insertComposition: function(compositionURI) {
-      new jToxComposition(jT.$('.jtox-compo-tab', this.rootElement)[0], jT.$.extend({}, this.settings, jT.blankSettings, {'compositionUri': compositionURI}));
+      var compRoot = jT.$('.jtox-compo-tab', this.rootElement)[0];
+      jT.$(compRoot).empty();
+      new jToxComposition(compRoot, jT.$.extend({}, this.settings, jT.blankSettings, {'compositionUri': compositionURI}));
     },
     
     querySubstance: function(substanceURI) {
