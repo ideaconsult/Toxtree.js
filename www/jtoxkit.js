@@ -642,10 +642,7 @@ window.jT = window.jToxKit = {
 		  
 		var accType = settings.plainText ? "text/plain" : (settings.jsonp ? "application/x-javascript" : "application/json");
 		
-		if (!!params.form) {
-		  params.data = params.form;
-		}
-		else if (!params.data){
+		if (!params.data){
 			params.data = {};
 			if (settings.jsonp)
 				params.data.media = accType;
@@ -664,8 +661,6 @@ window.jT = window.jToxKit = {
 		jT.$.ajax(service, {
 			dataType: params.dataType || (settings.plainText ? "text": (settings.jsonp ? 'jsonp' : 'json')),
 			headers: { Accept: accType },
-      contentType: !params.form,
-      processData: !params.form,
 			crossDomain: settings.crossDomain || settings.jsonp,
 			timeout: settings.timeout,
 			type: params.method,

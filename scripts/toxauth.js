@@ -50,19 +50,19 @@ var jToxPolicy = (function () {
         return type != 'display' ? (data || '') : '<select class="jt-inlineaction" data-data="role" value="' + (data || '') + '">' + self.roleOptions + '</select>';
       };
       
-      var formDater = function (data) {
-        var fd = new FormData();
-        ccLib.enumObject(data, function (val, name) {
-          fd.append(name, val);
-        });
-        return fd;
-      };
-      
       var alerter = function (el, icon) {
         $(el).removeClass(icon).addClass('ui-icon-alert');
         setTimeout(function () {
           $(el).addClass(icon).removeClass('ui-icon-alert');
         }, 2500);
+      };
+      
+      var dataEnumer = function (data) {
+        var out = {};
+        ccLib.enumObject(data, function (val, name) {
+          out[name] = val;
+        });
+        return out;
       };
       
       var inlineHandlers = {
@@ -77,7 +77,7 @@ var jToxPolicy = (function () {
 
             $(el).addClass('loading');
             // now make the update call...
-            jT.call(self, data.uri, { method: 'PUT', form: formDater(myObj) }, function (task) {
+            jT.call(self, data.uri, { method: 'PUT', data: dataEnumer(myObj) }, function (task) {
               jT.pollTask(self, task, function (task) {
                 $(el).removeClass('loading');
                 if (!task || !!task.error)
@@ -119,7 +119,7 @@ var jToxPolicy = (function () {
           delete data['uri'];
           var el = this;
           $(el).addClass('loading');
-          jT.call(self, '/admin/restpolicy', { method: "PUSH", form: formDater(data)}, function (task) {
+          jT.call(self, '/admin/restpolicy', { method: "POST", data: dataEnumer(data)}, function (task) {
             jT.pollTask(self, task, function (task) {
               $(el).removeClass('loading');
               if (!task || !!task.error)
