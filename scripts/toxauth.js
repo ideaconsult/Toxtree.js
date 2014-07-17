@@ -50,11 +50,13 @@ var jToxPolicy = (function () {
         return type != 'display' ? (data || '') : '<select class="jt-inlineaction" data-data="role" value="' + (data || '') + '">' + self.roleOptions + '</select>';
       };
       
-      var alerter = function (el, icon) {
-        $(el).removeClass(icon).addClass('ui-icon-alert');
+      var alerter = function (el, icon, task) {
+        var mess = (!!task ? task.error : "Unknown error");
+        $(el).removeClass(icon).addClass('ui-icon-alert').attr('title', mess);
         setTimeout(function () {
           $(el).addClass(icon).removeClass('ui-icon-alert');
-        }, 2500);
+          $(el).removeAttr('title');
+        }, 3500);
       };
       
       var dataEnumer = function (data) {
@@ -80,8 +82,10 @@ var jToxPolicy = (function () {
             jT.call(self, data.uri, { method: 'PUT', data: dataEnumer(myObj) }, function (task) {
               jT.pollTask(self, task, function (task) {
                 $(el).removeClass('loading');
-                if (!task || !!task.error)
+                if (!task || !!task.error) {
                   ccLib.setObjValue(el, ccLib.getJsonValue(data, myData)); // i.e. revert the old value
+                  alerter(el, '', task);
+                }
                 else {
                   // we need to update the value... in our internal 'policies' array...
                   var idx = $(self.table).dataTable().fnGetPosition($(el).closest('tr')[0]);
@@ -108,7 +112,7 @@ var jToxPolicy = (function () {
             jT.pollTask(self, task, function (task) {
               $(el).removeClass('loading');
               if (!task || !!task.error)
-                alerter(el, 'ui-icon-closethick')
+                alerter(el, 'ui-icon-closethick', task)
               else // i.e. - on success - reload them!
                 self.loadPolicies();
             }, jhr);
@@ -123,7 +127,7 @@ var jToxPolicy = (function () {
             jT.pollTask(self, task, function (task) {
               $(el).removeClass('loading');
               if (!task || !!task.error)
-                alerter(el, 'ui-icon-plusthick')
+                alerter(el, 'ui-icon-plusthick', task)
               else // i.e. - on success - reload them!
                 self.loadPolicies();
             });
