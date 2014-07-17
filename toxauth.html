@@ -25,10 +25,27 @@
   <script src="scripts/common.js"></script>
   <script src="scripts/jtoxkit.js"></script>
   <script src="scripts/toxauth.js"></script>
-  
+  <script language="JavaScript">
+  function errorHandler(service, status, jhr) {
+    var message = '(' + jhr.status + ') ' + jhr.statusText;
+
+    try {
+      var obj = JSON.parse(jhr.responseText);
+      if (obj != null) {
+        if (!!obj.error)
+          message = obj.error;
+        else if (obj.task != null && obj.task.length > 0 && !!obj.task[0].error)
+          message = obj.task[0].error;
+      }
+    }
+    catch (e) { ; }
+      
+    console.log("Auth error on [" + service + "]: " + message);
+  }
+  </script>
 </head>
 <body>
-	<div class="jtox-toolkit" data-kit="policy" data-base-url="http://apps.ideaconsult.net:8080/biodeg" data-load-on-init="true"></div>
+	<div class="jtox-toolkit" data-kit="policy" data-base-url="http://apps.ideaconsult.net:8080/biodeg" data-load-on-init="true" data-on-error="errorHandler"></div>
   <div class="jtox-template">
 <!--[[ jT.templates['all-model'] -->
 	  <div id="jtox-policy">
