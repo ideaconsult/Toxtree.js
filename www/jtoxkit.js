@@ -111,12 +111,16 @@ var ccLib = {
   },
   
   setJsonValue: function (json, field, val) {
-    if (field !== undefined){
+    if (field != null){
       try {
         eval("json." + field + " = val");
       }
       catch(e){
-        ;
+        var arr = field.split('.');
+        for (var i = 0, al = arr.length; i < al - 1; ++i)
+          json = json[arr[i]] = {};
+
+        json[arr[i]] = val;
       }
     }  
   },
@@ -623,7 +627,10 @@ window.jT = window.jToxKit = {
 		  
 		var accType = settings.plainText ? "text/plain" : (settings.jsonp ? "application/x-javascript" : "application/json");
 		
-		if (!params.data){
+		if (!!params.form) {
+		  params.data = params.form;
+		}
+		else if (!params.data){
 			params.data = {};
 			if (settings.jsonp)
 				params.data.media = accType;
@@ -642,6 +649,8 @@ window.jT = window.jToxKit = {
 		jT.$.ajax(service, {
 			dataType: params.dataType || (settings.plainText ? "text": (settings.jsonp ? 'jsonp' : 'json')),
 			headers: { Accept: accType },
+      contentType: !params.form,
+      processData: !params.form,
 			crossDomain: settings.crossDomain || settings.jsonp,
 			timeout: settings.timeout,
 			type: params.method,
@@ -738,32 +747,54 @@ window.jT.ui = {
     return colDefs;
   },
   
-  inlineRenderer: function (location, breed, holder) {
+  inlineChanger: function (location, breed, holder) {
     if (breed == "select")
       return function (data, type, full) {
-        return type != 'display' ? (data || '') : '<select class="jt-inlineedit" data-data="' + location + '" value="' + (data || '') + '">' + (!holder ? '' : '<option value="">' + holder + '</option>') + '</select>';
+        return type != 'display' ? (data || '') : '<select class="jt-inlineaction" data-data="' + location + '" value="' + (data || '') + '">' + (!holder ? '' : '<option value="">' + holder + '</option>') + '</select>';
       };
     else if (breed == "checkbox") // we use holder as 'isChecked' value
       return function (data, type, full) {
-        return type != 'display' ? (data || '') : '<input type="checkbox" class="jt-inlineedit" data-data="' + location + '"' + (((!!holder && data == holder) || !!data) ? 'checked="true"' : '') + '"/>';
+        return type != 'display' ? (data || '') : '<input type="checkbox" class="jt-inlineaction" data-data="' + location + '"' + (((!!holder && data == holder) || !!data) ? 'checked="true"' : '') + '"/>';
       };
     else if (breed =="text")
       return function (data, type, full) {
-        return type != 'display' ? (data || '') : '<input type="' + breed + '" class="jt-inlineedit" data-data="' + location + '" value="' + (data || '') + '"' + (!holder ? '' : ' placeholder="' + holder + '"') + '/>';
+        return type != 'display' ? (data || '') : '<input type="' + breed + '" class="jt-inlineaction" data-data="' + location + '" value="' + (data || '') + '"' + (!holder ? '' : ' placeholder="' + holder + '"') + '/>';
       };
   },
   
   inlineRowFn: function (on) {
     return function( nRow, aData, iDataIndex ) {
-      $('.jt-inlineedit', nRow).on('change', on.change).on('keydown', jT.ui.enterBlur);
-      $('.jt-inlineremove', nRow).on('click', on.remove);
-      $('.jt-inlineadd', nRow).on('click', on.add);
+      $('.jt-inlineaction', nRow).each(function () {
+        var action = $(this).data('action') || 'change';
+        if (this.tagName == 'INPUT' || this.tagName == 'SELECT' || this.tagName == "TEXTAREA")
+          $(this).on('change', on[action]).on('keydown', jT.ui.enterBlur);
+        else
+          $(this).on('click', on[action]);
+      });
     }
   },
   
   enterBlur: function (e) {
     if (e.keyCode == 13)
       this.blur();
+  },
+  
+  rowData: function (el) {
+    var row = $(el).closest('tr')[0];
+    var table = $(row).closest('table')[0];
+    return $(table).dataTable().fnGetData(row);
+  },
+  
+  rowInline: function (el) {
+    var row = $(el).closest('tr')[0];
+    var data = {};
+    $('.jt-inlineaction', row).each(function () {
+      var loc = $(this).data('data');
+      if (loc != null)
+        ccLib.setJsonValue(data, loc, $(this).val());
+    });
+    
+    return data;
   },
   
   columnData: function (cols, data, type) {
@@ -2572,7 +2603,7 @@ var jToxModel = (function () {
             ccLib.fireCallback(callback, self, null, jhr);
           else
             jT.pollTask(self, result, function (task, jhr) {
-              ccLib.fireCallback(callback, self, (!kit.error ? task.result : null), jhr);
+              ccLib.fireCallback(callback, self, (!task.error ? task.result : null), jhr);
             });
         });
       };

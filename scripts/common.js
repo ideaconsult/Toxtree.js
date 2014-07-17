@@ -111,12 +111,16 @@ var ccLib = {
   },
   
   setJsonValue: function (json, field, val) {
-    if (field !== undefined){
+    if (field != null){
       try {
         eval("json." + field + " = val");
       }
       catch(e){
-        ;
+        var arr = field.split('.');
+        for (var i = 0, al = arr.length; i < al - 1; ++i)
+          json = json[arr[i]] = {};
+
+        json[arr[i]] = val;
       }
     }  
   },

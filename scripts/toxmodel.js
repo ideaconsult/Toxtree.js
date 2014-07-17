@@ -167,7 +167,7 @@ var jToxModel = (function () {
             ccLib.fireCallback(callback, self, null, jhr);
           else
             jT.pollTask(self, result, function (task, jhr) {
-              ccLib.fireCallback(callback, self, (!kit.error ? task.result : null), jhr);
+              ccLib.fireCallback(callback, self, (!task.error ? task.result : null), jhr);
             });
         });
       };

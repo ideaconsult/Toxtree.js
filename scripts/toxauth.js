@@ -19,16 +19,16 @@ var jToxPolicy = (function () {
             else if (type != 'display')
               return data || '';
             else if (!data)
-              return '<span class="ui-icon ui-icon-plusthick jt-inlineadd jtox-inline jtox-hidden"></span>';
+              return '<span class="ui-icon ui-icon-plusthick jt-inlineaction jtox-inline jtox-hidden" data-action="add"></span>';
             else
-              return '<span class="ui-icon ui-icon-closethick jt-inlineremove jtox-inline"></span>';
+              return '<span class="ui-icon ui-icon-closethick jt-inlineaction jtox-inline" data-action="remove"></span>';
           }},
-          'Role': { iOrder: 1, sTitle: "Role", sDefaultContent: '', sWidth: "20%", mData: "role", mRender: jT.ui.inlineRenderer('role', 'select') },
-          'Resource': {iOrder: 3, sTitle: "Resource", sDefaultContent: '', mData: "resource", sWidth: "40%", mRender: jT.ui.inlineRenderer('service', 'text', 'Service_') },
-          'Get': { iOrder: 4, sClass: "center", sTitle: "Get", bSortable: false, sDefaultContent: '', mData: "methods.get", mRender: jT.ui.inlineRenderer('methods.get', 'checkbox') },
-          'Post': { iOrder: 5, sClass: "center", sTitle: "Post", bSortable: false, sDefaultContent: '', mData: "methods.post", mRender: jT.ui.inlineRenderer('methods.post', 'checkbox') },
-          'Put': { iOrder: 6, sClass: "center", sTitle: "Put", bSortable: false, sDefaultContent: '', mData: "methods.put", mRender: jT.ui.inlineRenderer('methods.put', 'checkbox') },
-          'Delete': { iOrder: 7, sClass: "center", sTitle: "Delete", bSortable: false, sDefaultContent: '', mData: "methods.delete", mRender: jT.ui.inlineRenderer('methods.delete', 'checkbox') },
+          'Role': { iOrder: 1, sTitle: "Role", sDefaultContent: '', sWidth: "20%", mData: "role", mRender: jT.ui.inlineChanger('role', 'select', '-- Role --') },
+          'Service': {iOrder: 3, sTitle: "Service", sDefaultContent: '', mData: "resource", sWidth: "40%", mRender: jT.ui.inlineChanger('resource', 'text', 'Service_') },
+          'Get': { iOrder: 4, sClass: "center", sTitle: "Get", bSortable: false, sDefaultContent: '', mData: "methods.get", mRender: jT.ui.inlineChanger('methods.get', 'checkbox') },
+          'Post': { iOrder: 5, sClass: "center", sTitle: "Post", bSortable: false, sDefaultContent: '', mData: "methods.post", mRender: jT.ui.inlineChanger('methods.post', 'checkbox') },
+          'Put': { iOrder: 6, sClass: "center", sTitle: "Put", bSortable: false, sDefaultContent: '', mData: "methods.put", mRender: jT.ui.inlineChanger('methods.put', 'checkbox') },
+          'Delete': { iOrder: 7, sClass: "center", sTitle: "Delete", bSortable: false, sDefaultContent: '', mData: "methods.delete", mRender: jT.ui.inlineChanger('methods.delete', 'checkbox') },
         }
       }
     }
@@ -46,9 +46,41 @@ var jToxPolicy = (function () {
       self.rootElement.appendChild(jT.getTemplate('#jtox-policy'));
       self.settings.configuration.columns.policy.Id.sTitle = '';
       
-      
       var inlineHandlers = {
         change: function (e) {
+          var data = jT.ui.rowData(this);
+          if (data.uri != null) {
+            // Initiate a change in THIS field.
+            var el = this;
+            var myData = $(el).data('data');
+            var myArr = myData.split('.');
+            var fd = new FormData();
+            fd.append(myArr[myArr.length - 1], $(el).val());
+            $(el).addClass('loading');
+            // now make the update call...
+            jT.call(self, data.uri, { method: 'PUT', form: fd }, function (task) {
+              if (!task) {
+                $(el).removeClass('loading');
+                $(el).val(ccLib.getJsonValue(data, myData)); // i.e. revert the old value
+              }
+              else {
+                jT.pollTask(self, task, function (task) {
+                  $(el).removeClass('loading');
+                  if (!task)
+                    $(el).val(ccLib.getJsonValue(data, myData)); // i.e. revert the old value
+                });
+              }
+            });
+          }
+          else {
+            // collect and validate and react
+            var row = $(this).closest('tr');
+            var inline = jT.ui.rowInline(row);
+            if (!inline.role || !inline.resource)
+              $('span.ui-icon-plusthick', row).addClass('jtox-hidden');
+            else
+              $('span.ui-icon-plusthick', row).removeClass('jtox-hidden');
+          }
           console.log("CHANGE");
         },
         remove: function (e) {

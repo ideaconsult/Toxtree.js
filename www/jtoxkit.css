@@ -184,28 +184,28 @@
   border: 0px;
 }
 
-.jtox-toolkit input[type="password"].jt-inlineedit, 
-.jtox-toolkit input[type="search"].jt-inlineedit, 
-.jtox-toolkit input[type="text"].jt-inlineedit, 
-.jtox-toolkit select.jt-inlineedit {
+.jtox-toolkit input[type="password"].jt-inlineaction, 
+.jtox-toolkit input[type="search"].jt-inlineaction, 
+.jtox-toolkit input[type="text"].jt-inlineaction, 
+.jtox-toolkit select.jt-inlineaction {
   margin: 1px;
   box-sizing: border-box;
   width: 100%;
 }
 
-.jtox-toolkit input.jt-inlineedit {
+.jtox-toolkit input.jt-inlineaction {
   border: 0px;
   border-radius: 3px;
   background-color: transparent;
 }
 
-.jtox-toolkit input.jt-inlineedit:focus,
-.jtox-toolkit input.jt-inlineedit:hover {
+.jtox-toolkit input.jt-inlineaction:focus,
+.jtox-toolkit input.jt-inlineaction:hover {
   border: inherit;
   margin: 0px;
 }
 
-.jtox-toolkit input.jt-inlineedit:focus {
+.jtox-toolkit input.jt-inlineaction:focus {
   background-color: #fefefe;
 }
 
