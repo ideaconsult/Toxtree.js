@@ -62,7 +62,9 @@ var ccLib = {
   	if ((value === undefined || value === null) && jQuery(obj).data('default') !== undefined)
   		value = jQuery(obj).data('default');
   
-    if (obj.nodeName == "INPUT" || obj.nodeName == "SELECT")
+    if (obj.nodeName == "INPUT" && obj.type == 'checkbox')
+      obj.checked = !!value;
+    else if (obj.nodeName == "INPUT" || obj.nodeName == "SELECT")
       obj.value = value;
     else if (obj.nodeName == "IMG")
       obj.src = value;
@@ -70,6 +72,19 @@ var ccLib = {
   		jQuery(obj).data('value', value);
     else
       obj.innerHTML = value;      
+  },
+
+  getObjValue: function (obj){
+    if (obj.nodeName == "INPUT" && obj.type == 'checkbox')
+      return obj.checked;
+    else if (obj.nodeName == "INPUT" || obj.nodeName == "SELECT")
+      return obj.value;
+    else if (obj.nodeName == "IMG")
+      return obj.src;
+    else if (obj.nodeName == "BUTTON")
+  		return jQuery(obj).data('value');
+    else
+      return obj.innerHTML;
   },
 
   isNull: function(obj) {

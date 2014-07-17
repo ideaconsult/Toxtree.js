@@ -9,6 +9,7 @@
 var jToxPolicy = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     loadOnInit: false,      // whether to make initial load upon initializing the kit
+    noInterface: false,     // whether to have interface... at all.
     sDom: "rt",
     configuration: { 
       columns : {
@@ -25,10 +26,10 @@ var jToxPolicy = (function () {
           }},
           'Role': { iOrder: 1, sTitle: "Role", sDefaultContent: '', sWidth: "20%", mData: "role", mRender: jT.ui.inlineChanger('role', 'select', '-- Role --') },
           'Service': {iOrder: 3, sTitle: "Service", sDefaultContent: '', mData: "resource", sWidth: "40%", mRender: jT.ui.inlineChanger('resource', 'text', 'Service_') },
-          'Get': { iOrder: 4, sClass: "center", sTitle: "Get", bSortable: false, sDefaultContent: '', mData: "methods.get", mRender: jT.ui.inlineChanger('methods.get', 'checkbox') },
-          'Post': { iOrder: 5, sClass: "center", sTitle: "Post", bSortable: false, sDefaultContent: '', mData: "methods.post", mRender: jT.ui.inlineChanger('methods.post', 'checkbox') },
-          'Put': { iOrder: 6, sClass: "center", sTitle: "Put", bSortable: false, sDefaultContent: '', mData: "methods.put", mRender: jT.ui.inlineChanger('methods.put', 'checkbox') },
-          'Delete': { iOrder: 7, sClass: "center", sTitle: "Delete", bSortable: false, sDefaultContent: '', mData: "methods.delete", mRender: jT.ui.inlineChanger('methods.delete', 'checkbox') },
+          'Get': { iOrder: 4, sClass: "center", sTitle: "Get", bSortable: false, sDefaultContent: false, mData: "methods.get", mRender: jT.ui.inlineChanger('methods.get', 'checkbox') },
+          'Post': { iOrder: 5, sClass: "center", sTitle: "Post", bSortable: false, sDefaultContent: false, mData: "methods.post", mRender: jT.ui.inlineChanger('methods.post', 'checkbox') },
+          'Put': { iOrder: 6, sClass: "center", sTitle: "Put", bSortable: false, sDefaultContent: false, mData: "methods.put", mRender: jT.ui.inlineChanger('methods.put', 'checkbox') },
+          'Delete': { iOrder: 7, sClass: "center", sTitle: "Delete", bSortable: false, sDefaultContent: false, mData: "methods.delete", mRender: jT.ui.inlineChanger('methods.delete', 'checkbox') },
         }
       }
     }
@@ -45,31 +46,48 @@ var jToxPolicy = (function () {
     if (!self.settings.noInterface) {
       self.rootElement.appendChild(jT.getTemplate('#jtox-policy'));
       self.settings.configuration.columns.policy.Id.sTitle = '';
+      self.settings.configuration.columns.policy.Role.mRender = function (data, type, full) {
+        return type != 'display' ? (data || '') : '<select class="jt-inlineaction" data-data="role" value="' + (data || '') + '">' + self.roleOptions + '</select>';
+      };
+      
+      var formDater = function (data) {
+        var fd = new FormData();
+        ccLib.enumObject(data, function (val, name) {
+          fd.append(name, val);
+        });
+        return fd;
+      };
+      
+      var alerter = function (el, icon) {
+        $(el).removeClass(icon).addClass('ui-icon-alert');
+        setTimeout(function () {
+          $(el).addClass(icon).removeClass('ui-icon-alert');
+        }, 2500);
+      };
       
       var inlineHandlers = {
         change: function (e) {
           var data = jT.ui.rowData(this);
-          if (data.uri != null) {
+          if (!!data.uri) {
             // Initiate a change in THIS field.
             var el = this;
             var myData = $(el).data('data');
-            var myArr = myData.split('.');
-            var fd = new FormData();
-            fd.append(myArr[myArr.length - 1], $(el).val());
+            var myObj = {};
+            ccLib.setJsonValue(myObj, myData, ccLib.getObjValue(el));
+
             $(el).addClass('loading');
             // now make the update call...
-            jT.call(self, data.uri, { method: 'PUT', form: fd }, function (task) {
-              if (!task) {
+            jT.call(self, data.uri, { method: 'PUT', form: formDater(myObj) }, function (task) {
+              jT.pollTask(self, task, function (task) {
                 $(el).removeClass('loading');
-                $(el).val(ccLib.getJsonValue(data, myData)); // i.e. revert the old value
-              }
-              else {
-                jT.pollTask(self, task, function (task) {
-                  $(el).removeClass('loading');
-                  if (!task)
-                    $(el).val(ccLib.getJsonValue(data, myData)); // i.e. revert the old value
-                });
-              }
+                if (!task || !!task.error)
+                  ccLib.setObjValue(el, ccLib.getJsonValue(data, myData)); // i.e. revert the old value
+                else {
+                  // we need to update the value... in our internal 'policies' array...
+                  var idx = $(self.table).dataTable().fnGetPosition($(el).closest('tr')[0]);
+                  ccLib.setJsonValue(self.policies[idx], myData, ccLib.getObjValue(el));
+                }
+              });
             });
           }
           else {
@@ -81,13 +99,35 @@ var jToxPolicy = (function () {
             else
               $('span.ui-icon-plusthick', row).removeClass('jtox-hidden');
           }
-          console.log("CHANGE");
         },
         remove: function (e) {
-          console.log("REMOVE");
+          var el = this;
+          var data = jT.ui.rowData(this);
+          $(el).addClass('loading');
+          jT.call(self, data.uri, { method: "DELETE" }, function (task, jhr) {
+            jT.pollTask(self, task, function (task) {
+              $(el).removeClass('loading');
+              if (!task || !!task.error)
+                alerter(el, 'ui-icon-closethick')
+              else // i.e. - on success - reload them!
+                self.loadPolicies();
+            }, jhr);
+          });
         },
         add: function (e) {
-          console.log("ADD");
+          var data = jT.ui.rowInline(this, jT.ui.rowData(this));
+          delete data['uri'];
+          var el = this;
+          $(el).addClass('loading');
+          jT.call(self, '/admin/restpolicy', { method: "PUSH", form: formDater(data)}, function (task) {
+            jT.pollTask(self, task, function (task) {
+              $(el).removeClass('loading');
+              if (!task || !!task.error)
+                alerter(el, 'ui-icon-plusthick')
+              else // i.e. - on success - reload them!
+                self.loadPolicies();
+            });
+          });
         },
       };
       
@@ -115,14 +155,39 @@ var jToxPolicy = (function () {
       self.loadPolicies();
   };
 
-  cls.prototype.loadPolicies = function () {
+  cls.prototype.loadPolicies = function (force) {
     var self = this;
     $(self.table).dataTable().fnClearTable();
-    jT.call(self, '/admin/restpolicy', function (result) { 
-      if (!!result) {
-        $(self.table).dataTable().fnAddData(result.policy.concat({  }));  
-      }
-    });
+    
+    // The real policy loader...
+    var realLoader = function () {
+      jT.call(self, '/admin/restpolicy', function (result) { 
+        if (!!result) {
+          self.policies = result.policy;  
+          if (!self.settings.noInterface)
+            $(self.table).dataTable().fnAddData(result.policy.concat({  }));
+        }
+      });
+    };
+    
+    // we need to load roles first, if not before, or if forces to...
+    if (!self.roles || force) {
+      jT.call(self, '/admin/role', function (roles) {
+        if (!!roles) {
+          // remember and prepare roles for select presenting...
+          self.roles = roles;
+          realLoader();
+          if (!self.settings.noInterface) {
+            var optList = '';
+            for (var i = 0, rl = roles.roles.length; i < rl; ++i)
+              optList += '<option>' + roles.roles[i] + '</option>';
+            self.roleOptions = optList;
+          }
+        }
+      });
+    }
+    else
+      realLoader();
   };
   
   cls.prototype.query = function () {

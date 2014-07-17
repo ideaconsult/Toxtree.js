@@ -191,8 +191,8 @@ window.jT = window.jToxKit = {
 	*/
 	pollTask : function(kit, task, callback, jhr) {
 		var self = this;
-		if (task === undefined || task.task === undefined || task.task.length < 1){
-			console.log("Wrong task passed for polling: " + JSON.stringify(task));
+		if (task == null || task.task == null || task.task.length < 1){
+		  ccLib.fireCallback(callback, kit, task, jhr);
 			return;
 		}
 		task = task.task[0];
@@ -386,11 +386,11 @@ window.jT.ui = {
   inlineChanger: function (location, breed, holder) {
     if (breed == "select")
       return function (data, type, full) {
-        return type != 'display' ? (data || '') : '<select class="jt-inlineaction" data-data="' + location + '" value="' + (data || '') + '">' + (!holder ? '' : '<option value="">' + holder + '</option>') + '</select>';
+        return type != 'display' ? (data || '') : '<select class="jt-inlineaction" data-data="' + location + '" value="' + (data || '') + '">' + (holder || '') + '</select>';
       };
     else if (breed == "checkbox") // we use holder as 'isChecked' value
       return function (data, type, full) {
-        return type != 'display' ? (data || '') : '<input type="checkbox" class="jt-inlineaction" data-data="' + location + '"' + (((!!holder && data == holder) || !!data) ? 'checked="true"' : '') + '"/>';
+        return type != 'display' ? (data || '') : '<input type="checkbox" class="jt-inlineaction" data-data="' + location + '"' + (((!!holder && data == holder) || !!data) ? 'checked="checked"' : '') + '"/>';
       };
     else if (breed =="text")
       return function (data, type, full) {
@@ -421,13 +421,13 @@ window.jT.ui = {
     return $(table).dataTable().fnGetData(row);
   },
   
-  rowInline: function (el) {
+  rowInline: function (el, base) {
     var row = $(el).closest('tr')[0];
-    var data = {};
+    var data = $.extend({}, base);
     $('.jt-inlineaction', row).each(function () {
       var loc = $(this).data('data');
       if (loc != null)
-        ccLib.setJsonValue(data, loc, $(this).val());
+        ccLib.setJsonValue(data, loc, ccLib.getObjValue(this));
     });
     
     return data;

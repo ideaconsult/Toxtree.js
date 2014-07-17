@@ -62,7 +62,9 @@ var ccLib = {
   	if ((value === undefined || value === null) && jQuery(obj).data('default') !== undefined)
   		value = jQuery(obj).data('default');
   
-    if (obj.nodeName == "INPUT" || obj.nodeName == "SELECT")
+    if (obj.nodeName == "INPUT" && obj.type == 'checkbox')
+      obj.checked = !!value;
+    else if (obj.nodeName == "INPUT" || obj.nodeName == "SELECT")
       obj.value = value;
     else if (obj.nodeName == "IMG")
       obj.src = value;
@@ -70,6 +72,19 @@ var ccLib = {
   		jQuery(obj).data('value', value);
     else
       obj.innerHTML = value;      
+  },
+
+  getObjValue: function (obj){
+    if (obj.nodeName == "INPUT" && obj.type == 'checkbox')
+      return obj.checked;
+    else if (obj.nodeName == "INPUT" || obj.nodeName == "SELECT")
+      return obj.value;
+    else if (obj.nodeName == "IMG")
+      return obj.src;
+    else if (obj.nodeName == "BUTTON")
+  		return jQuery(obj).data('value');
+    else
+      return obj.innerHTML;
   },
 
   isNull: function(obj) {
@@ -555,8 +570,8 @@ window.jT = window.jToxKit = {
 	*/
 	pollTask : function(kit, task, callback, jhr) {
 		var self = this;
-		if (task === undefined || task.task === undefined || task.task.length < 1){
-			console.log("Wrong task passed for polling: " + JSON.stringify(task));
+		if (task == null || task.task == null || task.task.length < 1){
+		  ccLib.fireCallback(callback, kit, task, jhr);
 			return;
 		}
 		task = task.task[0];
@@ -750,11 +765,11 @@ window.jT.ui = {
   inlineChanger: function (location, breed, holder) {
     if (breed == "select")
       return function (data, type, full) {
-        return type != 'display' ? (data || '') : '<select class="jt-inlineaction" data-data="' + location + '" value="' + (data || '') + '">' + (!holder ? '' : '<option value="">' + holder + '</option>') + '</select>';
+        return type != 'display' ? (data || '') : '<select class="jt-inlineaction" data-data="' + location + '" value="' + (data || '') + '">' + (holder || '') + '</select>';
       };
     else if (breed == "checkbox") // we use holder as 'isChecked' value
       return function (data, type, full) {
-        return type != 'display' ? (data || '') : '<input type="checkbox" class="jt-inlineaction" data-data="' + location + '"' + (((!!holder && data == holder) || !!data) ? 'checked="true"' : '') + '"/>';
+        return type != 'display' ? (data || '') : '<input type="checkbox" class="jt-inlineaction" data-data="' + location + '"' + (((!!holder && data == holder) || !!data) ? 'checked="checked"' : '') + '"/>';
       };
     else if (breed =="text")
       return function (data, type, full) {
@@ -785,13 +800,13 @@ window.jT.ui = {
     return $(table).dataTable().fnGetData(row);
   },
   
-  rowInline: function (el) {
+  rowInline: function (el, base) {
     var row = $(el).closest('tr')[0];
-    var data = {};
+    var data = $.extend({}, base);
     $('.jt-inlineaction', row).each(function () {
       var loc = $(this).data('data');
       if (loc != null)
-        ccLib.setJsonValue(data, loc, $(this).val());
+        ccLib.setJsonValue(data, loc, ccLib.getObjValue(this));
     });
     
     return data;
@@ -2599,12 +2614,9 @@ var jToxModel = (function () {
       var self = this;
       var createIt = function () {
         jT.call(self, algoUri, { method: 'POST' }, function (result, jhr) {
-          if (!result)
-            ccLib.fireCallback(callback, self, null, jhr);
-          else
-            jT.pollTask(self, result, function (task, jhr) {
-              ccLib.fireCallback(callback, self, (!task.error ? task.result : null), jhr);
-            });
+          jT.pollTask(self, result, function (task, jhr) {
+            ccLib.fireCallback(callback, self, (!task.error ? task.result : null), jhr);
+          });
         });
       };
       
@@ -2627,15 +2639,12 @@ var jToxModel = (function () {
 
       var createIt = function () {
         jT.call(self, modelUri, { method: "POST", data: { dataset_uri: datasetUri } }, function (task, jhr) {
-          if (!task)
-            ccLib.fireCallback(callback, self, null, jhr);
-          else
-            jT.pollTask(self, task, function (task, jhr) {
-              if (!task || !!task.error)
-                ccLib.fireCallback(callback, self, null, jhr);
-              else
-                jT.call(self, task.result, callback);
-            });
+          jT.pollTask(self, task, function (task, jhr) {
+            if (!task || !!task.error)
+              ccLib.fireCallback(callback, self, null, jhr);
+            else
+              jT.call(self, task.result, callback);
+          });
         });
       };     
       jT.call(self, q, function (result, jhr) {
