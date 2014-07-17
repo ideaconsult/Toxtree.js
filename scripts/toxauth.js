@@ -105,6 +105,8 @@ var jToxPolicy = (function () {
           }
         },
         remove: function (e) {
+          if (!window.confirm("Do you really want to delete this policy?"))
+            return;
           var el = this;
           var data = jT.ui.rowData(this);
           $(el).addClass('loading');
