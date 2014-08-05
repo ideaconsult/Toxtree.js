@@ -34,7 +34,7 @@ jTConfig.dataset = {
 			"column": { bVisible: false },
 			"basic": true,
 			"render" : function(data, type, full) {
-        return (type != "details") ? "-" : '<span class="jtox-details-composition" data-URI="' + data + '"></span>';
+        return (type != "details") ? "-" : '<span class="jtox-details-composition"></span>';
       }
 		}
   },

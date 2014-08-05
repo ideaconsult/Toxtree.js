@@ -31,7 +31,7 @@
   <script language="javascript">
     $(document).ready(function(){
       var ds = new jToxSubstance($(".jtox-toolkit")[0], {crossDomain: true, embedComposition: true, showDiagrams: true } );
-      ds.querySubstance('http://apps.ideaconsult.net:8080/data/substance?compound_uri=http%3A%2F%2Fapps.ideaconsult.net%3A8080%2Fdata%2Fcompound%2F21219%2Fconformer%2F39738&page=0&pagesize=20');
+      ds.querySubstance('http://apps.ideaconsult.net:8080/data/substance?type=related&compound_uri=http%3A%2F%2Fapps.ideaconsult.net%3A8080%2Fdata%2Fcompound%2F21219%2Fconformer%2F39738');
     });
   </script>
 </head>
