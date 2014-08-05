@@ -47,7 +47,7 @@ var jToxPolicy = (function () {
       self.rootElement.appendChild(jT.getTemplate('#jtox-policy'));
       self.settings.configuration.columns.policy.Id.sTitle = '';
       self.settings.configuration.columns.policy.Role.mRender = function (data, type, full) {
-        return type != 'display' ? (data || '') : '<select class="jt-inlineaction" data-data="role" value="' + (data || '') + '">' + self.roleOptions + '</select>';
+        return type != 'display' ? (data || '') : '<select class="jt-inlineaction" data-data="role">' + self.roleOptions + '</select>';
       };
       
       var alerter = function (el, icon, task) {
@@ -68,6 +68,10 @@ var jToxPolicy = (function () {
       };
       
       var inlineHandlers = {
+        init: function (data) {
+          if (this.tagName == 'SELECT')
+            $(this).val(data.role);
+        },
         change: function (e) {
           var data = jT.ui.rowData(this);
           if (!!data.uri) {

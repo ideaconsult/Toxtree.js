@@ -396,6 +396,7 @@ window.jT.ui = {
   inlineRowFn: function (on) {
     return function( nRow, aData, iDataIndex ) {
       $('.jt-inlineaction', nRow).each(function () {
+        ccLib.fireCallback(on.init, this, aData, iDataIndex);
         var action = $(this).data('action') || 'change';
         if (this.tagName == 'INPUT' || this.tagName == 'SELECT' || this.tagName == "TEXTAREA")
           $(this).on('change', on[action]).on('keydown', jT.ui.enterBlur);
