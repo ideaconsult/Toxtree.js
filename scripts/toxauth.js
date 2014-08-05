@@ -70,7 +70,7 @@ var jToxPolicy = (function () {
       var inlineHandlers = {
         init: function (data) {
           if (this.tagName == 'SELECT')
-            $(this).val(data.role);
+            $(this).val(data[$(this).data('data')]);
         },
         change: function (e) {
           var data = jT.ui.rowData(this);
