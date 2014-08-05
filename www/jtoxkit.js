@@ -2901,7 +2901,7 @@ var jToxComposition = (function () {
 					'Typical concentration': { sTitle: "Typical concentration", sClass: "center", sWidth: "15%", mData: "proportion.typical", mRender: function(val, type, full) { return type != 'display' ? '' + val.value : jToxComposition.formatConcentration(val.precision, val.value, val.unit); } },
 					'Concentration ranges': { sTitle: "Concentration ranges", sClass : "center colspan-2", sWidth : "20%", mData : "proportion.real", mRender : function(val, type, full) { return type != 'display' ? '' + val.lowerValue : jToxComposition.formatConcentration(val.lowerPrecision, val.lowerValue, val.unit); } },
 					'Upper range': { sTitle: 'Upper range', sClass: "center", sWidth: "20%", mData: "proportion.real", mRender: function(val, type, full) { return type != 'display' ? '' + val.upperValue : jToxComposition.formatConcentration(val.upperPrecision, val.upperValue, val.unit); } },
-					'Also': { sTitle: "Also", sClass: "center", bSortable: false, mData: "component.compound.URI", mRender: function(val, type, full) { return !val ? '' : '<a href="' + (jT.settings.baseUrl || self.baseUrl) + '/substance?type=related&compound_uri=' + encodeURIComponent(val) + '" target="_blank">Also contained in...</span></a>'; } }
+					'Also': { sTitle: "Also", sClass: "center", bSortable: false, mData: "component.compound.URI", sDefaultContent: "-" }
 				}
       }
     }
@@ -2943,6 +2943,8 @@ var jToxComposition = (function () {
       for (var i = 0, cl = cols.length; i < cl; ++i)
         if (cols[i].sTitle == 'Also') {
           cols[i].sTitle = '';
+          // we need to do this here, because 'self' is not defined up there...
+          cols[i].mRender = function(val, type, full) { return !val ? '' : '<a href="' + (self.settings.baseUrl || self.baseUrl) + '/substance?type=related&compound_uri=' + encodeURIComponent(val) + '" target="_blank">Also contained in...</a>'; };
           break;
         }
         
@@ -2981,6 +2983,7 @@ var jToxComposition = (function () {
     queryComposition: function (uri) {
       var self = this;
       self.compositionUri = uri;
+      self.baseUrl = jT.grabBaseUrl(uri);
       jT.call(self, uri, function (json) {
         if (!!json && !!json.composition) {
           // clear the old tabs, if any.
