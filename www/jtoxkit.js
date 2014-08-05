@@ -3000,9 +3000,15 @@ var jToxComposition = (function () {
               substances[cmp.compositionUUID] = theSubs = { name: "", purity: "", maxvalue: 0, uuid: cmp.compositionUUID, composition: [] };
             
             theSubs.composition.push(cmp);
+            if (cmp.compositionName != '' && cmp.compositionName != null)
+              theSubs.name = cmp.compositionName;
+              
             var val = cmp.proportion.typical;
-            if (cmp.relation == 'HAS_CONSTITUENT' && (theSubs.maxvalue < val.value || theSubs.name == '')) {
+            if (cmp.relation == 'HAS_CONSTITUENT' && theSubs.name == '') {
               theSubs.name = cmp.component.compound['name'] + ' (' + jToxComposition.formatConcentration(val.precision, val.value, val.unit) + ')';
+            }
+            
+            if (cmp.relation == 'HAS_CONSTITUENT' && theSubs.maxvalue < val.value) {
               theSubs.maxvalue = val.value;
               val = cmp.proportion.real;
               theSubs.purity = jToxComposition.formatConcentration(null, val.lowerValue + '-' + val.upperValue, val.unit);
