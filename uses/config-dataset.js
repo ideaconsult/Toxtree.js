@@ -41,11 +41,17 @@ jTConfig.dataset = {
   "groups": createGroups,
 	"columns": {
   	"dataset": {
-    	'Info': { bVisible: false }
+    	'Info': { bVisible: false },
+    	'Id': { sWidth: "25%" },
+    	'Title': { sWidth: "45%" },
+    	'Stars': { sWidth: "30%" }
   	},
   	"model": { 
     	'Info': { bVisible: false },
-    	'Algorithm': { bVisible: false }
+    	'Algorithm': { bVisible: false },
+    	'Id': { sWidth: "25%" },
+    	'Title': { sWidth: "45%" },
+    	'Stars': { sWidth: "30%" }
   	}
 	},
 	"handlers": {

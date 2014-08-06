@@ -38,12 +38,12 @@ var jToxDataset = (function () {
     var self = this;
     self.rootElement = root;
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even when manually initialized
-    
+
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
-    
+        
     if (!self.settings.noInterface) {
       self.rootElement.appendChild(jT.getTemplate('#jtox-dataset'));
-      self.init();
+      self.init(settings);
     }
         
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
@@ -52,21 +52,25 @@ var jToxDataset = (function () {
   };
   
   cls.prototype = {
-    init: function () {
+    init: function (settings) {
       var self = this;
       
       // arrange certain things on the columns first - like dealing with short/long stars
-      self.settings.configuration.columns.dataset.Stars.mRender = function (data, type, full) {
+      defaultSettings.configuration.columns.dataset.Stars.mRender = function (data, type, full) {
         return type != 'display' ? data : jT.ui.putStars(self, data, "Dataset quality stars rating (worst) 1-10 (best)");
       };
+      
       if (self.settings.shortStars)
-        self.settings.configuration.columns.dataset.Stars.sWidth = "40px";
+        defaultSettings.configuration.columns.dataset.Stars.sWidth = "40px";
       
       // deal if the selection is chosen
       if (!!self.settings.selectionHandler || !!self.settings.onDetails) {
-        jT.ui.putActions(self, self.settings.configuration.columns.dataset.Id, { selection: self.settings.selectionHandler, details: !!self.settings.onDetails });
-        self.settings.configuration.columns.dataset.Id.sWidth = "60px";
+        jT.ui.putActions(self, defaultSettings.configuration.columns.dataset.Id, { selection: self.settings.selectionHandler, details: !!self.settings.onDetails });
+        defaultSettings.configuration.columns.dataset.Id.sWidth = "60px";
       }
+      
+      // again , so that changed defaults can be taken into account.
+      self.settings.configuration = jT.$.extend(true, {}, defaultSettings.configuration, settings.configuration);
       
       // READYY! Go and prepare THE table.
       self.table = jT.$('table', self.rootElement).dataTable({

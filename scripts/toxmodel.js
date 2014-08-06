@@ -60,7 +60,7 @@ var jToxModel = (function () {
     
     if (!self.settings.noInterface) {
       self.rootElement.appendChild(jT.getTemplate('#jtox-model'));
-      self.init();
+      self.init(settings);
     }
         
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
@@ -69,17 +69,16 @@ var jToxModel = (function () {
   };
   
   cls.prototype = {
-    init: function () {
+    init: function (settings) {
       var self = this;
       
       // but before given it up - make a small sorting..
       if (!self.settings.algorithms) {
-        self.settings.configuration.columns.model.Stars.mRender = function (data, type, full) { return type != 'display' ? data : jT.ui.putStars(self, data, "Model star rating (worst) 1 - 10 (best)"); };
-        if (self.settings.shortStars) {
-          self.settings.configuration.columns.model.Stars.sWidth = "40px";
-        }
+        defaultSettings.configuration.columns.model.Stars.mRender = function (data, type, full) { return type != 'display' ? data : jT.ui.putStars(self, data, "Model star rating (worst) 1 - 10 (best)"); };
+        if (self.settings.shortStars)
+          defaultSettings.configuration.columns.model.Stars.sWidth = "40px";
 
-        self.settings.configuration.columns.model.Algorithm.mRender = function (data, type, full) { 
+        defaultSettings.configuration.columns.model.Algorithm.mRender = function (data, type, full) { 
           var name = data.URI.match(/https{0,1}:\/\/.*\/algorithm\/(\w+).*/)[1];
           if (type != 'display')
             return name;
@@ -98,9 +97,12 @@ var jToxModel = (function () {
       var cat = self.settings.algorithms ? 'algorithm' : 'model';
       // deal if the selection is chosen
       if (!!self.settings.selectionHandler || !!self.settings.onDetails) {
-        jT.ui.putActions(self, self.settings.configuration.columns[cat].Id, { selection: self.settings.selectionHandler, details: !!self.settings.onDetails});
-        self.settings.configuration.columns[cat].Id.sWidth = "60px";
+        jT.ui.putActions(self, defaultSettings.configuration.columns[cat].Id, { selection: self.settings.selectionHandler, details: !!self.settings.onDetails});
+        defaultSettings.configuration.columns[cat].Id.sWidth = "60px";
       }
+      
+      // again , so that changed defaults can be taken into account.
+      self.settings.configuration = jT.$.extend(true, {}, defaultSettings.configuration, settings.configuration);
       
       // READYY! Go and prepare THE table.
       self.table = jT.$('table', self.rootElement).dataTable({

@@ -66,7 +66,7 @@ var jToxSubstance = (function () {
       }
 
       self.rootElement.appendChild(jT.getTemplate('#jtox-substance'));
-      self.init();
+      self.init(settings);
     }    
         
     // finally, if provided - make the query
@@ -75,19 +75,18 @@ var jToxSubstance = (function () {
   };
   
   cls.prototype = {
-    init: function () {
+    init: function (settings) {
       var self = this;
       
       // deal if the selection is chosen
-      
-      var colId = self.settings.configuration.columns.substance['Id'];
+      var colId = defaultSettings.configuration.columns.substance['Id'];
       jT.ui.putActions(self, colId, { 
         selection: self.settings.selectionHandler,
         details: !!self.settings.onDetails
       });
       colId.sTitle = '';
       
-      self.settings.configuration.columns.substance['Owner'].mRender = function (data, type, full) {
+      defaultSettings.configuration.columns.substance['Owner'].mRender = function (data, type, full) {
         return (type != 'display') ? data : '<a target="_blank" href="' + self.settings.baseUrl + '/substanceowner/' + full.ownerUUID + '/substance">' + data + '</a>';
       };
       
@@ -101,6 +100,9 @@ var jToxSubstance = (function () {
       }
       else
         jT.$('.jtox-controls', self.rootElement).remove();
+      
+      // again , so that changed defaults can be taken into account.
+      self.settings.configuration = jT.$.extend(true, {}, defaultSettings.configuration, settings.configuration);
       
       // READYY! Go and prepare THE table.
       self.table = jT.$('table', self.rootElement).dataTable({
