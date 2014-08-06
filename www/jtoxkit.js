@@ -42,6 +42,13 @@ var ccLib = {
     return base;
   },
   
+  joinDeep: function (data, field, jn) {
+    var arr = [];
+    for (var i = 0, dl = data.length;i < dl; ++i)
+      arr.push(this.getJsonValue(data[i], field));
+    return arr.join(jn);
+  },
+  
   fireCallback: function (callback, self) {
     if (!jQuery.isArray(callback))
       callback = [callback];
@@ -2722,12 +2729,8 @@ var jToxSubstance = (function () {
             return (type != 'display') ? data.i5uuid : jT.ui.shortenedData('<a target="_blank" href="' + data.uri + '">' + data.i5uuid + '</a>', "Press to copy the UUID in the clipboard", data.i5uuid);
           } },
           'Owner': { sTitle: "Owner", mData: "ownerName", sDefaultContent: '-'},
-          'Info': { sTitle: "Info", mData: "externalIdentifiers", mRender: function (data, type, full) {
-            var arr = [];
-            for (var i = 0, dl = data.length;i < dl; ++i)
-              arr.push(data[i].type);
-            return arr.join(', ');
-          } }
+          'Info': { sTitle: "Info", mData: "externalIdentifiers", mRender: function (data, type, full) { return ccLib.joinDeep(data, 'type', ', '); }
+          }
         }
       }
     }
@@ -2900,7 +2903,7 @@ var jToxComposition = (function () {
 					  if (type != 'display')
 					    return '' + val;
 					  var func = ("HAS_ADDITIVE" == val) ? full.proportion.function_as_additive : "";
-					  return '<span class="camelCase">' +  val.replace("HAS_", "").toLowerCase() + '</span>' + ((func === undefined || func === null || func == '') ? "" : " (" + func + ")");
+					  return '<span class="camelCase">' +  val.substr(4).toLowerCase() + '</span>' + ((func === undefined || func === null || func == '') ? "" : " (" + func + ")");
           } },
           'Name': { sTitle: "Name", sClass: "camelCase left", sWidth: "15%", mData: "component.compound.name", mRender: function(val, type, full) {
 						return (type != 'display') ? '' + val : 

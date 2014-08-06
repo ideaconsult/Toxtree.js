@@ -52,6 +52,9 @@ jTConfig.dataset = {
     	'Id': { sWidth: "25%" },
     	'Title': { sWidth: "45%" },
     	'Stars': { sWidth: "30%" }
+  	},
+  	"substance": {
+    	'Relation': { iOrder: 20, mData: "composition", sTitle: "Relation", mRender: renderRelation }
   	}
 	},
 	"handlers": {

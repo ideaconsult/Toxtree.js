@@ -42,6 +42,13 @@ var ccLib = {
     return base;
   },
   
+  joinDeep: function (data, field, jn) {
+    var arr = [];
+    for (var i = 0, dl = data.length;i < dl; ++i)
+      arr.push(this.getJsonValue(data[i], field));
+    return arr.join(jn);
+  },
+  
   fireCallback: function (callback, self) {
     if (!jQuery.isArray(callback))
       callback = [callback];

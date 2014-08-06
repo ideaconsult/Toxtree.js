@@ -32,12 +32,8 @@ var jToxSubstance = (function () {
             return (type != 'display') ? data.i5uuid : jT.ui.shortenedData('<a target="_blank" href="' + data.uri + '">' + data.i5uuid + '</a>', "Press to copy the UUID in the clipboard", data.i5uuid);
           } },
           'Owner': { sTitle: "Owner", mData: "ownerName", sDefaultContent: '-'},
-          'Info': { sTitle: "Info", mData: "externalIdentifiers", mRender: function (data, type, full) {
-            var arr = [];
-            for (var i = 0, dl = data.length;i < dl; ++i)
-              arr.push(data[i].type);
-            return arr.join(', ');
-          } }
+          'Info': { sTitle: "Info", mData: "externalIdentifiers", mRender: function (data, type, full) { return ccLib.joinDeep(data, 'type', ', '); }
+          }
         }
       }
     }

@@ -22,7 +22,7 @@ var jToxComposition = (function () {
 					  if (type != 'display')
 					    return '' + val;
 					  var func = ("HAS_ADDITIVE" == val) ? full.proportion.function_as_additive : "";
-					  return '<span class="camelCase">' +  val.replace("HAS_", "").toLowerCase() + '</span>' + ((func === undefined || func === null || func == '') ? "" : " (" + func + ")");
+					  return '<span class="camelCase">' +  val.substr(4).toLowerCase() + '</span>' + ((func === undefined || func === null || func == '') ? "" : " (" + func + ")");
           } },
           'Name': { sTitle: "Name", sClass: "camelCase left", sWidth: "15%", mData: "component.compound.name", mRender: function(val, type, full) {
 						return (type != 'display') ? '' + val : 
