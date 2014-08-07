@@ -56,21 +56,21 @@ var jToxDataset = (function () {
       var self = this;
       
       // arrange certain things on the columns first - like dealing with short/long stars
-      defaultSettings.configuration.columns.dataset.Stars.mRender = function (data, type, full) {
+      self.settings.configuration.columns.dataset.Stars.mRender = function (data, type, full) {
         return type != 'display' ? data : jT.ui.putStars(self, data, "Dataset quality stars rating (worst) 1-10 (best)");
       };
       
       if (self.settings.shortStars)
-        defaultSettings.configuration.columns.dataset.Stars.sWidth = "40px";
+        self.settings.configuration.columns.dataset.Stars.sWidth = "40px";
       
       // deal if the selection is chosen
       if (!!self.settings.selectionHandler || !!self.settings.onDetails) {
-        jT.ui.putActions(self, defaultSettings.configuration.columns.dataset.Id, { selection: self.settings.selectionHandler, details: !!self.settings.onDetails });
-        defaultSettings.configuration.columns.dataset.Id.sWidth = "60px";
+        jT.ui.putActions(self, self.settings.configuration.columns.dataset.Id, { selection: self.settings.selectionHandler, details: !!self.settings.onDetails });
+        self.settings.configuration.columns.dataset.Id.sWidth = "60px";
       }
       
       // again , so that changed defaults can be taken into account.
-      self.settings.configuration = jT.$.extend(true, {}, defaultSettings.configuration, settings.configuration);
+      self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
       
       // READYY! Go and prepare THE table.
       self.table = jT.$('table', self.rootElement).dataTable({

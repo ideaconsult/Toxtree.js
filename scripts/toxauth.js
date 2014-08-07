@@ -54,8 +54,8 @@ var jToxPolicy = (function () {
   cls.prototype.init = function (settings) {
     var self = this;
     self.rootElement.appendChild(jT.getTemplate('#jtox-policy'));
-    defaultSettings.configuration.columns.policy.Id.sTitle = '';
-    defaultSettings.configuration.columns.policy.Role.mRender = function (data, type, full) {
+    self.settings.configuration.columns.policy.Id.sTitle = '';
+    self.settings.configuration.columns.policy.Role.mRender = function (data, type, full) {
       return type != 'display' ? (data || '') : '<select class="jt-inlineaction" data-data="role">' + self.roleOptions + '</select>';
     };
     
@@ -151,7 +151,7 @@ var jToxPolicy = (function () {
     };
     
     // again , so that changed defaults can be taken into account.
-    self.settings.configuration = jT.$.extend(true, {}, defaultSettings.configuration, settings.configuration);
+    self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
  
     self.table = jT.$('table', self.rootElement).dataTable({
       "bPaginate": false,
