@@ -722,7 +722,7 @@ var jToxCompound = (function () {
       var self = this;
       var pane = jT.$('.jtox-controls', self.rootElement)[0];
       ccLib.fillTree(pane, {
-        "pagestart": qStart + 1,
+        "pagestart": qSize > 0 ? qStart + 1 : 0,
         "pageend": qStart + qSize,
       });
       

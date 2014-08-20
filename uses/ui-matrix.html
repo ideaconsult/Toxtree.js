@@ -9,47 +9,42 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
 
   <title>ToxMatrix development page</title>
-  <link rel="stylesheet" href="styles/base.css">
-	<link rel="stylesheet" href="styles/skeleton.css">
-	<link rel="stylesheet" href="styles/layout.css">
-	<link rel="stylesheet" href="styles/jquery-ui.css">
-	<link rel="stylesheet" href="styles/jquery.dataTables.css">
+  <link rel="stylesheet" href="../tests/base.css"/>
+	<link rel="stylesheet" href="../tests/skeleton-fluid.css"/>
+	<link rel="stylesheet" href="../tests/layout.css"/>
+	<link rel="stylesheet" href="../tests/jquery-ui.css"/>
+	<link rel="stylesheet" href="../tests/jquery.dataTables.css"/>
+	<link rel="stylesheet" href="../tests/ambit2.css"/>
 
-	<link rel="stylesheet" href="styles/jtoxkit.css">
-	<link rel="stylesheet" href="styles/toxcompound.css">
-	<link rel="stylesheet" href="styles/toxstudy.css">
+	<link rel="stylesheet" href="../www/jtoxkit.css"/>
+	<link rel="stylesheet" href="../www/ketcher.css"/>
+	<link rel="stylesheet" href="ui-matrix.css"/>
 
-	<link rel="stylesheet" href="styles/toxmatrix.css">
+  <script src="oecdcategories.js"></script>
 
-  <script src="scripts/jquery.js"></script>
-  <script src="scripts/jquery-migrate-1.2.1.min.js"></script>
-  <script src="scripts/colResizable-1.3.min.js"></script>
-  <script src="scripts/jquery-ui.js"></script>
-  <script src="scripts/jquery.dataTables.js"></script>
+  <script src="../tests/jquery.js"></script>
+  <script src="../tests/jquery.base64.min.js"></script>
+  <script src="../tests/jquery-migrate-1.2.1.min.js"></script>
+  <script src="../tests/colResizable-1.3.min.js"></script>
+  <script src="../tests/jquery-ui.min.js"></script>
+  <script src="../tests/jquery.dataTables-1.9.4.min.js"></script>
 
-  <script src="scripts/common.js"></script>
-  <script src="scripts/jtoxkit.js"></script>
-  <script src="scripts/toxcompound.js"></script>
-  <script src="scripts/toxstudy.js"></script>
-
-  <script src="scripts/toxmatrix.js"></script>
-
-  <script language="javascript">
-  	$(document).ready(function() {
-	  	jToxMatrix.init($('#jtox-matrix')[0]);
-  	});
-  </script>
+  <script src="../www/jtoxkit.js"></script>
+  <script src="../www/ketcher.js"></script>
+  <script src="ui-common.js"></script>
+  <script src="ui-matrix.js"></script>
+  <script src="config-matrix.js"></script>
 </head>
 <body>
-  <div class="jtox-toolkit" id="jtox-matrix">
+  <div class="jtox-toolkit" id="jtox-matrix" data-kit="assessment">
     <ul>
       <li><a href="#jtox-identifiers">Assessment identifier</a></li>
-      <li><a href="#jtox-structures">Structures used</a></li>
+      <li><a href="#jtox-structures">Collect structures</a></li>
       <li><a href="#jtox-endpoints">Endpoint data used</a></li>
-      <li><a href="#jtox-details">Assessment details</a></li>
+        <li><a href="#jtox-matrix">Assessment details</a></li>
       <li><a href="#jtox-report">Report</a></li>
     </ul>
-    <div id="jtox-identifiers" class="jtox-identifiers">
+    <div id="jtox-identifiers" class="jtox-identifiers" data-action="onIdentifiers">
 	  	<form>
 	      <table class="dataTable">
 	        <thead>
@@ -102,23 +97,21 @@
 	  </div>
     <div id="jtox-structures" class="jtox-structures">
 	  	<div class="jq-buttonset center action" data-action="onStructures">
-			  <input type="radio" id="structtarget" name="structaction" checked="checked"><label for="structtarget">Define initial target</label></input>
-			  <input type="radio" id="structallied" name="structaction"><label for="structallied">Search allied structures</label></input>
-			  <input type="radio" id="structselected" name="structaction"><label for="structselected">Selected structures</label></input>
+			  <input type="radio" id="structtarget" name="structaction" checked="checked"><label for="structtarget">Collect structures</label></input>
+			  <input type="radio" id="structallied" name="structaction"><label for="structallied">List collected</label></input>
 			</div>
     </div>
     <div id="jtox-endpoints" class="jtox-endpoints">
 	  	<div class="jq-buttonset center action" data-action="onEndpoint">
-			  <input type="radio" id="endsubstance" name="endaction" checked="checked"><label for="endsubstance">Find substance(s)</label></input>
+			  <input type="radio" id="endsubstance" name="endaction" checked="checked"><label for="endsubstance">Search substance(s)</label></input>
 			  <input type="radio" id="endpoints" name="endaction"><label for="endpoints">Selection of endpoints</label></input>
-			  <input type="radio" id="endmatrix" name="endaction"><label for="endmatrix">Data matrix</label></input>
 			</div>
 		</div>
-    <div id="jtox-details" class="jtox-details">
-	  	<div class="jq-buttonset center action" data-action="onDetails">
-			  <input type="radio" id="xdata" name="xaction" checked="checked"><label for="xdata">Add data</label></input>
-			  <input type="radio" id="xgap" name="xaction"><label for="xgap">Gap filling</label></input>
-			  <input type="radio" id="xoverview" name="xaction"><label for="xoverview">Final data matrix</label></input>
+    <div id="jtox-matrix" class="jtox-matrix">
+	  	<div class="jq-buttonset center action" data-action="onMatrix">
+			  <input type="radio" id="xinitial" name="xaction" checked="checked"><label for="xinitial">Initial matrix</label></input>
+			  <input type="radio" id="xworking" name="xaction"><label for="xworking">Working matrix</label></input>
+			  <input type="radio" id="xfinal" name="xaction"><label for="xfinal">Final matrix</label></input>
 			</div>
     </div>
     <div id="jtox-report" class="jtox-report"></div>
