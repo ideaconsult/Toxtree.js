@@ -90,10 +90,10 @@ window.jT = window.jToxKit = {
   	  });
 	  }
 	  else {
-	    if (!!dataParams.configuration && typeof dataParams.configuration == "string" && !!window[dataParams.configuration]) {
+	    if (!!window[dataParams.configuration] && typeof dataParams.configuration == "string") {
 	      var config = window[dataParams.configuration];
 	      dataParams.configuration = (typeof config != 'function' ? config : config(kit));
-	     }
+      }
   	  
       jT.$(element).data('jtKit', realInit(dataParams));
 	  }

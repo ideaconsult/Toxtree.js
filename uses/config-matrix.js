@@ -14,7 +14,7 @@ jTConfig.matrix = {
       "accumulate": true,
       "render" : function(data, type, full) {
         return (type != "display") ? data : (
-                (data=="active")?("<span style='color:red'>"+data+"</span>"):data
+                (data=="active")?('<span style="color:red">' + data + '</span>'):data
         );
       }
     },
@@ -24,7 +24,7 @@ jTConfig.matrix = {
 			"accumulate": true,
 			"render" : function(data, type, full) {
         return (type != "display") ? data : (
-				  (data=="active")?("<span style='color:red'>"+data+"</span>"):data);
+				  (data=="active")?('<span style="color:red">' + data + '</span>'):data);
       }
 		},
 		"http://www.opentox.org/api/1.1#CompositionInfo" : {
@@ -40,19 +40,6 @@ jTConfig.matrix = {
   },
   "groups": createGroups,
 	"columns": {
-  	"dataset": {
-    	'Info': { bVisible: false },
-    	'Id': { sWidth: "25%" },
-    	'Title': { sWidth: "45%" },
-    	'Stars': { sWidth: "30%" }
-  	},
-  	"model": { 
-    	'Info': { bVisible: false },
-    	'Algorithm': { bVisible: false },
-    	'Id': { sWidth: "25%" },
-    	'Title': { sWidth: "45%" },
-    	'Stars': { sWidth: "30%" }
-  	},
   	"substance": {
     	'Contained in as': { iOrder: 20, mData: "composition", sTitle: "Contained in as", mRender: renderRelation }
   	}

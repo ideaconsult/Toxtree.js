@@ -23,31 +23,45 @@ function createGroups(miniset, kit) {
       "http://www.opentox.org/api/1.1#REACHRegistrationDate"
 	  ]
 	};
-	for (var fId in miniset.feature) {
-	  var feat = miniset.feature[fId]; 
-  	var src = feat.source;
-  	if (!src || !src.type || src.type.toLowerCase() != 'model')
-  	  continue;
-    src = src.URI.substr(src.URI.lastIndexOf('/') + 1);
-    if (groups[src] === undefined)
-      groups[src] = [];
-    if (feat.title.indexOf('explanation') > 0)
-      feat.visibility = "details";
-    groups[src].push(fId);
-	}
-	groups["Substances"] = [ "http://www.opentox.org/api/1.1#CompositionInfo" ];
-	groups["Calculated"] = null;
-	groups["Other"] = function (name, miniset) {
-    var arr = [];
-    for (var f in miniset.feature) {
-      if (!miniset.feature[f].used && !miniset.feature[f].basic) {
-        arr.push(f);
-        if (feat.title.indexOf('explanation') > 0)
-          feat.visibility = "details";
-      }
+	
+	var endpoints = {};
+	var grp = [];
+	var fAcc = function (fId, oldVal, newVal, features) {
+  	if (newVal == null)
+  	  return oldVal;
+    else if (oldVal == null)
+      return [newVal];
+    else if (!$.isArray(oldVal)) 
+      return [oldVal, newVal];
+    else {
+      oldVal.push(newVal);
+      return oldVal;
     }
-    return arr;
-  }
+	};
+	
+	var fRender = function (sameAs, units) {
+	  var uStr = units != null ? '<span class="units">' + units + '</span>' : '';
+	  return function (data, type, full) {
+	    return data.join(type != 'display' ? "," : uStr + '<br/>') + uStr;
+    };
+  };
+	
+	for (var fId in miniset.feature) {
+	  var feat = miniset.feature[fId];
+	  if (feat.sameAs == null || feat.sameAs.indexOf("echaEndpoints.owl#") < 0)
+	    continue;
+    
+    var sameAs = feat.sameAs.substr(feat.sameAs.indexOf('#') + 1);
+    if (endpoints[sameAs] == undefined) {
+      endpoints[sameAs] = true;
+      feat.render = fRender(sameAs, feat.units);
+      grp.push(fId);
+    }
+    feat.accumulate = fAcc;
+    feat.data = "endpoints." + sameAs;
+	}
+		
+	groups["Endpoints"] = grp;
 	return groups;
 }
 
@@ -93,7 +107,7 @@ var jToxAssessment = {
 	    var method = $(el).parent().data('action');
 	    if (!method)
 	    	return;
-	    ccLib.fireCallback(self[method], self, el.id, $(el).closest('ui-tabs-panel')[0]);
+	    ccLib.fireCallback(self[method], self, el.id, $(el).closest('.ui-tabs-panel')[0]);
 		};
 		
     var loadPanel = function(panel){
@@ -156,7 +170,18 @@ var jToxAssessment = {
 	
 	// called when a sub-action in assessment details tab is called
 	onMatrix: function (id, panel) {
-		console.log("Matrix: " + id);
+		if (!$(panel).hasClass('initialized')) {
+  		$(panel).addClass('initialized');
+  		self.matrixKit = new jToxCompound($('.jtox-toolkit', panel)[0], {
+    		crossDomain: true,
+    		rememberChecks: true,
+    		tabsFolded: true,
+    		showDiagrams: true,
+    		configuration: jTConfig.matrix
+  		});
+  		
+  		self.matrixKit.query("http://apps.ideaconsult.net:8080/data/substanceowner/IUC5-8DA74AF7-C7DD-4E38-8D8E-8FC765D5D15F/dataset");
+		}
 	},
 	
 	// called when a sub-action in endpoint selection tab is called

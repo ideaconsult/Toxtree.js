@@ -871,12 +871,13 @@ var jToxCompound = (function () {
       
       // if applicable - location the feature value to a specific location whithin the entry
       if (!!feature.accumulate && newVal !== undefined && feature.data !== undefined) {
+        var fn = typeof feature.accumulate == 'function' ? feature.accumulate : fnValue;
         var accArr = feature.data;
         if (!jT.$.isArray(accArr))
           accArr = [accArr];
         
         for (var v = 0; v < accArr.length; ++v)
-          ccLib.setJsonValue(entry, accArr[v], ccLib.fireCallback(fnValue, this, fid,  /* oldVal */ ccLib.getJsonValue(entry, accArr[v]), newVal, features));
+          ccLib.setJsonValue(entry, accArr[v], ccLib.fireCallback(fn, this, fid,  /* oldVal */ ccLib.getJsonValue(entry, accArr[v]), newVal, features));
       }
       
       if (feature.process !== undefined)
