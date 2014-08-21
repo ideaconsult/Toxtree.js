@@ -1366,6 +1366,7 @@ var jToxCompound = (function () {
     "tabsFolded": false,      // should present the feature-selection tabs folded initially
     "showExport": true,       // should we add export tab up there
     "showControls": true,     // should we show the pagination/navigation controls.
+    "showUnits": true,        // should we show units in the column title.
     "hideEmpty": false,       // whether to hide empty groups instead of making them inactive
     "hasDetails": true,       // whether browser should provide the option for per-item detailed info rows.
     "hideEmptyDetails": true, // hide feature values, when they are empty (only in detailed view)
@@ -1858,7 +1859,7 @@ var jToxCompound = (function () {
             
           // now we now we should show this one.
           var col = {
-            "sTitle": feature.title.replace(/_/g, ' ') + (ccLib.isNull(feature.units) ? "" : feature.units),
+            "sTitle": feature.title.replace(/_/g, ' ') + (!self.settings.showUnits || ccLib.isNull(feature.units) ? "" : feature.units),
             "sDefaultContent": "-",
           };
           

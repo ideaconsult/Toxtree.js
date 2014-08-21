@@ -55,6 +55,7 @@ function createGroups(miniset, kit) {
     if (endpoints[sameAs] == undefined) {
       endpoints[sameAs] = true;
       feat.render = fRender(sameAs, feat.units);
+      feat.title = sameAs;
       grp.push(fId);
     }
     feat.accumulate = fAcc;
@@ -177,6 +178,7 @@ var jToxAssessment = {
     		rememberChecks: true,
     		tabsFolded: true,
     		showDiagrams: true,
+    		showUnits: false,
     		configuration: jTConfig.matrix
   		});
   		
