@@ -38,7 +38,6 @@ jTConfig.matrix = {
       }
 		}
   },
-  "groups": createGroups,
 	"columns": {
   	"substance": {
     	'Contained in as': { iOrder: 20, mData: "composition", sTitle: "Contained in as", mRender: renderRelation }
