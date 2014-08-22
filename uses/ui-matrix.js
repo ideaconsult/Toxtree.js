@@ -142,7 +142,7 @@ var jToxAssessment = {
               if (html.length > 0) 
                 html += '<br/>';
               
-              html += '<a target="_blank" href="' + self.matrixKit.settings.baseUrl + '/substance/id/study?property_uri=' + encodeURIComponent(fId) + '">' + (full.values[fId] || '-') + '</a>';
+              html += '<a target="_blank" href="' + full.compound.URI + '/study?property_uri=' + encodeURIComponent(fId) + '">' + (full.values[fId] || '-') + uStr + '</a>';
             }
       	    return  html;
           };
