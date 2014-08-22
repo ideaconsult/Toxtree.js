@@ -130,7 +130,6 @@ var jToxAssessment = {
       	var grp = [];
       	
       	var fRender = function (feat) {
-      	  var uStr = feat.units != null ? '<span class="units">' + feat.units + '</span>' : '';
       	  return function (data, type, full) {
       	    if (type != 'display')
       	      return data.toString();
@@ -142,7 +141,10 @@ var jToxAssessment = {
               if (html.length > 0) 
                 html += '<br/>';
               
-              html += '<a target="_blank" href="' + full.compound.URI + '/study?property_uri=' + encodeURIComponent(fId) + '">' + (full.values[fId] || '-') + uStr + '</a>';
+              html += 
+                '<a target="_blank" href="' + full.compound.URI + '/study?property_uri=' + encodeURIComponent(fId) + '">' + 
+                (full.values[fId] || '-') + (f.units != null ? '<span class="units">' + f.units + '</span>' : '') + 
+                '</a>';
             }
       	    return  html;
           };
