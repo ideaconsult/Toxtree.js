@@ -3127,7 +3127,7 @@ var jToxStudy = (function () {
   var cls = function (root, settings) {
     var self = this;
     self.rootElement = root;
-    var suffix = '_' + instanceCount++;
+    self.instanceNo = instanceCount++;
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even in manual initialization.
     
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings); // i.e. defaults from jToxStudy
@@ -3138,7 +3138,7 @@ var jToxStudy = (function () {
     // There should be no overlap, because already-added instances will have their IDs changed already...
     var tree = jT.getTemplate('#jtox-studies');
     root.appendChild(tree);
-    jT.ui.changeTabsIds(tree, suffix);
+    jT.ui.changeTabsIds(tree, '_' + self.instanceNo);
     
     // initialize the tab structure for several versions of tabs.
     self.tabs = jT.$(tree).tabs({
@@ -3161,19 +3161,17 @@ var jToxStudy = (function () {
   cls.prototype = {
     loadPanel: function(panel){
       var self = this;
-      if (panel){
-        jT.$('.jtox-study.unloaded', panel).each(function(i){
-          var table = this;
-          jT.call(self, jT.$(table).data('jtox-uri'), function(study){
-            if (!!study) {
-              jT.$(table).removeClass('unloaded folded');
-              jT.$(table).addClass('loaded');
+      if (jT.$(panel).hasClass('unloaded')){
+        var uri = self.addParameters(jT.$(panel).data('jtox-uri'));
+        jT.call(self, uri, function(study){
+          if (!!study) {
+            jT.$('.jtox-study.folded', panel).removeClass('folded');
+            jT.$(panel).removeClass('unloaded').addClass('loaded');
 
-              self.processStudies(panel, study.study, false);
-              ccLib.fireCallback(self.settings.onStudy, self, study.study);
-            }
-          });  
-        });
+            self.processStudies(panel, study.study, true);
+            ccLib.fireCallback(self.settings.onStudy, self, study.study);
+          }
+        });  
       }
     },
     
@@ -3215,6 +3213,18 @@ var jToxStudy = (function () {
       }
       
       return theCat;
+    },
+    
+    addParameters: function (summaryURI) {
+      var self = this;
+      var pars = ["property_uri", "top", "category"];
+      for (var i = 0; i < pars.length; ++i) {
+        var p = pars[i];
+        if (!!self.settings[p])
+          summaryURI = ccLib.addParameter(summaryURI, p + "=" + self.settings[p]);
+      }
+      
+      return summaryURI;
     },
     
     // modifies the column title, according to configuration and returns "null" if it is marked as "invisible".
@@ -3430,10 +3440,10 @@ var jToxStudy = (function () {
       var lastAdded = null;
       var addStudyTab = function (top, sum) {
         var tab = jT.getTemplate('#jtox-study-tab');
-        var link = jT.ui.addTab(tabRoot, (knownNames[top] || sum.topcategory.title) + " (0)", "jtox-" + top.toLowerCase(), tab).tab;
+        var link = jT.ui.addTab(tabRoot, (knownNames[top] || sum.topcategory.title) + " (0)", "jtox-" + top.toLowerCase() + '_' + self.instanceNo, tab).tab;
         jT.$(link).data('type', top);
         
-        jT.$(tab).addClass(top).data('uri', sum.topcategory.uri);
+        jT.$(tab).addClass(top).data('jtox-uri', sum.topcategory.uri);
         ccLib.fillTree(tab, self.substance);
         
         added++;
@@ -3463,13 +3473,10 @@ var jToxStudy = (function () {
           tab = addStudyTab(top, sum);
         
         var catname = sum.category.title;
-        if (!catname) {
+        if (!catname)
           typeSummary[top] = sum.count;
-        }
-        else {
-          var cat = self.createCategory(tab, catname);
-          jT.$(cat).data('jtox-uri', sum.category.uri);
-        }
+        else
+          self.createCategory(tab, catname);
       }
 
       // a small hack to force openning of this, later in the querySummary()      
@@ -3512,6 +3519,7 @@ var jToxStudy = (function () {
     processStudies: function (tab, study, map) {
       var self = this;
       var cats = {};
+      var cntCats = 0;
       
       // first swipe to map them to different categories...
       if (!map){
@@ -3523,8 +3531,9 @@ var jToxStudy = (function () {
         for (var i = 0, slen = study.length; i < slen; ++i) {
           var ones = study[i];
           if (map) {
-            if (cats[ones.protocol.category] === undefined) {
+            if (cats[ones.protocol.category.code] === undefined) {
               cats[ones.protocol.category.code] = [ones];
+              cntCats++;
             }
             else {
               cats[ones.protocol.category.code].push(ones);
@@ -3553,7 +3562,8 @@ var jToxStudy = (function () {
         var theTable = self.ensureTable(tab, study);
         jT.$(theTable).dataTable().fnAddData(onec);
         jT.$(theTable).colResizable({ minWidth: 30, liveDrag: true });
-        jT.$(theTable).parents('.jtox-study').addClass('folded');
+        if (cntCats > 1)
+          jT.$(theTable).parents('.jtox-study').addClass('folded');
 
         // we need to fix columns height's because of multi-cells
         jT.$('#' + theTable.id + ' .jtox-multi').each(function(index){
@@ -3565,13 +3575,7 @@ var jToxStudy = (function () {
     querySummary: function(summaryURI) {
       var self = this;
       
-      var pars = ["property_uri", "top", "category"];
-      for (var i = 0; i < pars.length; ++i) {
-        var p = pars[i];
-        if (!!self.settings[p])
-          summaryURI = ccLib.addParameter(summaryURI, p + "=" + self.settings[p]);
-      }
-      
+      summaryURI = self.addParameters(summaryURI);      
       jT.call(self, summaryURI, function(summary) {
         if (!!summary && !!summary.facet)
           self.processSummary(summary.facet);
@@ -4062,7 +4066,7 @@ jT.templates['all-studies']  =
 ""; // end of #jtox-studies 
 
 jT.templates['one-category']  = 
-"    <div id=\"jtox-study-tab\" class=\"jtox-study-tab\">" +
+"    <div id=\"jtox-study-tab\" class=\"jtox-study-tab unloaded\">" +
 "    	<div class=\"float-right\">" +
 "      	<button class=\"expand-all\">Expand all</button><button class=\"collapse-all\">Collapse all</button>" +
 "    	</div>" +
@@ -4072,7 +4076,7 @@ jT.templates['one-category']  =
 ""; // end of #jtox-category 
 
 jT.templates['one-study']  = 
-"    <div id=\"jtox-study\" class=\"jtox-study jtox-foldable folded unloaded\">" +
+"    <div id=\"jtox-study\" class=\"jtox-study jtox-foldable folded\">" +
 "      <div class=\"title\"><p class=\"data-field\" data-field=\"title\">? (0)</p></div>" +
 "      <div class=\"content\">" +
 "        <table class=\"jtox-study-table content\"></table>" +
