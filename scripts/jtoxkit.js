@@ -328,6 +328,34 @@ window.jT.ui = {
     })  
   },
   
+  addTab: function(root, name, id, content) {
+    // first try to see if there is same already...
+    if (document.getElementById(id) != null)
+      return;
+  
+    // first, create and add li/a element
+    var li = document.createElement('li');
+    var a = document.createElement('a');
+    li.appendChild(a);
+    a.href = '#' + id;
+    a.innerHTML = name;
+    jT.$('ul', root)[0].appendChild(li);
+    
+    // then proceed with the panel, itself...
+    if (typeof content == 'function')
+      content = content(root);
+    else if (typeof content == 'string') {
+      var div = document.createElement('div');
+      div.innerHTML = content;
+      content = div;
+    }
+      
+    content.id = id;
+    root.appendChild(content);
+    $(root).tabs('refresh');
+    return { 'tab': a, 'content': content };
+  },
+  
   modifyColDef: function (kit, col, category, group) {
     if (col.sTitle === undefined || col.sTitle == null)
       return null;

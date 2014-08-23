@@ -1,5 +1,10 @@
 DOCS:
 - jToxCompound / showUnits added.
+- study one-per-category requests for all studies;
+- issue for the studies in the mail: jToxStudy компонентата не взима предвид URI параметрите на заявка от вида /study, дори и съществуващите досега ?top=X&category=Y
+- take into account those, as well as property_uri ones.
+- make matrix info popup.
+- 
 
 TODO:
 

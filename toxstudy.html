@@ -57,7 +57,7 @@
 /*       st.querySubstance("http://apps.ideaconsult.net:8080/biodeg/substance/IUC5-410e026d-f182-4e36-b14f-28013022f906"); */
 /*       st.querySubstance("http://apps.ideaconsult.net:8080/biodeg/substance/IUC4-efdb21bb-e79f-3286-a988-b6f6944d3734"); */
 /*       st.querySubstance("http://apps.ideaconsult.net:8080/biodeg/substance/IUC4-1a7f9a36-d906-3877-beea-e3a15f291712"); */
-      st.querySubstance("http://apps.ideaconsult.net:8080/data/substance/IUC5-410e026d-f182-4e36-b14f-28013022f906");
+      st.querySubstance("http://apps.ideaconsult.net:8080/data/substance/IUC4-efdb21bb-e79f-3286-a988-b6f6944d3734");
 /*       st.querySubstance("http://apps.ideaconsult.net:8080/toxbank/substance/IUC5-410e026d-f182-4e36-b14f-28013022f906");       */
 /*       st.querySubstance("http://apps.ideaconsult.net:8080/toxbank/substance/IUC4-d982cd73-9ee1-32af-8604-962ae6875cc7"); */
 /*       st.querySubstance("http://apps.ideaconsult.net:8080/data/substance/IUC4-d0966414-0e9b-3610-ab7d-7d27848027e2"); */
@@ -73,10 +73,6 @@
 	    <ul>
 	      <li><a href="#jtox-substance">IUC Substance</a></li>
 	      <li><a href="#jtox-compo-tab">Composition</a></li>
-	      <li><a href="#jtox-pchem" data-type="P-CHEM">P-Chem (0)</a></li>
-	      <li><a href="#jtox-envfate" data-type="ENV_FATE">Env Fate (0)</a></li>
-	      <li><a href="#jtox-ecotox" data-type="ECOTOX">Eco Tox (0)</a></li>
-	      <li><a href="#jtox-tox" data-type="TOX">Tox (0)</a></li>
 	    </ul>
 	    <div id="jtox-substance" class="jtox-substance">
 	      <table class="dataTable">
@@ -137,36 +133,17 @@
 	      </table>
 	    </div>
 	    <div id="jtox-compo-tab" class="jtox-compo-tab"></div>
-	    <div id="jtox-pchem" class="jtox-study-tab P-CHEM">
-	    	<div class="float-right">
-	      	<button class="expand-all">Expand all</button><button class="collapse-all">Collapse all</button>
-	    	</div>
-	      <p><input type="text" class="jtox-study-filter ui-input" placeholder="Filter..." /></p>
-	      <h4 class="data-field camelCase" data-field="showname"> ? </h4>
-      </div>
-	    <div id="jtox-envfate" class="jtox-study-tab ENV_FATE">
-	    	<div class="float-right">
-	      	<button class="expand-all">Expand all</button><button class="collapse-all">Collapse all</button>
-	    	</div>
-	      <p><input type="text" class="jtox-study-filter ui-input" placeholder="Filter..." /></p>
-	      <h4 class="data-field camelCase" data-field="showname"> ? </h4>
-	    </div>
-	    <div id="jtox-ecotox" class="jtox-study-tab ECOTOX">
-	    	<div class="float-right">
-	      	<button class="expand-all">Expand all</button><button class="collapse-all">Collapse all</button>
-	    	</div>
-	      <p><input type="text" class="jtox-study-filter ui-input" placeholder="Filter..." /></p>
-	      <h4 class="data-field camelCase" data-field="showname"> ? </h4>
-	    </div>
-	    <div id="jtox-tox" class="jtox-study-tab TOX">
-	    	<div class="float-right">
-	      	<button class="expand-all">Expand all</button><button class="collapse-all">Collapse all</button>
-	    	</div>
-	      <p><input type="text" class="jtox-study-filter ui-input" placeholder="Filter..." /></p>
-	      <h4 class="data-field camelCase" data-field="showname"> ? </h4>
-	    </div>
 	  </div>
 <!-- // end of #jtox-studies ]]-->
+<!--[[ jT.templates['one-category'] -->
+    <div id="jtox-study-tab" class="jtox-study-tab">
+    	<div class="float-right">
+      	<button class="expand-all">Expand all</button><button class="collapse-all">Collapse all</button>
+    	</div>
+      <p><input type="text" class="jtox-study-filter ui-input" placeholder="Filter..." /></p>
+      <h4 class="data-field camelCase" data-field="showname"> ? </h4>
+    </div>
+<!-- // end of #jtox-category ]]-->
 <!--[[ jT.templates['one-study'] -->
     <div id="jtox-study" class="jtox-study jtox-foldable folded unloaded">
       <div class="title"><p class="data-field" data-field="title">? (0)</p></div>

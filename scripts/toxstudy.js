@@ -49,15 +49,6 @@ var jToxStudy = (function () {
     var tree = jT.getTemplate('#jtox-studies');
     root.appendChild(tree);
     jT.ui.changeTabsIds(tree, suffix);
-    jT.$('div.jtox-study-tab div button', tree).on('click', function (e) {
-    	var par = jT.$(this).parents('.jtox-study-tab')[0];
-	    if (jT.$(this).hasClass('expand-all')) {
-		    jT.$('.jtox-foldable', par).removeClass('folded');
-	    }
-	    else if (jT.$(this).hasClass('collapse-all')) {
-		    jT.$('.jtox-foldable', par).addClass('folded');
-	    }
-    });
     
     // initialize the tab structure for several versions of tabs.
     self.tabs = jT.$(tree).tabs({
@@ -135,7 +126,7 @@ var jToxStudy = (function () {
       
       return theCat;
     },
-  
+    
     // modifies the column title, according to configuration and returns "null" if it is marked as "invisible".
     ensureTable: function (tab, study) {
       var self = this;
@@ -325,7 +316,8 @@ var jToxStudy = (function () {
     
     processSummary: function (summary) {
       var self = this;
-      var typeSummary = [];
+      var typeSummary = {};
+      var knownNames = { "P-CHEM": "P-Chem", "ENV_FATE" : "Env Fate", "ECOTOX" : "Eco Tox", "TOX" : "Tox"};
       
       // first - clear all existing tabs
 			jT.$('.jtox-study', self.rootElement).remove();
@@ -338,8 +330,37 @@ var jToxStudy = (function () {
       		return -1;
       	if (valB == null)
       		return 1;
+        if (valA == valB)
+          return 0;
 	      return (valA < valB) ? -1 : 1;
       });
+      
+      var tabRoot = $('ul', self.rootElement).parent()[0];
+      var added = 0;
+      var lastAdded = null;
+      var addStudyTab = function (top, sum) {
+        var tab = jT.getTemplate('#jtox-study-tab');
+        var link = jT.ui.addTab(tabRoot, (knownNames[top] || sum.topcategory.title) + " (0)", "jtox-" + top.toLowerCase(), tab).tab;
+        jT.$(link).data('type', top);
+        
+        jT.$(tab).addClass(top).data('uri', sum.topcategory.uri);
+        ccLib.fillTree(tab, self.substance);
+        
+        added++;
+        lastAdded = top;
+      
+        jT.$('div.jtox-study-tab div button', tabRoot).on('click', function (e) {
+        	var par = jT.$(this).parents('.jtox-study-tab')[0];
+    	    if (jT.$(this).hasClass('expand-all')) {
+    		    jT.$('.jtox-foldable', par).removeClass('folded');
+    	    }
+    	    else if (jT.$(this).hasClass('collapse-all')) {
+    		    jT.$('.jtox-foldable', par).addClass('folded');
+    	    }
+        });
+        
+        return tab;
+      };
       
       for (var si = 0, sl = summary.length; si < sl; ++si) {
         var sum = summary[si];
@@ -348,6 +369,8 @@ var jToxStudy = (function () {
           continue;
         var top = top.replace(/ /g, "_");
         var tab = jT.$('.jtox-study-tab.' + top, self.rootElement)[0];
+        if (!tab)
+          tab = addStudyTab(top, sum);
         
         var catname = sum.category.title;
         if (!catname) {
@@ -358,7 +381,11 @@ var jToxStudy = (function () {
           jT.$(cat).data('jtox-uri', sum.category.uri);
         }
       }
-      
+
+      // a small hack to force openning of this, later in the querySummary()      
+      if (added == 1)
+        self.settings.tab = lastAdded;
+
       // update the number in the tabs...
       jT.$('ul li a', self.rootElement).each(function (i){
         var data = jT.$(this).data('type');
@@ -448,13 +475,20 @@ var jToxStudy = (function () {
     querySummary: function(summaryURI) {
       var self = this;
       
+      var pars = ["property_uri", "top", "category"];
+      for (var i = 0; i < pars.length; ++i) {
+        var p = pars[i];
+        if (!!self.settings[p])
+          summaryURI = ccLib.addParameter(summaryURI, p + "=" + self.settings[p]);
+      }
+      
       jT.call(self, summaryURI, function(summary) {
         if (!!summary && !!summary.facet)
           self.processSummary(summary.facet);
           ccLib.fireCallback(self.settings.onSummary, self, summary.facet);
           // check if there is an initial tab passed so we switch to it
           if (!!self.settings.tab) {
-            var div = jT.$('.jtox-study-tab.' + decodeURIComponent(self.settings.tab).replace(/ /g, '_'), self.root)[0];
+            var div = jT.$('.jtox-study-tab.' + decodeURIComponent(self.settings.tab).replace(/ /g, '_').toUpperCase(), self.root)[0];
             if (!!div) {
               for (var idx = 0, cl = div.parentNode.children.length; idx < cl; ++idx)
                 if (div.parentNode.children[idx].id == div.id)
@@ -491,6 +525,7 @@ var jToxStudy = (function () {
             flags += substance.externalIdentifiers[i].id || '';
           }
           substance["IUCFlags"] = flags;
+          self.substance = substance;
             
           ccLib.fillTree(self.rootElement, substance);
           // go and query for the reference query
@@ -507,6 +542,10 @@ var jToxStudy = (function () {
           self.insertComposition(substance.URI + "/composition");
         }
       });
+    },
+    
+    query: function (uri) {
+      this.querySubstance(uri);
     }
   }; // end of prototype
   
