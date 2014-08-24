@@ -28,6 +28,12 @@
   overflow: hidden;
 }
 
+.jtox-selection {
+  font-size: 80%;
+  float: right;
+  vertical-align: top;
+}
+
 .jtox-ds-tables {
   position: relative;  
 }

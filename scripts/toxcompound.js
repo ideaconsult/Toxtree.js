@@ -13,6 +13,7 @@ var jToxCompound = (function () {
     "showControls": true,     // should we show the pagination/navigation controls.
     "showUnits": true,        // should we show units in the column title.
     "hideEmpty": false,       // whether to hide empty groups instead of making them inactive
+    "groupSelection": true,   // wether to show select all / unselect all links in each group
     "hasDetails": true,       // whether browser should provide the option for per-item detailed info rows.
     "hideEmptyDetails": true, // hide feature values, when they are empty (only in detailed view)
     "detailsHeight": "fill",  // what is the tabs' heightStyle used for details row
@@ -250,6 +251,19 @@ var jToxCompound = (function () {
         var divEl = document.createElement('div');
         divEl.id = grId;
         all.appendChild(divEl);
+        // add the group check multi-change
+        if (self.settings.groupSelection) {
+          var sel = jT.getTemplate("#jtox-ds-selection");
+          divEl.appendChild(sel);
+          jT.$('.multi-select', sel).on('click', function (e) {
+            var par = jT.$(this).closest('.ui-tabs-panel')[0];
+            var doSel = jT.$(this).hasClass('select');
+            $('input', par).each(function () {
+              this.checked = doSel;
+              jT.$(this).trigger('change');
+            });
+          });
+        }
         
         if (groupFn(divEl, gr)) {
           if (self.settings.hideEmpty) {

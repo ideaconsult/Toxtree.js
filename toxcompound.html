@@ -30,7 +30,7 @@
   <script language="javascript">
     $(document).ready(function(){
       window['ds'] = new jToxCompound($(".jtox-toolkit")[0], {crossDomain: true, rememberChecks: true, hideEmpty: true} );
-      ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/dataset/18?feature_uris[]=http://apps.ideaconsult.net:8080/toxbank/model/6/predicted");
+      ds.queryDataset("http://apps.ideaconsult.net:8080/data/dataset/18?feature_uris[]=http://apps.ideaconsult.net:8080/toxbank/model/6/predicted");
 /*       ds.queryDataset("https://apps.ideaconsult.net/enanomapper/query/compound/search/all?type=auto&search=%5BAu%5D&page=0&pagesize=1"); */
 /*       ds.queryDataset("http://apps.ideaconsult.net:8080/ambit2/dataset/1945542");  */
 /*       ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/query/similarity?search=c1ccccc1O&threshold=0.5"); */
@@ -65,6 +65,11 @@
 	    </div>
 	  </div>
 <!-- // end of #jtox-dataset ]]-->
+<!--[[ jT.templates['compound-one-tab'] -->
+    <div id="jtox-ds-selection" class="jtox-selection">
+      <a href="#" class="multi-select select">select all</a>&nbsp;<a href="#" class="multi-select unselect">unselect all</a>
+    </div>
+<!-- // end of #compound-one-tab ]]-->
 <!--[[ jT.templates['compound-one-feature'] -->
     <div id="jtox-ds-feature" class="jtox-ds-feature"><input type="checkbox" checked="yes" class="jtox-checkbox" /><span class="data-field jtox-title" data-field="title"> ? </span><sup><a target="_blank" class="data-field attribute" data-attribute="href" data-field="uri">?</a></sup></div>
 <!-- // end of #jtox-ds-feature ]]-->

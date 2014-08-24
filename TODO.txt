@@ -1,5 +1,5 @@
 DOCS:
-- jToxCompound / showUnits added.
+- jToxCompound / showUnits, groupSelection added.
 - make matrix info popup.
 - 
 
