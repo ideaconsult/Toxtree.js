@@ -142,7 +142,7 @@ var jToxAssessment = {
                 html += '<br/>';
               
               html += 
-                '<a target="_blank" href="' + full.compound.URI + '/study?property_uri=' + encodeURIComponent(fId) + '">' + 
+                '<a target="jtox-study" href="' + full.compound.URI + '/study?property_uri=' + encodeURIComponent(fId) + '">' + 
                 (full.values[fId] || '-') + (f.units != null ? '&nbsp;<span class="units">' + f.units + '</span>' : '') + 
                 '</a>';
             }
