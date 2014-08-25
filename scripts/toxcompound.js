@@ -412,10 +412,15 @@ var jToxCompound = (function () {
       var fnShowColumn = function() {
         var dt = $(this).data();
         var cells = jT.$(dt.sel + ' table tr>*:nth-child(' + (dt.idx + 1) + ')', self.rootElement);
-        if (this.checked)
+        if (this.checked) {
           jT.$(cells).show();
-        else
+          jT.$("table tr .blank-col", self.rootElement).addClass('jtox-hidden');
+        }
+        else {
           jT.$(cells).hide();
+          if (jT.$(dt.sel + " table tr *:visible", self.rootElement).length == 0)
+            jT.$("table tr .blank-col", self.rootElement).removeClass('jtox-hidden');
+        }
         if (self.settings.rememberChecks)
           self.featureStates[dt.id] = this.checked;
         self.equalizeTables();
@@ -437,7 +442,7 @@ var jToxCompound = (function () {
         var idx = jT.$(row).data('jtox-index');
         
         if (self.settings.preDetails != null && !ccLib.fireCallback(self.settings.preDetails, self, idx, cell) || !cell)
-          return; // that !cell  means you've forgotten to add #DetailedInfoRow feature somewhere.
+          return; // the !cell  means you've forgotten to add #DetailedInfoRow feature somewhere.
         jT.$(row).toggleClass('jtox-detailed-row');
         var toShow = jT.$(row).hasClass('jtox-detailed-row');
 
@@ -584,8 +589,8 @@ var jToxCompound = (function () {
         }
       }))[0];
 
-      if (varCols.length == 1) // i.e. we _don't_ have other then hidden ID column.. add blank one.
-        varCols.push({ "sClass": "center", "mData": "index", "mRender": function(data, type, full) { return type != 'display' ? data : '...'; }  });
+      // we need to put a fake column to stay, when there is no other column here, or when everything is hidden..
+      varCols.push({ "sClass": "center blank-col" + (varCols.length > 1 ? " jtox-hidden" : ""), "mData": "index", "mRender": function(data, type, full) { return type != 'display' ? data : '...'; }  });
 
       self.varTable = (jT.$(".jtox-ds-variable table", self.rootElement).dataTable({
         "bPaginate": false,
