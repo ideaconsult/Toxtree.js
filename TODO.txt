@@ -1,5 +1,5 @@
 DOCS:
-- jToxCompound / showUnits, groupSelection added.
+- jToxCompound / showUnits, groupSelection added. 'primary' column configuration parameter
 - make matrix info popup.
 - 
 

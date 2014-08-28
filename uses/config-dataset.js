@@ -54,7 +54,7 @@ jTConfig.dataset = {
     	'Stars': { sWidth: "30%" }
   	},
   	"substance": {
-    	'Contained in as': { iOrder: 20, mData: "composition", sTitle: "Contained in as", mRender: renderRelation }
+    	'Contained in as': { iOrder: 20, mData: "composition", sTitle: "Contained in as", mRender: jT.ui.renderRelation }
   	}
 	},
 	"handlers": {
