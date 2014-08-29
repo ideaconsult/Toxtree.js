@@ -1,6 +1,8 @@
 var jTConfig = {};
 
 function onSideLoaded(result) {
+  if (!result)
+    return;
 	var tEl = $('.title', $(this.rootElement).parents('.jtox-foldable')[0])[0];
 	var set = (result.model || result.dataset);
 	$(tEl).data('total', set.length);

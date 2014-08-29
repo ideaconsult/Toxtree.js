@@ -155,10 +155,9 @@ var jToxSubstance = (function () {
             
             self.updateControls(qStart, result.substance.length);
           }
-
-          // time to call the supplied function, if any.
-          ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
+        // time to call the supplied function, if any.
+        ccLib.fireCallback(self.settings.onLoaded, self, result);
       });
     },
     

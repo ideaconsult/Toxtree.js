@@ -137,8 +137,8 @@ var jToxModel = (function () {
           self.models = result.model;
           if (!self.settings.noInterface)
             jT.$(self.table).dataTable().fnAddData(result.model);
-          ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
+        ccLib.fireCallback(self.settings.onLoaded, self, result);
       });
     },
     
@@ -156,8 +156,8 @@ var jToxModel = (function () {
           self.algorithm = result.algorithm;
           if (!self.settings.noInterface)
             jT.$(self.table).dataTable().fnAddData(result.algorithm);
-          ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
+        ccLib.fireCallback(self.settings.onLoaded, self, result);
       });
     },
     

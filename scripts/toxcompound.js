@@ -235,6 +235,7 @@ var jToxCompound = (function () {
 
       var createATab = function(grId, name) {
         var liEl = document.createElement('li');
+        liEl.title = "Select which " + name + "(s) to be displayed";
         ulEl.appendChild(liEl);
         var aEl = document.createElement('a');
         aEl.href = "#" + grId;
@@ -792,10 +793,9 @@ var jToxCompound = (function () {
               // finally - go and update controls if they are visible
               self.updateControls(qStart, dataset.dataEntry.length);
           }
-
-          // time to call the supplied function, if any.
-          ccLib.fireCallback(self.settings.onLoaded, self, dataset, self);
         }
+        // time to call the supplied function, if any.
+        ccLib.fireCallback(self.settings.onLoaded, self, dataset);
       });
     },
     

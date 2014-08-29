@@ -545,6 +545,8 @@ var jToxStudy = (function () {
           self.querySummary(substance.URI + "/studysummary");
           self.insertComposition(substance.URI + "/composition");
         }
+        else
+          ccLib.fireCallback(self.settings.onLoaded, self, null);
       });
     },
     

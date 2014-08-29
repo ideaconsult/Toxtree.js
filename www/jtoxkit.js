@@ -1629,6 +1629,7 @@ var jToxCompound = (function () {
 
       var createATab = function(grId, name) {
         var liEl = document.createElement('li');
+        liEl.title = "Select which " + name + "(s) to be displayed";
         ulEl.appendChild(liEl);
         var aEl = document.createElement('a');
         aEl.href = "#" + grId;
@@ -2186,10 +2187,9 @@ var jToxCompound = (function () {
               // finally - go and update controls if they are visible
               self.updateControls(qStart, dataset.dataEntry.length);
           }
-
-          // time to call the supplied function, if any.
-          ccLib.fireCallback(self.settings.onLoaded, self, dataset, self);
         }
+        // time to call the supplied function, if any.
+        ccLib.fireCallback(self.settings.onLoaded, self, dataset);
       });
     },
     
@@ -2487,10 +2487,10 @@ var jToxDataset = (function () {
           self.dataset = result.dataset;
           if (!self.settings.noInterface)
             jT.$(self.table).dataTable().fnAddData(result.dataset);
-          ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
         else
           self.dataset = null;
+        ccLib.fireCallback(self.settings.onLoaded, self, result);
       });
     },
     
@@ -2649,8 +2649,8 @@ var jToxModel = (function () {
           self.models = result.model;
           if (!self.settings.noInterface)
             jT.$(self.table).dataTable().fnAddData(result.model);
-          ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
+        ccLib.fireCallback(self.settings.onLoaded, self, result);
       });
     },
     
@@ -2668,8 +2668,8 @@ var jToxModel = (function () {
           self.algorithm = result.algorithm;
           if (!self.settings.noInterface)
             jT.$(self.table).dataTable().fnAddData(result.algorithm);
-          ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
+        ccLib.fireCallback(self.settings.onLoaded, self, result);
       });
     },
     
@@ -2906,10 +2906,9 @@ var jToxSubstance = (function () {
             
             self.updateControls(qStart, result.substance.length);
           }
-
-          // time to call the supplied function, if any.
-          ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
+        // time to call the supplied function, if any.
+        ccLib.fireCallback(self.settings.onLoaded, self, result);
       });
     },
     
@@ -3659,6 +3658,8 @@ var jToxStudy = (function () {
           self.querySummary(substance.URI + "/studysummary");
           self.insertComposition(substance.URI + "/composition");
         }
+        else
+          ccLib.fireCallback(self.settings.onLoaded, self, null);
       });
     },
     

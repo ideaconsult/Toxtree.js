@@ -104,10 +104,10 @@ var jToxDataset = (function () {
           self.dataset = result.dataset;
           if (!self.settings.noInterface)
             jT.$(self.table).dataTable().fnAddData(result.dataset);
-          ccLib.fireCallback(self.settings.onLoaded, self, result);
         }
         else
           self.dataset = null;
+        ccLib.fireCallback(self.settings.onLoaded, self, result);
       });
     },
     
