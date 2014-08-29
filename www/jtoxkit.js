@@ -1631,7 +1631,7 @@ var jToxCompound = (function () {
 
       var createATab = function(grId, name) {
         var liEl = document.createElement('li');
-        liEl.title = "Select which " + name + "(s) to be displayed";
+        liEl.title = "Select which columns to be displayed";
         ulEl.appendChild(liEl);
         var aEl = document.createElement('a');
         aEl.href = "#" + grId;
