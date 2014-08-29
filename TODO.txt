@@ -1,10 +1,8 @@
 DOCS:
-- jToxCompound / showUnits, groupSelection added. 'primary' column configuration parameter
-- make matrix info popup.
 - 
 
 TODO:
-
+- make matrix info popup.
 - Make all kits react adequately on failure on network / calls
 - deferred re-query (postpone)
 

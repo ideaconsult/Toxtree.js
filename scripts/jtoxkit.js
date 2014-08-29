@@ -259,8 +259,6 @@ window.jT = window.jToxKit = {
 		else 
   		settings = jT.$.extend(settings, kit.settings);
 
-		ccLib.fireCallback(settings.onConnect, kit, service);
-		  
 		var accType = settings.plainText ? "text/plain" : (settings.jsonp ? "application/x-javascript" : "application/json");
 		
 		if (!params.data){
@@ -277,6 +275,8 @@ window.jT = window.jToxKit = {
 		// on some queries, like tasks, we DO have baseUrl at the beginning
 		if (service.indexOf("http") != 0)
 			service = settings.baseUrl + service;
+
+		ccLib.fireCallback(settings.onConnect, kit, service, params);
 			
 		// now make the actual call
 		jT.$.ajax(service, {
