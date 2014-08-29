@@ -14,16 +14,16 @@ window.jT = window.jToxKit = {
 	/* SETTINGS. The following parametes can be passed in settings object to jT.init(), or as data-XXX - with the same names. Values set here are the defaults.
 	*/
 	settings: {
-	  plainText: false,               // whether to expect result as plain text, and not JSON. Used in special cases like ketcher.
-  	jsonp: false,                   // whether to use JSONP approach, instead of JSON.
-  	crossDomain: false,             // should it expect cross-domain capabilities for the queries.
-  	baseUrl: null,                  // the baseUrl for the server that loaded the page.
-  	fullUrl: null,                  // the url as it is on loading the page - this is parsed one, i.e. parseUrl() processed.
-  	timeout: 15000,                 // the timeout an call to the server should be wait before the attempt is considered error.
-  	pollDelay: 250,                 // after how many milliseconds a new attempt should be made during task polling.
-  	onConnect: function(s){ },		  // function (service): called when a server request is started - for proper visualization. Part of settings.
-  	onSuccess: function(s, c, j) { },	// function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
-  	onError: function (s, c, j) { if (!!console && !!console.log) console.log("jT call error [" + c + "]: " + j.responseText + " from request: [" + s + "]"); },		// function (code, mess): called on server reques error. Part of settings.
+	  plainText: false,     // whether to expect result as plain text, and not JSON. Used in special cases like ketcher.
+  	jsonp: false,         // whether to use JSONP approach, instead of JSON.
+  	crossDomain: false,   // should it expect cross-domain capabilities for the queries.
+  	baseUrl: null,        // the baseUrl for the server that loaded the page.
+  	fullUrl: null,        // the url as it is on loading the page - this is parsed one, i.e. parseUrl() processed.
+  	timeout: 15000,       // the timeout an call to the server should be wait before the attempt is considered error.
+  	pollDelay: 250,       // after how many milliseconds a new attempt should be made during task polling.
+  	onConnect: null,		  // function (service): called when a server request is started - for proper visualization. Part of settings.
+  	onSuccess: null,	    // function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
+  	onError: function (s, c, j) { if (!!console && !!console.log) console.log("jT call error [" + c + "]: " + j.responseText + " from request: [" + s + "]"); },		// called on server request error.
   },
   
   // these are used in setting inheritance, so that non-inheritable settings are blanked...

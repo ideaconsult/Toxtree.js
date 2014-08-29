@@ -175,9 +175,7 @@ var jToxModel = (function () {
         createIt();
       else 
         jT.call(self, self.settings.baseUrl + '/model?algorithm=' + encodeURIComponent(algoUri), function (result, jhr) {
-          if (!result)
-            ccLib.fireCallback(callback, self, null, jhr);
-          else if (result.model.length == 0)
+          if (!result || result.model.length == 0)
             createIt();
           else // we have it!
             ccLib.fireCallback(callback, self, result.model[0].URI, jhr);
