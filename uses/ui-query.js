@@ -85,7 +85,7 @@ function createGroups(miniset, kit) {
 
 $(document).ready(function(){
   var toggleBar = function () {
-    $(this).parents('#sidebar').toggleClass('hidden');
+    $('#sidebar').toggleClass('hidden');
   };
   $('#sidebar span.ui-icon').on('click', toggleBar);
   $('#sidebar div.side-title').on('click', toggleBar);
@@ -99,4 +99,5 @@ $(document).ready(function(){
     $('input[type="checkbox"]', this.parentNode).each(function () { this.checked = false;});
     onSelectedUpdate.call(this, e);
   });
+  $('#logger').on('mouseover', function () { $(this).removeClass('hidden'); }).on('mouseout', function () { $(this).addClass('hidden');});
 });

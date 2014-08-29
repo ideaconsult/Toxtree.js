@@ -16,6 +16,7 @@
 	<link rel="stylesheet" href="tests/jquery.dataTables.css">
 
 	<link rel="stylesheet" href="styles/jtoxkit.css">
+	<link rel="stylesheet" href="styles/toxlog.css">
 
   <script src="tests/jquery.js"></script>
   <script src="tests/jquery-ui.js"></script>
@@ -30,18 +31,18 @@
   <div class="jtox-template">
 <!--[[ jT.templates['logger'] -->
 	  <div id="jtox-logger" class="jtox-logger">
-	    <div class="status">
-	      <div class="icon jtox-fadable"></div>
-	    </div>
+	    <div class="status"><div class="icon jtox-fadable"></div></div>
 	    <div class="borderer"></div>
-	    <div class="list-root">
+	    <div class="list-wrap">
+	      <div class="list-root"></div>
 	    </div>
 	  </div>
 <!-- // end of #jtox-logger ]]-->
 <!--[[ jT.templates['logline'] -->
 	  <div id="jtox-logline" class="logline">
   	    <div class="icon"></div>
-  	    <span class="content"></span>
+  	    <span class="content data-field" data-field="header"></span>
+  	    <div class="details data-field" data-field="details"></div>
 	  </div>
 <!-- // end of #jtox-logline ]]-->
   </div>

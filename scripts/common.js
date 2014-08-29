@@ -165,6 +165,8 @@ var ccLib = {
   // If prefix is given AND json has id property - the root's id set to to prefix + json.id
   fillTree: function (root, json, prefix, filter) {
     var self = this;
+    if (json == null)
+      return;
   	if (!filter)
   		filter = 'data-field';
   	
