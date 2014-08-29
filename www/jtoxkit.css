@@ -566,6 +566,8 @@ td.jtox-multi table {
 }
 
 .jtox-logger .status {
+  position: absolute;
+  top: 1px;
   width: 32px;
   height: 24px;
   text-align: center;
@@ -575,15 +577,6 @@ td.jtox-multi table {
   border-top: 1px solid black;
   border-right: 1px solid black;
   border-bottom: 0px;
-  background: inherit;
-}
-
-.jtox-logger .borderer {
-  position: absolute;
-  top: 24px;
-  border-top: 1px solid #222;
-  width: 100%;
-  margin-left: 33px;
 }
 
 .jtox-logger .jt-faded {
@@ -592,19 +585,22 @@ td.jtox-multi table {
 
 .jtox-logger .list-wrap {
   position: absolute;
+  box-sizing: border-box;
   top: 0px;
   width: 100%;
-  border-top: 0px;
-  border-left: 1px solid black;
-  border-right: 1px solid black;
-  border-bottom: 1px solid black;
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
+  border: 1px solid black;
+  border-radius: 5px;
+  border-top-left-radius: 0px;
   min-height: 50px;
   height: 100%;
   overflow: scroll;
   margin-top: 25px;
   padding-left: 8px;
+}
+
+.jtox-logger .list-wrap.right-side {
+  border-top-right-radius: 0px;
+  border-top-left-radius: 5px;
 }
 
 .jtox-logger .list-root {

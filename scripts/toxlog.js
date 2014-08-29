@@ -8,7 +8,8 @@ var jToxLog = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     statusDelay: 1500,      // number of milliseconds to keep success / error messages before fading out
     lineHeight: "20px",     // the height of each status line
-    background: "#fafafa",  // the background property as set for both the status icon and the list
+    background: "#ffffff",  // the background property as set for both the status icon and the list
+    rightSide: false,       // put the status icon on the right side
     hasDetails: true,       // whether to have the ability to open each line, to show it's details
     resendEvents: true,     // whether received onConnect, onSuccess and onError events are passed back to original jToxKit one's.
     onStatus: null,         // a callback, when new status has arrived: function (newstatus, oldstatus)
@@ -21,11 +22,13 @@ var jToxLog = (function () {
           header: params.method.toUpperCase() + ": " + service,
           details: "..."
         };
-      else
+      else if (jhr != null)
         // by returning only the details part, we leave the header as it is.
         return {
           details: jhr.status + " " + jhr.statusText + '<br/>' + jhr.getAllResponseHeaders()
         };
+      else
+        return null;
     }       
   };
   
@@ -37,7 +40,6 @@ var jToxLog = (function () {
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
     self.rootElement.appendChild(jT.getTemplate('#jtox-logger'));
     
-    // save the originals in case we need them for resending
     if (typeof self.settings.lineHeight == "number")
       self.settings.lineHeight = self.settings.lineHeight.toString() + 'px';
       
@@ -45,6 +47,13 @@ var jToxLog = (function () {
     jT.$('.status,.list-wrap', self.rootElement).css('background', self.settings.background);
     var listRoot = $('.list-root', self.rootElement)[0];
     var statusEl = $('.status', self.rootElement)[0];
+
+    if (!!self.settings.rightSide) {
+      statusEl.style.right = '0px';
+      jT.$('.list-wrap', self.rootElement).addClass('right-side');
+    }
+    else
+      statusEl.style.left = '0px';
     
     var setIcon = function (root, status) {
       if (status == "error")
