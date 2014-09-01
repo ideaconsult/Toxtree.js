@@ -58,7 +58,7 @@ var ccLib = {
       var callone = callback[i];
       if (typeof callone != 'function')
         callone = window[callone];
-      ret = (typeof callone == 'function') ? (callone.apply((self !== undefined && self != null) ? self : document, Array.prototype.slice.call(arguments, 2))) : null;
+      ret = (typeof callone == 'function') ? (callone.apply((self !== undefined && self != null) ? self : document, Array.prototype.slice.call(arguments, 2))) : undefined;
     }
     return ret;
   },

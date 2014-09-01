@@ -45,14 +45,20 @@ window.jT = window.jToxKit = {
   	var dataParams = self.$(element).data();
   	var kit = dataParams.kit;
   	var topSettings = self.$.extend(true, {}, self.settings);
+  	var parent = null;
 
   	// we need to traverse up, to collect some parent's settings...
   	self.$(self.$(element).parents('.jtox-toolkit').toArray().reverse()).each(function(){
-    	if (!self.$(this).hasClass('jtox-widget') && self.kit(this) != null) {
-      	topSettings = self.$.extend(true, topSettings, self.kit(this).settings);
+  	  parent = self.kit(this);
+    	if (!self.$(this).hasClass('jtox-widget') && parent != null) {
+      	topSettings = self.$.extend(true, topSettings, parent.settings);
     	}
   	});
   	
+  	// make us ultimate parent of all
+  	if (!parent)
+  	  parent = self;
+  	  
     dataParams = self.$.extend(true, topSettings, self.blankSettings, dataParams);
 
 	  // the real initialization function
@@ -69,10 +75,14 @@ window.jT = window.jToxKit = {
         if (fn.kits === undefined)
           fn.kits = [];
         fn.kits.push(obj);
+        obj.parentKit = parent;
         return obj;
     	}
-      else if (typeof fn == "object" && typeof fn.init == "function")
-        return fn.init(element, params);
+      else if (typeof fn == "object" && typeof fn.init == "function") {
+        var obj = fn.init(element, params);
+        obj.parentKit = parent;
+        return obj;
+      }
       else
         console.log("jToxError: trying to initialize unexistend jTox kit: " + kit);
 
@@ -86,7 +96,7 @@ window.jT = window.jToxKit = {
   	  self.call({ settings: dataParams}, dataParams.configFile, function(config){
     	  if (!!config)
     	    dataParams['configuration'] = self.$.extend(true, dataParams['configuration'], config);
-        jT.$(element).data('jtKit', realInit(dataParams));
+        self.$(element).data('jtKit', realInit(dataParams));
   	  });
 	  }
 	  else {
@@ -95,7 +105,7 @@ window.jT = window.jToxKit = {
 	      dataParams.configuration = (typeof config != 'function' ? config : config(kit));
       }
   	  
-      jT.$(element).data('jtKit', realInit(dataParams));
+      self.$(element).data('jtKit', realInit(dataParams));
 	  }
   },
   
@@ -127,7 +137,7 @@ window.jT = window.jToxKit = {
   	}
 
   	// now scan all insertion divs
-  	self.$('.jtox-toolkit', root).each(function(i) { if (!jT.$(this).data('manualInit')) self. initKit(this); });
+  	self.$('.jtox-toolkit', root).each(function(i) { if (!self.$(this).data('manualInit')) self. initKit(this); });
 	},
 	
 	kit: function (element) {
@@ -135,14 +145,15 @@ window.jT = window.jToxKit = {
 	},
 	
 	parentKit: function(name, element) {
+	  var self = this;
     var query = null;
     if (typeof name == 'string')
       name = window[name];
     self.$(element).parents('.jtox-toolkit').each(function() {
-      var kit = jT.kit(this);
-      if (!kit)
+      var kit = self.kit(this);
+      if (!kit || !!query)
         return;
-      if (kit instanceof name)
+      if (!name || kit instanceof name)
         query = kit;
     });
     
@@ -152,7 +163,7 @@ window.jT = window.jToxKit = {
 	initTemplates: function() {
 	  var self = this;
 
-    var root = jT.$('.jtox-template')[0];
+    var root = self.$('.jtox-template')[0];
     if (!root) {
     	root = document.createElement('div');
     	root.className = 'jtox-template';
@@ -169,7 +180,7 @@ window.jT = window.jToxKit = {
 	},
 	
 	getTemplate: function(selector) {
-  	var el = jT.$(selector, this.templateRoot)[0];
+  	var el = this.$(selector, this.templateRoot)[0];
   	if (!!el){
     	var el = el.cloneNode(true);
       el.removeAttribute('id');
@@ -246,6 +257,7 @@ window.jT = window.jToxKit = {
 		'data': the data to be passed to the server with the request.
 	*/
 	call: function (kit, service, params, callback){
+	  var self = this;
 		if (typeof params != 'object') {
 			callback = params; // the params parameters is obviously omitted
 			params = {};
@@ -253,11 +265,11 @@ window.jT = window.jToxKit = {
 		else if (params == null)
 		  params = {};
 		
-	  var settings = jT.$.extend({}, this.settings, params);
+	  var settings = self.$.extend({}, this.settings, params);
 		if (kit == null)
-		  kit = this;
+		  kit = self;
 		else 
-  		settings = jT.$.extend(settings, kit.settings);
+  		settings = self.$.extend(settings, kit.settings);
 
 		var accType = settings.plainText ? "text/plain" : (settings.jsonp ? "application/x-javascript" : "application/json");
 		
@@ -275,11 +287,12 @@ window.jT = window.jToxKit = {
 		// on some queries, like tasks, we DO have baseUrl at the beginning
 		if (service.indexOf("http") != 0)
 			service = settings.baseUrl + service;
-
+			
 		ccLib.fireCallback(settings.onConnect, kit, service, params);
+		ccLib.fireCallback(self.settings.onConnect, kit, service, params);
 			
 		// now make the actual call
-		jT.$.ajax(service, {
+		self.$.ajax(service, {
 			dataType: params.dataType || (settings.plainText ? "text": (settings.jsonp ? 'jsonp' : 'json')),
 			headers: { Accept: accType },
 			crossDomain: settings.crossDomain || settings.jsonp,
@@ -289,10 +302,12 @@ window.jT = window.jToxKit = {
 			jsonp: settings.jsonp ? 'callback' : false,
 			error: function(jhr, status, error){
 			  ccLib.fireCallback(settings.onError, kit, service, status, jhr);
+			  ccLib.fireCallback(self.settings.onError, kit, service, status, jhr);
 				callback(null, jhr);
 			},
 			success: function(data, status, jhr){
 			  ccLib.fireCallback(settings.onSuccess, kit, service, status, jhr);
+			  ccLib.fireCallback(self.settings.onSuccess, kit, service, status, jhr);
 				callback(data, jhr);
 			}
 		});

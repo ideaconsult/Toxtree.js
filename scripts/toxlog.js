@@ -11,7 +11,6 @@ var jToxLog = (function () {
     lineHeight: "20px",     // the height of each status line
     rightSide: false,       // put the status icon on the right side
     hasDetails: true,       // whether to have the ability to open each line, to show it's details
-    resendEvents: true,     // whether received onConnect, onSuccess and onError events are passed back to original jToxKit one's.
     onStatus: null,         // a callback, when new status has arrived: function (newstatus, oldstatus)
     
     // line formatting function - function (service, params, status, jhr) -> { header: "", details: "" }
@@ -129,8 +128,6 @@ var jToxLog = (function () {
       self.events[service] = line;
       setIcon(line, 'connecting');
       jT.$(line).data('status', "connecting");
-      if (!!self.settings.resendEvents && this._originals != null)
-        ccLib.fireCallback(this._originals.onConnect, this, service, params);
     };
     
     var onSuccess = function (service, status, jhr) {
@@ -144,8 +141,6 @@ var jToxLog = (function () {
       setIcon(line, 'success');
       ccLib.fillTree(line, ccLib.fireCallback(self.settings.formatLine, this, service, null, status, jhr));
       jT.$(line).data('status', "success");
-      if (!!self.settings.resendEvents && this._originals != null)
-        ccLib.fireCallback(this._originals.onSuccess, this, service, status, jhr);
     };
     
     var onError = function (service, status, jhr) {
@@ -159,8 +154,6 @@ var jToxLog = (function () {
       setIcon(line, 'error');
       ccLib.fillTree(line, ccLib.fireCallback(self.settings.formatLine, this, service, null, status, jhr));
       jT.$(line).data('status', "error");
-      if (!!self.settings.resendEvents && this._originals != null)
-        ccLib.fireCallback(this._originals.onError, this, service, status, jhr);
     };
     
     // now, finally swipe through everybody and install me...
@@ -168,20 +161,11 @@ var jToxLog = (function () {
       if (kit == null || kit == self)
         return;
         
-      if (!!self.settings.resendEvents) {
-        kit._originals = {
-          onConnect: kit.settings.onConnect,
-          onError: kit.settings.onError,
-          onSuccess: kit.settings.onSuccess
-        };
-      }
-      
       kit.settings.onConnect = onConnect;
       kit.settings.onError = onError;
       kit.settings.onSuccess = onSuccess;
     };
     
-    jT.$('.jtox-toolkit').each (function () { installHnd(jT.kit(this)); });
     installHnd(jT);
   };
   

@@ -921,13 +921,12 @@ Initiates a query, by asking the wrapping jToxQuery kit, for the main component 
 <a name="jtoxlog"></a> jToxLog kit
 --------------------------------------
 
-A network requests logger, providing feedback for sucess or failure on each call. It self-installs by changing all kits' `onConnect`, `onSuccess` and `onError` handlers, including those of `jToxKit` instance itself, which means that future kits on the page will copy changed ones in their settings.
+A network requests logger, providing feedback for sucess or failure on each call. It self-installs by resetting jToxKit's main `onConnect`, `onSuccess` and `onError` handlers, and since they are always called (independent of each kit's corresponding handlers), this means _jToxLog_'s instance always receives these calls and it does not interfere with other kit's custom handlers.
 
 ##### Parameters
 
 There are few things that can be setup from outside:
 
-- **`resendEvents`** (attr. `data-resend-events`): Whether to call each kit's original `onXXX` handler, after processing it here. Default: _true_.
 - **`statusDelay`** (attr. `data-status-delay`): Number of milliseconds to keep the last success or failure status before fading it out. Default: _1500_.
 - **`keepMessages`** (attr. `data-keep-messages`): How many olf messages should be kept in the logger list, before starting to delete the oldest ones. Default is _50_.
 - **`lineHeight`** (attr. `data-line-height`): How tall should be the (closed) request line - it can be given in normal CSS way. The openned status line (with details) has different height - enough to contain all data. Default: _20px_.
