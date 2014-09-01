@@ -6,6 +6,8 @@
 
 var jToxLog = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
+    autoInstall: true,      // auto install itself on the jToxKit instance, ie. - universally
+    resend: false,          // whether to resend the coming events on installed kits to their original handlers
     statusDelay: 1500,      // number of milliseconds to keep success / error messages before fading out
     keepMessages: 50,       // how many messages to keep in the queue
     lineHeight: "20px",     // the height of each status line
@@ -122,51 +124,75 @@ var jToxLog = (function () {
     // this is the queue of events - indexes by the passed service
     self.events = {};
     
-    var onConnect = function (service, params) {
-      setStatus("connecting");
-      var line = addLine(ccLib.fireCallback(self.settings.formatLine, this, service, params, null, null));
-      self.events[service] = line;
-      setIcon(line, 'connecting');
-      jT.$(line).data('status', "connecting");
-    };
-    
-    var onSuccess = function (service, status, jhr) {
-      setStatus("success");
-      var line = self.events[service];
-      if (!line) {
-        console.log("jToxLog: missing line for:" + service);
-        return;
+    self.handlers = {
+      onConnect: function (service, params) {
+        setStatus("connecting");
+        var line = addLine(ccLib.fireCallback(self.settings.formatLine, this, service, params, null, null));
+        self.events[service] = line;
+        setIcon(line, 'connecting');
+        jT.$(line).data('status', "connecting");
+        if (!!self.settings.resend && this._handlers != null)
+          ccLib.fireCallback(this._handlers.onConnect, this, service, params);
+      },
+      onSuccess: function (service, status, jhr) {
+        setStatus("success");
+        var line = self.events[service];
+        if (!line) {
+          console.log("jToxLog: missing line for:" + service);
+          return;
+        }
+        delete self.events[service];
+        setIcon(line, 'success');
+        ccLib.fillTree(line, ccLib.fireCallback(self.settings.formatLine, this, service, null, status, jhr));
+        jT.$(line).data('status', "success");
+        if (!!self.settings.resend && this._handlers != null)
+          ccLib.fireCallback(this._handlers.onSuccess, this, service, status, jhr);
+      },
+      onError: function (service, status, jhr) {
+        setStatus("error");
+        var line = self.events[service];
+        if (!line) {
+          console.log("jToxLog: missing line for:" + service + "(" + status + ")");
+          return;
+        }
+        delete self.events[service];
+        setIcon(line, 'error');
+        ccLib.fillTree(line, ccLib.fireCallback(self.settings.formatLine, this, service, null, status, jhr));
+        jT.$(line).data('status', "error");
+        if (!!self.settings.resend && this._handlers != null)
+          ccLib.fireCallback(this._handlers.onError, this, service, status, jhr);
       }
-      delete self.events[service];
-      setIcon(line, 'success');
-      ccLib.fillTree(line, ccLib.fireCallback(self.settings.formatLine, this, service, null, status, jhr));
-      jT.$(line).data('status', "success");
     };
     
-    var onError = function (service, status, jhr) {
-      setStatus("error");
-      var line = self.events[service];
-      if (!line) {
-        console.log("jToxLog: missing line for:" + service + "(" + status + ")");
-        return;
-      }
-      delete self.events[service];
-      setIcon(line, 'error');
-      ccLib.fillTree(line, ccLib.fireCallback(self.settings.formatLine, this, service, null, status, jhr));
-      jT.$(line).data('status', "error");
+    if (!!self.settings.autoInstall)
+      self.install();
+  };
+  
+  // Install the handers for given kit
+  cls.prototype.install = function (kit) {
+    var self = this;
+    if (kit == null)
+      kit = jT;
+    
+    // save the oldies
+    kit._handlers = {
+      onConnect: kit.settings.onConnect,
+      onSuccess: kit.settings.onSuccess,
+      onError: kit.settings.onError
     };
     
-    // now, finally swipe through everybody and install me...
-    var installHnd = function (kit) {
-      if (kit == null || kit == self)
-        return;
-        
-      kit.settings.onConnect = onConnect;
-      kit.settings.onError = onError;
-      kit.settings.onSuccess = onSuccess;
-    };
-    
-    installHnd(jT);
+    kit.settings = jT.$.extend(kit.settings, self.handlers);
+    return kit;
+  };
+  
+  // Deinstall the handlers for given kit, reverting old ones
+  cls.prototype.revert = function (kit) {
+    var self = this;
+    if (kit == null)
+      kit = jT;
+
+    kit.settings = jT.$.extend(kit.settings, kit._handlers);
+    return kit;
   };
   
   cls.prototype.modifyUri = function (uri) { 

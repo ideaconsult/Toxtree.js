@@ -289,7 +289,6 @@ window.jT = window.jToxKit = {
 			service = settings.baseUrl + service;
 			
 		ccLib.fireCallback(settings.onConnect, kit, service, params);
-		ccLib.fireCallback(self.settings.onConnect, kit, service, params);
 			
 		// now make the actual call
 		self.$.ajax(service, {
@@ -302,12 +301,10 @@ window.jT = window.jToxKit = {
 			jsonp: settings.jsonp ? 'callback' : false,
 			error: function(jhr, status, error){
 			  ccLib.fireCallback(settings.onError, kit, service, status, jhr);
-			  ccLib.fireCallback(self.settings.onError, kit, service, status, jhr);
 				callback(null, jhr);
 			},
 			success: function(data, status, jhr){
 			  ccLib.fireCallback(settings.onSuccess, kit, service, status, jhr);
-			  ccLib.fireCallback(self.settings.onSuccess, kit, service, status, jhr);
 				callback(data, jhr);
 			}
 		});

@@ -42,7 +42,7 @@ $(document).ready(function() {
 
 **jToxKit** itself provides certain _global_ routines, which can be invoked like `jToxKit.call()`, however for ease of use, there is an alias `jT` for `jToxKit`, so `jT.call()` is also a valid reference.
 
-### Configuration parameters
+### <a href="#jtox-configuration"></a>Configuration parameters
 
 Beside specifying the exact place of code insertion the `<div>` tag, referred above, is also used to setup the type and configuration of the front-end. There are three ways to pass configuration parameters to _jToxKit_:
 
@@ -921,12 +921,16 @@ Initiates a query, by asking the wrapping jToxQuery kit, for the main component 
 <a name="jtoxlog"></a> jToxLog kit
 --------------------------------------
 
-A network requests logger, providing feedback for sucess or failure on each call. It self-installs by resetting jToxKit's main `onConnect`, `onSuccess` and `onError` handlers, and since they are always called (independent of each kit's corresponding handlers), this means _jToxLog_'s instance always receives these calls and it does not interfere with other kit's custom handlers.
+A network requests logger, providing feedback for sucess or failure on each call. Normally it should be put somewhere in the beginning of the page, so it can auto-install itself on the instance of _jToxKit_, which will make it available for all kits, during [settings inheritance mechanism](#jtox-configuration).
+
+The notifications handled are `onConnect`, `onSuccess` and `onError` - and the requested _service_ (see `jToxKit.call()`) is used as identifier for updating status changes.
 
 ##### Parameters
 
 There are few things that can be setup from outside:
 
+- **`autoInstall`** (attr. `data-auto-install`): If _true_ automatically installs itself for the _jToxKit_ instance and starts to receive all network request. Default is this: _true_.
+- **`resend`** (attr. `data-resend`): Whether to call old, remembered handlers for the kit, a logger is installed on. This is rarely used, because _jToxLog_ is usually installed generally on the _jToxKit_ instance and it receives all network notifications, independently of kit's handlers. This is useful if logger is installed separately on a kit to enable its handlers to still receive the notifications. Default: _true_.
 - **`statusDelay`** (attr. `data-status-delay`): Number of milliseconds to keep the last success or failure status before fading it out. Default: _1500_.
 - **`keepMessages`** (attr. `data-keep-messages`): How many olf messages should be kept in the logger list, before starting to delete the oldest ones. Default is _50_.
 - **`lineHeight`** (attr. `data-line-height`): How tall should be the (closed) request line - it can be given in normal CSS way. The openned status line (with details) has different height - enough to contain all data. Default: _20px_.
@@ -934,6 +938,20 @@ There are few things that can be setup from outside:
 - **`hasDetails`** (attr. `data-has-details`): Whether clicking on each line's status will open a detailed info for the request (if any). Default: _true_.
 - **`onStatus`** (attr. `data-on-status`): A handler which is called when a new status has happenned, the format is `function (newstatus, oldstatus)`. Both can be `connecting`, `success` or `error`. Default: _null_.
 - **`formatLine`** (attr. `data-on-line`): A handler which is called to format a newly adding line (or already existing one, upon status change). The format is `function (service, params, status, jhr)` and it is called within calling kit's context (ie. _this_ parameter). _Params_ are reflecting the `jTokKit.call()` argument, while _status_ and _jhr_ - the ones returned on `onSuccess` or `onError`. The function should return an object with two properties: `header` and `details`, which a refilled in the logger line, respectfully. There is default implementation.
+
+##### Methods
+
+They are pretty straightforward:
+
+```
+<jToxLog>.install(kit)
+```
+Installs the logger for given kit. If _kit_ is null - the (only) instance of _jToxKit_ is used, which means that all calls are passed to the logger. If `resend` setting is set to _true_ the original handlers for this kit are still called.
+
+```
+<jToxLog>.revert(kit)
+```
+Restores the old handlers for the kit.
 
 
 How is made and how to build?
