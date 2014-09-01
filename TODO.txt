@@ -1,5 +1,5 @@
 DOCS:
-- 
+- Start sending jhr on each callback
 
 TODO:
 - Document jToxLog

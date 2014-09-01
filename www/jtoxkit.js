@@ -1520,7 +1520,7 @@ var jToxCompound = (function () {
         	render: function(data, type, full) { return ''; }
       	},
       	
-      	"http://www.opentox.org/api/1.1#Similarity": {title: "Similarity", data: "compound.metric", search: true, used: true},
+      	"http://www.opentox.org/api/1.1#Similarity": {title: "Similarity", data: "compound.metric", search: true},
       },
       "columns": {
         "compound": {
