@@ -406,7 +406,7 @@ var jToxCompound = (function () {
               '' + data : 
               "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;<br/>" + 
                 (self.settings.hasDetails ?              
-                  '<span class="jtox-details-open ui-icon ui-icon-circle-triangle-e" title="Press to open/close detailed info for this compound"></span>'
+                  '<span class="jtox-details-open ui-icon ui-icon-folder-collapsed" title="Press to open/close detailed info for this compound"></span>'
                   : '');
           }
         },
@@ -459,8 +459,8 @@ var jToxCompound = (function () {
         fnExpandCell(varCell, toShow);
         
         var iconCell = jT.$('.jtox-details-open', row);
-        jT.$(iconCell).toggleClass('ui-icon-circle-triangle-e');
-        jT.$(iconCell).toggleClass('ui-icon-circle-triangle-w');
+        jT.$(iconCell).toggleClass('ui-icon-folder-open');
+        jT.$(iconCell).toggleClass('ui-icon-folder-collapsed');
         
         if (toShow) {
           // i.e. we need to show it - put the full sized diagram in the fixed part and the tabs in the variable one...

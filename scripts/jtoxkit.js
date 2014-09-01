@@ -590,7 +590,7 @@ window.jT.ui = {
         if (typeof defs.details == 'function')
           html += defs.details(data, type, full);
         else if (!!defs.details)
-          html += '<span class="jtox-details-toggle ui-icon ui-icon-circle-triangle-e" data-data="' + data +'" title="Press to open/close detailed info for this entry"></span>';
+          html += '<span class="jtox-details-toggle ui-icon ui-icon-folder" data-data="' + data +'" title="Press to open/close detailed info for this entry"></span>';
 
         // post content adding
         if (typeof defs.post == 'function')
@@ -606,8 +606,8 @@ window.jT.ui = {
   },
   
   toggleDetails: function (event, row) {
-    self.$(event.currentTarget).toggleClass('ui-icon-circle-triangle-e');
-    self.$(event.currentTarget).toggleClass('ui-icon-circle-triangle-w');
+    self.$(event.currentTarget).toggleClass('ui-icon-folder-collapsed');
+    self.$(event.currentTarget).toggleClass('ui-icon-folder-open');
     self.$(event.currentTarget).toggleClass('jtox-openned');
     if (!row)
       row = self.$(event.currentTarget).parents('tr')[0];
