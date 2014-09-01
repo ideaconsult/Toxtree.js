@@ -1417,6 +1417,7 @@ var jToxCompound = (function () {
     "pageStart": 0,           // what is the default startint point for entries retrieval
     "rememberChecks": false,  // whether to remember feature-checkbox settings between queries
     "metricFeature": "http://www.opentox.org/api/1.1#Similarity",   // This is the default metric feature, if no other is specified
+    "onTab": null,            // invoked after each group's tab is created - function (element, tab, name, isMain);
     "onLoaded": null,         // invoked when a set of compound is loaded.
     "onPrepared": null,       // invoked when the initial call for determining the tabs/columns is ready
     "onDetails": null,        // invoked when a details pane is openned
@@ -1631,7 +1632,6 @@ var jToxCompound = (function () {
 
       var createATab = function(grId, name) {
         var liEl = document.createElement('li');
-        liEl.title = "Select which columns to be displayed";
         ulEl.appendChild(liEl);
         var aEl = document.createElement('a');
         aEl.href = "#" + grId;
@@ -1644,14 +1644,17 @@ var jToxCompound = (function () {
       var idx = 0;
       for (var gr in self.groups) {
         var grId = "jtox-ds-" + gr.replace(/\s/g, "_") + "-" + self.instanceNo + (isMain ? '' : '-details');
-        var tabLi = createATab(grId, gr.replace(/_/g, " "));
+        var grName = gr.replace(/_/g, " ");
+        var tabLi = createATab(grId, grName);
+        if (isMain)
+          tabLi.title = "Select which columns to be displayed";
         
         // now prepare the content...
         var divEl = document.createElement('div');
         divEl.id = grId;
         all.appendChild(divEl);
         // add the group check multi-change
-        if (self.settings.groupSelection) {
+        if (self.settings.groupSelection && isMain) {
           var sel = jT.getTemplate("#jtox-ds-selection");
           divEl.appendChild(sel);
           jT.$('.multi-select', sel).on('click', function (e) {
@@ -1674,6 +1677,8 @@ var jToxCompound = (function () {
             emptyList.push(idx);
         }
         ++idx;
+        
+        ccLib.fireCallback(self.settings.onTab, self, divEl, tabLi, grName, isMain);
       }
       
       if (isMain && self.settings.showExport) {
@@ -1695,6 +1700,8 @@ var jToxCompound = (function () {
           img.alt = img.title = expo.type;
           img.src = (jT.settings.baseUrl || self.settings.baseUrl) + '/' + expo.icon;
         }
+        
+        ccLib.fireCallback(self.settings.onTab, self, divEl, liEl, "Export", isMain);
       }
       
       // now show the whole stuff and mark the disabled tabs

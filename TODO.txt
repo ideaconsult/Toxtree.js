@@ -2,8 +2,10 @@ DOCS:
 - 
 
 TODO:
+- Document jToxLog
+- Make jToxLog delete older messages.
+
 - make matrix info popup.
-- Make all kits react adequately on failure on network / calls
 - deferred re-query (postpone)
 
 IDEAS?
