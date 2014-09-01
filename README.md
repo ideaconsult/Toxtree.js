@@ -12,6 +12,7 @@ Each different front-end is referred as _kit_. Currently available are:
 - `study` - [IUCLID5](http://iuclid.eu/) substance studies visuzalizer... [more](#jtoxstudy)
 - `query` - a wrapper around other kits and widgets, making them work together... [more](#jtoxquery).
 - `search` - the search banner, integrating with jToxQuery, providing different search methods... [more](#jtoxsearch).
+- `log` - a logger for all network requests, self-installing to all declared kits on the page... [more](#jtoxlog)
 
 
 The toolkit is intended to be used by semi-programmers, and thus it's integration process is rather simple - referring two files and marking a placeholder in HTML of where all the structure to be inserted. However, it relies on the fact that certain external libraries like [jQuery](http://www.jquery.com) and some of [jQueryUI](http://www.jqueryui.com) widgets are already included in the page.
@@ -916,6 +917,24 @@ Returns the current search needle - be it, as displayed in the _search box_, or 
 <jToxQuery>.makeQuery(needle)
 ```
 Initiates a query, by asking the wrapping jToxQuery kit, for the main component providing the queries. If `needle` is supplies - it makes a `setAuto()` call first, i.e. - resets the method to auto and the searching needle.
+
+<a name="jtoxlog"></a> jToxLog kit
+--------------------------------------
+
+A network requests logger, providing feedback for sucess or failure on each call. It self-installs by changing all kits' `onConnect`, `onSuccess` and `onError` handlers, including those of `jToxKit` instance itself, which means that future kits on the page will copy changed ones in their settings.
+
+##### Parameters
+
+There are few things that can be setup from outside:
+
+- **`resendEvents`** (attr. `data-resend-events`): Whether to call each kit's original `onXXX` handler, after processing it here. Default: _true_.
+- **`statusDelay`** (attr. `data-status-delay`): Number of milliseconds to keep the last success or failure status before fading it out. Default: _1500_.
+- **`keepMessages`** (attr. `data-keep-messages`): How many olf messages should be kept in the logger list, before starting to delete the oldest ones. Default is _50_.
+- **`lineHeight`** (attr. `data-line-height`): How tall should be the (closed) request line - it can be given in normal CSS way. The openned status line (with details) has different height - enough to contain all data. Default: _20px_.
+- **`rightSide`** (attr. `data-right-side`): Whether to put the status thumb on the right side of the logger. Default: _false_.
+- **`hasDetails`** (attr. `data-has-details`): Whether clicking on each line's status will open a detailed info for the request (if any). Default: _true_.
+- **`onStatus`** (attr. `data-on-status`): A handler which is called when a new status has happenned, the format is `function (newstatus, oldstatus)`. Both can be `connecting`, `success` or `error`. Default: _null_.
+- **`formatLine`** (attr. `data-on-line`): A handler which is called to format a newly adding line (or already existing one, upon status change). The format is `function (service, params, status, jhr)` and it is called within calling kit's context (ie. _this_ parameter). _Params_ are reflecting the `jTokKit.call()` argument, while _status_ and _jhr_ - the ones returned on `onSuccess` or `onError`. The function should return an object with two properties: `header` and `details`, which a refilled in the logger line, respectfully. There is default implementation.
 
 
 How is made and how to build?

@@ -1,8 +1,8 @@
 DOCS:
-- Start sending jhr on each callback
+- 
 
 TODO:
-- Document jToxLog
+- Reduce network calls in ToxTree no run-all - postopone the call until the last model has ran.
 
 - make matrix info popup.
 - deferred re-query (postpone)

@@ -3906,12 +3906,10 @@ var jToxLog = (function () {
     statusDelay: 1500,      // number of milliseconds to keep success / error messages before fading out
     keepMessages: 50,       // how many messages to keep in the queue
     lineHeight: "20px",     // the height of each status line
-    background: "#ffffff",  // the background property as set for both the status icon and the list
     rightSide: false,       // put the status icon on the right side
     hasDetails: true,       // whether to have the ability to open each line, to show it's details
     resendEvents: true,     // whether received onConnect, onSuccess and onError events are passed back to original jToxKit one's.
     onStatus: null,         // a callback, when new status has arrived: function (newstatus, oldstatus)
-    onLine: null,           // a new line callback: function (service, status)
     
     // line formatting function - function (service, params, status, jhr) -> { header: "", details: "" }
     formatLine: function (service, params, status, jhr) {
@@ -3944,7 +3942,6 @@ var jToxLog = (function () {
       self.settings.keepMessages = parseInt(self.settings.keepMessages);
       
     // now the actual UI manipulation functions...
-    jT.$('.status,.list-wrap', self.rootElement).css('background', self.settings.background);
     var listRoot = $('.list-root', self.rootElement)[0];
     var statusEl = $('.status', self.rootElement)[0];
 
