@@ -3904,6 +3904,7 @@ var jToxPolicy = (function () {
 var jToxLog = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     statusDelay: 1500,      // number of milliseconds to keep success / error messages before fading out
+    keepMessages: 50,       // how many messages to keep in the queue
     lineHeight: "20px",     // the height of each status line
     background: "#ffffff",  // the background property as set for both the status icon and the list
     rightSide: false,       // put the status icon on the right side
@@ -3939,6 +3940,8 @@ var jToxLog = (function () {
     
     if (typeof self.settings.lineHeight == "number")
       self.settings.lineHeight = self.settings.lineHeight.toString() + 'px';
+    if (typeof self.settings.keepMessages != "number")
+      self.settings.keepMessages = parseInt(self.settings.keepMessages);
       
     // now the actual UI manipulation functions...
     jT.$('.status,.list-wrap', self.rootElement).css('background', self.settings.background);
@@ -4008,6 +4011,10 @@ var jToxLog = (function () {
             el.style.height = self.settings.lineHeight;
         });
       }
+      
+      while (listRoot.childNodes.length > self.settings.keepMessages)
+        listRoot.removeChild(listRoot.lastElementChild);
+
       return el;
     };
     

@@ -3,7 +3,6 @@ DOCS:
 
 TODO:
 - Document jToxLog
-- Make jToxLog delete older messages.
 
 - make matrix info popup.
 - deferred re-query (postpone)
