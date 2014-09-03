@@ -13,23 +13,23 @@ var jToxAssessment = {
 	createForm: null,
 	rootElement: null,
 	queries: {
-		'assess_create': { method: "POST", service: "/dataset"},
-		'assess_update': { method: "PUT", service: "/dataset/{id}/metadata"},
-		'add_compound': { method: 'PUT', service: "/dataset/{datasetId}"},
-		'del_compound': { method: 'DELETE', service: "/dataset/{datasetId}/compound?compound_uri={compoundUri}"},
-		'get_compounds': { method: 'GET', service: "/dataset/{datasetId}/compounds"},
-		'get_substances': { method: 'GET', service: "/dataset/{datasetId}/substances"},
-		'add_substance': { method: 'PUT', service: "/dataset/{datasetId}/substances"},
-		'del_substance': { method: 'DELETE', service: "/dataset/{datasetId}/substances?substance={substanceUri}"},
+		'assess_create': { method: "POST", service: "/assessment"},
+		'assess_update': { method: "PUT", service: "/assessment/{id}/metadata"},
+		'add_compound': { method: 'PUT', service: "/assessment/{id}"},
+		'del_compound': { method: 'DELETE', service: "/assessment/{id}/compound?compound_uri={compoundUri}"},
+		'get_compounds': { method: 'GET', service: "/assessment/{id}/compounds"},
+		'get_substances': { method: 'GET', service: "/assessment/{id}/substances"},
+		'add_substance': { method: 'PUT', service: "/assessment/{id}/substances"},
+		'del_substance': { method: 'DELETE', service: "/assessment/{id}/substances?substance={substanceUri}"},
 		'get_endpoints': { method: 'GET', service: ""},
-		'add_endpoint': { method: 'PUT', service: "/dataset/{datasetId}/feature"},
-		'del_endpoint': { method: 'DELETE', service: "/dataset/{datasetId}/feature?feature={featureUri}"},
+		'add_endpoint': { method: 'PUT', service: "/assessment/{id}/feature"},
+		'del_endpoint': { method: 'DELETE', service: "/assessment/{id}/feature?feature={featureUri}"},
 	},
 	
-	settings: { // defaults settings go here
+	collected: {
+  	compounds: [],
+	},
 		
-	},
-	
 	init: function (root, settings) {
 		var self = this;
 
@@ -38,13 +38,12 @@ var jToxAssessment = {
 		
 		// the (sub)action in the panel
 		var loadAction = function () {
-			var el = this;
-    	if (!el.checked)
+    	if (!this.checked)
     		return;
-	    var method = $(el).parent().data('action');
+	    var method = $(this).parent().data('action');
 	    if (!method)
 	    	return;
-	    ccLib.fireCallback(self[method], self, el.id, $(el).closest('.ui-tabs-panel')[0]);
+	    ccLib.fireCallback(self[method], self, this.id, $(this).closest('.ui-tabs-panel')[0], false);
 		};
 		
     var loadPanel = function(panel){
@@ -53,7 +52,7 @@ var jToxAssessment = {
         if (subs.length > 0)
       	  subs.each(loadAction);
         else 
-  		    ccLib.fireCallback(self[$(panel).data('action')], self, panel.id, panel);
+  		    ccLib.fireCallback(self[$(panel).data('action')], self, panel.id, panel, true);
       }
     };
     
@@ -91,7 +90,7 @@ var jToxAssessment = {
     	return this.value.length > 0;
     };
     
-    self.createForm = $('.jtox-identifiers form', self.rootElement)[0];
+    self.createForm = $('form', panel)[0];
     self.createForm.assStart.onclick = function (e) {
     	if (ccLib.validateForm(self.createForm, checkForm)) {
 		    jT.service(self, 'assess_create', null, function (task) {
@@ -189,14 +188,27 @@ var jToxAssessment = {
 	
 	// called when a sub-action in endpoint selection tab is called
 	onEndpoint: function (id, panel) {
-		console.log("Endpoint: " + id);
+	  var sub = $(".tab-" + id.substr(3), panel)[0];
+	  sub.parentNode.style.left = (-sub.offsetLeft) + 'px';
+	  
+	  if (id == "endsubstance") {
+  	  if (sub.firstElementChild == null) {
+    	  var root = document.createElement('div');
+    	  sub.appendChild(root);
+    	  self.substanceKit = new jToxSubstance(root, { crossDomain: true });
+  	  }
+  	  
+      self.substanceKit.query('http://apps.ideaconsult.net:8080/data/substance?type=related&compound_uri=http%3A%2F%2Fapps.ideaconsult.net%3A8080%2Fdata%2Fcompound%2F21219%2Fconformer%2F39738');
+	  }
+	  else {// i.e. endpoints
+	  }
 	},
 	
 	// called when a sub-action in structures selection tab is called
 	onStructures: function (id, panel) {
 	  if (!self.queryKit)
   	  self.queryKit = jT.kit($('#jtox-query')[0]);
-
+      
     self.queryKit.query();
 	},
 	

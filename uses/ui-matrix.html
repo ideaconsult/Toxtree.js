@@ -37,7 +37,7 @@
 <body>
   <div id="logger" class="jtox-toolkit jtox-widget hidden" data-kit="log" data-resend="false"></div>  
 
-  <div class="jtox-toolkit" id="jtox-matrix" data-kit="assessment">
+  <div class="jtox-toolkit" data-kit="assessment">
     <ul>
       <li><a href="#jtox-identifiers">Assessment identifier</a></li>
       <li><a href="#jtox-structures">Collect structures</a></li>
@@ -45,7 +45,7 @@
         <li><a href="#jtox-matrix">Assessment details</a></li>
       <li><a href="#jtox-report">Report</a></li>
     </ul>
-    <div id="jtox-identifiers" class="jtox-identifiers" data-action="onIdentifiers">
+    <div id="jtox-identifiers" data-action="onIdentifiers">
 	  	<form>
 	      <table class="dataTable">
 	        <thead>
@@ -96,7 +96,7 @@
 	      </div>
 	  	</form>
 	  </div>
-    <div id="jtox-structures" class="jtox-structures">
+    <div id="jtox-structures">
 	  	<div class="jq-buttonset center action" data-action="onStructures">
 			  <input type="radio" id="structtarget" name="structaction" checked="checked"><label for="structtarget">Collect structures</label></input>
 			  <input type="radio" id="structallied" name="structaction"><label for="structallied">List collected</label></input>
@@ -111,13 +111,18 @@
         <div id="browser" class="jtox-toolkit" data-kit="compound" data-remember-checks="true" data-hide-empty="true" data-details-height="500px" data-tabs-folded="true" data-on-details="onDetailedRow" data-show-diagrams="true"></div>
       </div>
     </div>
-    <div id="jtox-endpoints" class="jtox-endpoints">
+    <div id="jtox-endpoints">
 	  	<div class="jq-buttonset center action" data-action="onEndpoint">
 			  <input type="radio" id="endsubstance" name="endaction" checked="checked"><label for="endsubstance">Search substance(s)</label></input>
 			  <input type="radio" id="endpoints" name="endaction"><label for="endpoints">Selection of endpoints</label></input>
 			</div>
+			<div class="size-full">
+  			<div class="jtox-slidable">
+          <div class="jtox-inline tab-substance"></div><div class="jtox-inline tab-points">ENDPOINTS!</div>
+  			</div>
+  		</div>
 		</div>
-    <div id="jtox-matrix" class="jtox-matrix">
+    <div id="jtox-matrix">
 	  	<div class="jq-buttonset center action" data-action="onMatrix">
 			  <input type="radio" id="xinitial" name="xaction" checked="checked"><label for="xinitial">Initial matrix</label></input>
 			  <input type="radio" id="xworking" name="xaction"><label for="xworking">Working matrix</label></input>

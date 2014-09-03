@@ -20,17 +20,49 @@
 }
 
 
-.jtox-identifiers form div.actions {
+#jtox-identifiers form div.actions {
 	margin-top: 15px;
 	font-size: 80%;
 }
 
-.jtox-identifiers form input,
-.jtox-identifiers form textarea {
+#jtox-identifiers form input,
+#jtox-identifiers form textarea {
 	width: 100%;
 }
 
 #jtox-structures .jtox-foldable {
   margin-top: 5px;
   margin-bottom: 5px;
+}
+
+.jtox-slidable {
+  overflow: hidden;
+  position: relative;
+  top: 0px;
+  width: 202%;
+  padding: 0px;
+  -moz-transition: left ease 500ms;
+  -ms-transition: left ease 500ms;
+  -o-transition: left ease 500ms;
+  -webkit-transition: left ease 500ms;
+  transition: left ease 300ms;
+}
+
+.jtox-slidable>div {
+  width: 50%;
+  position: relative;
+  margin: 0px;
+  box-sizing: border-box;
+}
+
+#jtox-endpoints .tab-substance input.filterbox {
+  margin-right: 20px;
+}
+
+#jtox-endpoints .tab-substance  {
+  padding-right: 25px;
+}
+
+#jtox-endpoints .tab-points  {
+  padding-left: 15px;
 }

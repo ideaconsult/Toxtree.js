@@ -204,6 +204,14 @@
   color: rgba(0, 0, 0, 0);
 }
 
+.jtox-toolkit input[type="password"],
+.jtox-toolkit input[type="search"],
+.jtox-toolkit input[type="text"],
+textarea,
+select {
+  margin-bottom: 10px;
+}
+
 .jtox-toolkit input[type="password"].jt-inlineaction, 
 .jtox-toolkit input[type="search"].jt-inlineaction, 
 .jtox-toolkit input[type="text"].jt-inlineaction, 
