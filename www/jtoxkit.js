@@ -4122,12 +4122,12 @@ var jToxEndpoint = (function () {
     selectionHandler: null,   // selection handler to be attached on checkbox, for jToxQuery integration    
     noInterface: false,       // run in interface-less mode, with data retrieval and callback calling only
     heightStyle: "content",   // the accordition heightStyle
-    hideEmpty: false,         // hide tabs with empty endpoints, given the query passed
-    sDom: "rt",          // passed with dataTable settings upon creation
+    hideFilter: false,        // if you don't want to have filter box - just hide it
+    sDom: "rt<i>",               // passed with dataTable settings upon creation
     oLanguage: null,          // passed with dataTable settings upon creation
     onLoaded: null,           // callback called when the is available
     loadOnInit: false,        // whether to make an (empty) call when initialized. 
-    /* summaryUri */
+    /* endpointUri */
     configuration: { 
       columns : {
         endpoint: {
@@ -4153,8 +4153,8 @@ var jToxEndpoint = (function () {
     }
         
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
-    if (self.settings.datasetUri != undefined || self.settings.loadOnInit)
-      self.loadEndpoints(self.settings.datasetUri)
+    if (self.settings.endpointUri != undefined || self.settings.loadOnInit)
+      self.loadEndpoints(self.settings.endpointUri)
   };
   
   cls.prototype = {
@@ -4178,7 +4178,7 @@ var jToxEndpoint = (function () {
       }, self.settings.oLanguage);
       
       // make the accordition now...
-    	$(self.rootElement.firstElementChild).accordion( {
+    	jT.$('.jtox-categories', self.rootElement).accordion( {
     		heightStyle: self.settings.heightStyle
     	});
 
@@ -4188,15 +4188,62 @@ var jToxEndpoint = (function () {
         var name = this.className;
         self.tables[name] = jT.$(this).dataTable({
           "bPaginate": false,
+          "bProcessing": true,
           "bLengthChange": false,
   				"bAutoWidth": false,
           "sDom" : self.settings.sDom,
           "aoColumns": cols,
-  				"oLanguage": language
+  				"oLanguage": language,
+  				"fnInfoCallback": self.updateStats(name)
         });
       
         jT.$(self.tables[name]).dataTable().fnAdjustColumnSizing();
       });
+      
+      if (!!self.settings.hideFilter)
+        jT.$('.filter-box', self.rootElement).remove();
+      else {
+        var filterTimeout = null;
+        var fFilter = function (ev) {
+          if (!!filterTimeout)
+            clearTimeout(filterTimeout);
+      
+          var field = ev.currentTarget;
+          
+          filterTimeout = setTimeout(function() {
+            jT.$('table', self.rootElement).each(function () {
+              jT.$(this).dataTable().fnFilter(field.value);
+            });
+          }, 300);
+        };
+        
+        jT.$('.filter-box input', self.rootElement).on('keydown', fFilter);
+      }
+    },
+    
+    updateStats: function (name) {
+      var self = this;
+      return function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
+        var head = jT.$('h3.' + name, self.rootElement)[0];
+        // now make the summary...
+        var html = '';
+        if (iTotal > 0) {
+          var substances = 0, count = 0;
+          var data = this.fnGetData();
+          for (var i = iStart; i <= iEnd && i < iMax; ++i) {
+            count += data[i].count;
+            substances += data[i].substancescount;
+          }
+          var html = "(" + substances + ") [" + count + "]";
+          if (iTotal < iMax)
+            html = "#" + iTotal + " " + html;
+        }
+        else
+          html = '#0';
+        
+        jT.$('span.jtox-details', head).html(html); 
+        return sPre;
+      }
     },
     
     fillEntries: function (facet) {
@@ -4207,23 +4254,19 @@ var jToxEndpoint = (function () {
         var entry = facet[i];
         var cat = ends[entry.subcategory];
         if (cat == null)
-          ends[entry.subcategory] = cat = { list: [], count: 0, substancescount: 0};
+          ends[entry.subcategory] = cat = [];
 
-        cat.list.push(entry);
-        cat.count += entry.count;
-        cat.substancescount += entry.substancescount;
+        cat.push(entry);
       }
       
       // now, as we're ready - go and fill everything
       jT.$('h3', self.rootElement).each(function () {
         var name = jT.$(this).data('cat');
-        var cat = ends[name];
+        var cat = ends[name.replace("_", " ")];
         
-        jT.$('span.jtox-details', this).html("(" + cat.substancescount + ") [" + cat.count + "]"); 
-        // TODO: fill the header with summary data
-        var table = self.tables[name.replace(' ', '_')];
+        var table = self.tables[name];
         table.fnClearTable();
-        table.fnAddData(cat.list);
+        table.fnAddData(cat);
       });
     },
     
@@ -4517,22 +4560,25 @@ jT.templates['logline']  =
 
 jT.templates['all-endpoint']  = 
 "	  <div id=\"jtox-endpoint\">" +
-"  		<h3 data-cat=\"P-CHEM\">P-Chem <span class=\"float-right jtox-details\"></span></h3>" +
-"  		<div>" +
-"  		  <table class=\"P-CHEM\"></table>" +
-"  		</div>" +
-"  		<h3 data-cat=\"ENV FATE\">Env Fate <span class=\"float-right jtox-details\"></span></h3>" +
-"  		<div>" +
-"    		<table class=\"ENV_FATE\"></table>" +
-"  		</div>" +
-"  		<h3 data-cat=\"ECOTOX\">Eco Tox <span class=\"float-right jtox-details\"></span></h3>" +
-"  		<div>" +
-"    		<table class=\"ECOTOX\"></table>" +
-"  		</div>" +
-"  		<h3 data-cat=\"TOX\">Tox <span class=\"float-right jtox-details\"></span></h3>" +
-"  		<div>" +
-"  		  <table class=\"TOX\"></table>" +
-"  		</div>" +
+"	    <div class=\"size-full filter-box\" style=\"height: 35px\"><input type=\"text\" class=\"float-right ui-input\" placeholder=\"Filter...\" /></div>" +
+"	    <div class=\"jtox-categories\">" +
+"    		<h3 class=\"P-CHEM\" data-cat=\"P-CHEM\">P-Chem <span class=\"float-right jtox-details\"></span></h3>" +
+"    		<div>" +
+"    		  <table class=\"P-CHEM\"></table>" +
+"    		</div>" +
+"    		<h3 class=\"ENV_FATE\" data-cat=\"ENV_FATE\">Env Fate <span class=\"float-right jtox-details\"></span></h3>" +
+"    		<div>" +
+"      		<table class=\"ENV_FATE\"></table>" +
+"    		</div>" +
+"    		<h3 class=\"ECOTOX\" data-cat=\"ECOTOX\">Eco Tox <span class=\"float-right jtox-details\"></span></h3>" +
+"    		<div>" +
+"      		<table class=\"ECOTOX\"></table>" +
+"    		</div>" +
+"    		<h3 class=\"TOX\" data-cat=\"TOX\">Tox <span class=\"float-right jtox-details\"></span></h3>" +
+"    		<div>" +
+"    		  <table class=\"TOX\"></table>" +
+"    		</div>" +
+"	    </div>" +
 "	  </div>" +
 ""; // end of #jtox-endpoint 
 
