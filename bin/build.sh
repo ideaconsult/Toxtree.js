@@ -5,7 +5,7 @@ outdir='../www'
 jsdir='../scripts'
 cssdir='../styles'
 htmldir='..'
-target='toxquery toxcompound toxdataset toxmodel toxsubstance toxcomposition toxstudy toxauth toxlog'
+target='toxquery toxcompound toxdataset toxmodel toxsubstance toxcomposition toxstudy toxauth toxlog toxendpoint'
 libs=()
 tools=''
 append=0
@@ -59,7 +59,7 @@ while (( "$#" )); do
 			echo "    [--out <output dir>]    : the directory where output files should be put. Default is [../www]."
 			echo "    [-css <styles dir>]     : the directory where styling files live. Default is [../styles]."
 			echo "    [--js <js dir>]         : the directory where script files live. Default is [../scripts]."
-			echo "    [--target <kit list>]   : list of kits to be included. Omit jtoxkit. Default [toxquery toxcompound toxdataset toxmodel toxsubstance toxcomposition toxstudy]."
+			echo "    [--target <kit list>]   : list of kits to be included. Omit jtoxkit. Default are all of them."
 			echo "    [--lib | -l <filename>] : html file name, referring to some external library (tool)."
 			echo "    [--tool | -t <filename>]: html file name, referring to some internal tool."
 			echo "    [--help | -h]           : this help."

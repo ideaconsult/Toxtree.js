@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+
+  <title>ToxEndpoint development page</title>
+  <link rel="stylesheet" href="tests/base.css">
+	<link rel="stylesheet" href="tests/skeleton.css">
+	<link rel="stylesheet" href="tests/layout.css">
+	<link rel="stylesheet" href="tests/jquery-ui.css">
+	<link rel="stylesheet" href="tests/jquery.dataTables.css">
+
+	<link rel="stylesheet" href="styles/jtoxkit.css">
+
+  <script src="tests/jquery.js"></script>
+  <script src="tests/jquery-ui.js"></script>
+  <script src="tests/jquery.dataTables.js"></script>
+
+  <script src="scripts/common.js"></script>
+  <script src="scripts/jtoxkit.js"></script>
+  <script src="scripts/toxendpoint.js"></script>
+  
+</head>
+<body>
+	<div class="jtox-toolkit" data-kit="endpoint" data-load-on-init="true" data-base-url="http://apps.ideaconsult.net:8080/data"></div>
+  <div class="jtox-template">
+<!--[[ jT.templates['all-endpoint'] -->
+	  <div id="jtox-endpoint">
+  		<h3 data-cat="P-CHEM">P-Chem <span class="float-right jtox-details"></span></h3>
+  		<div>
+  		  <table class="P-CHEM"></table>
+  		</div>
+  		<h3 data-cat="ENV FATE">Env Fate <span class="float-right jtox-details"></span></h3>
+  		<div>
+    		<table class="ENV_FATE"></table>
+  		</div>
+  		<h3 data-cat="ECOTOX">Eco Tox <span class="float-right jtox-details"></span></h3>
+  		<div>
+    		<table class="ECOTOX"></table>
+  		</div>
+  		<h3 data-cat="TOX">Tox <span class="float-right jtox-details"></span></h3>
+  		<div>
+  		  <table class="TOX"></table>
+  		</div>
+	  </div>
+<!-- // end of #jtox-endpoint ]]-->
+  </div>
+</body>
+</html>

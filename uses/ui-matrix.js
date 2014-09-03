@@ -201,6 +201,13 @@ var jToxAssessment = {
       self.substanceKit.query('http://apps.ideaconsult.net:8080/data/substance?type=related&compound_uri=http%3A%2F%2Fapps.ideaconsult.net%3A8080%2Fdata%2Fcompound%2F21219%2Fconformer%2F39738');
 	  }
 	  else {// i.e. endpoints
+  	  if (sub.firstElementChild == null) {
+    	  var root = document.createElement('div');
+    	  sub.appendChild(root);
+    	  self.endpointKit = new jToxEndpoint(root, {});
+  	  }
+  	  
+  	  self.endpointKit.loadEndpoints();
 	  }
 	},
 	
