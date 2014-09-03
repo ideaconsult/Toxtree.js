@@ -70,23 +70,22 @@ window.jT = window.jToxKit = {
   	  	kit = 'jTox' + kit.charAt(0).toUpperCase() + kit.slice(1);
   
     	var fn = window[kit];
-    	if (typeof fn == 'function') {
-    	  var obj = new fn(element, params);
+    	var obj = null;
+      if (typeof fn == 'function')
+    	  obj = new fn(element, params);
+      else if (typeof fn == "object" && typeof fn.init == "function")
+        obj = fn.init(element, params);
+      
+      if (obj != null) {
         if (fn.kits === undefined)
           fn.kits = [];
         fn.kits.push(obj);
         obj.parentKit = parent;
-        return obj;
-    	}
-      else if (typeof fn == "object" && typeof fn.init == "function") {
-        var obj = fn.init(element, params);
-        obj.parentKit = parent;
-        return obj;
       }
       else
         console.log("jToxError: trying to initialize unexistend jTox kit: " + kit);
 
-      return null;
+      return obj;
     };
 
 	  // first, get the configuration, if such is passed

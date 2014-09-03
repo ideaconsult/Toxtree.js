@@ -458,23 +458,22 @@ window.jT = window.jToxKit = {
   	  	kit = 'jTox' + kit.charAt(0).toUpperCase() + kit.slice(1);
   
     	var fn = window[kit];
-    	if (typeof fn == 'function') {
-    	  var obj = new fn(element, params);
+    	var obj = null;
+      if (typeof fn == 'function')
+    	  obj = new fn(element, params);
+      else if (typeof fn == "object" && typeof fn.init == "function")
+        obj = fn.init(element, params);
+      
+      if (obj != null) {
         if (fn.kits === undefined)
           fn.kits = [];
         fn.kits.push(obj);
         obj.parentKit = parent;
-        return obj;
-    	}
-      else if (typeof fn == "object" && typeof fn.init == "function") {
-        var obj = fn.init(element, params);
-        obj.parentKit = parent;
-        return obj;
       }
       else
         console.log("jToxError: trying to initialize unexistend jTox kit: " + kit);
 
-      return null;
+      return obj;
     };
 
 	  // first, get the configuration, if such is passed
@@ -1052,10 +1051,8 @@ var jToxQuery = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
     scanDom: true,
     initialQuery: false,
-    dom: {
-      kit: null, // ... here.
-      widgets: {},
-    },
+    kitSelector: null,
+    dom: null,
 
     configuration: {
       // this is the main thing to be configured
@@ -1073,7 +1070,8 @@ var jToxQuery = (function () {
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
     self.mainKit = null;
         
-    if (self.settings.scanDom) {
+    if (self.settings.scanDom && !self.settings.dom) {
+      self.settings.dom = { kit: null, widgets: { } };
       jT.$('.jtox-toolkit', self.rootElement).each(function () {
         if (jT.$(this).hasClass('jtox-widget'))
           self.settings.dom.widgets[jT.$(this).data('kit')] = this;
@@ -1081,7 +1079,10 @@ var jToxQuery = (function () {
           self.settings.dom.kit = this;
       });
     }
-
+    
+    if (!!self.settings.kitSelector)
+      self.settings.dom.kit = jT.$(self.settings.kitSelector)[0];
+    
     self.initHandlers();
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
     if (!!self.settings.initialQuery)
@@ -1090,7 +1091,7 @@ var jToxQuery = (function () {
   
   cls.prototype = {
     addHandlers: function (handlers) {
-      self.settings.configuration.handlers = jT.$.extend(self.settings.configuration.handlers, handlers);
+      self.settings.configuration.handlers = jT.$.extend(true, self.settings.configuration.handlers, handlers);
     },
     
     widget: function (name) {
@@ -1165,7 +1166,7 @@ var jToxSearch = (function () {
     self.rootElement = root;
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even when manually initialized
     
-    self.settings = jT.$.extend({}, defaultSettings, jT.settings, settings);
+    self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
     self.rootElement.appendChild(jT.getTemplate('#jtox-search'));
     self.queryKit = jT.parentKit(jToxQuery, self.rootElement);
     

@@ -1,6 +1,25 @@
 /* toxtmatrix.css - jToxMatrix tool styles
 */
 
+#logger {
+  position: fixed;
+	height: 144px;
+  width: 99%;
+  right: 0px;
+	bottom: 0px;
+	z-index: 100;
+	transition: bottom 0.5s ease;
+	-moz-transition: bottom 0.5s ease;
+	-webkit-transition: bottom 0.5s ease;
+	-o-transition: bottom 0.5s ease;
+	box-shadow: -3px 7px 7px #999;
+}
+
+#logger.hidden {
+  bottom: -120px;
+}
+
+
 .jtox-identifiers form div.actions {
 	margin-top: 15px;
 	font-size: 80%;
@@ -9,4 +28,9 @@
 .jtox-identifiers form input,
 .jtox-identifiers form textarea {
 	width: 100%;
+}
+
+#jtox-structures .jtox-foldable {
+  margin-top: 5px;
+  margin-bottom: 5px;
 }

@@ -1,5 +1,8 @@
 var jTConfig = {};
 
+function jTConfigurator(kit) {
+  return jTConfig;
+}
 /* toxmatrix.js - Read-across UI tool
  *
  * Copyright 2012-2014, IDEAconsult Ltd. http://www.ideaconsult.net/
@@ -77,6 +80,8 @@ var jToxAssessment = {
     if (!ccLib.isNull(self.settings.assessmentUri)) {
 	    self.load(self.settings.assessmentUri);
     }
+    
+    return self;
 	},
 	
 	onIdentifiers: function (id, panel) {
@@ -189,10 +194,17 @@ var jToxAssessment = {
 	
 	// called when a sub-action in structures selection tab is called
 	onStructures: function (id, panel) {
-		console.log("Structures: " + id);
+	  if (!self.queryKit)
+  	  self.queryKit = jT.kit($('#jtox-query')[0]);
+
+    self.queryKit.query();
 	},
 	
 	load: function(assessmentUri) {
 		
 	},
 };
+
+$(document).ready(function(){
+  $('#logger').on('mouseover', function () { $(this).removeClass('hidden'); }).on('mouseout', function () { $(this).addClass('hidden');});
+});

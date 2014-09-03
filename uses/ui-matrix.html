@@ -35,6 +35,8 @@
   <script src="config-matrix.js"></script>
 </head>
 <body>
+  <div id="logger" class="jtox-toolkit jtox-widget hidden" data-kit="log" data-resend="false"></div>  
+
   <div class="jtox-toolkit" id="jtox-matrix" data-kit="assessment">
     <ul>
       <li><a href="#jtox-identifiers">Assessment identifier</a></li>
@@ -99,6 +101,15 @@
 			  <input type="radio" id="structtarget" name="structaction" checked="checked"><label for="structtarget">Collect structures</label></input>
 			  <input type="radio" id="structallied" name="structaction"><label for="structallied">List collected</label></input>
 			</div>
+      <div id="jtox-query" class="jtox-toolkit" data-kit="query" data-cross-domain="true" data-configuration="jTConfigurator" data-initial-query="false">
+        <div class="jtox-foldable folded">
+          <div class="title"><p class="data-field" data-field="title">Search</p></div>
+          <div class="content">
+            <div id="searchbar" class="jtox-toolkit jtox-widget" data-kit="search" data-hide-options="url,context"></div>
+          </div>
+        </div>
+        <div id="browser" class="jtox-toolkit" data-kit="compound" data-remember-checks="true" data-hide-empty="true" data-details-height="500px" data-tabs-folded="true" data-on-details="onDetailedRow" data-show-diagrams="true"></div>
+      </div>
     </div>
     <div id="jtox-endpoints" class="jtox-endpoints">
 	  	<div class="jq-buttonset center action" data-action="onEndpoint">

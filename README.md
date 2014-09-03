@@ -832,7 +832,7 @@ There are two ways to enrich this list of handlers - pass proper _configuration_
 There are few things that can be setup from outside:
 
 - **`scanDom`** (attr. `data-scan-dom`): It can be used to stop _jToxQuery_ from scanning it's sub-elements to discover and built the _widgets_ list. Default: _true_.
-
+- **`kitSelector`** (attr. `data-kit-selector`): If you want to provide the main kit for querying yourself, this is the way to achieve it. Normally _jToxQuery_ will scan all it's children (see _scanDom_), but if the kit being targeted, it's not going to be found this way. The string provided here is passed in jQuery call and the resulting element used. Default _null_.
 - **`dom`**: It can't be passed with data attribute, because it is an objet with two properties: `widgets` and `kit`, which can contain the DOM elements, which are roots of _widgets_ and the _main kit_ of jToxQuery. This can be used, when you want to specify them yourself, like the case when they are not _under_ the jToxQuery's root. Default _null_.
 - **`initialQuery`** (atrt. `data-initial-query`): Whether to make a initiate a query immediately after all (sub)kits are initialized. Default is _false_.
 - **`service`** (attr. `data-service`): The initial serivce/uri string to be used, when building the final URI for calling. See `query()` method for more information.
