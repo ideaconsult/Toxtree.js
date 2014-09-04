@@ -1,14 +1,16 @@
+TODO:
+- jToxEndpoint: make it possible select/unselect all per category
+- add tagging;
+- make matrix info popup.
+
+- deferred re-query (postpone)
+- Reduce network calls in ToxTree no run-all - postopone the call until the last model has ran.
+
 DOCS:
 - 
 
-TODO:
-- Reduce network calls in ToxTree no run-all - postopone the call until the last model has ran.
-
-- make matrix info popup.
-- deferred re-query (postpone)
 
 IDEAS?
-- move classification related objects, CSS, and functions (like formatClassification) to jToxKit
 - 
 
 Assessment:

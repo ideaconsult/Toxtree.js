@@ -59,6 +59,7 @@ var jToxAssessment = {
     // initialize the tab structure for several versions of dataTables.
     $(root).tabs({
 /*     	"disabled": [1, 2, 3, 4], */
+      "heightStyle": "fill",
       "select" : function(event, ui) {
         loadPanel(ui.panel);
       },

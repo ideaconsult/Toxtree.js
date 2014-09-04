@@ -1,5 +1,10 @@
 /* toxtmatrix.css - jToxMatrix tool styles
 */
+html, body, .ui-tabs {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
 
 #logger {
   position: fixed;
@@ -35,6 +40,12 @@
   margin-bottom: 5px;
 }
 
+.ui-tabs-panel {
+  position: relative;
+  overflow-x: hidden !important;
+  overflow-y: scroll !important;
+}
+
 .jtox-slidable {
   overflow: hidden;
   position: relative;
@@ -52,11 +63,12 @@
   width: 50%;
   position: relative;
   margin: 0px;
+  vertical-align: top;
   box-sizing: border-box;
 }
 
-#jtox-endpoints .tab-substance input.filterbox {
-  margin-right: 20px;
+.jtox-slidable>div>div {
+  position: relative;
 }
 
 #jtox-endpoints .tab-substance  {
