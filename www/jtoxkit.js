@@ -4178,7 +4178,11 @@ var jToxEndpoint = (function () {
       // and now - initialize all the tables...
       jT.$('table', self.rootElement).each(function () {
         var name = this.className;
-        self.tables[name] = jT.ui.putTable(self, this, "endpoint", { "aoColumns": cols, "fnInfoCallback": self.updateStats(name) });
+        self.tables[name] = jT.ui.putTable(self, this, "endpoint", { 
+          "aoColumns": cols, 
+          "fnInfoCallback": self.updateStats(name),
+          "aaSortingFixed": [[1, 'asc']]
+        });
       });
       
       if (!!self.settings.hideFilter)

@@ -45,6 +45,7 @@ var jToxAssessment = {
 		var loadAction = function () {
     	if (!this.checked)
     		return;
+      document.body.className = this.id;
 	    var method = $(this).parent().data('action');
 	    if (!method)
 	    	return;

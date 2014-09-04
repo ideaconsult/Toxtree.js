@@ -40,6 +40,14 @@ html, body, #jtox-assessment {
   margin-bottom: 5px;
 }
 
+body.structlist #jtox-query .jtox-foldable {
+  display: none;
+}
+
+body.structlist #browser {
+  margin-top: 5px;  
+}
+
 #jtox-matrix .jtox-toolkit {
   margin-top: 10px;
 }
