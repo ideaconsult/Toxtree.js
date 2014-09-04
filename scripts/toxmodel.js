@@ -15,8 +15,8 @@ var jToxModel = (function () {
     forceCreate: false,       // upon creating a model from algorithm - whether to attempt getting a prepared one, or always create it new
     onLoaded: null,           // callback to be called when data has arrived.
     sDom: "<Fif>rt",          // merged to dataTable's settings, when created
-    oLanguage: null,          // merged to dataTable's settings, when created
     loadOnInit: false,        // whether to make a (blank) request upon loading
+    oLanguage: null,          // merged to dataTable's settings, when created
     /* algorithmNeedle */
     /* modelUri */
     configuration: { 
@@ -97,29 +97,27 @@ var jToxModel = (function () {
       var cat = self.settings.algorithms ? 'algorithm' : 'model';
       // deal if the selection is chosen
       if (!!self.settings.selectionHandler || !!self.settings.onDetails) {
-        jT.ui.putActions(self, self.settings.configuration.columns[cat].Id, { selection: self.settings.selectionHandler, details: !!self.settings.onDetails});
+        jT.ui.putActions(self, self.settings.configuration.columns[cat].Id);
         self.settings.configuration.columns[cat].Id.sWidth = "60px";
       }
       
       // again , so that changed defaults can be taken into account.
       self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
-      
-      // READYY! Go and prepare THE table.
-      self.table = jT.$('table', self.rootElement).dataTable({
-        "bPaginate": false,
-        "bLengthChange": false,
-				"bAutoWidth": false,
-        "sDom" : self.settings.sDom,
-        "aoColumns": jT.ui.processColumns(self, cat),
-				"oLanguage": jT.$.extend({
+      if (self.settings.oLanguage == null)
+        self.settings.oLanguage = (self.settings.algorithms ? {
+          "sLoadingRecords": "No algorithms found.",
+          "sZeroRecords": "No algorithms found.",
+          "sEmptyTable": "No algorithmss available.",
+          "sInfo": "Showing _TOTAL_ algorithm(s) (_START_ to _END_)"
+        } : {
           "sLoadingRecords": "No models found.",
           "sZeroRecords": "No models found.",
           "sEmptyTable": "No models available.",
           "sInfo": "Showing _TOTAL_ model(s) (_START_ to _END_)"
-        }, self.settings.oLanguage)
-      });
+        });
       
-      jT.$(self.table).dataTable().fnAdjustColumnSizing();
+      // READYY! Go and prepare THE table.
+      self.table = jT.ui.putTable(self, $('table', self.rootElement)[0], cat);
     },
     
     listModels: function (uri) {

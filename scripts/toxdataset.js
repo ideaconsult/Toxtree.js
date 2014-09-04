@@ -13,7 +13,13 @@ var jToxDataset = (function () {
     sDom: "<Fif>rt",          // passed with dataTable settings upon creation
     oLanguage: null,          // passed with dataTable settings upon creation
     onLoaded: null,           // callback called when the is available
-    loadOnInit: false,        // whether to make an (empty) call when initialized. 
+    loadOnInit: false,        // whether to make an (empty) call when initialized.
+    oLanguage: {
+      "sLoadingRecords": "No datasets found.",
+      "sZeroRecords": "No datasets found.",
+      "sEmptyTable": "No datasets available.",
+      "sInfo": "Showing _TOTAL_ dataset(s) (_START_ to _END_)"
+    },
     /* datasetUri */
     configuration: { 
       columns : {
@@ -65,7 +71,7 @@ var jToxDataset = (function () {
       
       // deal if the selection is chosen
       if (!!self.settings.selectionHandler || !!self.settings.onDetails) {
-        jT.ui.putActions(self, self.settings.configuration.columns.dataset.Id, { selection: self.settings.selectionHandler, details: !!self.settings.onDetails });
+        jT.ui.putActions(self, self.settings.configuration.columns.dataset.Id);
         self.settings.configuration.columns.dataset.Id.sWidth = "60px";
       }
       
@@ -73,21 +79,7 @@ var jToxDataset = (function () {
       self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
       
       // READYY! Go and prepare THE table.
-      self.table = jT.$('table', self.rootElement).dataTable({
-        "bPaginate": false,
-        "bLengthChange": false,
-				"bAutoWidth": false,
-        "sDom" : self.settings.sDom,
-        "aoColumns": jT.ui.processColumns(self, 'dataset'),
-				"oLanguage": jT.$.extend({
-          "sLoadingRecords": "No datasets found.",
-          "sZeroRecords": "No datasets found.",
-          "sEmptyTable": "No datasets available.",
-          "sInfo": "Showing _TOTAL_ dataset(s) (_START_ to _END_)"
-        }, self.settings.oLanguage)
-      });
-      
-      jT.$(self.table).dataTable().fnAdjustColumnSizing();
+      self.table = jT.ui.putTable(self, jT.$('table', self.rootElement)[0], 'dataset');
     },
     
     listDatasets: function (uri) {

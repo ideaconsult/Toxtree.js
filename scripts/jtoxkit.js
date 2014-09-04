@@ -9,7 +9,7 @@ window.jT = window.jToxKit = {
 	},
 	
 	templates: { },        // html2js routine will fill up this variable
-	tools: { },        // additional, external tools added with html2js
+	tools: { },            // additional, external tools added with html2js
 
 	/* SETTINGS. The following parametes can be passed in settings object to jT.init(), or as data-XXX - with the same names. Values set here are the defaults.
 	*/
@@ -460,6 +460,24 @@ window.jT.ui = {
     });
   },
   
+  installHandlers: function (kit, root) {
+    if (kit.settings.configuration == null || kit.settings.configuration.handlers == null)
+      return;
+    if (root == null)
+      root = kit.rootElement;
+      
+    jT.$('.jtox-handler', root).each(function () {
+      var name = jT.$(this).data('handler');
+      var handler = kit.settings.configuration.handlers[name] || window[name];
+      if (!handler)
+        console.log("jToxQuery: referring unknown handler: " + name);
+      else if (this.tagName == "BUTTON")
+        jT.$(this).on('click', handler);
+      else // INPUT, SELECT
+        jT.$(this).on('change', handler);
+    });
+  },
+  
   enterBlur: function (e) {
     if (e.keyCode == 13)
       this.blur();
@@ -517,6 +535,43 @@ window.jT.ui = {
     }
     
     return info;
+  },
+  
+  putTable: function (kit, root, config, settings) {
+    var opts = jT.$.extend({
+      "bPaginate": false,
+      "bProcessing": true,
+      "bLengthChange": false,
+  		"bAutoWidth": false,
+      "sDom" : kit.settings.sDom,
+  		"oLanguage": kit.settings.oLanguage,
+      "bServerSide": false,
+      "fnCreatedRow": function( nRow, aData, iDataIndex ) {
+        // handle a selection click.. if any
+        jT.ui.installHandlers(kit, nRow);
+        if (typeof kit.settings.selectionHandler == "function")
+          jT.$('input.jt-selection', nRow).on('change', kit.settings.selectionHandler);
+        // other (non-function) handlers are installed via installHandlers().
+
+        if (!!kit.settings.onDetails) {
+          jT.$('.jtox-details-toggle', nRow).on('click', function(e) {  
+            var root = jT.ui.toggleDetails(e, nRow);
+            if (!!root) {
+              ccLib.fireCallback(kit.settings.onDetails, kit, root, jT.$(this).data('data'), e);
+            }
+          });
+        }
+      }
+    }, settings);
+    
+    if (opts.aoColumns == null)
+      opts.aoColumns = jT.ui.processColumns(kit, config);
+    if (opts.oLanguage == null)
+      delete opts.oLanguage;
+
+    var table = jT.$(root).dataTable(opts);
+    jT.$(table).dataTable().fnAdjustColumnSizing();
+    return table;
   },
   
   renderRelation: function (data, type, full) {
@@ -588,41 +643,27 @@ window.jT.ui = {
       pane.style.display = "none";
   },
 
-  putActions: function (kit, col, defs) {
-    if (!!defs && !jQuery.isEmptyObject(defs)) {
+  putActions: function (kit, col, ignoreOriginal) {
+    if (!!kit.settings.selectionHandler || !!kit.settings.onDetails) {
       var oldFn = col.mRender;
       var newFn = function (data, type, full) {
         var html = oldFn(data, type, full);
         if (type != 'display')
           return html;
           
-        if (!!defs.ignoreOriginal)
+        if (!!ignoreOriginal)
           html = '';
           
         // this is inserted BEFORE the original, starting with given PRE-content
-        if (typeof defs.pre == 'function')
-          html = defs.pre(data, type, full) + html;
-        else if (!!defs.pre)
-          html = defs.pre + html;
-          
-        if (typeof defs.selection == 'function')
-          html = defs.selection(data, type, full) + html;
-        else if (!!defs.selection)
-          html = '<input type="checkbox" value="' + data + '"' +
-                (typeof defs.selection == 'string' ? ' class="jtox-handler" data-handler="' + defs.selection + '"' : '') +
+        if (!!kit.settings.selectionHandler)
+          html = '<input type="checkbox" value="' + data + '" class="' +
+                (typeof kit.settings.selectionHandler == 'string' ? 'jtox-handler" data-handler="' + kit.settings.selectionHandler + '"' : 'jt-selection"') +
                 '/>' + html;
                 
         // strange enough - this is inserted AFTER the original
-        if (typeof defs.details == 'function')
-          html += defs.details(data, type, full);
-        else if (!!defs.details)
+        if (!!kit.settings.onDetails)
           html += '<span class="jtox-details-toggle ui-icon ui-icon-folder-collapsed" data-data="' + data +'" title="Press to open/close detailed info for this entry"></span>';
 
-        // post content adding
-        if (typeof defs.post == 'function')
-          html += defs.post(data, type, full);
-        else if (!!defs.post)
-          html += defs.post;
         return html;
       };
       

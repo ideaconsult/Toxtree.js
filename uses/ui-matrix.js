@@ -25,6 +25,11 @@ var jToxAssessment = {
 		'add_endpoint': { method: 'PUT', service: "/assessment/{id}/feature"},
 		'del_endpoint': { method: 'DELETE', service: "/assessment/{id}/feature?feature={featureUri}"},
 	},
+	handlers: {
+  	selectEndpoint: function (e) {
+    	
+  	},
+	},
 	
 	collected: {
   	compounds: [],
@@ -189,6 +194,7 @@ var jToxAssessment = {
 	
 	// called when a sub-action in endpoint selection tab is called
 	onEndpoint: function (id, panel) {
+	  var self = this;
 	  var sub = $(".tab-" + id.substr(3), panel)[0];
 	  sub.parentNode.style.left = (-sub.offsetLeft) + 'px';
 	  
@@ -205,7 +211,7 @@ var jToxAssessment = {
   	  if (sub.firstElementChild == null) {
     	  var root = document.createElement('div');
     	  sub.appendChild(root);
-    	  self.endpointKit = new jToxEndpoint(root, {});
+    	  self.endpointKit = new jToxEndpoint(root, { selectionHandler: self.handlers.selectEndpoint});
     	  self.endpointKit.loadEndpoints();
   	  }
 	  }

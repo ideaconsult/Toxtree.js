@@ -12,6 +12,12 @@ var jToxSubstance = (function () {
     noInterface: false,       // run in interface-less mode - only data retrieval and callback calling.
     onDetails: null,          // called when a details row is about to be openned. If null - no details handler is attached at all.
     onLoaded: null,           // called when the set of substances (for this page) is loaded.
+    oLanguage: {
+      "sLoadingRecords": "No substances found.",
+      "sZeroRecords": "No substances found.",
+      "sEmptyTable": "No substances available.",
+      "sInfo": "Showing _TOTAL_ substance(s) (_START_ to _END_)"
+    },
   
     pageStart: 0,
     pageSize: 10,
@@ -76,10 +82,7 @@ var jToxSubstance = (function () {
       
       // deal if the selection is chosen
       var colId = self.settings.configuration.columns.substance['Id'];
-      jT.ui.putActions(self, colId, { 
-        selection: self.settings.selectionHandler,
-        details: !!self.settings.onDetails
-      });
+      jT.ui.putActions(self, colId);
       colId.sTitle = '';
       
       self.settings.configuration.columns.substance['Owner'].mRender = function (data, type, full) {
@@ -101,33 +104,7 @@ var jToxSubstance = (function () {
       self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
       
       // READYY! Go and prepare THE table.
-      self.table = jT.$('table', self.rootElement).dataTable({
-        "bPaginate": false,
-        "bProcessing": true,
-        "bLengthChange": false,
-        "bAutoWidth": false,
-        "sDom": "rt",
-        "aoColumns": jT.ui.processColumns(self, 'substance'),
-        "fnCreatedRow": function( nRow, aData, iDataIndex ) {
-          if (!!self.settings.onDetails) {
-            jT.$('.jtox-details-toggle', nRow).on('click', function(e) {  
-              var root = jT.ui.toggleDetails(e, nRow);
-              if (!!root) {
-                ccLib.fireCallback(self.settings.onDetails, self, root, jT.$(this).data('data'), e);
-              }
-            });
-          }
-        },
-        "bServerSide": false,
-				"oLanguage": {
-          "sLoadingRecords": "No substances found.",
-          "sZeroRecords": "No substances found.",
-          "sEmptyTable": "No substances available.",
-          "sInfo": "Showing _TOTAL_ substance(s) (_START_ to _END_)"
-        }
-      });
-      
-      jT.$(self.table).dataTable().fnAdjustColumnSizing();
+      self.table = jT.ui.putTable(self, jT.$('table', self.rootElement)[0], 'substance', { "sDom": "rt" });
     },
     
     queryEntries: function(from, size) {

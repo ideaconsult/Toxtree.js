@@ -397,7 +397,7 @@ window.jT = window.jToxKit = {
 	},
 	
 	templates: { },        // html2js routine will fill up this variable
-	tools: { },        // additional, external tools added with html2js
+	tools: { },            // additional, external tools added with html2js
 
 	/* SETTINGS. The following parametes can be passed in settings object to jT.init(), or as data-XXX - with the same names. Values set here are the defaults.
 	*/
@@ -848,6 +848,24 @@ window.jT.ui = {
     });
   },
   
+  installHandlers: function (kit, root) {
+    if (kit.settings.configuration == null || kit.settings.configuration.handlers == null)
+      return;
+    if (root == null)
+      root = kit.rootElement;
+      
+    jT.$('.jtox-handler', root).each(function () {
+      var name = jT.$(this).data('handler');
+      var handler = kit.settings.configuration.handlers[name] || window[name];
+      if (!handler)
+        console.log("jToxQuery: referring unknown handler: " + name);
+      else if (this.tagName == "BUTTON")
+        jT.$(this).on('click', handler);
+      else // INPUT, SELECT
+        jT.$(this).on('change', handler);
+    });
+  },
+  
   enterBlur: function (e) {
     if (e.keyCode == 13)
       this.blur();
@@ -905,6 +923,43 @@ window.jT.ui = {
     }
     
     return info;
+  },
+  
+  putTable: function (kit, root, config, settings) {
+    var opts = jT.$.extend({
+      "bPaginate": false,
+      "bProcessing": true,
+      "bLengthChange": false,
+  		"bAutoWidth": false,
+      "sDom" : kit.settings.sDom,
+  		"oLanguage": kit.settings.oLanguage,
+      "bServerSide": false,
+      "fnCreatedRow": function( nRow, aData, iDataIndex ) {
+        // handle a selection click.. if any
+        jT.ui.installHandlers(kit, nRow);
+        if (typeof kit.settings.selectionHandler == "function")
+          jT.$('input.jt-selection', nRow).on('change', kit.settings.selectionHandler);
+        // other (non-function) handlers are installed via installHandlers().
+
+        if (!!kit.settings.onDetails) {
+          jT.$('.jtox-details-toggle', nRow).on('click', function(e) {  
+            var root = jT.ui.toggleDetails(e, nRow);
+            if (!!root) {
+              ccLib.fireCallback(kit.settings.onDetails, kit, root, jT.$(this).data('data'), e);
+            }
+          });
+        }
+      }
+    }, settings);
+    
+    if (opts.aoColumns == null)
+      opts.aoColumns = jT.ui.processColumns(kit, config);
+    if (opts.oLanguage == null)
+      delete opts.oLanguage;
+
+    var table = jT.$(root).dataTable(opts);
+    jT.$(table).dataTable().fnAdjustColumnSizing();
+    return table;
   },
   
   renderRelation: function (data, type, full) {
@@ -976,41 +1031,27 @@ window.jT.ui = {
       pane.style.display = "none";
   },
 
-  putActions: function (kit, col, defs) {
-    if (!!defs && !jQuery.isEmptyObject(defs)) {
+  putActions: function (kit, col, ignoreOriginal) {
+    if (!!kit.settings.selectionHandler || !!kit.settings.onDetails) {
       var oldFn = col.mRender;
       var newFn = function (data, type, full) {
         var html = oldFn(data, type, full);
         if (type != 'display')
           return html;
           
-        if (!!defs.ignoreOriginal)
+        if (!!ignoreOriginal)
           html = '';
           
         // this is inserted BEFORE the original, starting with given PRE-content
-        if (typeof defs.pre == 'function')
-          html = defs.pre(data, type, full) + html;
-        else if (!!defs.pre)
-          html = defs.pre + html;
-          
-        if (typeof defs.selection == 'function')
-          html = defs.selection(data, type, full) + html;
-        else if (!!defs.selection)
-          html = '<input type="checkbox" value="' + data + '"' +
-                (typeof defs.selection == 'string' ? ' class="jtox-handler" data-handler="' + defs.selection + '"' : '') +
+        if (!!kit.settings.selectionHandler)
+          html = '<input type="checkbox" value="' + data + '" class="' +
+                (typeof kit.settings.selectionHandler == 'string' ? 'jtox-handler" data-handler="' + kit.settings.selectionHandler + '"' : 'jt-selection"') +
                 '/>' + html;
                 
         // strange enough - this is inserted AFTER the original
-        if (typeof defs.details == 'function')
-          html += defs.details(data, type, full);
-        else if (!!defs.details)
+        if (!!kit.settings.onDetails)
           html += '<span class="jtox-details-toggle ui-icon ui-icon-folder-collapsed" data-data="' + data +'" title="Press to open/close detailed info for this entry"></span>';
 
-        // post content adding
-        if (typeof defs.post == 'function')
-          html += defs.post(data, type, full);
-        else if (!!defs.post)
-          html += defs.post;
         return html;
       };
       
@@ -1072,7 +1113,7 @@ var jToxQuery = (function () {
     configuration: {
       // this is the main thing to be configured
       handlers: { 
-        query: function (e, query) { query.query(); },
+        query: function (e, query) { jT.parentKit(jToxQuery, this).query(); },
       }
     }
   };
@@ -1098,17 +1139,12 @@ var jToxQuery = (function () {
     if (!!self.settings.kitSelector)
       self.settings.dom.kit = jT.$(self.settings.kitSelector)[0];
     
-    self.initHandlers();
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
     if (!!self.settings.initialQuery)
       setTimeout(function () { self.query(); }, 200);
   };
   
   cls.prototype = {
-    addHandlers: function (handlers) {
-      self.settings.configuration.handlers = jT.$.extend(true, self.settings.configuration.handlers, handlers);
-    },
-    
     widget: function (name) {
       return this.settings.dom.widgets[name];
     },
@@ -1119,21 +1155,7 @@ var jToxQuery = (function () {
         
       return this.mainKit;
     },
-    
-    initHandlers: function () {
-      var self = this;
-      var fireHandler = function (e) {
-        var handler = self.settings.configuration.handlers[jT.$(this).data('handler')];
-        if (!!handler)
-          ccLib.fireCallback(handler, this, e, self);
-        else
-          console.log("jToxQuery: referring unknown handler: " + jT.$(this).data('handler'));
-      };
-      
-      jT.$(document).on('change', 'input.jtox-handler', fireHandler);
-      jT.$(document).on('click', 'button.jtox-handler', fireHandler);
-    },
-    
+        
     /* Perform the actual query, traversing all the widgets and asking them to
     alter the given URL, then - makes the call */
     query: function () {
@@ -1354,6 +1376,9 @@ var jToxSearch = (function () {
       self.setMol($.base64.decode(self.settings.b64search));
     else if (!!self.settings.search)
       self.setAuto(self.settings.search);
+      
+    // and very finally - install the handlers...
+    jT.ui.installHandlers(self);
   };
   
   cls.prototype = {
@@ -2433,7 +2458,13 @@ var jToxDataset = (function () {
     sDom: "<Fif>rt",          // passed with dataTable settings upon creation
     oLanguage: null,          // passed with dataTable settings upon creation
     onLoaded: null,           // callback called when the is available
-    loadOnInit: false,        // whether to make an (empty) call when initialized. 
+    loadOnInit: false,        // whether to make an (empty) call when initialized.
+    oLanguage: {
+      "sLoadingRecords": "No datasets found.",
+      "sZeroRecords": "No datasets found.",
+      "sEmptyTable": "No datasets available.",
+      "sInfo": "Showing _TOTAL_ dataset(s) (_START_ to _END_)"
+    },
     /* datasetUri */
     configuration: { 
       columns : {
@@ -2485,7 +2516,7 @@ var jToxDataset = (function () {
       
       // deal if the selection is chosen
       if (!!self.settings.selectionHandler || !!self.settings.onDetails) {
-        jT.ui.putActions(self, self.settings.configuration.columns.dataset.Id, { selection: self.settings.selectionHandler, details: !!self.settings.onDetails });
+        jT.ui.putActions(self, self.settings.configuration.columns.dataset.Id);
         self.settings.configuration.columns.dataset.Id.sWidth = "60px";
       }
       
@@ -2493,21 +2524,7 @@ var jToxDataset = (function () {
       self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
       
       // READYY! Go and prepare THE table.
-      self.table = jT.$('table', self.rootElement).dataTable({
-        "bPaginate": false,
-        "bLengthChange": false,
-				"bAutoWidth": false,
-        "sDom" : self.settings.sDom,
-        "aoColumns": jT.ui.processColumns(self, 'dataset'),
-				"oLanguage": jT.$.extend({
-          "sLoadingRecords": "No datasets found.",
-          "sZeroRecords": "No datasets found.",
-          "sEmptyTable": "No datasets available.",
-          "sInfo": "Showing _TOTAL_ dataset(s) (_START_ to _END_)"
-        }, self.settings.oLanguage)
-      });
-      
-      jT.$(self.table).dataTable().fnAdjustColumnSizing();
+      self.table = jT.ui.putTable(self, jT.$('table', self.rootElement)[0], 'dataset');
     },
     
     listDatasets: function (uri) {
@@ -2564,8 +2581,8 @@ var jToxModel = (function () {
     forceCreate: false,       // upon creating a model from algorithm - whether to attempt getting a prepared one, or always create it new
     onLoaded: null,           // callback to be called when data has arrived.
     sDom: "<Fif>rt",          // merged to dataTable's settings, when created
-    oLanguage: null,          // merged to dataTable's settings, when created
     loadOnInit: false,        // whether to make a (blank) request upon loading
+    oLanguage: null,          // merged to dataTable's settings, when created
     /* algorithmNeedle */
     /* modelUri */
     configuration: { 
@@ -2646,29 +2663,27 @@ var jToxModel = (function () {
       var cat = self.settings.algorithms ? 'algorithm' : 'model';
       // deal if the selection is chosen
       if (!!self.settings.selectionHandler || !!self.settings.onDetails) {
-        jT.ui.putActions(self, self.settings.configuration.columns[cat].Id, { selection: self.settings.selectionHandler, details: !!self.settings.onDetails});
+        jT.ui.putActions(self, self.settings.configuration.columns[cat].Id);
         self.settings.configuration.columns[cat].Id.sWidth = "60px";
       }
       
       // again , so that changed defaults can be taken into account.
       self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
-      
-      // READYY! Go and prepare THE table.
-      self.table = jT.$('table', self.rootElement).dataTable({
-        "bPaginate": false,
-        "bLengthChange": false,
-				"bAutoWidth": false,
-        "sDom" : self.settings.sDom,
-        "aoColumns": jT.ui.processColumns(self, cat),
-				"oLanguage": jT.$.extend({
+      if (self.settings.oLanguage == null)
+        self.settings.oLanguage = (self.settings.algorithms ? {
+          "sLoadingRecords": "No algorithms found.",
+          "sZeroRecords": "No algorithms found.",
+          "sEmptyTable": "No algorithmss available.",
+          "sInfo": "Showing _TOTAL_ algorithm(s) (_START_ to _END_)"
+        } : {
           "sLoadingRecords": "No models found.",
           "sZeroRecords": "No models found.",
           "sEmptyTable": "No models available.",
           "sInfo": "Showing _TOTAL_ model(s) (_START_ to _END_)"
-        }, self.settings.oLanguage)
-      });
+        });
       
-      jT.$(self.table).dataTable().fnAdjustColumnSizing();
+      // READYY! Go and prepare THE table.
+      self.table = jT.ui.putTable(self, $('table', self.rootElement)[0], cat);
     },
     
     listModels: function (uri) {
@@ -2800,6 +2815,12 @@ var jToxSubstance = (function () {
     noInterface: false,       // run in interface-less mode - only data retrieval and callback calling.
     onDetails: null,          // called when a details row is about to be openned. If null - no details handler is attached at all.
     onLoaded: null,           // called when the set of substances (for this page) is loaded.
+    oLanguage: {
+      "sLoadingRecords": "No substances found.",
+      "sZeroRecords": "No substances found.",
+      "sEmptyTable": "No substances available.",
+      "sInfo": "Showing _TOTAL_ substance(s) (_START_ to _END_)"
+    },
   
     pageStart: 0,
     pageSize: 10,
@@ -2864,10 +2885,7 @@ var jToxSubstance = (function () {
       
       // deal if the selection is chosen
       var colId = self.settings.configuration.columns.substance['Id'];
-      jT.ui.putActions(self, colId, { 
-        selection: self.settings.selectionHandler,
-        details: !!self.settings.onDetails
-      });
+      jT.ui.putActions(self, colId);
       colId.sTitle = '';
       
       self.settings.configuration.columns.substance['Owner'].mRender = function (data, type, full) {
@@ -2889,33 +2907,7 @@ var jToxSubstance = (function () {
       self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
       
       // READYY! Go and prepare THE table.
-      self.table = jT.$('table', self.rootElement).dataTable({
-        "bPaginate": false,
-        "bProcessing": true,
-        "bLengthChange": false,
-        "bAutoWidth": false,
-        "sDom": "rt",
-        "aoColumns": jT.ui.processColumns(self, 'substance'),
-        "fnCreatedRow": function( nRow, aData, iDataIndex ) {
-          if (!!self.settings.onDetails) {
-            jT.$('.jtox-details-toggle', nRow).on('click', function(e) {  
-              var root = jT.ui.toggleDetails(e, nRow);
-              if (!!root) {
-                ccLib.fireCallback(self.settings.onDetails, self, root, jT.$(this).data('data'), e);
-              }
-            });
-          }
-        },
-        "bServerSide": false,
-				"oLanguage": {
-          "sLoadingRecords": "No substances found.",
-          "sZeroRecords": "No substances found.",
-          "sEmptyTable": "No substances available.",
-          "sInfo": "Showing _TOTAL_ substance(s) (_START_ to _END_)"
-        }
-      });
-      
-      jT.$(self.table).dataTable().fnAdjustColumnSizing();
+      self.table = jT.ui.putTable(self, jT.$('table', self.rootElement)[0], 'substance', { "sDom": "rt" });
     },
     
     queryEntries: function(from, size) {
@@ -2982,7 +2974,6 @@ var jToxComposition = (function () {
     showDiagrams: false,      // whether to show diagram for each compound in the composition
     noInterface: false,       // run in interface-less mode - just data retrieval and callback calling.
     sDom: "rt<Ffp>",          // compounds (ingredients) table sDom
-    oLanguage: null,
     onLoaded: null,
     
     /* compositionUri */
@@ -3036,7 +3027,7 @@ var jToxComposition = (function () {
       // deal if the selection is chosen
       var colId = self.settings.configuration.columns.composition.Name;
       if (!!self.settings.selectionHandler) {
-        jT.ui.putActions(self, colId, { selection: self.settings.selectionHandler});
+        jT.ui.putActions(self, colId);
         colId.sWidth = "60px";
       }
         
@@ -3063,17 +3054,10 @@ var jToxComposition = (function () {
         }));
       }
       // READYY! Go and prepare THE table.
-      self.table = jT.$('table.composition-table', tab).dataTable({
-        "bPaginate": false,
-        "bLengthChange": false,
-				"bAutoWidth": false,
-        "bServerSide": false,
-        "sDom" : self.settings.sDom,
-        "oLanguage": jT.$.extend(true, {}, self.settings.oLanguage),
-        "aoColumns": cols,
+      self.table = jT.ui.putTable(self, jT.$('table.composition-table', tab)[0], 'composition', {
+        "aoColumns": cols
       });
       
-      jT.$(self.table).dataTable().fnAdjustColumnSizing();
       jT.$(self.table).dataTable().fnAddData(json);
       // now make a few fixing for multi-column title
       var colSpan = jT.$('th.colspan-2', self.table);
@@ -3720,6 +3704,12 @@ var jToxPolicy = (function () {
     loadOnInit: false,      // whether to make initial load upon initializing the kit
     noInterface: false,     // whether to have interface... at all.
     sDom: "rt",
+    oLanguage: {
+      "sLoadingRecords": "No policies found.",
+      "sZeroRecords": "No policies found.",
+      "sEmptyTable": "No policies available.",
+      "sInfo": "Showing _TOTAL_ policy(s) (_START_ to _END_)"
+    },
     configuration: { 
       columns : {
         policy: {
@@ -3785,7 +3775,7 @@ var jToxPolicy = (function () {
       return out;
     };
     
-    var inlineHandlers = {
+    self.settings.configuration.handlers = {
       init: function (data) {
         if (this.tagName == 'SELECT')
           $(this).val(data[$(this).data('data')]);
@@ -3861,25 +3851,11 @@ var jToxPolicy = (function () {
     
     // again , so that changed defaults can be taken into account.
     self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
- 
-    self.table = jT.$('table', self.rootElement).dataTable({
-      "bPaginate": false,
-      "bLengthChange": false,
-			"bAutoWidth": false,
-      "sDom" : self.settings.sDom,
+    
+    self.table = jT.ui.putTable(self, jT.$('table', self.rootElement)[0], 'policy', {
       "aoColumns": jT.ui.processColumns(self, 'policy'),
       "aaSortingFixed": [[0, 'asc']],
-      "fnCreatedRow": jT.ui.inlineRowFn(inlineHandlers),
-			"oLanguage": jT.$.extend({
-        "sLoadingRecords": "No policies found.",
-        "sZeroRecords": "No policies found.",
-        "sEmptyTable": "No policies available.",
-        "sInfo": "Showing _TOTAL_ policy(s) (_START_ to _END_)"
-      }, self.settings.oLanguage)
     });
-    
-    jT.$(self.table).dataTable().fnAdjustColumnSizing();
-    
   };
   
   cls.prototype.loadPolicies = function (force) {
@@ -4139,10 +4115,16 @@ var jToxEndpoint = (function () {
     heightStyle: "content",   // the accordition heightStyle
     hideFilter: false,        // if you don't want to have filter box - just hide it
     showMultiselect: true,    // whether to hide select all / unselect all buttons
-    sDom: "rt<i>",            // passed with dataTable settings upon creation
+    sDom: "<i>rt",            // passed with dataTable settings upon creation
     oLanguage: null,          // passed with dataTable settings upon creation
     onLoaded: null,           // callback called when the is available
     loadOnInit: false,        // whether to make an (empty) call when initialized. 
+    oLanguage: {
+      "sLoadingRecords": "No endpoints found.",
+      "sZeroRecords": "No endpoints found.",
+      "sEmptyTable": "No endpoints available.",
+      "sInfo": "Showing _TOTAL_ endpoint(s) (_START_ to _END_)"
+    },
     /* endpointUri */
     configuration: { 
       columns : {
@@ -4179,19 +4161,13 @@ var jToxEndpoint = (function () {
       
       // deal if the selection is chosen
       if (!!self.settings.selectionHandler || !!self.settings.onDetails)
-        jT.ui.putActions(self, self.settings.configuration.columns.endpoint.Id, { selection: self.settings.selectionHandler, details: !!self.settings.onDetails });
+        jT.ui.putActions(self, self.settings.configuration.columns.endpoint.Id);
       
       self.settings.configuration.columns.endpoint.Id.sTitle = '';
       
       // again , so that changed defaults can be taken into account.
       self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
       var cols = jT.ui.processColumns(self, 'endpoint');
-      var language = jT.$.extend({
-        "sLoadingRecords": "No endpoints found.",
-        "sZeroRecords": "No endpoints found.",
-        "sEmptyTable": "No endpoints available.",
-        "sInfo": "Showing _TOTAL_ endpoint(s) (_START_ to _END_)"
-      }, self.settings.oLanguage);
       
       // make the accordition now...
     	jT.$('.jtox-categories', self.rootElement).accordion( {
@@ -4202,18 +4178,7 @@ var jToxEndpoint = (function () {
       // and now - initialize all the tables...
       jT.$('table', self.rootElement).each(function () {
         var name = this.className;
-        self.tables[name] = jT.$(this).dataTable({
-          "bPaginate": false,
-          "bProcessing": true,
-          "bLengthChange": false,
-  				"bAutoWidth": false,
-          "sDom" : self.settings.sDom,
-          "aoColumns": cols,
-  				"oLanguage": language,
-  				"fnInfoCallback": self.updateStats(name)
-        });
-      
-        jT.$(self.tables[name]).dataTable().fnAdjustColumnSizing();
+        self.tables[name] = jT.ui.putTable(self, this, "endpoint", { "aoColumns": cols, "fnInfoCallback": self.updateStats(name) });
       });
       
       if (!!self.settings.hideFilter)
@@ -4255,12 +4220,10 @@ var jToxEndpoint = (function () {
             count += data[i].count;
             substances += data[i].substancescount;
           }
-          var html = "(" + substances + ") [" + count + "]";
-          if (iTotal < iMax)
-            html = "#" + iTotal + " " + html;
+          html = "(" + substances + ") [" + count + "]";
         }
         else
-          html = '#0';
+          html = '';
         
         jT.$('div.jtox-details span', head).html(html); 
         return sPre;
@@ -4377,7 +4340,7 @@ jT.templates['ketcher-buttons']  =
 ""; // end of ketcher-buttons 
 
 jT.templates['all-compound']  = 
-"	  <div id=\"jtox-compound\">" +
+"	  <div id=\"jtox-compound\" class=\"jtox-compound\">" +
 "	    <div class=\"jtox-ds-features\"></div>" +
 "	    <div class=\"jtox-controls\">" +
 "	      Showing from <span class=\"data-field from-field\" data-field=\"pagestart\"> ? </span> to <span class=\"data-field\" data-field=\"pageend\"> ? </span> in pages of <select class=\"data-field\" data-field=\"pagesize\">" +
@@ -4399,7 +4362,7 @@ jT.templates['all-compound']  =
 "	      </div>" +
 "	    </div>" +
 "	  </div>" +
-""; // end of #jtox-dataset 
+""; // end of #jtox-compound 
 
 jT.templates['compound-one-tab']  = 
 "    <div id=\"jtox-ds-selection\" class=\"jtox-selection\">" +
@@ -4425,13 +4388,13 @@ jT.templates['compound-export']  =
 ""; // end of #jtox-ds-export 
 
 jT.templates['all-dataset']  = 
-"	  <div id=\"jtox-dataset\">" +
+"	  <div id=\"jtox-dataset\" class=\"jtox-dataset\">" +
 "      <table></table>" +
 "	  </div>" +
 ""; // end of #jtox-dataset 
 
 jT.templates['all-model']  = 
-"	  <div id=\"jtox-model\">" +
+"	  <div id=\"jtox-model\" class=\"jtox-model\">" +
 "      <table></table>" +
 "	  </div>" +
 ""; // end of #jtox-model 
@@ -4557,13 +4520,13 @@ jT.templates['one-study']  =
 ""; // end of #jtox-study 
 
 jT.templates['policy']  = 
-"	  <div id=\"jtox-policy\">" +
+"	  <div id=\"jtox-policy\" class=\"jtox-auth\">" +
 "      <table></table>" +
 "	  </div>" +
 ""; // end of #jtox-model 
 
 jT.templates['logger']  = 
-"	  <div id=\"jtox-logger\" class=\"jtox-logger\">" +
+"	  <div id=\"jtox-logger\" class=\"jtox-log\">" +
 "	    <div class=\"list-wrap\">" +
 "	      <div class=\"list-root\"></div>" +
 "	    </div>" +
@@ -4580,7 +4543,7 @@ jT.templates['logline']  =
 ""; // end of #jtox-logline 
 
 jT.templates['all-endpoint']  = 
-"	  <div id=\"jtox-endpoint\">" +
+"	  <div id=\"jtox-endpoint\" class=\"jtox-endpoint\">" +
 "	    <div class=\"size-full filter-box\" style=\"height: 35px\"><input type=\"text\" class=\"float-right ui-input\" placeholder=\"Filter...\" /></div>" +
 "	    <div class=\"jtox-categories\">" +
 "    		<h3 class=\"P-CHEM\" data-cat=\"P-CHEM\">P-Chem <div class=\"float-right jtox-inline jtox-details\"><a href=\"#\" class=\"select-all\">select all</a>&nbsp;<a href=\"#\" class=\"unselect-all\">unselect all</a><span style=\"margin-left: 10px\"></span></div></h3>" +

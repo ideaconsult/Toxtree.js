@@ -14,7 +14,7 @@ var jToxQuery = (function () {
     configuration: {
       // this is the main thing to be configured
       handlers: { 
-        query: function (e, query) { query.query(); },
+        query: function (e, query) { jT.parentKit(jToxQuery, this).query(); },
       }
     }
   };
@@ -40,17 +40,12 @@ var jToxQuery = (function () {
     if (!!self.settings.kitSelector)
       self.settings.dom.kit = jT.$(self.settings.kitSelector)[0];
     
-    self.initHandlers();
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
     if (!!self.settings.initialQuery)
       setTimeout(function () { self.query(); }, 200);
   };
   
   cls.prototype = {
-    addHandlers: function (handlers) {
-      self.settings.configuration.handlers = jT.$.extend(true, self.settings.configuration.handlers, handlers);
-    },
-    
     widget: function (name) {
       return this.settings.dom.widgets[name];
     },
@@ -61,21 +56,7 @@ var jToxQuery = (function () {
         
       return this.mainKit;
     },
-    
-    initHandlers: function () {
-      var self = this;
-      var fireHandler = function (e) {
-        var handler = self.settings.configuration.handlers[jT.$(this).data('handler')];
-        if (!!handler)
-          ccLib.fireCallback(handler, this, e, self);
-        else
-          console.log("jToxQuery: referring unknown handler: " + jT.$(this).data('handler'));
-      };
-      
-      jT.$(document).on('change', 'input.jtox-handler', fireHandler);
-      jT.$(document).on('click', 'button.jtox-handler', fireHandler);
-    },
-    
+        
     /* Perform the actual query, traversing all the widgets and asking them to
     alter the given URL, then - makes the call */
     query: function () {
@@ -296,6 +277,9 @@ var jToxSearch = (function () {
       self.setMol($.base64.decode(self.settings.b64search));
     else if (!!self.settings.search)
       self.setAuto(self.settings.search);
+      
+    // and very finally - install the handlers...
+    jT.ui.installHandlers(self);
   };
   
   cls.prototype = {

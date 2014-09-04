@@ -11,10 +11,16 @@ var jToxEndpoint = (function () {
     heightStyle: "content",   // the accordition heightStyle
     hideFilter: false,        // if you don't want to have filter box - just hide it
     showMultiselect: true,    // whether to hide select all / unselect all buttons
-    sDom: "rt<i>",            // passed with dataTable settings upon creation
+    sDom: "<i>rt",            // passed with dataTable settings upon creation
     oLanguage: null,          // passed with dataTable settings upon creation
     onLoaded: null,           // callback called when the is available
     loadOnInit: false,        // whether to make an (empty) call when initialized. 
+    oLanguage: {
+      "sLoadingRecords": "No endpoints found.",
+      "sZeroRecords": "No endpoints found.",
+      "sEmptyTable": "No endpoints available.",
+      "sInfo": "Showing _TOTAL_ endpoint(s) (_START_ to _END_)"
+    },
     /* endpointUri */
     configuration: { 
       columns : {
@@ -51,19 +57,13 @@ var jToxEndpoint = (function () {
       
       // deal if the selection is chosen
       if (!!self.settings.selectionHandler || !!self.settings.onDetails)
-        jT.ui.putActions(self, self.settings.configuration.columns.endpoint.Id, { selection: self.settings.selectionHandler, details: !!self.settings.onDetails });
+        jT.ui.putActions(self, self.settings.configuration.columns.endpoint.Id);
       
       self.settings.configuration.columns.endpoint.Id.sTitle = '';
       
       // again , so that changed defaults can be taken into account.
       self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
       var cols = jT.ui.processColumns(self, 'endpoint');
-      var language = jT.$.extend({
-        "sLoadingRecords": "No endpoints found.",
-        "sZeroRecords": "No endpoints found.",
-        "sEmptyTable": "No endpoints available.",
-        "sInfo": "Showing _TOTAL_ endpoint(s) (_START_ to _END_)"
-      }, self.settings.oLanguage);
       
       // make the accordition now...
     	jT.$('.jtox-categories', self.rootElement).accordion( {
@@ -74,18 +74,7 @@ var jToxEndpoint = (function () {
       // and now - initialize all the tables...
       jT.$('table', self.rootElement).each(function () {
         var name = this.className;
-        self.tables[name] = jT.$(this).dataTable({
-          "bPaginate": false,
-          "bProcessing": true,
-          "bLengthChange": false,
-  				"bAutoWidth": false,
-          "sDom" : self.settings.sDom,
-          "aoColumns": cols,
-  				"oLanguage": language,
-  				"fnInfoCallback": self.updateStats(name)
-        });
-      
-        jT.$(self.tables[name]).dataTable().fnAdjustColumnSizing();
+        self.tables[name] = jT.ui.putTable(self, this, "endpoint", { "aoColumns": cols, "fnInfoCallback": self.updateStats(name) });
       });
       
       if (!!self.settings.hideFilter)
@@ -127,12 +116,10 @@ var jToxEndpoint = (function () {
             count += data[i].count;
             substances += data[i].substancescount;
           }
-          var html = "(" + substances + ") [" + count + "]";
-          if (iTotal < iMax)
-            html = "#" + iTotal + " " + html;
+          html = "(" + substances + ") [" + count + "]";
         }
         else
-          html = '#0';
+          html = '';
         
         jT.$('div.jtox-details span', head).html(html); 
         return sPre;

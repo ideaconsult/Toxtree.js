@@ -25,7 +25,7 @@ var config_toxtree = {
 	"handlers": {
   	"query": function (e, query) {
   	  clearSlate(true);
-      query.query();
+      jT.parentKit(jToxQuery, this).query();
     },
     "checked": function (e, query) {
       // TODO: initiate the single compound browser to work on selected only

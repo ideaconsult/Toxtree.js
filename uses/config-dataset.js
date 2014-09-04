@@ -56,8 +56,5 @@ jTConfig.dataset = {
   	"substance": {
     	'Contained in as': { iOrder: 20, mData: "composition", sTitle: "Contained in as", mRender: jT.ui.renderRelation }
   	}
-	},
-	"handlers": {
-  	"checked": onSelectedUpdate
 	}
 };

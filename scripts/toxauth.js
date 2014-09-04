@@ -11,6 +11,12 @@ var jToxPolicy = (function () {
     loadOnInit: false,      // whether to make initial load upon initializing the kit
     noInterface: false,     // whether to have interface... at all.
     sDom: "rt",
+    oLanguage: {
+      "sLoadingRecords": "No policies found.",
+      "sZeroRecords": "No policies found.",
+      "sEmptyTable": "No policies available.",
+      "sInfo": "Showing _TOTAL_ policy(s) (_START_ to _END_)"
+    },
     configuration: { 
       columns : {
         policy: {
@@ -76,7 +82,7 @@ var jToxPolicy = (function () {
       return out;
     };
     
-    var inlineHandlers = {
+    self.settings.configuration.handlers = {
       init: function (data) {
         if (this.tagName == 'SELECT')
           $(this).val(data[$(this).data('data')]);
@@ -152,25 +158,11 @@ var jToxPolicy = (function () {
     
     // again , so that changed defaults can be taken into account.
     self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
- 
-    self.table = jT.$('table', self.rootElement).dataTable({
-      "bPaginate": false,
-      "bLengthChange": false,
-			"bAutoWidth": false,
-      "sDom" : self.settings.sDom,
+    
+    self.table = jT.ui.putTable(self, jT.$('table', self.rootElement)[0], 'policy', {
       "aoColumns": jT.ui.processColumns(self, 'policy'),
       "aaSortingFixed": [[0, 'asc']],
-      "fnCreatedRow": jT.ui.inlineRowFn(inlineHandlers),
-			"oLanguage": jT.$.extend({
-        "sLoadingRecords": "No policies found.",
-        "sZeroRecords": "No policies found.",
-        "sEmptyTable": "No policies available.",
-        "sInfo": "Showing _TOTAL_ policy(s) (_START_ to _END_)"
-      }, self.settings.oLanguage)
     });
-    
-    jT.$(self.table).dataTable().fnAdjustColumnSizing();
-    
   };
   
   cls.prototype.loadPolicies = function (force) {

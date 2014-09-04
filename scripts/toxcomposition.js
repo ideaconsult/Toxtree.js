@@ -11,7 +11,6 @@ var jToxComposition = (function () {
     showDiagrams: false,      // whether to show diagram for each compound in the composition
     noInterface: false,       // run in interface-less mode - just data retrieval and callback calling.
     sDom: "rt<Ffp>",          // compounds (ingredients) table sDom
-    oLanguage: null,
     onLoaded: null,
     
     /* compositionUri */
@@ -65,7 +64,7 @@ var jToxComposition = (function () {
       // deal if the selection is chosen
       var colId = self.settings.configuration.columns.composition.Name;
       if (!!self.settings.selectionHandler) {
-        jT.ui.putActions(self, colId, { selection: self.settings.selectionHandler});
+        jT.ui.putActions(self, colId);
         colId.sWidth = "60px";
       }
         
@@ -92,17 +91,10 @@ var jToxComposition = (function () {
         }));
       }
       // READYY! Go and prepare THE table.
-      self.table = jT.$('table.composition-table', tab).dataTable({
-        "bPaginate": false,
-        "bLengthChange": false,
-				"bAutoWidth": false,
-        "bServerSide": false,
-        "sDom" : self.settings.sDom,
-        "oLanguage": jT.$.extend(true, {}, self.settings.oLanguage),
-        "aoColumns": cols,
+      self.table = jT.ui.putTable(self, jT.$('table.composition-table', tab)[0], 'composition', {
+        "aoColumns": cols
       });
       
-      jT.$(self.table).dataTable().fnAdjustColumnSizing();
       jT.$(self.table).dataTable().fnAddData(json);
       // now make a few fixing for multi-column title
       var colSpan = jT.$('th.colspan-2', self.table);

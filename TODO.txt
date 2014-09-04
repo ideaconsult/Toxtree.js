@@ -1,5 +1,4 @@
 TODO:
-- jToxEndpoint: make it possible select/unselect all per category
 - add tagging;
 - make matrix info popup.
 
@@ -7,7 +6,7 @@ TODO:
 - Reduce network calls in ToxTree no run-all - postopone the call until the last model has ran.
 
 DOCS:
-- 
+- new handling mechsnism with 'handler' propert in each kit
 
 
 IDEAS?

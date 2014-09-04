@@ -1,4 +1,4 @@
-.jtox-logger div.icon {
+.jtox-log div.icon {
   display: inline-block;
   vertical-align: middle;
   color: rgba(0, 0, 0, 0);
@@ -6,7 +6,7 @@
   height: 16px;
 }
 
-.jtox-logger .status {
+.jtox-log .status {
   background: #fff;
   position: absolute;
   top: 1px;
@@ -21,11 +21,11 @@
   border-bottom: 0px;
 }
 
-.jtox-logger .jt-faded {
+.jtox-log .jt-faded {
   opacity: 0.2;
 }
 
-.jtox-logger .list-wrap {
+.jtox-log .list-wrap {
   background: #fff;
   position: absolute;
   box-sizing: border-box;
@@ -41,17 +41,17 @@
   padding-left: 8px;
 }
 
-.jtox-logger .list-wrap.right-side {
+.jtox-log .list-wrap.right-side {
   border-top-right-radius: 0px;
   border-top-left-radius: 5px;
 }
 
-.jtox-logger .list-root {
+.jtox-log .list-root {
   margin-bottom: 24px;
   margin-right: 8px;
 }
 
-.jtox-logger .logline {
+.jtox-log .logline {
   margin-top: 2px;
   background: inherit;
   border: 0px;
@@ -66,11 +66,11 @@
   transition: height ease 300ms;
 }
 
-.jtox-logger .logline .content {
+.jtox-log .logline .content {
   vertical-align: middle;
 }
 
-.jtox-logger .logline .details {
+.jtox-log .logline .details {
   margin-left: 18px;
   vertical-align: top;
 }

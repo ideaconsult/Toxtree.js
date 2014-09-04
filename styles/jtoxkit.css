@@ -263,3 +263,7 @@ img.jtox-smalldiagram {
   width: 125px;
   height: 125px;
 }
+
+.jtox-endpoint thead {
+  display: none;
+}
