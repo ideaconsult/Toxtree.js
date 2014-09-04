@@ -428,7 +428,7 @@ window.jT.ui = {
       };
     else if (breed =="text")
       return function (data, type, full) {
-        return type != 'display' ? (data || '') : '<input type="' + breed + '" class="jt-inlineaction" data-data="' + location + '" value="' + (data || '') + '"' + (!holder ? '' : ' placeholder="' + holder + '"') + '/>';
+        return type != 'display' ? (data || '') : '<input type="text" class="jt-inlineaction" data-data="' + location + '" value="' + (data || '') + '"' + (!holder ? '' : ' placeholder="' + holder + '"') + '/>';
       };
   },
   
@@ -443,6 +443,21 @@ window.jT.ui = {
           $(this).on('click', on[action]);
       });
     }
+  },
+  
+  installMultiSelect: function (root, callback, parenter) {
+    if (parenter == null)
+      parenter = function (el) { return el.parentNode; };
+    $('a.select-all', root).on('click', function (e) {
+      $('input[type="checkbox"]', parenter(this)).each(function () { this.checked = true; if (callback == null) jT.$(this).trigger('change'); });
+      if (callback != null)
+        callback.call(this, e);
+    });
+    $('a.unselect-all', root).on('click', function (e) {
+      $('input[type="checkbox"]', parenter(this)).each(function () { this.checked = false; if (callback == null) jT.$(this).trigger('change');});
+      if (callback != null)
+        callback.call(this, e);
+    });
   },
   
   enterBlur: function (e) {

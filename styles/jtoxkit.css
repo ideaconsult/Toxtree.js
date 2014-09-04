@@ -197,6 +197,11 @@
   border: 0px;
 }
 
+.jtox-toolkit a.select-all,
+.jtox-toolkit a.unselect-all {
+  text-decoration: underline;
+}
+
 .jtox-toolkit .loading {
   background: url(../images/waiting_small.gif) right top no-repeat;
   background-size: 16px 16px;

@@ -816,7 +816,7 @@ window.jT.ui = {
       };
     else if (breed =="text")
       return function (data, type, full) {
-        return type != 'display' ? (data || '') : '<input type="' + breed + '" class="jt-inlineaction" data-data="' + location + '" value="' + (data || '') + '"' + (!holder ? '' : ' placeholder="' + holder + '"') + '/>';
+        return type != 'display' ? (data || '') : '<input type="text" class="jt-inlineaction" data-data="' + location + '" value="' + (data || '') + '"' + (!holder ? '' : ' placeholder="' + holder + '"') + '/>';
       };
   },
   
@@ -831,6 +831,21 @@ window.jT.ui = {
           $(this).on('click', on[action]);
       });
     }
+  },
+  
+  installMultiSelect: function (root, callback, parenter) {
+    if (parenter == null)
+      parenter = function (el) { return el.parentNode; };
+    $('a.select-all', root).on('click', function (e) {
+      $('input[type="checkbox"]', parenter(this)).each(function () { this.checked = true; if (callback == null) jT.$(this).trigger('change'); });
+      if (callback != null)
+        callback.call(this, e);
+    });
+    $('a.unselect-all', root).on('click', function (e) {
+      $('input[type="checkbox"]', parenter(this)).each(function () { this.checked = false; if (callback == null) jT.$(this).trigger('change');});
+      if (callback != null)
+        callback.call(this, e);
+    });
   },
   
   enterBlur: function (e) {
@@ -4123,7 +4138,8 @@ var jToxEndpoint = (function () {
     noInterface: false,       // run in interface-less mode, with data retrieval and callback calling only
     heightStyle: "content",   // the accordition heightStyle
     hideFilter: false,        // if you don't want to have filter box - just hide it
-    sDom: "rt<i>",               // passed with dataTable settings upon creation
+    showMultiselect: true,    // whether to hide select all / unselect all buttons
+    sDom: "rt<i>",            // passed with dataTable settings upon creation
     oLanguage: null,          // passed with dataTable settings upon creation
     onLoaded: null,           // callback called when the is available
     loadOnInit: false,        // whether to make an (empty) call when initialized. 
@@ -4219,6 +4235,11 @@ var jToxEndpoint = (function () {
         
         jT.$('.filter-box input', self.rootElement).on('keydown', fFilter);
       }
+      
+      if (!self.settings.showMultiselect || !self.settings.selectionHandler)
+        jT.$('h3 a', self.rootElement).remove();
+      else
+        jT.ui.installMultiSelect(self.rootElement, null, function (el) { return el.parentNode.parentNode.nextElementSibling; });
     },
     
     updateStats: function (name) {
@@ -4241,7 +4262,7 @@ var jToxEndpoint = (function () {
         else
           html = '#0';
         
-        jT.$('span.jtox-details', head).html(html); 
+        jT.$('div.jtox-details span', head).html(html); 
         return sPre;
       }
     },
@@ -4562,19 +4583,19 @@ jT.templates['all-endpoint']  =
 "	  <div id=\"jtox-endpoint\">" +
 "	    <div class=\"size-full filter-box\" style=\"height: 35px\"><input type=\"text\" class=\"float-right ui-input\" placeholder=\"Filter...\" /></div>" +
 "	    <div class=\"jtox-categories\">" +
-"    		<h3 class=\"P-CHEM\" data-cat=\"P-CHEM\">P-Chem <span class=\"float-right jtox-details\"></span></h3>" +
+"    		<h3 class=\"P-CHEM\" data-cat=\"P-CHEM\">P-Chem <div class=\"float-right jtox-inline jtox-details\"><a href=\"#\" class=\"select-all\">select all</a>&nbsp;<a href=\"#\" class=\"unselect-all\">unselect all</a><span style=\"margin-left: 10px\"></span></div></h3>" +
 "    		<div>" +
 "    		  <table class=\"P-CHEM\"></table>" +
 "    		</div>" +
-"    		<h3 class=\"ENV_FATE\" data-cat=\"ENV_FATE\">Env Fate <span class=\"float-right jtox-details\"></span></h3>" +
+"    		<h3 class=\"ENV_FATE\" data-cat=\"ENV_FATE\">Env Fate <div class=\"float-right jtox-inline jtox-details\"><a href=\"#\" class=\"select-all\">select all</a>&nbsp;<a href=\"#\" class=\"unselect-all\">unselect all</a><span style=\"margin-left: 10px\"></span></div></h3>" +
 "    		<div>" +
 "      		<table class=\"ENV_FATE\"></table>" +
 "    		</div>" +
-"    		<h3 class=\"ECOTOX\" data-cat=\"ECOTOX\">Eco Tox <span class=\"float-right jtox-details\"></span></h3>" +
+"    		<h3 class=\"ECOTOX\" data-cat=\"ECOTOX\">Eco Tox <div class=\"float-right jtox-inline jtox-details\"><a href=\"#\" class=\"select-all\">select all</a>&nbsp;<a href=\"#\" class=\"unselect-all\">unselect all</a><span style=\"margin-left: 10px\"></span></div></h3>" +
 "    		<div>" +
 "      		<table class=\"ECOTOX\"></table>" +
 "    		</div>" +
-"    		<h3 class=\"TOX\" data-cat=\"TOX\">Tox <span class=\"float-right jtox-details\"></span></h3>" +
+"    		<h3 class=\"TOX\" data-cat=\"TOX\">Tox <div class=\"float-right jtox-inline jtox-details\"><a href=\"#\" class=\"select-all\">select all</a>&nbsp;<a href=\"#\" class=\"unselect-all\">unselect all</a><span style=\"margin-left: 10px\"></span></div></h3>" +
 "    		<div>" +
 "    		  <table class=\"TOX\"></table>" +
 "    		</div>" +

@@ -1,6 +1,6 @@
 /* toxtmatrix.css - jToxMatrix tool styles
 */
-html, body, .ui-tabs {
+html, body, #jtox-assessment {
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -40,7 +40,11 @@ html, body, .ui-tabs {
   margin-bottom: 5px;
 }
 
-.ui-tabs-panel {
+#jtox-matrix .jtox-toolkit {
+  margin-top: 10px;
+}
+
+#jtox-assessment>div.ui-tabs-panel {
   position: relative;
   overflow-x: hidden !important;
   overflow-y: scroll !important;
@@ -52,11 +56,11 @@ html, body, .ui-tabs {
   top: 0px;
   width: 202%;
   padding: 0px;
-  -moz-transition: left ease 500ms;
-  -ms-transition: left ease 500ms;
-  -o-transition: left ease 500ms;
-  -webkit-transition: left ease 500ms;
-  transition: left ease 300ms;
+  -moz-transition: left ease 800ms;
+  -ms-transition: left ease 800ms;
+  -o-transition: left ease 800ms;
+  -webkit-transition: left ease 800ms;
+  transition: left ease 800ms;
 }
 
 .jtox-slidable>div {

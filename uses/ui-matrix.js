@@ -206,9 +206,8 @@ var jToxAssessment = {
     	  var root = document.createElement('div');
     	  sub.appendChild(root);
     	  self.endpointKit = new jToxEndpoint(root, {});
+    	  self.endpointKit.loadEndpoints();
   	  }
-  	  
-  	  self.endpointKit.loadEndpoints();
 	  }
 	},
 	

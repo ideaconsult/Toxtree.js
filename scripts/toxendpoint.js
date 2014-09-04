@@ -10,7 +10,8 @@ var jToxEndpoint = (function () {
     noInterface: false,       // run in interface-less mode, with data retrieval and callback calling only
     heightStyle: "content",   // the accordition heightStyle
     hideFilter: false,        // if you don't want to have filter box - just hide it
-    sDom: "rt<i>",               // passed with dataTable settings upon creation
+    showMultiselect: true,    // whether to hide select all / unselect all buttons
+    sDom: "rt<i>",            // passed with dataTable settings upon creation
     oLanguage: null,          // passed with dataTable settings upon creation
     onLoaded: null,           // callback called when the is available
     loadOnInit: false,        // whether to make an (empty) call when initialized. 
@@ -106,6 +107,11 @@ var jToxEndpoint = (function () {
         
         jT.$('.filter-box input', self.rootElement).on('keydown', fFilter);
       }
+      
+      if (!self.settings.showMultiselect || !self.settings.selectionHandler)
+        jT.$('h3 a', self.rootElement).remove();
+      else
+        jT.ui.installMultiSelect(self.rootElement, null, function (el) { return el.parentNode.parentNode.nextElementSibling; });
     },
     
     updateStats: function (name) {
@@ -128,7 +134,7 @@ var jToxEndpoint = (function () {
         else
           html = '#0';
         
-        jT.$('span.jtox-details', head).html(html); 
+        jT.$('div.jtox-details span', head).html(html); 
         return sPre;
       }
     },
