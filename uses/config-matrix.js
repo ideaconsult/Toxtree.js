@@ -72,7 +72,11 @@ jTConfig.matrix = {
       "http://www.opentox.org/api/1.1#InChI",
       "http://www.opentox.org/api/1.1#REACHRegistrationDate"
     ],
-    
+
+    "Substances": [ 
+      "http://www.opentox.org/api/1.1#CompositionInfo" 
+    ],
+
     "Calculated": function (name, miniset) {
       var arr = [];
       if (miniset.dataEntry.length > 0 && !ccLib.isNull(miniset.dataEntry[0].compound.metric))

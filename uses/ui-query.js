@@ -68,7 +68,6 @@ function createGroups(miniset, kit) {
     groups[src].push(fId);
 	}
 	groups["Substances"] = [ "http://www.opentox.org/api/1.1#CompositionInfo" ];
-	groups["Calculated"] = null;
 	groups["Other"] = function (name, miniset) {
     var arr = [];
     for (var f in miniset.feature) {
