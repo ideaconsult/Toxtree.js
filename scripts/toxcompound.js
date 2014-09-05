@@ -629,6 +629,7 @@ var jToxCompound = (function () {
         "bScrollCollapse": true,
         "fnCreatedRow": function( nRow, aData, iDataIndex ) {
           nRow.id = 'jtox-var-' + self.instanceNo + '-' + iDataIndex;
+          jT.ui.installHandlers(self, nRow);
           jT.$(nRow).addClass('jtox-row');
           jT.$(nRow).data('jtox-index', iDataIndex);
         },

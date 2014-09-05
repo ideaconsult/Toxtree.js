@@ -27,9 +27,6 @@ var config_toxtree = {
   	  clearSlate(true);
       jT.parentKit(jToxQuery, this).query();
     },
-    "checked": function (e, query) {
-      // TODO: initiate the single compound browser to work on selected only
-    },
     "markAuto": function (e) {
       $(this).toggleClass('active');
       onSelectedUpdate(e);
@@ -45,9 +42,6 @@ var config_toxtree = {
       "http://www.opentox.org/api/1.1#EINECS",
       "http://www.opentox.org/api/1.1#IUCLID5_UUID"
 	  ],
-  	"Names" : null,
-  	"Calculated": null,
-  	"Other": null,
   	"ToxTree": []   // to be expanded upon algorithm loading
 	}
 };
@@ -224,10 +218,12 @@ function onAlgoLoaded(result) {
       };
       idx++;
     });
+    
+    jT.ui.installHandlers(tt.modelKit);
   }
   
   onSelectedUpdate(null);
-  // not it's time to create the browser table
+  // now it's time to create the browser table
   jT.initKit($('#tt-table')[0]);
   tt.browserKit = jToxCompound.kits[0];
 }
