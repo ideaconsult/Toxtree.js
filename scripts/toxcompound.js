@@ -599,6 +599,7 @@ var jToxCompound = (function () {
         "aoColumns": fixCols,
         "bSort": false,
         "fnCreatedRow": function( nRow, aData, iDataIndex ) {
+          jT.ui.installHandlers(self, nRow);
           // attach the click handling
           if (self.settings.hasDetails)
             jT.$('.jtox-details-open', nRow).on('click', function(e) { fnShowDetails(nRow, e); });

@@ -43,16 +43,18 @@ jTConfig.matrix = {
 			"data": "compound.URI",
 			"column": { sWidth: "300px" },
 			"render" : function(data, type, full) {
-        return '-';
+			  data = data || '';
+			  return (type != 'display') ? data : '<textarea>' + data + '</textarea>';
       }
 		},
 		"#IdRow" : {
 			"data": "compound.URI",
 			"column": { sWidth: "80px", sClass: "text-top" },
 			"render" : function(data, type, full) {
-        return  '<button class="tt-toggle jtox-handler target" data-handler="selectStructure" title="Select the structure as Target">T</button>' +
-                '<button class="tt-toggle jtox-handler source" data-handler="selectStructure" title="Select the structure as Source">S</button>' +
-                '<span class="jtox-details-open ui-icon ui-icon-folder-collapsed" title="Press to open/close detailed info for this compound"></span>';
+        return  (type != 'display') ? data : 
+          '<button class="tt-toggle jtox-handler target" data-data="' + data + '" data-handler="onSelectStructure" title="Select the structure as Target">T</button>' +
+          '<button class="tt-toggle jtox-handler source" data-data="' + data + '" data-handler="onSelectStructure" title="Select the structure as Source">S</button>' +
+          '<span class="jtox-details-open ui-icon ui-icon-folder-collapsed" title="Press to open/close detailed info for this compound"></span>';
       }
 		}
   },

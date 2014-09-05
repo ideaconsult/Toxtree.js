@@ -1,13 +1,47 @@
-var jTConfig = {};
-
-function jTConfigurator(kit) {
-  return jTConfig.matrix;
-}
 /* toxmatrix.js - Read-across UI tool
  *
  * Copyright 2012-2014, IDEAconsult Ltd. http://www.ideaconsult.net/
  * Created by Ivan Georgiev
 **/
+
+var jTConfig = {};
+
+function jTConfigurator(kit) {
+  return jTConfig.matrix;
+}
+
+function onSelectStructure(e) {
+  var what = $(this).hasClass('target') ? 'target' : 'source';
+  var uri = $(this).data('data');
+  console.log("Structure [" + uri + "] selected as <" + what + ">");
+}
+
+function onSelectSubstance(e) {
+  var uri = this.value;
+  console.log("Substance [" + uri + "] selected");  
+}
+
+function onSelectEndpoint(e) {
+  var uri = this.value;
+  console.log("Endpoint [" + uri + "] selected");  
+}
+
+function onDetailedRow(row, data, event) {
+  var el = $('.jtox-details-composition', row)[0];
+  if (!el)
+    return;
+  var uri = this.settings.baseUrl + '/substance?type=related&compound_uri=' + encodeURIComponent(data.compound.URI);
+  el = $(el).parents('table')[0];
+  el = el.parentNode;
+  $(el).empty();
+  $(el).addClass('paddingless');
+  var div = document.createElement('div');
+  el.appendChild(div);
+  new jToxSubstance(div, $.extend(true, {}, this.settings, {crossDomain: true, selectionHandler: null, substanceUri: uri, showControls: false, onDetails: function (root, data, event) {
+    new jToxStudy(root, $.extend({}, this.settings, {substanceUri: data}));
+  } } ) );
+}
+
 
 var jToxAssessment = {
 	createForm: null,
@@ -24,11 +58,6 @@ var jToxAssessment = {
 		'get_endpoints': { method: 'GET', service: ""},
 		'add_endpoint': { method: 'PUT', service: "/assessment/{id}/feature"},
 		'del_endpoint': { method: 'DELETE', service: "/assessment/{id}/feature?feature={featureUri}"},
-	},
-	handlers: {
-  	selectEndpoint: function (e) {
-    	
-  	},
 	},
 	
 	collected: {
@@ -203,7 +232,7 @@ var jToxAssessment = {
   	  if (sub.firstElementChild == null) {
     	  var root = document.createElement('div');
     	  sub.appendChild(root);
-    	  self.substanceKit = new jToxSubstance(root, { crossDomain: true });
+    	  self.substanceKit = new jToxSubstance(root, { crossDomain: true, selectionHandler: "onSelectSubstance" });
   	  }
   	  
       self.substanceKit.query('http://apps.ideaconsult.net:8080/data/substance?type=related&compound_uri=http%3A%2F%2Fapps.ideaconsult.net%3A8080%2Fdata%2Fcompound%2F21219%2Fconformer%2F39738');
@@ -212,7 +241,7 @@ var jToxAssessment = {
   	  if (sub.firstElementChild == null) {
     	  var root = document.createElement('div');
     	  sub.appendChild(root);
-    	  self.endpointKit = new jToxEndpoint(root, { selectionHandler: self.handlers.selectEndpoint});
+    	  self.endpointKit = new jToxEndpoint(root, { selectionHandler: "onSelectEndpoint" });
     	  self.endpointKit.loadEndpoints();
   	  }
 	  }

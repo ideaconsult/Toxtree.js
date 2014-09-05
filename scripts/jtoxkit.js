@@ -417,34 +417,24 @@ window.jT.ui = {
     return colDefs;
   },
   
-  inlineChanger: function (location, breed, holder) {
+  inlineChanger: function (location, breed, holder, handler) {
+    if (handler == null)
+      handler = "changed";
+      
     if (breed == "select")
       return function (data, type, full) {
-        return type != 'display' ? (data || '') : '<select class="jt-inlineaction" data-data="' + location + '" value="' + (data || '') + '">' + (holder || '') + '</select>';
+        return type != 'display' ? (data || '') : '<select class="jt-inlineaction jtox-handler" data-handler="' + handler + '" data-data="' + location + '" value="' + (data || '') + '">' + (holder || '') + '</select>';
       };
     else if (breed == "checkbox") // we use holder as 'isChecked' value
       return function (data, type, full) {
-        return type != 'display' ? (data || '') : '<input type="checkbox" class="jt-inlineaction" data-data="' + location + '"' + (((!!holder && data == holder) || !!data) ? 'checked="checked"' : '') + '"/>';
+        return type != 'display' ? (data || '') : '<input type="checkbox" class="jt-inlineaction jtox-handler" data-handler="' + handler + '" data-data="' + location + '"' + (((!!holder && data == holder) || !!data) ? 'checked="checked"' : '') + '"/>';
       };
     else if (breed =="text")
       return function (data, type, full) {
-        return type != 'display' ? (data || '') : '<input type="text" class="jt-inlineaction" data-data="' + location + '" value="' + (data || '') + '"' + (!holder ? '' : ' placeholder="' + holder + '"') + '/>';
+        return type != 'display' ? (data || '') : '<input type="text" class="jt-inlineaction jtox-handler" data-handler="' + handler + '" data-data="' + location + '" value="' + (data || '') + '"' + (!holder ? '' : ' placeholder="' + holder + '"') + '/>';
       };
   },
-  
-  inlineRowFn: function (on) {
-    return function( nRow, aData, iDataIndex ) {
-      $('.jt-inlineaction', nRow).each(function () {
-        ccLib.fireCallback(on.init, this, aData, iDataIndex);
-        var action = $(this).data('action') || 'change';
-        if (this.tagName == 'INPUT' || this.tagName == 'SELECT' || this.tagName == "TEXTAREA")
-          $(this).on('change', on[action]).on('keydown', jT.ui.enterBlur);
-        else
-          $(this).on('click', on[action]);
-      });
-    }
-  },
-  
+    
   installMultiSelect: function (root, callback, parenter) {
     if (parenter == null)
       parenter = function (el) { return el.parentNode; };
@@ -461,20 +451,22 @@ window.jT.ui = {
   },
   
   installHandlers: function (kit, root) {
-    if (kit.settings.configuration == null || kit.settings.configuration.handlers == null)
-      return;
     if (root == null)
       root = kit.rootElement;
       
     jT.$('.jtox-handler', root).each(function () {
       var name = jT.$(this).data('handler');
-      var handler = kit.settings.configuration.handlers[name] || window[name];
+      var handler = null;
+      if (kit.settings.configuration != null && kit.settings.configuration.handlers != null)
+        handler = kit.settings.configuration.handlers[name];
+      handler = handler || window[name];
+      
       if (!handler)
         console.log("jToxQuery: referring unknown handler: " + name);
-      else if (this.tagName == "BUTTON")
+      else if (this.tagName == "INPUT" || this.tagName == "SELECT" || this.tagName == "TEXTAREA")
+        jT.$(this).on('change', handler).on('keydown', jT.ui.enterBlur);
+      else // all the rest respond on click
         jT.$(this).on('click', handler);
-      else // INPUT, SELECT
-        jT.$(this).on('change', handler);
     });
   },
   
@@ -547,6 +539,12 @@ window.jT.ui = {
   		"oLanguage": kit.settings.oLanguage,
       "bServerSide": false,
       "fnCreatedRow": function( nRow, aData, iDataIndex ) {
+        // call the provided onRow handler, if any
+        if (typeof kit.settings.onRow == 'function') {
+          var res = ccLib.fireCallback(kit.settings.onRow, kit, nRow, aData, iDataIndex);
+          if (typeof res == 'boolean' && !res)
+            return;
+        }
         // handle a selection click.. if any
         jT.ui.installHandlers(kit, nRow);
         if (typeof kit.settings.selectionHandler == "function")

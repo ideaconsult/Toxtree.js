@@ -17,6 +17,11 @@ var jToxPolicy = (function () {
       "sEmptyTable": "No policies available.",
       "sInfo": "Showing _TOTAL_ policy(s) (_START_ to _END_)"
     },
+    onRow: function (row, data, index) {
+      jT.$('select', row).each(function () {
+        $(this).val(data[$(this).data('data')]);
+      });
+    },
     configuration: { 
       columns : {
         policy: {
@@ -26,16 +31,16 @@ var jToxPolicy = (function () {
             else if (type != 'display')
               return data || '';
             else if (!data)
-              return '<span class="ui-icon ui-icon-plusthick jt-inlineaction jtox-inline jtox-hidden" data-action="add"></span>';
+              return '<span class="ui-icon ui-icon-plusthick jtox-handler jtox-inline jtox-hidden" data-handler="add"></span>';
             else
-              return '<span class="ui-icon ui-icon-closethick jt-inlineaction jtox-inline" data-action="remove"></span>';
+              return '<span class="ui-icon ui-icon-closethick jtox-handler jtox-inline" data-handler="remove"></span>';
           }},
-          'Role': { iOrder: 1, sTitle: "Role", sDefaultContent: '', sWidth: "20%", mData: "role", mRender: jT.ui.inlineChanger('role', 'select', '-- Role --') },
-          'Service': {iOrder: 3, sTitle: "Service", sDefaultContent: '', mData: "resource", sWidth: "40%", mRender: jT.ui.inlineChanger('resource', 'text', 'Service_') },
-          'Get': { iOrder: 4, sClass: "center", sTitle: "Get", bSortable: false, sDefaultContent: false, mData: "methods.get", mRender: jT.ui.inlineChanger('methods.get', 'checkbox') },
-          'Post': { iOrder: 5, sClass: "center", sTitle: "Post", bSortable: false, sDefaultContent: false, mData: "methods.post", mRender: jT.ui.inlineChanger('methods.post', 'checkbox') },
-          'Put': { iOrder: 6, sClass: "center", sTitle: "Put", bSortable: false, sDefaultContent: false, mData: "methods.put", mRender: jT.ui.inlineChanger('methods.put', 'checkbox') },
-          'Delete': { iOrder: 7, sClass: "center", sTitle: "Delete", bSortable: false, sDefaultContent: false, mData: "methods.delete", mRender: jT.ui.inlineChanger('methods.delete', 'checkbox') },
+          'Role': { iOrder: 1, sTitle: "Role", sDefaultContent: '', sWidth: "20%", mData: "role"},
+          'Service': {iOrder: 2, sTitle: "Service", sDefaultContent: '', mData: "resource", sWidth: "40%", mRender: jT.ui.inlineChanger('resource', 'text', 'Service_') },
+          'Get': { iOrder: 3, sClass: "center", sTitle: "Get", bSortable: false, sDefaultContent: false, mData: "methods.get", mRender: jT.ui.inlineChanger('methods.get', 'checkbox') },
+          'Post': { iOrder: 4, sClass: "center", sTitle: "Post", bSortable: false, sDefaultContent: false, mData: "methods.post", mRender: jT.ui.inlineChanger('methods.post', 'checkbox') },
+          'Put': { iOrder: 5, sClass: "center", sTitle: "Put", bSortable: false, sDefaultContent: false, mData: "methods.put", mRender: jT.ui.inlineChanger('methods.put', 'checkbox') },
+          'Delete': { iOrder: 6, sClass: "center", sTitle: "Delete", bSortable: false, sDefaultContent: false, mData: "methods.delete", mRender: jT.ui.inlineChanger('methods.delete', 'checkbox') },
         }
       }
     }
@@ -62,7 +67,8 @@ var jToxPolicy = (function () {
     self.rootElement.appendChild(jT.getTemplate('#jtox-policy'));
     self.settings.configuration.columns.policy.Id.sTitle = '';
     self.settings.configuration.columns.policy.Role.mRender = function (data, type, full) {
-      return type != 'display' ? (data || '') : '<select class="jt-inlineaction" data-data="role">' + self.roleOptions + '</select>';
+      return type != 'display' ? (data || '') : 
+        '<select class="jt-inlineaction jtox-handler" data-handler="changed" data-data="role" value="' + (data || '') + '">' + self.roleOptions + '</select>';
     };
     
     var alerter = function (el, icon, task) {
@@ -83,11 +89,7 @@ var jToxPolicy = (function () {
     };
     
     self.settings.configuration.handlers = {
-      init: function (data) {
-        if (this.tagName == 'SELECT')
-          $(this).val(data[$(this).data('data')]);
-      },
-      change: function (e) {
+      changed: function (e) {
         var data = jT.ui.rowData(this);
         if (!!data.uri) {
           // Initiate a change in THIS field.
@@ -159,10 +161,7 @@ var jToxPolicy = (function () {
     // again , so that changed defaults can be taken into account.
     self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
     
-    self.table = jT.ui.putTable(self, jT.$('table', self.rootElement)[0], 'policy', {
-      "aoColumns": jT.ui.processColumns(self, 'policy'),
-      "aaSortingFixed": [[0, 'asc']],
-    });
+    self.table = jT.ui.putTable(self, jT.$('table', self.rootElement)[0], 'policy', { "aaSortingFixed": [[0, 'asc']] });
   };
   
   cls.prototype.loadPolicies = function (force) {
@@ -186,13 +185,15 @@ var jToxPolicy = (function () {
         if (!!roles) {
           // remember and prepare roles for select presenting...
           self.roles = roles;
-          realLoader();
           if (!self.settings.noInterface) {
             var optList = '';
             for (var i = 0, rl = roles.roles.length; i < rl; ++i)
               optList += '<option>' + roles.roles[i] + '</option>';
             self.roleOptions = optList;
           }
+
+          // and now - really load the list
+          realLoader();
         }
       });
     }

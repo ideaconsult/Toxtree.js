@@ -1,6 +1,5 @@
 TODO:
-- add tag handling and layout the buttons properly
-- add reason writing;
+- add reason writing (two columns, in order to have it as separate tab in details)
 - add compound details along with substances, as in ui-query
 - make matrix info popup.
 
@@ -10,6 +9,7 @@ TODO:
 
 DOCS:
 - new handling mechsnism with 'handler' propert in each kit
+- onRow universal handler
 
 
 IDEAS?
