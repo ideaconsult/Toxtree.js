@@ -113,6 +113,10 @@ var jToxCompound = (function () {
             return (type != "display") ? "-" : '<div class="jtox-diagram borderless"><span class="ui-icon ui-icon-zoomin"></span><a target="_blank" href="' + full.compound.URI + '"><img src="' + data + '" class="jtox-smalldiagram"/></a></div>';
           }
       	},
+      	'#IdRow': {
+      	  data: "number",
+      	  column: { "sClass": "middle"}
+      	},
       	"#DetailedInfoRow": {
       	  title: "Diagram", 
       	  search: false,
@@ -173,6 +177,11 @@ var jToxCompound = (function () {
     
     var newDefs = jT.$.extend(true, { "configuration" : { "baseFeatures": baseFeatures} }, defaultSettings);
     self.settings = jT.$.extend(true, {}, newDefs, jT.settings, settings); // i.e. defaults from jToxCompound
+    
+    // make a dull copy here, because, otherwise groups are merged... which we DON'T want
+    if (settings.configuration != null && settings.configuration.groups != null)
+      self.settings.configuration.groups = settings.configuration.groups;
+      
     self.instanceNo = instanceCount++;
     if (self.settings.rememberChecks && self.settings.showTabs)
       self.featureStates = {};
@@ -393,23 +402,65 @@ var jToxCompound = (function () {
       return data;
     },
     
+    prepareColumn: function (feature) {
+      var self = this;
+      if (feature.visibility == 'details')
+        return null;
+        
+      // now we now we should show this one.
+      var col = {
+        "sTitle": !feature.title ? '' : (feature.title.replace(/_/g, ' ') + (!self.settings.showUnits || ccLib.isNull(feature.units) ? "" : feature.units)),
+        "sDefaultContent": "-",
+      };
+      
+      if (typeof feature.column == 'function')
+        col = feature.column.call(self, col, fId);
+      else if (!ccLib.isNull(feature.column))
+        col = jT.$.extend(col, feature.column);
+      
+      if (feature.data !== undefined)
+        col["mData"] = feature.data;
+      else {
+        col["mData"] = 'values';
+        col["mRender"] = (function(featureId) { return function(data, type, full) { var val = data[featureId]; return ccLib.isEmpty(val) ? '-' : val }; })(fId);
+      }
+      
+      // other convenient cases
+      if (!!feature.shorten) {
+        col["mRender"] = function(data, type, full) { return (type != "display") ? '' + data : jT.ui.shortenedData(data, "Press to copy the value in the clipboard"); };
+        col["sWidth"] = "75px";
+      }
+  
+      // finally - this one.          
+      if (feature.render !== undefined)
+        col["mRender"] = feature.render;
+      return col;
+    },
+    
     prepareTables: function() {
       var self = this;
       var varCols = [];
       var fixCols = [];
       
-      fixCols.push({
-          "mData": "number",
-          "sClass": "middle",
-          "mRender": function (data, type, full) { 
+      // first, some preparation of the first, IdRow column
+      var idFeature = self.settings.configuration.baseFeatures['#IdRow'];
+      if (!idFeature.render) {
+        idFeature.render = self.settings.hasDetails ? 
+          function (data, type, full) {
             return (type != "display") ?
               '' + data : 
               "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;<br/>" + 
-                (self.settings.hasDetails ?              
-                  '<span class="jtox-details-open ui-icon ui-icon-folder-collapsed" title="Press to open/close detailed info for this compound"></span>'
-                  : '');
-          }
-        },
+              '<span class="jtox-details-open ui-icon ui-icon-folder-collapsed" title="Press to open/close detailed info for this compound"></span>';
+          } : // no details case
+          function (data, type, full) { 
+            return (type != "display") ?
+              '' + data : 
+              "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;";
+          };
+      }
+      
+      fixCols.push(
+        self.prepareColumn(idFeature),
         { "sClass": "jtox-hidden", "mData": "index", "sDefaultContent": "-", "bSortable": true, "mRender": function(data, type, full) { return ccLib.isNull(self.orderList) ? 0 : self.orderList[data]; } } // column used for ordering
       );
       
@@ -525,36 +576,9 @@ var jToxCompound = (function () {
             return;
             
           var feature = self.feature[fId];
-          if (feature.visibility == 'details')
+          var col = self.prepareColumn(feature);
+          if (!col)
             return;
-            
-          // now we now we should show this one.
-          var col = {
-            "sTitle": feature.title.replace(/_/g, ' ') + (!self.settings.showUnits || ccLib.isNull(feature.units) ? "" : feature.units),
-            "sDefaultContent": "-",
-          };
-          
-          if (typeof feature.column == 'function')
-            col = feature.column.call(self, col, fId);
-          else if (!ccLib.isNull(feature.column))
-            col = jT.$.extend(col, feature.column);
-          
-          if (feature.data !== undefined)
-            col["mData"] = feature.data;
-          else {
-            col["mData"] = 'values';
-            col["mRender"] = (function(featureId) { return function(data, type, full) { var val = data[featureId]; return ccLib.isEmpty(val) ? '-' : val }; })(fId);
-          }
-          
-          // other convenient cases
-          if (!!feature.shorten) {
-            col["mRender"] = function(data, type, full) { return (type != "display") ? '' + data : jT.ui.shortenedData(data, "Press to copy the value in the clipboard"); };
-            col["sWidth"] = "75px";
-          }
-
-          // finally - this one.          
-          if (feature.render !== undefined)
-            col["mRender"] = feature.render;
           
           // finally - assign column switching to the checkbox of main tab.
           var colList = !!feature.primary ? fixCols : varCols;

@@ -1,7 +1,10 @@
 TODO:
-- add tagging;
+- add tag handling and layout the buttons properly
+- add reason writing;
+- add compound details along with substances, as in ui-query
 - make matrix info popup.
 
+- History of searches in jToxSearch component (along with type of search and additional parameters)
 - deferred re-query (postpone)
 - Reduce network calls in ToxTree no run-all - postopone the call until the last model has ran.
 

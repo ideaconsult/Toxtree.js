@@ -36,7 +36,56 @@ jTConfig.matrix = {
 			"render" : function(data, type, full) {
         return (type != "details") ? "-" : '<span class="jtox-details-composition"></span>';
       }
+		},
+		"http://www.opentox.org/api/1.1#Reasoning" : {
+		  "visibility": "main", 
+			"title": "Reason",
+			"data": "compound.URI",
+			"column": { sWidth: "300px" },
+			"render" : function(data, type, full) {
+        return '-';
+      }
+		},
+		"#IdRow" : {
+			"data": "compound.URI",
+			"column": { sWidth: "80px", sClass: "text-top" },
+			"render" : function(data, type, full) {
+        return  '<button class="tt-toggle jtox-handler target" data-handler="selectStructure" title="Select the structure as Target">T</button>' +
+                '<button class="tt-toggle jtox-handler source" data-handler="selectStructure" title="Select the structure as Source">S</button>' +
+                '<span class="jtox-details-open ui-icon ui-icon-folder-collapsed" title="Press to open/close detailed info for this compound"></span>';
+      }
 		}
+  },
+  "groups": {
+    "Identifiers" : [
+      "http://www.opentox.org/api/1.1#Diagram",
+      "#DetailedInfoRow",
+      "http://www.opentox.org/api/1.1#CASRN", 
+      "http://www.opentox.org/api/1.1#EINECS",
+      // The rest of them
+      "http://www.opentox.org/api/1.1#Reasoning",
+      "http://www.opentox.org/api/1.1#ChemicalName",
+      "http://www.opentox.org/api/1.1#SMILES",
+      "http://www.opentox.org/api/1.1#InChIKey",
+      "http://www.opentox.org/api/1.1#InChI",
+      "http://www.opentox.org/api/1.1#REACHRegistrationDate"
+    ],
+    
+    "Calculated": function (name, miniset) {
+      var arr = [];
+      if (miniset.dataEntry.length > 0 && !ccLib.isNull(miniset.dataEntry[0].compound.metric))
+        arr.push(this.settings.metricFeature);
+
+      for (var f in miniset.feature) {
+        var feat = miniset.feature[f];
+        if (ccLib.isNull(feat.source) || ccLib.isNull(feat.source.type) || !!feat.basic)
+          continue;
+        else if (feat.source.type.toLowerCase() == "algorithm" || feat.source.type.toLowerCase() == "model") {
+          arr.push(f);
+        }
+      }
+      return arr;
+    }
   },
 	"columns": {
   	"substance": {

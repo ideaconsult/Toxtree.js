@@ -1,7 +1,7 @@
 var jTConfig = {};
 
 function jTConfigurator(kit) {
-  return jTConfig;
+  return jTConfig.matrix;
 }
 /* toxmatrix.js - Read-across UI tool
  *
@@ -222,8 +222,9 @@ var jToxAssessment = {
 	onStructures: function (id, panel) {
 	  if (!self.queryKit)
   	  self.queryKit = jT.kit($('#jtox-query')[0]);
-      
-    self.queryKit.query();
+    
+    if (!!self.queryKit)
+      self.queryKit.query();
 	},
 	
 	load: function(assessmentUri) {
