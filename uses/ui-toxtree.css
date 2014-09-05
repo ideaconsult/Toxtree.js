@@ -136,26 +136,6 @@ div.tt-algorithm div.tt-classification {
   text-align: center;
 }
 
-.tt-toggle {
-  display: inline-block;
-  border: 1px solid #aaa;
-  border-radius: 5px;
-  background: #eee;
-  opacity: 0.7;
-  width: 24px;
-  text-align: center;
-  vertical-align: middle;
-  padding: 2px;
-  font-weight: bold;
-  margin: 0px;
-}
-
-.tt-toggle:hover,
-.tt-toggle.active {
-  background: #aaa;
-  opacity: 1.0;
-}
-
 #tt-browser-panel {
   position: relative;
   width: 40%;

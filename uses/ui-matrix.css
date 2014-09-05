@@ -40,6 +40,11 @@ html, body, #jtox-assessment {
   margin-bottom: 5px;
 }
 
+#jtox-structures td textarea {
+  width: 100%;
+  height: 100%;
+}
+
 body.structlist #jtox-query .jtox-foldable {
   display: none;
 }

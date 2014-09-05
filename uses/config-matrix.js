@@ -52,8 +52,8 @@ jTConfig.matrix = {
 			"column": { sWidth: "80px", sClass: "text-top" },
 			"render" : function(data, type, full) {
         return  (type != 'display') ? data : 
-          '<button class="tt-toggle jtox-handler target" data-data="' + data + '" data-handler="onSelectStructure" title="Select the structure as Target">T</button>' +
-          '<button class="tt-toggle jtox-handler source" data-data="' + data + '" data-handler="onSelectStructure" title="Select the structure as Source">S</button>' +
+          '<button class="jt-toggle jtox-handler target" data-data="' + data + '" data-handler="onSelectStructure" title="Select the structure as Target">T</button>' +
+          '<button class="jt-toggle jtox-handler source" data-data="' + data + '" data-handler="onSelectStructure" title="Select the structure as Source">S</button>' +
           '<span class="jtox-details-open ui-icon ui-icon-folder-collapsed" title="Press to open/close detailed info for this compound"></span>';
       }
 		}

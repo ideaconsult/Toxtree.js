@@ -1849,7 +1849,7 @@ var jToxCompound = (function () {
       return data;
     },
     
-    prepareColumn: function (feature) {
+    prepareColumn: function (fId, feature) {
       var self = this;
       if (feature.visibility == 'details')
         return null;
@@ -1907,7 +1907,7 @@ var jToxCompound = (function () {
       }
       
       fixCols.push(
-        self.prepareColumn(idFeature),
+        self.prepareColumn('#IdRow', idFeature),
         { "sClass": "jtox-hidden", "mData": "index", "sDefaultContent": "-", "bSortable": true, "mRender": function(data, type, full) { return ccLib.isNull(self.orderList) ? 0 : self.orderList[data]; } } // column used for ordering
       );
       
@@ -2023,7 +2023,7 @@ var jToxCompound = (function () {
             return;
             
           var feature = self.feature[fId];
-          var col = self.prepareColumn(feature);
+          var col = self.prepareColumn(fId, feature);
           if (!col)
             return;
           
