@@ -1626,7 +1626,7 @@ var jToxCompound = (function () {
     self.settings = jT.$.extend(true, {}, newDefs, jT.settings, settings); // i.e. defaults from jToxCompound
     
     // make a dull copy here, because, otherwise groups are merged... which we DON'T want
-    if (settings.configuration != null && settings.configuration.groups != null)
+    if (settings != null && settings.configuration != null && settings.configuration.groups != null)
       self.settings.configuration.groups = settings.configuration.groups;
       
     self.instanceNo = instanceCount++;
