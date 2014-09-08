@@ -18,7 +18,7 @@ function onSelectStructure(e) {
 
 function onSelectSubstance(e) {
   var uri = this.value;
-  console.log("Substance [" + uri + "] selected");  
+  console.log("Substance [" + uri + "] selected");
 }
 
 function onSelectEndpoint(e) {

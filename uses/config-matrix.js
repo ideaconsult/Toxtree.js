@@ -41,7 +41,7 @@ jTConfig.matrix = {
 		  "visibility": "main", 
 			"title": "Reason",
 			"data": "compound.URI",
-			"column": { sWidth: "300px" },
+			"column": { sWidth: "300px", sClass: "paddingless" },
 			"render" : function(data, type, full) {
 			  data = data || '';
 			  return (type != 'display') ? data : '<textarea>' + data + '</textarea>';
