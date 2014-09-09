@@ -190,11 +190,8 @@ var jToxStudy = (function () {
         // some value formatting functions
         var formatValue = function (data, unit, type) {
           var out = "";
-          if (typeof data == 'string') {
-            out += ccLib.trim(data).replace(/ /g, "&nbsp;");
-            if (!!unit)
-              out += '&nbsp;<span class="units">' + unit.replace(/ /g, "&nbsp;") + '</span>';
-          }
+          if (typeof data == 'string')
+            out += jT.ui.valueWithUnits(data, unit);
           else if (typeof data == 'object' && data != null) {
             data.loValue = ccLib.trim(data.loValue);
             data.upValue = ccLib.trim(data.upValue);

@@ -38,13 +38,12 @@ jTConfig.matrix = {
       }
 		},
 		"http://www.opentox.org/api/1.1#Reasoning" : {
-		  "visibility": "main", 
 			"title": "Reason",
 			"data": "compound.URI",
 			"column": { sWidth: "300px", sClass: "paddingless" },
 			"render" : function(data, type, full) {
 			  data = data || '';
-			  return (type != 'display') ? data : '<textarea>' + data + '</textarea>';
+			  return (type != 'display') ? data : '<textarea placeholder="Reason for selection_"></textarea>';
       }
 		},
 		"#IdRow" : {

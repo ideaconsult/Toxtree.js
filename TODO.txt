@@ -1,6 +1,4 @@
 TODO:
-- add reason writing (two columns, in order to have it as separate tab in details)
-- add compound details along with substances, as in ui-query
 - make matrix info popup.
 
 - History of searches in jToxSearch component (along with type of search and additional parameters)
@@ -13,7 +11,10 @@ DOCS:
 
 
 IDEAS?
-- 
+- add ordering of jToxCompound columns
+- check missing / mismatched details for Names / IUPAC Names
+- add reason writing - ordered 
+
 
 Assessment:
 - Ability to re-use the built tab/features structures? Additional setting?

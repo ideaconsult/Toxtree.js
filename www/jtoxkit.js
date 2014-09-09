@@ -966,7 +966,7 @@ window.jT.ui = {
       
     var res = '';
     for (var i = 0, il = data.length; i < il; ++i)
-      res += '<span>' + data[i].relation.substring(4).toLowerCase() + '</span><sup><a target="_blank" href="' + (full.URI + '/composition') + '" title="' + data[i].compositionName + '(' + data[i].compositionUUID + ')">?</a></sup>';
+      res += '<span>' + data[i].relation.substring(4).toLowerCase() + '</span><sup class="helper"><a target="_blank" href="' + (full.URI + '/composition') + '" title="' + data[i].compositionName + '(' + data[i].compositionUUID + ')">?</a></sup>';
   
     return res;
   },
@@ -985,6 +985,16 @@ window.jT.ui = {
     else { // i.e. short version
       return '<span class="ui-icon ui-icon-star jtox-inline" title="' + title + '"></span>' + stars;
     }
+  },
+  
+  valueWithUnits: function (val, unit) {
+    var out = '';
+    if (val != null) {
+      out += ccLib.trim(val.toString()).replace(/ /g, "&nbsp;");
+      if (!!unit)
+        out += '&nbsp;<span class="units">' + unit.replace(/ /g, "&nbsp;") + '</span>';
+    }
+    return out;
   },
   
   updateCounter: function (str, count, total) {
@@ -1581,7 +1591,7 @@ var jToxCompound = (function () {
       },
       "columns": {
         "compound": {
-          "Name": { sTitle: "Name", mData: 'title', mRender: function (data, type, full) { return '<span>' + data + '</span><sup><a target="_blank" href="' + full.URI + '">?</a></sup>'; } },
+          "Name": { sTitle: "Name", mData: 'title', mRender: function (data, type, full) { return '<span>' + data + '</span><sup class="helper"><a target="_blank" href="' + full.URI + '">?</a></sup>'; } },
           "Value": { sTitle: "Value", mData: 'value', sDefaultContent: "-" },
           "SameAs": { sTitle: "SameAs", mData: 'sameAs', sDefaultContent: "-" },
           "Source": { sTitle: "Source", mData: 'source', sDefaultContent: "-", mRender: function (data, type, full) { return !data || !data.type ? '-' : '<a target="_blank" href="' + data.URI + '">' + data.type + '</a>'; } }
@@ -1819,10 +1829,9 @@ var jToxCompound = (function () {
       var self = this;
       var feature = self.feature[fId];
       var val = (feature.data !== undefined) ? (ccLib.getJsonValue(data, jT.$.isArray(feature.data) ? feature.data[0] : feature.data)) : data.values[fId];
-      var res = (typeof feature.render == 'function') ? feature.render(val, !!type ? type : 'filter', data) : val;
-      if (!!feature.units && (type == 'display' || type == 'details'))
-        res += '<span class="units">' + feature.units + '</span>';
-      return res;
+      return jT.ui.valueWithUnits(
+        (typeof feature.render == 'function') ? feature.render(val, !!type ? type : 'filter', data) : val,
+        !!feature.units && (type == 'display' || type == 'details') ? feature.units : null);
     },
     
     featureUri: function (fId) {
@@ -1858,7 +1867,7 @@ var jToxCompound = (function () {
         
       // now we now we should show this one.
       var col = {
-        "sTitle": !feature.title ? '' : (feature.title.replace(/_/g, ' ') + (!self.settings.showUnits || ccLib.isNull(feature.units) ? "" : feature.units)),
+        "sTitle": !feature.title ? '' : jT.ui.valueWithUnits(feature.title.replace(/_/g, ' '), (!self.settings.showUnits ? null : feature.units)),
         "sDefaultContent": "-",
       };
       
@@ -3039,7 +3048,7 @@ var jToxComposition = (function () {
   };
   
   cls.formatConcentration = function (precision, val, unit) {
-  	return ((!precision || "=" == precision ? "" : precision) + val + " ").replace(/ /g, "&nbsp;") + '<span class="units">' + (unit || '% (w/w)').replace(/ /g, "&nbsp;") + '</span>';
+  	return jT.ui.valueWithUnits((!precision || "=" == precision ? "" : precision) + val + " ", unit || '% (w/w)');
   };
 
   var fnDatasetValue = function (fid, old, value, features){
@@ -3350,11 +3359,8 @@ var jToxStudy = (function () {
         // some value formatting functions
         var formatValue = function (data, unit, type) {
           var out = "";
-          if (typeof data == 'string') {
-            out += ccLib.trim(data).replace(/ /g, "&nbsp;");
-            if (!!unit)
-              out += '&nbsp;<span class="units">' + unit.replace(/ /g, "&nbsp;") + '</span>';
-          }
+          if (typeof data == 'string')
+            out += jT.ui.valueWithUnits(data, unit);
           else if (typeof data == 'object' && data != null) {
             data.loValue = ccLib.trim(data.loValue);
             data.upValue = ccLib.trim(data.upValue);
@@ -4402,7 +4408,7 @@ jT.templates['compound-one-tab']  =
 ""; // end of #compound-one-tab 
 
 jT.templates['compound-one-feature']  = 
-"    <div id=\"jtox-ds-feature\" class=\"jtox-ds-feature\"><input type=\"checkbox\" checked=\"yes\" class=\"jtox-checkbox\" /><span class=\"data-field jtox-title\" data-field=\"title\"> ? </span><sup><a target=\"_blank\" class=\"data-field attribute\" data-attribute=\"href\" data-field=\"uri\">?</a></sup></div>" +
+"    <div id=\"jtox-ds-feature\" class=\"jtox-ds-feature\"><input type=\"checkbox\" checked=\"yes\" class=\"jtox-checkbox\" /><span class=\"data-field jtox-title\" data-field=\"title\"> ? </span><sup class=\"helper\"><a target=\"_blank\" class=\"data-field attribute\" data-attribute=\"href\" data-field=\"uri\">?</a></sup></div>" +
 ""; // end of #jtox-ds-feature 
 
 jT.templates['compound-download']  = 

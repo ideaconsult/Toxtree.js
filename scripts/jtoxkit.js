@@ -578,7 +578,7 @@ window.jT.ui = {
       
     var res = '';
     for (var i = 0, il = data.length; i < il; ++i)
-      res += '<span>' + data[i].relation.substring(4).toLowerCase() + '</span><sup><a target="_blank" href="' + (full.URI + '/composition') + '" title="' + data[i].compositionName + '(' + data[i].compositionUUID + ')">?</a></sup>';
+      res += '<span>' + data[i].relation.substring(4).toLowerCase() + '</span><sup class="helper"><a target="_blank" href="' + (full.URI + '/composition') + '" title="' + data[i].compositionName + '(' + data[i].compositionUUID + ')">?</a></sup>';
   
     return res;
   },
@@ -597,6 +597,16 @@ window.jT.ui = {
     else { // i.e. short version
       return '<span class="ui-icon ui-icon-star jtox-inline" title="' + title + '"></span>' + stars;
     }
+  },
+  
+  valueWithUnits: function (val, unit) {
+    var out = '';
+    if (val != null) {
+      out += ccLib.trim(val.toString()).replace(/ /g, "&nbsp;");
+      if (!!unit)
+        out += '&nbsp;<span class="units">' + unit.replace(/ /g, "&nbsp;") + '</span>';
+    }
+    return out;
   },
   
   updateCounter: function (str, count, total) {

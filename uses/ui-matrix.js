@@ -153,9 +153,8 @@ var jToxAssessment = {
             "#DetailedInfoRow",
             "http://www.opentox.org/api/1.1#CASRN", 
             "http://www.opentox.org/api/1.1#EINECS",
-            "http://www.opentox.org/api/1.1#IUCLID5_UUID"
-          ],
-          "Names": [
+            "http://www.opentox.org/api/1.1#IUCLID5_UUID",
+            // Now some names
             "http://www.opentox.org/api/1.1#ChemicalName",
             "http://www.opentox.org/api/1.1#TradeName",
             "http://www.opentox.org/api/1.1#IUPACName",
@@ -163,7 +162,7 @@ var jToxAssessment = {
             "http://www.opentox.org/api/1.1#InChIKey",
             "http://www.opentox.org/api/1.1#InChI",
             "http://www.opentox.org/api/1.1#REACHRegistrationDate"
-      	  ]
+          ]
       	};
       	
       	var endpoints = {};
@@ -171,20 +170,20 @@ var jToxAssessment = {
       	
       	var fRender = function (feat) {
       	  return function (data, type, full) {
+      	    if (data == null)
+      	      data = '';
       	    if (type != 'display')
       	      return data.toString();
             var html = '';
             for (var fId in miniset.feature) {
               var f = miniset.feature[fId];
-              if (f.sameAs != feat.sameAs)
+              if (f.sameAs != feat.sameAs || full.values[fId] == null)
                 continue;
-              if (html.length > 0) 
+              if (html.length > 0)
                 html += '<br/>';
               
-              html += 
-                '<a target="jtox-study" href="' + full.compound.URI + '/study?property_uri=' + encodeURIComponent(fId) + '">' + 
-                (full.values[fId] || '-') + (f.units != null ? '&nbsp;<span class="units">' + f.units + '</span>' : '') + 
-                '</a>';
+              html += '<a class="info-popup" href="#">' + jT.ui.valueWithUnits(full.values[fId], f.units) + '</a>';
+              html += '<sup class="helper"><a target="jtox-study" href="' + full.compound.URI + '/study?property_uri=' + encodeURIComponent(fId) + '">?</a></sup>';
             }
       	    return  html;
           };
@@ -208,13 +207,17 @@ var jToxAssessment = {
       }
 		
   		$(panel).addClass('initialized');
+  		var conf = $.extend(true, {}, jTConfig.matrix);
+  		delete conf.baseFeatures['#IdRow'];
+  		
   		self.matrixKit = new jToxCompound($('.jtox-toolkit', panel)[0], {
     		crossDomain: true,
     		rememberChecks: true,
     		tabsFolded: true,
     		showDiagrams: true,
     		showUnits: false,
-    		configuration: jTConfig.matrix
+    		hasDetails: false,
+    		configuration: conf
   		});
   		
 /*   		self.matrixKit.query("http://apps.ideaconsult.net:8080/data/substanceowner/IUC5-8DA74AF7-C7DD-4E38-8D8E-8FC765D5D15F/dataset"); */

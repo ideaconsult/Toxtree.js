@@ -50,7 +50,7 @@ var jToxComposition = (function () {
   };
   
   cls.formatConcentration = function (precision, val, unit) {
-  	return ((!precision || "=" == precision ? "" : precision) + val + " ").replace(/ /g, "&nbsp;") + '<span class="units">' + (unit || '% (w/w)').replace(/ /g, "&nbsp;") + '</span>';
+  	return jT.ui.valueWithUnits((!precision || "=" == precision ? "" : precision) + val + " ", unit || '% (w/w)');
   };
 
   var fnDatasetValue = function (fid, old, value, features){
