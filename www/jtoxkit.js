@@ -2057,11 +2057,12 @@ var jToxCompound = (function () {
         "aoColumns": fixCols,
         "bSort": false,
         "fnCreatedRow": function( nRow, aData, iDataIndex ) {
-          jT.ui.installHandlers(self, nRow);
           // attach the click handling
           if (self.settings.hasDetails)
             jT.$('.jtox-details-open', nRow).on('click', function(e) { fnShowDetails(nRow, e); });
           jT.$(nRow).data('jtox-index', iDataIndex);
+          ccLib.fireCallback(self.settings.onRow, self, nRow, aData, iDataIndex);
+          jT.ui.installHandlers(self, nRow);
           jT.$('.jtox-diagram span.ui-icon', nRow).on('click', function () {
             setTimeout(function () {
               jT.$(self.fixTable).dataTable().fnAdjustColumnSizing();
@@ -2087,9 +2088,10 @@ var jToxCompound = (function () {
         "bScrollCollapse": true,
         "fnCreatedRow": function( nRow, aData, iDataIndex ) {
           nRow.id = 'jtox-var-' + self.instanceNo + '-' + iDataIndex;
-          jT.ui.installHandlers(self, nRow);
           jT.$(nRow).addClass('jtox-row');
           jT.$(nRow).data('jtox-index', iDataIndex);
+          ccLib.fireCallback(self.settings.onRow, self, nRow, aData, iDataIndex);
+          jT.ui.installHandlers(self, nRow);
         },
         "fnDrawCallback": function(oSettings) {
           // this is for synchro-sorting the two tables

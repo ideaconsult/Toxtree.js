@@ -14,6 +14,7 @@
 	<link rel="stylesheet" href="../tests/layout.css"/>
 	<link rel="stylesheet" href="../tests/jquery-ui.css"/>
 	<link rel="stylesheet" href="../tests/jquery.dataTables.css"/>
+	<link rel="stylesheet" href="../tests/jBox.css"/>
 	<link rel="stylesheet" href="../tests/ambit2.css"/>
 
 	<link rel="stylesheet" href="../www/jtoxkit.css"/>
@@ -21,12 +22,14 @@
 	<link rel="stylesheet" href="ui-matrix.css"/>
 
   <script src="oecdcategories.js"></script>
+  <script src="i5enums.js"></script>
 
   <script src="../tests/jquery.js"></script>
   <script src="../tests/jquery.base64.min.js"></script>
   <script src="../tests/jquery-migrate-1.2.1.min.js"></script>
   <script src="../tests/jquery-ui.min.js"></script>
   <script src="../tests/jquery.dataTables-1.9.4.min.js"></script>
+  <script src="../tests/jBox.js"></script>
 
   <script src="../www/jtoxkit.js"></script>
   <script src="../www/ketcher.js"></script>
@@ -130,6 +133,51 @@
 			<div class="jtox-toolkit" data-kit="compound" data-manual-init="true"></div>
     </div>
     <div id="jtox-report" class="jtox-report"></div>
+  </div>
+  <div class="jtox-template">
+    <div id="info-box">
+      <table class="jt-popup-table">
+        <thead>
+          <tr>
+            <th rowspan="2">Value</th>
+            <th rowspan="2">Type</th>
+            <th class="conditions center">Conditions</th>
+            <th rowspan="2">Source</th>
+          </tr>
+          <tr class="conditions">
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="data-field the-value" data-field="value"></td>
+            <td class="data-field" data-field="type"></td>
+            <td class="data-field postconditions" data-field="source"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="edit-box">
+      <table class="jt-popup-table">
+        <thead>
+          <tr>
+            <th>Value</th>
+            <th>Type</th>
+            <th>Justification</th>
+            <th>Reference</th>
+            <th>Remark</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input class="data-field" data-field="value"/></td>
+            <td><select class="data-field" data-field="type"><option value="-1"> - Select type - </option></select></td>
+            <td><input class="data-field" data-field="justification" placeholder="Justification_"/></td>
+            <td><input class="data-field" data-field="reference" placeholder="Reference_"/></td>
+            <td><textarea placeholder="Remark_"></textarea></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </body>
 </html>

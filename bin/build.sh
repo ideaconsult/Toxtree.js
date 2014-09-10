@@ -105,7 +105,7 @@ for l in "${libs[@]}"; do
 	popd > /dev/null
 done
 # form the final target list
-target="common jtoxkit $target"
+target="ccLib jtoxkit $target"
 
 # start the building process...
 echo "Processing targets [$target]..."

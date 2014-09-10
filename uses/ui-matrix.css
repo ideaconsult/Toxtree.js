@@ -99,3 +99,41 @@ body.structlist #browser {
 #jtox-endpoints .tab-points  {
   padding-left: 15px;
 }
+
+/* Now come info and edit box declarations
+*/
+table.jt-popup-table th,
+table.jt-popup-table td {
+  padding: 2px 5px 2px 5px;
+  border-left: 1px solid #666;
+  border-right: 1px solid #666;
+  text-align: center;
+}
+
+table.jt-popup-table td:first-child,
+table.jt-popup-table th:first-child{
+  border-left: 0px;
+}
+
+table.jt-popup-table td:last-child,
+table.jt-popup-table th:last-child {
+  border-right: 0px;
+}
+
+table.jt-popup-table thead tr:first-child {
+  border-bottom: 1px solid #666;
+}
+
+table.jt-popup-table tbody {
+  border-top: 1px solid #666;
+}
+
+table.jt-popup-table th {
+  font-size: 80%;
+  font-weight: bold;
+}
+
+table.jt-popup-table .the-value {
+  font-style: italic;
+  font-weight: bold;
+}

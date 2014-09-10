@@ -46,6 +46,7 @@ function onDetailedRow(row, data, event) {
 var jToxAssessment = {
 	createForm: null,
 	rootElement: null,
+	studyTypeList: _i5.qaSettings["Study result type"],
 	queries: {
 		'assess_create': { method: "POST", service: "/assessment"},
 		'assess_update': { method: "PUT", service: "/assessment/{id}/metadata"},
@@ -69,6 +70,10 @@ var jToxAssessment = {
 
 		self.rootElement = root;
     self.settings = $.extend(self.settings, jT.settings, settings);
+    
+    // deal with some configuration
+    if (typeof self.settings.studyTypeList == 'string')
+      self.settings.studyTypeList = window[self.settings.studyTypeList];
 		
 		// the (sub)action in the panel
 		var loadAction = function () {
@@ -182,7 +187,7 @@ var jToxAssessment = {
               if (html.length > 0)
                 html += '<br/>';
               
-              html += '<a class="info-popup" href="#">' + jT.ui.valueWithUnits(full.values[fId], f.units) + '</a>';
+              html += '<a class="info-popup" data-feature="' + fId + '" href="#">' + jT.ui.valueWithUnits(full.values[fId], f.units) + '</a>';
               html += '<sup class="helper"><a target="jtox-study" href="' + full.compound.URI + '/study?property_uri=' + encodeURIComponent(fId) + '">?</a></sup>';
             }
       	    return  html;
@@ -210,6 +215,18 @@ var jToxAssessment = {
   		var conf = $.extend(true, {}, jTConfig.matrix);
   		delete conf.baseFeatures['#IdRow'];
   		
+  		// now prepare the mechanism for popups to work nicely
+  		var infoBox = new jBox('Tooltip', { 
+  		  overlay: true, 
+  		  closeOnEsc: true,
+  		  closeOnClick: "overlay",
+  		  addClass: "popup-box",
+  		  animation: "zoomIn"
+  		});
+  		
+  		var infoDiv = $('#info-box')[0];
+  		var editDiv = $('#edit-box')[0];
+  		
   		self.matrixKit = new jToxCompound($('.jtox-toolkit', panel)[0], {
     		crossDomain: true,
     		rememberChecks: true,
@@ -217,7 +234,59 @@ var jToxAssessment = {
     		showDiagrams: true,
     		showUnits: false,
     		hasDetails: false,
-    		configuration: conf
+    		configuration: conf,
+    		onRow: function (row, data, index) {
+      		$('.info-popup, .edit-popup', row).on('click', function () {
+      		  var html = '';
+      		  var fId = $(this).data('feature');
+      		  if ($(this).hasClass('info-popup')) {
+      		    var feature = self.matrixKit.dataset.feature[fId];
+      		    
+        		  $('.dynamic-condition', infoDiv).remove();
+        		  var dynHead = $('tr.conditions', infoDiv)[0];
+        		  var postCell = $('td.postconditions', infoDiv)[0];
+        		  
+        		  for (var i = 0, cl = feature.annotation.length; i < cl; ++i) {
+          		  var ano = feature.annotation[i];
+          		  // first add the column
+          		  var el = document.createElement('th');
+          		  el.className = 'dynamic-condition';
+          		  el.innerHTML = ano.p;
+          		  dynHead.appendChild(el);
+          		  // now add the value
+          		  el = document.createElement('td');
+          		  el.className = 'dynamic-condition';
+          		  el.innerHTML = ano.o;
+          		  postCell.parentNode.insertBefore(el, postCell);
+        		  }
+        		  
+        		  // make sure there is at least one cell.
+              if (cl < 1) {
+          		  el = document.createElement('td');
+          		  el.className = 'dynamic-condition';
+          		  el.innerHTML = '-';
+          		  postCell.parentNode.insertBefore(el, postCell);
+              }
+              
+        		  $('th.conditions', infoDiv).attr('colspan', cl);
+        		  
+        		  ccLib.fillTree(infoDiv, {
+          		  type: feature.type,
+          		  value: this.innerHTML,
+          		  source: '<a target="_blank" href="' + feature.source.URI + '">' + feature.source.type + '</a>'
+        		  });
+        		  
+        		  html = infoDiv.innerHTML;
+      		  }
+      		  else { // edit mode
+              // TODO:
+      		  }
+
+      		  infoBox.setContent(html);
+      		  infoBox.position({ target: $(this)});
+      		  infoBox.open();
+      		});
+    		}
   		});
   		
 /*   		self.matrixKit.query("http://apps.ideaconsult.net:8080/data/substanceowner/IUC5-8DA74AF7-C7DD-4E38-8D8E-8FC765D5D15F/dataset"); */
