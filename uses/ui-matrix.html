@@ -136,9 +136,10 @@
   </div>
   <div class="jtox-template">
     <div id="info-box">
-      <table class="jt-popup-table">
+      <table>
         <thead>
           <tr>
+            <th rowspan="2">Endpoint</th>
             <th rowspan="2">Value</th>
             <th rowspan="2">Type</th>
             <th class="conditions center">Conditions</th>
@@ -149,6 +150,7 @@
         </thead>
         <tbody>
           <tr>
+            <td class="data-field the-endpoint" data-field="endpoint"></td>
             <td class="data-field the-value" data-field="value"></td>
             <td class="data-field" data-field="type"></td>
             <td class="data-field postconditions" data-field="source"></td>
@@ -157,7 +159,7 @@
       </table>
     </div>
     <div id="edit-box">
-      <table class="jt-popup-table">
+      <table>
         <thead>
           <tr>
             <th>Value</th>
@@ -170,13 +172,17 @@
         <tbody>
           <tr>
             <td><input class="data-field" data-field="value"/></td>
-            <td><select class="data-field" data-field="type"><option value="-1"> - Select type - </option></select></td>
+            <td><select class="data-field type-list" data-field="type"><option value="-1"> - Select type - </option></select></td>
             <td><input class="data-field" data-field="justification" placeholder="Justification_"/></td>
             <td><input class="data-field" data-field="reference" placeholder="Reference_"/></td>
-            <td><textarea placeholder="Remark_"></textarea></td>
+            <td><input class="data-field" data-field="remark" placeholder="Remark_"/></td>
           </tr>
         </tbody>
       </table>
+      <div class="size-full the-send">
+        <span class="data-field the-endpoint" data-field="endpoint"></span>
+        <input value="Apply" type="button"/>
+      </div>
     </div>
   </div>
 </body>

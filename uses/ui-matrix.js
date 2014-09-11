@@ -46,7 +46,6 @@ function onDetailedRow(row, data, event) {
 var jToxAssessment = {
 	createForm: null,
 	rootElement: null,
-	studyTypeList: _i5.qaSettings["Study result type"],
 	queries: {
 		'assess_create': { method: "POST", service: "/assessment"},
 		'assess_update': { method: "PUT", service: "/assessment/{id}/metadata"},
@@ -65,6 +64,10 @@ var jToxAssessment = {
   	compounds: [],
 	},
 		
+  settings: {
+  	studyTypeList: _i5.qaSettings["Study result type"],
+  },
+  
 	init: function (root, settings) {
 		var self = this;
 
@@ -173,12 +176,11 @@ var jToxAssessment = {
       	var endpoints = {};
       	var grp = [];
       	
-      	var fRender = function (feat) {
+      	var fRender = function (feat, theId) {
       	  return function (data, type, full) {
-      	    if (data == null)
-      	      data = '';
       	    if (type != 'display')
-      	      return data.toString();
+      	      return '-';
+
             var html = '';
             for (var fId in miniset.feature) {
               var f = miniset.feature[fId];
@@ -190,6 +192,10 @@ var jToxAssessment = {
               html += '<a class="info-popup" data-feature="' + fId + '" href="#">' + jT.ui.valueWithUnits(full.values[fId], f.units) + '</a>';
               html += '<sup class="helper"><a target="jtox-study" href="' + full.compound.URI + '/study?property_uri=' + encodeURIComponent(fId) + '">?</a></sup>';
             }
+            
+            if (!html)
+              html += '<span class="ui-icon ui-icon-circle-plus edit-popup" data-feature="' + theId + '"></span>';
+
       	    return  html;
           };
         };
@@ -201,7 +207,7 @@ var jToxAssessment = {
           
           if (endpoints[feat.sameAs] == undefined) {
             endpoints[feat.sameAs] = true;
-            feat.render = fRender(feat);
+            feat.render = fRender(feat, fId);
             feat.title = feat.sameAs.substr(feat.sameAs.indexOf('#') + 1);
             grp.push(fId);
           }
@@ -226,6 +232,16 @@ var jToxAssessment = {
   		
   		var infoDiv = $('#info-box')[0];
   		var editDiv = $('#edit-box')[0];
+  		// now, fill the select with proper values...
+  		var df = document.createDocumentFragment();
+  		for (var id in self.settings.studyTypeList) {
+  		  var opt = document.createElement('option');
+  		  opt.value = id;
+  		  opt.innerHTML = self.settings.studyTypeList[id].title;
+  		  df.appendChild(opt);
+  		}
+  		
+  		$('select.type-list', editDiv)[0].appendChild(df);
   		
   		self.matrixKit = new jToxCompound($('.jtox-toolkit', panel)[0], {
     		crossDomain: true,
@@ -238,9 +254,10 @@ var jToxAssessment = {
     		onRow: function (row, data, index) {
       		$('.info-popup, .edit-popup', row).on('click', function () {
       		  var html = '';
-      		  var fId = $(this).data('feature');
+      		  var boxOptions = { target: $(this) };
+
+    		    var feature = self.matrixKit.dataset.feature[$(this).data('feature')];
       		  if ($(this).hasClass('info-popup')) {
-      		    var feature = self.matrixKit.dataset.feature[fId];
       		    
         		  $('.dynamic-condition', infoDiv).remove();
         		  var dynHead = $('tr.conditions', infoDiv)[0];
@@ -271,6 +288,7 @@ var jToxAssessment = {
         		  $('th.conditions', infoDiv).attr('colspan', cl);
         		  
         		  ccLib.fillTree(infoDiv, {
+        		    endpoint: feature.title,
           		  type: feature.type,
           		  value: this.innerHTML,
           		  source: '<a target="_blank" href="' + feature.source.URI + '">' + feature.source.type + '</a>'
@@ -279,12 +297,17 @@ var jToxAssessment = {
         		  html = infoDiv.innerHTML;
       		  }
       		  else { // edit mode
-              // TODO:
+      		    ccLib.fillTree(editDiv, {
+        		    endpoint: feature.title
+      		    });
+              html = editDiv.innerHTML;
+              boxOptions.closeButton = "box";
+              boxOptions.confirmButton = "Add";
+              boxOptions.cancelButton = "Cancel";
       		  }
 
       		  infoBox.setContent(html);
-      		  infoBox.position({ target: $(this)});
-      		  infoBox.open();
+      		  infoBox.open( boxOptions );
       		});
     		}
   		});

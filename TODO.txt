@@ -1,16 +1,17 @@
 TODO:
+- edit box popup showing
+- add ordering of jToxCompound columns
+- add the possibility in jToxLog to reconfigure the UI by disabling UI and using callback. Use jBox instead.
 - History of searches in jToxSearch component (along with type of search and additional parameters)
-- deferred re-query (postpone)
-- Reduce network calls in ToxTree on run-all - postopone the call until the last model has ran.
 
 DOCS:
 - new handling mechsnism with 'handler' propert in each kit
 - onRow universal handler
 
 
-IDEAS?
-- add ordering of jToxCompound columns
-- add the possibility in jToxLog to reconfigure the UI by disabling UI and using callback. Use jBox instead.
+FUTURE / IDEAS
+- deferred re-query (postpone)
+- Reduce network calls in ToxTree on run-all - postopone the call until the last model has ran.
 - 
 
 
