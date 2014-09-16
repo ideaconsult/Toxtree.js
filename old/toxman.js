@@ -19,7 +19,7 @@ window.ToxMan = {
 	inPrediction: false,			// true if we're in progress of making prediction.
 	inQuery: false,						// to prevent in making double queries. Second attempts for queries, while one is being held are ignored, not postponed.
 
-	/* A single place to hold all necessary queries. Parameters are marked with <XX> and ccLib.formatString() (common.js) is used
+	/* A single place to hold all necessary queries. Parameters are marked with <XX> and ccLib.formatString() (ccLib.js) is used
 	to prepare the actual URLs
 	*/
 	queries: {

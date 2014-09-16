@@ -372,9 +372,9 @@ var jToxCompound = (function () {
       var self = this;
       var feature = self.feature[fId];
       var val = (feature.data !== undefined) ? (ccLib.getJsonValue(data, jT.$.isArray(feature.data) ? feature.data[0] : feature.data)) : data.values[fId];
-      return jT.ui.valueWithUnits(
-        (typeof feature.render == 'function') ? feature.render(val, !!type ? type : 'filter', data) : val,
-        !!feature.units && (type == 'display' || type == 'details') ? feature.units : null);
+      return (typeof feature.render == 'function') ? 
+        feature.render(val, !!type ? type : 'filter', data) : 
+        jT.ui.valueWithUnits(val, !!feature.units && (type == 'display' || type == 'details') ? feature.units : null)
     },
     
     featureUri: function (fId) {
@@ -388,12 +388,12 @@ var jToxCompound = (function () {
       var data = [];
       ccLib.enumObject(set, function (fId, idx, level) {
         var feat = jT.$.extend({}, self.feature[fId]);
-        var vis = feat['visibility'];
+        var vis = feat.visibility;
         if (!!vis && vis != scope)
           return;
         var title = feat.title;
         feat.value = self.featureValue(fId, entry, scope);
-        if (!!title && (!self.settings.hideEmptyDetails || !! feat.value)) {
+        if (!!title && (!self.settings.hideEmptyDetails || !!feat.value)) {
           data.push(feat)
           if (!feat.value)
             feat.value = '-';
@@ -512,9 +512,7 @@ var jToxCompound = (function () {
         var varCell = document.getElementById('jtox-var-' + self.instanceNo + '-' + idx).firstElementChild;
         fnExpandCell(varCell, toShow);
         
-        var iconCell = jT.$('.jtox-details-open', row);
-        jT.$(iconCell).toggleClass('ui-icon-folder-open');
-        jT.$(iconCell).toggleClass('ui-icon-folder-collapsed');
+        jT.$('.jtox-details-open', row).toggleClass('ui-icon-folder-open ui-icon-folder-collapsed');
         
         if (toShow) {
           // i.e. we need to show it - put the full sized diagram in the fixed part and the tabs in the variable one...
@@ -558,7 +556,7 @@ var jToxCompound = (function () {
           });
           
           jT.$(cell).height(detDiv.offsetHeight);
-          ccLib.fireCallback(self.settings.onDetails, self, detDiv, entry, event);
+          ccLib.fireCallback(self.settings.onDetails, self, detDiv, entry, cell);
           jT.$(cell).data('detailsDiv', detDiv);
           jT.$(detDiv).data('rootCell', cell);
         }

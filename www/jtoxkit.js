@@ -389,7 +389,7 @@ function ccNonEmptyFilter(v) {
 window.jT = window.jToxKit = {
 	templateRoot: null,
 
-	/* A single place to hold all necessary queries. Parameters are marked with {id} and formatString() (common.js) is used
+	/* A single place to hold all necessary queries. Parameters are marked with {id} and formatString() (ccLib.js) is used
 	to prepare the actual URLs
 	*/
 	queries: {
@@ -822,7 +822,18 @@ window.jT.ui = {
         return type != 'display' ? (data || '') : '<input type="text" class="jt-inlineaction jtox-handler" data-handler="' + handler + '" data-data="' + location + '" value="' + (data || '') + '"' + (!holder ? '' : ' placeholder="' + holder + '"') + '/>';
       };
   },
-    
+
+  putAutocomplete: function (kit, root, service, maxhits, process) {
+		jT.$(root).autocomplete({
+      source: function( request, response ) {
+        jT.call(kit, service, { max: maxhits, search: request.term }, function (data) {
+          process(data, response, request);
+        });
+      },
+      minLength: 0
+		});			
+  },
+  
   installMultiSelect: function (root, callback, parenter) {
     if (parenter == null)
       parenter = function (el) { return el.parentNode; };
@@ -943,7 +954,7 @@ window.jT.ui = {
           jT.$('.jtox-details-toggle', nRow).on('click', function(e) {  
             var root = jT.ui.toggleDetails(e, nRow);
             if (!!root) {
-              ccLib.fireCallback(kit.settings.onDetails, kit, root, jT.$(this).data('data'), e);
+              ccLib.fireCallback(kit.settings.onDetails, kit, root, aData, this);
             }
           });
         }
@@ -1829,9 +1840,9 @@ var jToxCompound = (function () {
       var self = this;
       var feature = self.feature[fId];
       var val = (feature.data !== undefined) ? (ccLib.getJsonValue(data, jT.$.isArray(feature.data) ? feature.data[0] : feature.data)) : data.values[fId];
-      return jT.ui.valueWithUnits(
-        (typeof feature.render == 'function') ? feature.render(val, !!type ? type : 'filter', data) : val,
-        !!feature.units && (type == 'display' || type == 'details') ? feature.units : null);
+      return (typeof feature.render == 'function') ? 
+        feature.render(val, !!type ? type : 'filter', data) : 
+        jT.ui.valueWithUnits(val, !!feature.units && (type == 'display' || type == 'details') ? feature.units : null)
     },
     
     featureUri: function (fId) {
@@ -1845,12 +1856,12 @@ var jToxCompound = (function () {
       var data = [];
       ccLib.enumObject(set, function (fId, idx, level) {
         var feat = jT.$.extend({}, self.feature[fId]);
-        var vis = feat['visibility'];
+        var vis = feat.visibility;
         if (!!vis && vis != scope)
           return;
         var title = feat.title;
         feat.value = self.featureValue(fId, entry, scope);
-        if (!!title && (!self.settings.hideEmptyDetails || !! feat.value)) {
+        if (!!title && (!self.settings.hideEmptyDetails || !!feat.value)) {
           data.push(feat)
           if (!feat.value)
             feat.value = '-';
@@ -1969,9 +1980,7 @@ var jToxCompound = (function () {
         var varCell = document.getElementById('jtox-var-' + self.instanceNo + '-' + idx).firstElementChild;
         fnExpandCell(varCell, toShow);
         
-        var iconCell = jT.$('.jtox-details-open', row);
-        jT.$(iconCell).toggleClass('ui-icon-folder-open');
-        jT.$(iconCell).toggleClass('ui-icon-folder-collapsed');
+        jT.$('.jtox-details-open', row).toggleClass('ui-icon-folder-open ui-icon-folder-collapsed');
         
         if (toShow) {
           // i.e. we need to show it - put the full sized diagram in the fixed part and the tabs in the variable one...
@@ -2015,7 +2024,7 @@ var jToxCompound = (function () {
           });
           
           jT.$(cell).height(detDiv.offsetHeight);
-          ccLib.fireCallback(self.settings.onDetails, self, detDiv, entry, event);
+          ccLib.fireCallback(self.settings.onDetails, self, detDiv, entry, cell);
           jT.$(cell).data('detailsDiv', detDiv);
           jT.$(detDiv).data('rootCell', cell);
         }
@@ -2901,12 +2910,12 @@ var jToxSubstance = (function () {
     
     if (!self.settings.noInterface) {
       if (self.settings.embedComposition && self.settings.onDetails == null) {
-        self.settings.onDetails = function (root, data, event) {
+        self.settings.onDetails = function (root, data, element) {
           new jToxComposition(root, jT.$.extend(
             {}, 
             self.settings, 
             (typeof self.settings.embedComposition == 'object' ? self.settings.embedComposition : jT.blankSettings), 
-            { compositionUri : data + '/composition' }
+            { compositionUri : data.URI + '/composition' }
           ));
         };
       }
@@ -4154,6 +4163,7 @@ var jToxEndpoint = (function () {
     heightStyle: "content",   // the accordition heightStyle
     hideFilter: false,        // if you don't want to have filter box - just hide it
     showMultiselect: true,    // whether to hide select all / unselect all buttons
+    showEditors: false,       // whether to show endpoint value editing fields as details
     sDom: "<i>rt",            // passed with dataTable settings upon creation
     oLanguage: null,          // passed with dataTable settings upon creation
     onLoaded: null,           // callback called when the is available
@@ -4194,9 +4204,60 @@ var jToxEndpoint = (function () {
       self.loadEndpoints(self.settings.endpointUri)
   };
   
+  // now the editors...
+  cls.putValueEditor = function (element, units, qualifiers) {
+    jT.$(root).tagit({ 
+      availableTags: units.concat(qualifiers),
+      singleFieldDelimiter: ";",
+      allowSpaces: false,
+      allowDuplicates: true,
+      singleField: true,
+      removeConfirmation: false,
+      caseSensitive: false,
+      showAutocompleteOnFocus: true,
+      placeholderText: "Value range_",
+      afterTagAdded: function (e, ui) {
+        if (units.indexOf(ui.tagLabel) >= 0)
+          jT.$(ui.tag).addClass('tagit-unit');
+        else if (qualifiers.indexOf(ui.tagLabel) >= 0)
+          jT.$(ui.tag).addClass('tagit-qualifier');
+        else
+          jT.$(ui.tag).addClass('tagit-value');
+        return true;
+      }
+    });
+  };
+  
+  cls.putEditors = function (kit, root, category, top) {
+    root.appendChild(jT.getTemplate('#jtox-endeditor'));
+    jT.ui.putAutocomplete(kit, jT.$('input.end-name'), '/admin/stats/experiment_endpoints?top=' + encodeURIComponent(top) + '&category=' + encodeURIComponent(category), function (data, response, request) {
+      response( jT.$.map( data.facet, function( item ) {
+        return {
+          label: item.endpoint + " [" + item.count + "]",
+          value: item.endpoint
+        }
+      }));
+    });
+
+    jT.ui.putAutocomplete(kit, jT.$('input.end-interpret'), '', function (data, response, request) {
+      response( $.map( data.facet, function( item ) {
+        return {
+          label: item.interpretation_result + " [" + item.count + "]",
+          value: item.interpretation_result
+        }
+      }));
+    });
+    
+    // TODO: install value editor...
+  };
+  
   cls.prototype = {
     init: function (settings) {
       var self = this;
+      
+      // we can redefine onDetails only if there is not one passed and we're asked to show editors at ll
+      if (!!self.settings.showEditors && !self.settings.onDetails)
+        self.settings.onDetails = function (root, data, element) { cls.putEditors(self, root, data.endpoint, data.subcategory); };
       
       // deal if the selection is chosen
       if (!!self.settings.selectionHandler || !!self.settings.onDetails)
@@ -4330,7 +4391,7 @@ var jToxEndpoint = (function () {
       return uri;
     }
   };
-    
+  
   return cls;
 })();
 jT.templates['widget-search']  = 
@@ -4608,4 +4669,15 @@ jT.templates['all-endpoint']  =
 "	    </div>" +
 "	  </div>" +
 ""; // end of #jtox-endpoint 
+
+jT.templates['editor-endpoint']  = 
+"	  <div id=\"jtox-endeditor\" class=\"jt-endeditor\">" +
+"	    <div class=\"jtox-details\" class=\"end-name\">Endpoint name</div>" +
+"	    <input type=\"text\" placeholder=\"Endpoint_\" class=\"end-name\"/>" +
+"	    <div class=\"jtox-details\" class=\"end-name\">Value range</div>" +
+"	    <input type=\"text\" placeholder=\"Value_\" class=\"end-value\"/>" +
+"	    <div class=\"jtox-details\" class=\"end-intepret\">Intepretation results</div>" +
+"	    <input type=\"text\" placeholder=\"Intepretation\" class=\"end-interpret\"/>" +
+"	  </div>" +
+""; // end of #jtox-end-editor 
 

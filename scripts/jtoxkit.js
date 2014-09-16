@@ -1,7 +1,7 @@
 window.jT = window.jToxKit = {
 	templateRoot: null,
 
-	/* A single place to hold all necessary queries. Parameters are marked with {id} and formatString() (common.js) is used
+	/* A single place to hold all necessary queries. Parameters are marked with {id} and formatString() (ccLib.js) is used
 	to prepare the actual URLs
 	*/
 	queries: {
@@ -434,7 +434,18 @@ window.jT.ui = {
         return type != 'display' ? (data || '') : '<input type="text" class="jt-inlineaction jtox-handler" data-handler="' + handler + '" data-data="' + location + '" value="' + (data || '') + '"' + (!holder ? '' : ' placeholder="' + holder + '"') + '/>';
       };
   },
-    
+
+  putAutocomplete: function (kit, root, service, maxhits, process) {
+		jT.$(root).autocomplete({
+      source: function( request, response ) {
+        jT.call(kit, service, { method: "GET", data: { max: maxhits, search: request.term } } , function (data) {
+          process(data, response, request);
+        });
+      },
+      minLength: 0
+		});			
+  },
+  
   installMultiSelect: function (root, callback, parenter) {
     if (parenter == null)
       parenter = function (el) { return el.parentNode; };
@@ -555,7 +566,7 @@ window.jT.ui = {
           jT.$('.jtox-details-toggle', nRow).on('click', function(e) {  
             var root = jT.ui.toggleDetails(e, nRow);
             if (!!root) {
-              ccLib.fireCallback(kit.settings.onDetails, kit, root, jT.$(this).data('data'), e);
+              ccLib.fireCallback(kit.settings.onDetails, kit, root, aData, this);
             }
           });
         }

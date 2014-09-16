@@ -30,9 +30,9 @@
   <script src="../www/jtoxkit.js"></script>
   <script language="javascript">
     $(document).ready(function(){
-      var ds = new jToxSubstance($(".jtox-toolkit")[0], {crossDomain: true, selectionHandler: "query", onDetails: function (root, data, event) {
+      var ds = new jToxSubstance($(".jtox-toolkit")[0], {crossDomain: true, selectionHandler: "query", onDetails: function (root, data, element) {
         var comp = new jToxStudy(root);
-        comp.querySubstance(data);
+        comp.querySubstance(data.URI);
       } } );
       ds.querySubstance('http://apps.ideaconsult.net:8080/toxbank/substance');
     });

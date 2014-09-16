@@ -11,10 +11,13 @@ var jToxEndpoint = (function () {
     heightStyle: "content",   // the accordition heightStyle
     hideFilter: false,        // if you don't want to have filter box - just hide it
     showMultiselect: true,    // whether to hide select all / unselect all buttons
+    showEditors: false,       // whether to show endpoint value editing fields as details
     sDom: "<i>rt",            // passed with dataTable settings upon creation
     oLanguage: null,          // passed with dataTable settings upon creation
     onLoaded: null,           // callback called when the is available
-    loadOnInit: false,        // whether to make an (empty) call when initialized. 
+    loadOnInit: false,        // whether to make an (empty) call when initialized.
+    units: ['uSv', 'kg', 'mg/l', 'mg/kg bw', '°C', 'mg/kg bw/day', 'ppm', '%'],
+    qualifiers: ['<', '<=', '=', '>=', '>'],
     oLanguage: {
       "sLoadingRecords": "No endpoints found.",
       "sZeroRecords": "No endpoints found.",
@@ -51,9 +54,63 @@ var jToxEndpoint = (function () {
       self.loadEndpoints(self.settings.endpointUri)
   };
   
+  // now the editors...
+  cls.putEditors = function (kit, root, category, top) {
+    root.appendChild(jT.getTemplate('#jtox-endeditor'));
+    var fillFn = function (field) {
+      return function (data, response) {
+        response( !data ? [] : jT.$.map( data.facet, function( item ) {
+          return {
+            label: item[field] + " [" + item.count + "]",
+            value: item[field]
+          }
+        }));
+      };
+    };
+    
+    jT.ui.putAutocomplete(kit, jT.$('input.end-name'), '/admin/stats/experiment_endpoints?top=' + encodeURIComponent(top) + '&category=' + encodeURIComponent(category), 10, fillFn('endpoint'));
+    jT.ui.putAutocomplete(kit, jT.$('input.end-interpret'), '/admin/stats/interpretation_result?top=' + encodeURIComponent(top) + '&category=' + encodeURIComponent(category), 10, fillFn('interpretation_result'));
+    
+    var units = kit.settings.units || defaultSettings.units;
+    var qualifiers = kit.settings.qualifiers || defaultSettings.qualifiers;
+    
+    jT.$('input.end-value', root).tagit({
+/*
+      autocomplete: {
+        source: function (request, response) {
+          console.log("Auto: " + JSON.stringify(request));
+          response(qualifiers.concat(units));
+        }
+      },
+*/
+      availableTags: qualifiers.concat(units),
+      singleFieldDelimiter: ";",
+      allowSpaces: false,
+      allowDuplicates: true,
+      singleField: true,
+      removeConfirmation: false,
+      caseSensitive: false,
+      showAutocompleteOnFocus: true,
+      placeholderText: "Value range_",
+      afterTagAdded: function (e, ui) {
+        if (units.indexOf(ui.tagLabel) >= 0)
+          jT.$(ui.tag).addClass('tag-unit');
+        else if (qualifiers.indexOf(ui.tagLabel) >= 0)
+          jT.$(ui.tag).addClass('tag-qualifier');
+        else
+          jT.$(ui.tag).addClass('tag-value');
+        return true;
+      }
+    });
+  };
+  
   cls.prototype = {
     init: function (settings) {
       var self = this;
+      
+      // we can redefine onDetails only if there is not one passed and we're asked to show editors at ll
+      if (!!self.settings.showEditors && !self.settings.onDetails)
+        self.settings.onDetails = function (root, data, element) { cls.putEditors(self, root, data.endpoint, data.subcategory); };
       
       // deal if the selection is chosen
       if (!!self.settings.selectionHandler || !!self.settings.onDetails)
@@ -187,6 +244,6 @@ var jToxEndpoint = (function () {
       return uri;
     }
   };
-    
+  
   return cls;
 })();

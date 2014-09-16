@@ -272,6 +272,31 @@ img.jtox-smalldiagram {
   display: none;
 }
 
+.jtox-toolkit li.tagit-choice a.tagit-close {
+  opacity: 0.4;
+}
+
+.jtox-toolkit li.tagit-choice.tag-value,
+.jtox-toolkit li.tagit-choice.tag-unit {
+  border: 0px;
+  background: inherit;
+  padding-right: 0px;
+}
+
+.jtox-toolkit li.tagit-choice.tag-value a.tagit-close,
+.jtox-toolkit li.tagit-choice.tag-unit a.tagit-close {
+  display: none;
+}
+
+.jtox-toolkit li.tagit-choice.tag-value {
+  font-weight: bold;
+}
+
+.jtox-toolkit li.tagit-choice.tag-unit {
+  font-size: 80%;
+  line-height: 1.2rem;
+}
+
 button.jt-toggle {
   display: inline-block;
   border: 1px solid #aaa;

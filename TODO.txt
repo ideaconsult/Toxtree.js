@@ -9,6 +9,7 @@ TODO:
 DOCS:
 - new handling mechanism with 'handler' property in each kit
 - onRow universal handler
+- jToxComouns column ordering via 'order' field in feature definition
 
 
 FUTURE / IDEAS
