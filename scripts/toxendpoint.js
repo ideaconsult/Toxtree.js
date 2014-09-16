@@ -17,7 +17,6 @@ var jToxEndpoint = (function () {
     onLoaded: null,           // callback called when the is available
     loadOnInit: false,        // whether to make an (empty) call when initialized.
     units: ['uSv', 'kg', 'mg/l', 'mg/kg bw', '°C', 'mg/kg bw/day', 'ppm', '%'],
-    qualifiers: ['<', '<=', '=', '>=', '>'],
     oLanguage: {
       "sLoadingRecords": "No endpoints found.",
       "sZeroRecords": "No endpoints found.",
@@ -68,22 +67,30 @@ var jToxEndpoint = (function () {
       };
     };
     
-    jT.ui.putAutocomplete(kit, jT.$('input.end-name'), '/admin/stats/experiment_endpoints?top=' + encodeURIComponent(top) + '&category=' + encodeURIComponent(category), 10, fillFn('endpoint'));
-    jT.ui.putAutocomplete(kit, jT.$('input.end-interpret'), '/admin/stats/interpretation_result?top=' + encodeURIComponent(top) + '&category=' + encodeURIComponent(category), 10, fillFn('interpretation_result'));
+    jT.ui.putAutocomplete(kit, jT.$('input.end-name'), '/admin/stats/experiment_endpoints?top=' + encodeURIComponent(top) + '&category=' + encodeURIComponent(category), 10, fillFn('endpoint')).on('change', function () { jT.$(root).closest('tr').data('endpoint', data); });
+  
+    jT.ui.putAutocomplete(kit, jT.$('input.end-interpret'), '/admin/stats/interpretation_result?top=' + encodeURIComponent(top) + '&category=' + encodeURIComponent(category), 10, fillFn('interpretation_result')).on('change', function () { jT.$(root).closest('tr').data('interpretation', data); });
     
+    // now comes the tagging mechanism
     var units = kit.settings.units || defaultSettings.units;
-    var qualifiers = kit.settings.qualifiers || defaultSettings.qualifiers;
+    var sequence = [
+      { type: "tag-qualifier", field: "loQualifier", tags: ['>=', '>', '='], strict: true},
+      { type: "tag-value", field: "loValue", tags: null},
+      { type: "tag-unit", field: "unit", tags: units},
+      { type: "tag-qualifier", field: "hiQualifier", tags: ['<=', '<'], strict: true},
+      { type: "tag-value", field: "hiValue", tags: null},
+      { type: "tag-unit", field: "unit", tags: units}
+    ];
+    var nowOn = 0;
+    
+    var data = {};
     
     jT.$('input.end-value', root).tagit({
-/*
       autocomplete: {
         source: function (request, response) {
-          console.log("Auto: " + JSON.stringify(request));
-          response(qualifiers.concat(units));
+          response(nowOn < sequence.length ? sequence[nowOn].tags : null);
         }
       },
-*/
-      availableTags: qualifiers.concat(units),
       singleFieldDelimiter: ";",
       allowSpaces: false,
       allowDuplicates: true,
@@ -92,15 +99,25 @@ var jToxEndpoint = (function () {
       caseSensitive: false,
       showAutocompleteOnFocus: true,
       placeholderText: "Value range_",
+      beforeTagAdded: function (e, ui) {
+        var cur = sequence[nowOn];
+        return !cur.strict || cur.tags.indexOf(ui.tagLabel) > -1;
+      },
       afterTagAdded: function (e, ui) {
-        if (units.indexOf(ui.tagLabel) >= 0)
-          jT.$(ui.tag).addClass('tag-unit');
-        else if (qualifiers.indexOf(ui.tagLabel) >= 0)
-          jT.$(ui.tag).addClass('tag-qualifier');
-        else
-          jT.$(ui.tag).addClass('tag-value');
+        var cur = sequence[nowOn];
+        ui.tag.addClass(cur.type);
+        data[sequence[nowOn].field] = ui.tagLabel;
+        ++nowOn;
+        return true;
+      },
+      afterTagRemoved: function () {
+        --nowOn;
+        delete data[sequence[nowOn].field];
         return true;
       }
+    })
+    .on('change', function () {
+      jT.$(root).closest('tr').data('value', data);
     });
   };
   

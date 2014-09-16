@@ -824,14 +824,14 @@ window.jT.ui = {
   },
 
   putAutocomplete: function (kit, root, service, maxhits, process) {
-		jT.$(root).autocomplete({
+		return jT.$(root).autocomplete({
       source: function( request, response ) {
-        jT.call(kit, service, { max: maxhits, search: request.term }, function (data) {
+        jT.call(kit, service, { method: "GET", data: { max: maxhits, search: request.term } } , function (data) {
           process(data, response, request);
         });
       },
       minLength: 0
-		});			
+		});
   },
   
   installMultiSelect: function (root, callback, parenter) {
@@ -4167,7 +4167,8 @@ var jToxEndpoint = (function () {
     sDom: "<i>rt",            // passed with dataTable settings upon creation
     oLanguage: null,          // passed with dataTable settings upon creation
     onLoaded: null,           // callback called when the is available
-    loadOnInit: false,        // whether to make an (empty) call when initialized. 
+    loadOnInit: false,        // whether to make an (empty) call when initialized.
+    units: ['uSv', 'kg', 'mg/l', 'mg/kg bw', '°C', 'mg/kg bw/day', 'ppm', '%'],
     oLanguage: {
       "sLoadingRecords": "No endpoints found.",
       "sZeroRecords": "No endpoints found.",
@@ -4205,9 +4206,43 @@ var jToxEndpoint = (function () {
   };
   
   // now the editors...
-  cls.putValueEditor = function (element, units, qualifiers) {
-    jT.$(root).tagit({ 
-      availableTags: units.concat(qualifiers),
+  cls.putEditors = function (kit, root, category, top) {
+    root.appendChild(jT.getTemplate('#jtox-endeditor'));
+    var fillFn = function (field) {
+      return function (data, response) {
+        response( !data ? [] : jT.$.map( data.facet, function( item ) {
+          return {
+            label: item[field] + " [" + item.count + "]",
+            value: item[field]
+          }
+        }));
+      };
+    };
+    
+    jT.ui.putAutocomplete(kit, jT.$('input.end-name'), '/admin/stats/experiment_endpoints?top=' + encodeURIComponent(top) + '&category=' + encodeURIComponent(category), 10, fillFn('endpoint')).on('change', function () { jT.$(root).closest('tr').data('endpoint', data); });
+  
+    jT.ui.putAutocomplete(kit, jT.$('input.end-interpret'), '/admin/stats/interpretation_result?top=' + encodeURIComponent(top) + '&category=' + encodeURIComponent(category), 10, fillFn('interpretation_result')).on('change', function () { jT.$(root).closest('tr').data('interpretation', data); });
+    
+    // now comes the tagging mechanism
+    var units = kit.settings.units || defaultSettings.units;
+    var sequence = [
+      { type: "tag-qualifier", field: "loQualifier", tags: ['>=', '>', '='], strict: true},
+      { type: "tag-value", field: "loValue", tags: null},
+      { type: "tag-unit", field: "unit", tags: units},
+      { type: "tag-qualifier", field: "hiQualifier", tags: ['<=', '<'], strict: true},
+      { type: "tag-value", field: "hiValue", tags: null},
+      { type: "tag-unit", field: "unit", tags: units}
+    ];
+    var nowOn = 0;
+    
+    var data = {};
+    
+    jT.$('input.end-value', root).tagit({
+      autocomplete: {
+        source: function (request, response) {
+          response(nowOn < sequence.length ? sequence[nowOn].tags : null);
+        }
+      },
       singleFieldDelimiter: ";",
       allowSpaces: false,
       allowDuplicates: true,
@@ -4216,39 +4251,26 @@ var jToxEndpoint = (function () {
       caseSensitive: false,
       showAutocompleteOnFocus: true,
       placeholderText: "Value range_",
+      beforeTagAdded: function (e, ui) {
+        var cur = sequence[nowOn];
+        return !cur.strict || cur.tags.indexOf(ui.tagLabel) > -1;
+      },
       afterTagAdded: function (e, ui) {
-        if (units.indexOf(ui.tagLabel) >= 0)
-          jT.$(ui.tag).addClass('tagit-unit');
-        else if (qualifiers.indexOf(ui.tagLabel) >= 0)
-          jT.$(ui.tag).addClass('tagit-qualifier');
-        else
-          jT.$(ui.tag).addClass('tagit-value');
+        var cur = sequence[nowOn];
+        ui.tag.addClass(cur.type);
+        data[sequence[nowOn].field] = ui.tagLabel;
+        ++nowOn;
+        return true;
+      },
+      afterTagRemoved: function () {
+        --nowOn;
+        delete data[sequence[nowOn].field];
         return true;
       }
+    })
+    .on('change', function () {
+      jT.$(root).closest('tr').data('value', data);
     });
-  };
-  
-  cls.putEditors = function (kit, root, category, top) {
-    root.appendChild(jT.getTemplate('#jtox-endeditor'));
-    jT.ui.putAutocomplete(kit, jT.$('input.end-name'), '/admin/stats/experiment_endpoints?top=' + encodeURIComponent(top) + '&category=' + encodeURIComponent(category), function (data, response, request) {
-      response( jT.$.map( data.facet, function( item ) {
-        return {
-          label: item.endpoint + " [" + item.count + "]",
-          value: item.endpoint
-        }
-      }));
-    });
-
-    jT.ui.putAutocomplete(kit, jT.$('input.end-interpret'), '', function (data, response, request) {
-      response( $.map( data.facet, function( item ) {
-        return {
-          label: item.interpretation_result + " [" + item.count + "]",
-          value: item.interpretation_result
-        }
-      }));
-    });
-    
-    // TODO: install value editor...
   };
   
   cls.prototype = {

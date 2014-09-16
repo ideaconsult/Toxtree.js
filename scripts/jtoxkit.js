@@ -436,14 +436,14 @@ window.jT.ui = {
   },
 
   putAutocomplete: function (kit, root, service, maxhits, process) {
-		jT.$(root).autocomplete({
+		return jT.$(root).autocomplete({
       source: function( request, response ) {
         jT.call(kit, service, { method: "GET", data: { max: maxhits, search: request.term } } , function (data) {
           process(data, response, request);
         });
       },
       minLength: 0
-		});			
+		});
   },
   
   installMultiSelect: function (root, callback, parenter) {
