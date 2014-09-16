@@ -435,6 +435,8 @@ var jToxCompound = (function () {
       // finally - this one.          
       if (feature.render !== undefined)
         col["mRender"] = feature.render;
+      if (feature.order != null)
+        col["iOrder"] = feature.order;
       return col;
     },
     
@@ -590,7 +592,8 @@ var jToxCompound = (function () {
         });
       }
       
-      // now - create the tables...
+      // now - sort columns and create the tables...
+      jT.ui.sortColDefs(fixCols);
       self.fixTable = (jT.$(".jtox-ds-fixed table", self.rootElement).dataTable({
         "bPaginate": false,
         "bProcessing": true,
@@ -621,6 +624,7 @@ var jToxCompound = (function () {
       // we need to put a fake column to stay, when there is no other column here, or when everything is hidden..
       varCols.push({ "sClass": "center blank-col" + (varCols.length > 1 ? " jtox-hidden" : ""), "mData": "index", "mRender": function(data, type, full) { return type != 'display' ? data : '...'; }  });
 
+      jT.ui.sortColDefs(varCols);
       self.varTable = (jT.$(".jtox-ds-variable table", self.rootElement).dataTable({
         "bPaginate": false,
         "bLengthChange": false,

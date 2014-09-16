@@ -1,11 +1,13 @@
 TODO:
-- edit box popup showing
-- add ordering of jToxCompound columns
+- Integrate endpoint value editing from Nina into jToxEndpoint
+- use jToxEndpoint new feature in matrix' edit box popup.
+- make it possible to add more than one edit-box line
+- ?? make endpoint name and study type show directly into the matrix table
 - add the possibility in jToxLog to reconfigure the UI by disabling UI and using callback. Use jBox instead.
 - History of searches in jToxSearch component (along with type of search and additional parameters)
 
 DOCS:
-- new handling mechsnism with 'handler' propert in each kit
+- new handling mechanism with 'handler' property in each kit
 - onRow universal handler
 
 
@@ -13,7 +15,6 @@ FUTURE / IDEAS
 - deferred re-query (postpone)
 - Reduce network calls in ToxTree on run-all - postopone the call until the last model has ran.
 - 
-
 
 Assessment:
 - Ability to re-use the built tab/features structures? Additional setting?
