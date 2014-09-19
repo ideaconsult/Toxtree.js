@@ -16,6 +16,7 @@
 	<link rel="stylesheet" href="../tests/jquery.dataTables.css"/>
 	<link rel="stylesheet" href="../tests/jBox.css"/>
 	<link rel="stylesheet" href="../tests/ambit2.css"/>
+	<link rel="stylesheet" href="../tests/jquery.tagit.css">
 
 	<link rel="stylesheet" href="../www/jtoxkit.css"/>
 	<link rel="stylesheet" href="../www/ketcher.css"/>
@@ -30,11 +31,13 @@
   <script src="../tests/jquery-ui.min.js"></script>
   <script src="../tests/jquery.dataTables-1.9.4.min.js"></script>
   <script src="../tests/jBox.js"></script>
+  <script src="../tests/tag-it.js"></script>
 
   <script src="../www/jtoxkit.js"></script>
   <script src="../www/ketcher.js"></script>
   <script src="ui-matrix.js"></script>
   <script src="config-matrix.js"></script>
+  <script src="config-study.js"></script>
 </head>
 <body>
   <div id="logger" class="jtox-toolkit jtox-widget hidden" data-kit="log" data-resend="false"></div>  
@@ -159,26 +162,22 @@
       </table>
     </div>
     <div id="edit-box">
-      <table>
-        <thead>
-          <tr>
-            <th>Value</th>
-            <th>Type</th>
-            <th>Justification</th>
-            <th>Reference</th>
-            <th>Remark</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><input class="data-field" data-field="value"/></td>
-            <td><select class="data-field type-list" data-field="type"><option value="-1"> - Select type - </option></select></td>
-            <td><input class="data-field" data-field="justification" placeholder="Justification_"/></td>
-            <td><input class="data-field" data-field="reference" placeholder="Reference_"/></td>
-            <td><input class="data-field" data-field="remark" placeholder="Remark_"/></td>
-          </tr>
-        </tbody>
-      </table>
+	    <div class="jtox-medium-box box-type">
+  	    <div class="jtox-details font-heavy">Study type</div>
+  	    <select class="data-field type-list" data-field="type"><option value="-1"> - Select type - </option></select>
+	    </div>
+	    <div class="jtox-medium-box box-justification">
+  	    <div class="jtox-details font-heavy">Justification</div>
+  	    <input type="text" class="data-field" data-field="justification" placeholder="Justification_"/>
+	    </div>
+	    <div class="jtox-medium-box box-reference">
+  	    <div class="jtox-details font-heavy">Reference</div>
+  	    <input type="text" class="data-field" data-field="reference" placeholder="Reference_"/>
+	    </div>
+	    <div class="jtox-medium-box box-remarks">
+  	    <div class="jtox-details font-heavy">Remarks</div>
+  	    <input type="text" class="data-field" data-field="remarks" placeholder="Remarks_"/>
+	    </div>
       <div class="size-full the-send">
         <span class="data-field the-endpoint" data-field="endpoint"></span>
         <input value="Apply" type="button"/>

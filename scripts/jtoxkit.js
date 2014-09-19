@@ -60,6 +60,7 @@ window.jT = window.jToxKit = {
   	  parent = self;
   	  
     dataParams = self.$.extend(true, topSettings, self.blankSettings, dataParams);
+    dataParams.baseUrl = self.fixBaseUrl(dataParams.baseUrl);
 
 	  // the real initialization function
     var realInit = function (params) {
@@ -130,6 +131,8 @@ window.jT = window.jToxKit = {
   		var queryParams = url.params;
   		if (!queryParams.baseUrl)
   		  queryParams.baseUrl = self.formBaseUrl(url);
+  		else
+    		queryParams.baseUrl = self.fixBaseUrl(queryParams.baseUrl);
   	
       self.settings = self.$.extend(true, self.settings, queryParams); // merge with defaults
       root = document;
@@ -217,6 +220,13 @@ window.jT = window.jToxKit = {
   	  ccLib.fireCallback(callback, kit, task, jhr);
 	},
 	
+	/* Fix the baseUrl - remove the trailing slash if any
+	*/
+	fixBaseUrl: function (url) {
+    if (url != null && url.charAt(url.length - 1) == '/')
+      url = url.slice(0, -1);
+  	return url;
+	},
 	/* Deduce the baseUrl from a given Url - either if it is full url, of fallback to jToxKit's if it is local
 	Passed is the first "non-base" component of the path...
 	*/
@@ -530,6 +540,7 @@ window.jT.ui = {
   },
   
   putTable: function (kit, root, config, settings) {
+    var onRow = kit.settings.onRow || settings.onRow;
     var opts = jT.$.extend({
       "bPaginate": false,
       "bProcessing": true,
@@ -540,9 +551,9 @@ window.jT.ui = {
       "bServerSide": false,
       "fnCreatedRow": function( nRow, aData, iDataIndex ) {
         // call the provided onRow handler, if any
-        if (typeof kit.settings.onRow == 'function') {
-          var res = ccLib.fireCallback(kit.settings.onRow, kit, nRow, aData, iDataIndex);
-          if (typeof res == 'boolean' && !res)
+        if (typeof onRow == 'function') {
+          var res = ccLib.fireCallback(onRow, kit, nRow, aData, iDataIndex);
+          if (res === false)
             return;
         }
         // handle a selection click.. if any

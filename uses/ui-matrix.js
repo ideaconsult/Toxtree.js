@@ -66,6 +66,11 @@ var jToxAssessment = {
 		
   settings: {
   	studyTypeList: _i5.qaSettings["Study result type"],
+  	configuration: {
+    	columns: {
+      	
+    	}
+  	}
   },
   
 	init: function (root, settings) {
@@ -218,18 +223,9 @@ var jToxAssessment = {
       }
 		
   		$(panel).addClass('initialized');
-  		var conf = $.extend(true, {}, jTConfig.matrix);
+  		var conf = $.extend(true, {}, jTConfig.matrix, config_study);
   		delete conf.baseFeatures['#IdRow'];
-  		
-  		// now prepare the mechanism for popups to work nicely
-  		var infoBox = new jBox('Tooltip', { 
-  		  overlay: true, 
-  		  closeOnEsc: true,
-  		  closeOnClick: "overlay",
-  		  addClass: "popup-box",
-  		  animation: "zoomIn"
-  		});
-  		
+  		  		
   		var infoDiv = $('#info-box')[0];
   		var editDiv = $('#edit-box')[0];
   		// now, fill the select with proper values...
@@ -253,10 +249,20 @@ var jToxAssessment = {
     		configuration: conf,
     		onRow: function (row, data, index) {
       		$('.info-popup, .edit-popup', row).on('click', function () {
-      		  var html = '';
-      		  var boxOptions = { target: $(this) };
+      		  var boxOptions = { 
+        		  overlay: true,
+        		  closeOnEsc: true,
+        		  closeOnClick: "overlay",
+        		  addClass: "popup-box jtox-toolkit ui-front",
+        		  animation: "zoomIn",
+      		    target: $(this),
+      		    maxWidth: 600,
+      		    zIndex: 90,
+      		    onCloseComplete: function () { this.destroy(); }
+      		  };
 
-    		    var feature = self.matrixKit.dataset.feature[$(this).data('feature')];
+            var featureId = $(this).data('feature');
+    		    var feature = self.matrixKit.dataset.feature[featureId];
       		  if ($(this).hasClass('info-popup')) {
       		    
         		  $('.dynamic-condition', infoDiv).remove();
@@ -294,20 +300,26 @@ var jToxAssessment = {
           		  source: '<a target="_blank" href="' + feature.source.URI + '">' + feature.source.type + '</a>'
         		  });
         		  
-        		  html = infoDiv.innerHTML;
+        		  boxOptions.content = infoDiv.innerHTML;
+              new jBox('Tooltip', boxOptions).open();
       		  }
       		  else { // edit mode
-      		    ccLib.fillTree(editDiv, {
-        		    endpoint: feature.title
-      		    });
-              html = editDiv.innerHTML;
+              var parse = featureId.substr(self.matrixKit.settings.baseUrl.length).match(/property\/([^\/]+)\/([^\/]+)\/.+/);
+              
+              boxOptions.content = jT.getTemplate('#jtox-endeditor').innerHTML + editDiv.innerHTML;
+              boxOptions.title = parse[2];
               boxOptions.closeButton = "box";
               boxOptions.confirmButton = "Add";
               boxOptions.cancelButton = "Cancel";
+              var endSetValue = function (e, field, value) {
+                console.log("Value set [" + field + "] = `" + value + "`");
+              };
+              
+              boxOptions.onOpen = function () {
+                jToxEndpoint.linkEditors(self.matrixKit, this.content[0], parse[2].replace("+", " "), parse[1].replace("+", " "), endSetValue);
+              };
+              new jBox('Modal', boxOptions).open();
       		  }
-
-      		  infoBox.setContent(html);
-      		  infoBox.open( boxOptions );
       		});
     		}
   		});

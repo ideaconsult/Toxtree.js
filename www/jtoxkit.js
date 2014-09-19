@@ -448,6 +448,7 @@ window.jT = window.jToxKit = {
   	  parent = self;
   	  
     dataParams = self.$.extend(true, topSettings, self.blankSettings, dataParams);
+    dataParams.baseUrl = self.fixBaseUrl(dataParams.baseUrl);
 
 	  // the real initialization function
     var realInit = function (params) {
@@ -518,6 +519,8 @@ window.jT = window.jToxKit = {
   		var queryParams = url.params;
   		if (!queryParams.baseUrl)
   		  queryParams.baseUrl = self.formBaseUrl(url);
+  		else
+    		queryParams.baseUrl = self.fixBaseUrl(queryParams.baseUrl);
   	
       self.settings = self.$.extend(true, self.settings, queryParams); // merge with defaults
       root = document;
@@ -605,6 +608,13 @@ window.jT = window.jToxKit = {
   	  ccLib.fireCallback(callback, kit, task, jhr);
 	},
 	
+	/* Fix the baseUrl - remove the trailing slash if any
+	*/
+	fixBaseUrl: function (url) {
+    if (url != null && url.charAt(url.length - 1) == '/')
+      url = url.slice(0, -1);
+  	return url;
+	},
 	/* Deduce the baseUrl from a given Url - either if it is full url, of fallback to jToxKit's if it is local
 	Passed is the first "non-base" component of the path...
 	*/
@@ -918,6 +928,7 @@ window.jT.ui = {
   },
   
   putTable: function (kit, root, config, settings) {
+    var onRow = kit.settings.onRow || settings.onRow;
     var opts = jT.$.extend({
       "bPaginate": false,
       "bProcessing": true,
@@ -928,9 +939,9 @@ window.jT.ui = {
       "bServerSide": false,
       "fnCreatedRow": function( nRow, aData, iDataIndex ) {
         // call the provided onRow handler, if any
-        if (typeof kit.settings.onRow == 'function') {
-          var res = ccLib.fireCallback(kit.settings.onRow, kit, nRow, aData, iDataIndex);
-          if (typeof res == 'boolean' && !res)
+        if (typeof onRow == 'function') {
+          var res = ccLib.fireCallback(onRow, kit, nRow, aData, iDataIndex);
+          if (res === false)
             return;
         }
         // handle a selection click.. if any
@@ -4198,8 +4209,7 @@ var jToxEndpoint = (function () {
   };
   
   // now the editors...
-  cls.putEditors = function (kit, root, category, top, onchange) {
-    root.appendChild(jT.getTemplate('#jtox-endeditor'));
+  cls.linkEditors = function (kit, root, category, top, onchange) {
     // get the configuration so we can setup the fields and their titles according to it
     var config = jT.$.extend(true, {}, kit.settings.configuration.columns["_"], kit.settings.configuration.columns[category]);
 
@@ -4320,7 +4330,7 @@ var jToxEndpoint = (function () {
         self.edittedValues = {};
         self.settings.onDetails = function (root, data, element) {
           self.edittedValues[data.endpoint] = {};
-          cls.putEditors(self, root, data.endpoint, data.subcategory, function (e, field, value) {
+          cls.linkEditors(self, root.appendChild(jT.getTemplate('#jtox-endeditor')), data.endpoint, data.subcategory, function (e, field, value) {
             self.edittedValues[data.endpoint][field] = value;
           }); 
         };
@@ -4348,7 +4358,10 @@ var jToxEndpoint = (function () {
         self.tables[name] = jT.ui.putTable(self, this, "endpoint", { 
           "aoColumns": cols, 
           "fnInfoCallback": self.updateStats(name),
-          "aaSortingFixed": [[1, 'asc']]
+          "aaSortingFixed": [[1, 'asc']],
+          "onRow": function (nRow, aData, iDataIndex) {
+            jT.$(nRow).addClass(aData.endpoint);
+          }
         });
       });
       

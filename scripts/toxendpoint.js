@@ -57,8 +57,7 @@ var jToxEndpoint = (function () {
   };
   
   // now the editors...
-  cls.putEditors = function (kit, root, category, top, onchange) {
-    root.appendChild(jT.getTemplate('#jtox-endeditor'));
+  cls.linkEditors = function (kit, root, category, top, onchange) {
     // get the configuration so we can setup the fields and their titles according to it
     var config = jT.$.extend(true, {}, kit.settings.configuration.columns["_"], kit.settings.configuration.columns[category]);
 
@@ -179,7 +178,7 @@ var jToxEndpoint = (function () {
         self.edittedValues = {};
         self.settings.onDetails = function (root, data, element) {
           self.edittedValues[data.endpoint] = {};
-          cls.putEditors(self, root, data.endpoint, data.subcategory, function (e, field, value) {
+          cls.linkEditors(self, root.appendChild(jT.getTemplate('#jtox-endeditor')), data.endpoint, data.subcategory, function (e, field, value) {
             self.edittedValues[data.endpoint][field] = value;
           }); 
         };
@@ -207,7 +206,10 @@ var jToxEndpoint = (function () {
         self.tables[name] = jT.ui.putTable(self, this, "endpoint", { 
           "aoColumns": cols, 
           "fnInfoCallback": self.updateStats(name),
-          "aaSortingFixed": [[1, 'asc']]
+          "aaSortingFixed": [[1, 'asc']],
+          "onRow": function (nRow, aData, iDataIndex) {
+            jT.$(nRow).addClass(aData.endpoint);
+          }
         });
       });
       
