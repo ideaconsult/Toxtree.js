@@ -407,7 +407,7 @@ window.jT = window.jToxKit = {
   	crossDomain: false,   // should it expect cross-domain capabilities for the queries.
   	baseUrl: null,        // the baseUrl for the server that loaded the page.
   	fullUrl: null,        // the url as it is on loading the page - this is parsed one, i.e. parseUrl() processed.
-  	timeout: 15000,       // the timeout an call to the server should be wait before the attempt is considered error.
+  	timeout: 15000,       // the timeout of call to the server should be wait before the attempt is considered error.
   	pollDelay: 250,       // after how many milliseconds a new attempt should be made during task polling.
   	onConnect: null,		  // function (service): called when a server request is started - for proper visualization. Part of settings.
   	onSuccess: null,	    // function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
@@ -692,7 +692,7 @@ window.jT = window.jToxKit = {
 			dataType: params.dataType || (settings.plainText ? "text": (settings.jsonp ? 'jsonp' : 'json')),
 			headers: { Accept: accType },
 			crossDomain: settings.crossDomain || settings.jsonp,
-			timeout: settings.timeout,
+			timeout: parseInt(settings.timeout),
 			type: params.method,
 			data: params.data,
 			jsonp: settings.jsonp ? 'callback' : false,
