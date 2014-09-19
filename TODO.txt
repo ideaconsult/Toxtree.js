@@ -1,4 +1,7 @@
 TODO:
+- make proper deleting process
+- improve data recording process
+
 - Integrate endpoint value editing from Nina into jToxEndpoint
 - use jToxEndpoint new feature in matrix' edit box popup.
 - make it possible to add more than one edit-box line

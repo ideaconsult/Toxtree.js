@@ -133,6 +133,10 @@
   font-size: larger;
 }
 
+.jtox-toolkit .font-heavy {
+  font-weight: bold;
+}
+
 .jtox-toolkit .transparent {
   opacity: 0.3;
 }
@@ -266,6 +270,16 @@ select {
 img.jtox-smalldiagram {
   width: 125px;
   height: 125px;
+}
+
+.jtox-medium-box {
+  margin: 2px;
+  padding-left: 2px;
+  padding-right: 2px;
+  display: inline-block;
+  min-width: 220px;
+  height: auto;
+  vertical-align: top;  
 }
 
 .jtox-endpoint thead {

@@ -434,18 +434,7 @@ window.jT.ui = {
         return type != 'display' ? (data || '') : '<input type="text" class="jt-inlineaction jtox-handler" data-handler="' + handler + '" data-data="' + location + '" value="' + (data || '') + '"' + (!holder ? '' : ' placeholder="' + holder + '"') + '/>';
       };
   },
-
-  putAutocomplete: function (kit, root, service, maxhits, process) {
-		return jT.$(root).autocomplete({
-      source: function( request, response ) {
-        jT.call(kit, service, { method: "GET", data: { max: maxhits, search: request.term } } , function (data) {
-          process(data, response, request);
-        });
-      },
-      minLength: 0
-		});
-  },
-  
+    
   installMultiSelect: function (root, callback, parenter) {
     if (parenter == null)
       parenter = function (el) { return el.parentNode; };

@@ -26,10 +26,11 @@
   <script src="scripts/ccLib.js"></script>
   <script src="scripts/jtoxkit.js"></script>
   <script src="scripts/toxendpoint.js"></script>
+  <script src="uses/config-study.js"></script>
   
 </head>
 <body>
-	<div class="jtox-toolkit" data-kit="endpoint" data-load-on-init="true" data-base-url="http://apps.ideaconsult.net:8080/data" data-hide-empty="true" data-selection-handler="test" data-show-editors="true"></div>
+	<div class="jtox-toolkit" data-kit="endpoint" data-load-on-init="true" data-base-url="http://apps.ideaconsult.net:8080/data" data-hide-empty="true" data-selection-handler="test" data-show-editors="true" data-configuration="config_study"></div>
   <div class="jtox-template">
 <!--[[ jT.templates['all-endpoint'] -->
 	  <div id="jtox-endpoint" class="jtox-endpoint">
@@ -56,12 +57,18 @@
 <!-- // end of #jtox-endpoint ]]-->
 <!--[[ jT.templates['editor-endpoint'] -->
 	  <div id="jtox-endeditor" class="jt-endeditor">
-	    <div class="jtox-details" class="end-name">Endpoint name</div>
-	    <input type="text" placeholder="Endpoint_" class="end-name"/>
-	    <div class="jtox-details" class="end-name">Value range</div>
-	    <input type="text" placeholder="Value_" class="end-value"/>
-	    <div class="jtox-details" class="end-intepret">Intepretation results</div>
-	    <input type="text" placeholder="Intepretation" class="end-interpret"/>
+	    <div class="jtox-medium-box box-endpoint">
+  	    <div class="jtox-details font-heavy">Endpoint name</div>
+  	    <input type="text" placeholder="Endpoint_"/>
+	    </div>
+	    <div class="jtox-medium-box box-value">
+  	    <div class="jtox-details font-heavy">Value range</div>
+  	    <input type="text"/>
+	    </div>
+      <div class="jtox-medium-box box-interpretation_result">
+  	    <div class="jtox-details font-heavy">Intepretation of the results</div>
+  	    <input type="text" placeholder="Intepretation"/>
+      </div>
 	  </div>
 <!-- // end of #jtox-end-editor ]]-->
   </div>

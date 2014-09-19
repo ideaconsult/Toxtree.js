@@ -822,18 +822,7 @@ window.jT.ui = {
         return type != 'display' ? (data || '') : '<input type="text" class="jt-inlineaction jtox-handler" data-handler="' + handler + '" data-data="' + location + '" value="' + (data || '') + '"' + (!holder ? '' : ' placeholder="' + holder + '"') + '/>';
       };
   },
-
-  putAutocomplete: function (kit, root, service, maxhits, process) {
-		return jT.$(root).autocomplete({
-      source: function( request, response ) {
-        jT.call(kit, service, { method: "GET", data: { max: maxhits, search: request.term } } , function (data) {
-          process(data, response, request);
-        });
-      },
-      minLength: 0
-		});
-  },
-  
+    
   installMultiSelect: function (root, callback, parenter) {
     if (parenter == null)
       parenter = function (el) { return el.parentNode; };
@@ -4162,6 +4151,7 @@ var jToxEndpoint = (function () {
     noInterface: false,       // run in interface-less mode, with data retrieval and callback calling only
     heightStyle: "content",   // the accordition heightStyle
     hideFilter: false,        // if you don't want to have filter box - just hide it
+    maxHits: 10,              // max hits in autocomplete
     showMultiselect: true,    // whether to hide select all / unselect all buttons
     showEditors: false,       // whether to show endpoint value editing fields as details
     sDom: "<i>rt",            // passed with dataTable settings upon creation
@@ -4169,6 +4159,8 @@ var jToxEndpoint = (function () {
     onLoaded: null,           // callback called when the is available
     loadOnInit: false,        // whether to make an (empty) call when initialized.
     units: ['uSv', 'kg', 'mg/l', 'mg/kg bw', '°C', 'mg/kg bw/day', 'ppm', '%'],
+    loTags: ['>', '>=', '='],
+    hiTags: ['<', '<='],
     oLanguage: {
       "sLoadingRecords": "No endpoints found.",
       "sZeroRecords": "No endpoints found.",
@@ -4206,71 +4198,117 @@ var jToxEndpoint = (function () {
   };
   
   // now the editors...
-  cls.putEditors = function (kit, root, category, top) {
+  cls.putEditors = function (kit, root, category, top, onchange) {
     root.appendChild(jT.getTemplate('#jtox-endeditor'));
-    var fillFn = function (field) {
-      return function (data, response) {
-        response( !data ? [] : jT.$.map( data.facet, function( item ) {
-          return {
-            label: item[field] + " [" + item.count + "]",
-            value: item[field]
-          }
-        }));
-      };
-    };
-    
-    jT.ui.putAutocomplete(kit, jT.$('input.end-name'), '/admin/stats/experiment_endpoints?top=' + encodeURIComponent(top) + '&category=' + encodeURIComponent(category), 10, fillFn('endpoint')).on('change', function () { jT.$(root).closest('tr').data('endpoint', data); });
-  
-    jT.ui.putAutocomplete(kit, jT.$('input.end-interpret'), '/admin/stats/interpretation_result?top=' + encodeURIComponent(top) + '&category=' + encodeURIComponent(category), 10, fillFn('interpretation_result')).on('change', function () { jT.$(root).closest('tr').data('interpretation', data); });
-    
-    // now comes the tagging mechanism
-    var units = kit.settings.units || defaultSettings.units;
-    var sequence = [
-      { type: "tag-qualifier", field: "loQualifier", tags: ['>=', '>', '='], strict: true},
-      { type: "tag-value", field: "loValue", tags: null},
-      { type: "tag-unit", field: "unit", tags: units},
-      { type: "tag-qualifier", field: "hiQualifier", tags: ['<=', '<'], strict: true},
-      { type: "tag-value", field: "hiValue", tags: null},
-      { type: "tag-unit", field: "unit", tags: units}
-    ];
-    var nowOn = 0;
-    
-    var data = {};
-    
-    jT.$('input.end-value', root).tagit({
-      autocomplete: {
-        source: function (request, response) {
-          response(nowOn < sequence.length ? sequence[nowOn].tags : null);
-        }
-      },
-      singleFieldDelimiter: ";",
-      allowSpaces: false,
-      allowDuplicates: true,
-      singleField: true,
-      removeConfirmation: false,
-      caseSensitive: false,
-      showAutocompleteOnFocus: true,
-      placeholderText: "Value range_",
-      beforeTagAdded: function (e, ui) {
-        var cur = sequence[nowOn];
-        return !cur.strict || cur.tags.indexOf(ui.tagLabel) > -1;
-      },
-      afterTagAdded: function (e, ui) {
-        var cur = sequence[nowOn];
-        ui.tag.addClass(cur.type);
-        data[sequence[nowOn].field] = ui.tagLabel;
-        ++nowOn;
-        return true;
-      },
-      afterTagRemoved: function () {
-        --nowOn;
-        delete data[sequence[nowOn].field];
-        return true;
+    // get the configuration so we can setup the fields and their titles according to it
+    var config = jT.$.extend(true, {}, kit.settings.configuration.columns["_"], kit.settings.configuration.columns[category]);
+
+    var putAutocomplete = function (field, service, configEntry) {
+      // if we're not supposed to be visible - hide us.
+      var box = jT.$('div.box-' + field, root);
+      var v = ccLib.getJsonValue(config, configEntry + '.bVisible');
+      if (v !== undefined && !v) {
+        box.hide();
+        return false;
       }
-    })
-    .on('change', function () {
-      jT.$(root).closest('tr').data('value', data);
-    });
+      
+      // now deal with the title...
+      var t = ccLib.getJsonValue(config, configEntry + '.sTitle');
+      if (!!t)
+        jT.$('div', box[0]).html(t);
+        
+      // finally - deal with the autocomplete itself
+      jT.$('input', box[0])
+      .autocomplete({
+        minLength: 0,
+        change: function (e, ui) {
+          onchange(e, field, !ui.item ? '' : ui.item.value);
+        },
+        source: function( request, response ) {
+          jT.call(kit, service, { method: "GET", data: { 
+            'category': category,
+            'top': top,
+            'max': kit.settings.maxHits || defaultSettings.maxHits,
+            'search': request.term }
+          } , function (data) {
+            response( !data ? [] : jT.$.map( data.facet, function( item ) {
+              var val = item[field] || '';
+              return {
+                label: val + (!item.count ? '' : " [" + item.count + "]"),
+                value: val
+              }
+            }));
+          });
+        }
+  		});
+    };
+        
+    // deal with endpoint name itself
+    putAutocomplete('endpoint', '/admin/stats/experiment_endpoints', 'effects.endpoint');
+    putAutocomplete('interpretation_result', '/admin/stats/interpretation_result', 'interpretation.result');
+    
+    // now comes the tagging mechanism... first determine, if we need to show it at all
+    var v = ccLib.getJsonValue(config, 'effects.result.bVisible');
+    if (v !== undefined && !v)
+      jT.$('div.box-value', root).hide();
+    else {
+      var t = ccLib.getJsonValue(config, 'effects.text.sTitle') || ccLib.getJsonValue(config, 'effects.result.sTitle');
+      if (!!t)
+        jT.$('div.box-value div', root).html(t);
+        
+      var units = kit.settings.units || defaultSettings.units;
+      var sequence = [
+        { type: "tag-qualifier", field: "loQualifier", tags: kit.settings.loTags || defaultSettings.loTags, strict: true},
+        { type: "tag-value", field: "loValue", tags: null},
+        { type: "tag-unit", field: "unit", tags: units},
+        { type: "tag-qualifier", field: "hiQualifier", tags: kit.settings.hiTags || defaultSettings.hiTags, strict: true},
+        { type: "tag-value", field: "hiValue", tags: null},
+        { type: "tag-unit", field: "unit", tags: units}
+      ];
+  
+      var nowOn = 0;
+      var data = {};
+      
+      jT.$('.box-value input', root).tagit({
+        autocomplete: {
+          source: function (request, response) {
+            var tags = nowOn < sequence.length ? sequence[nowOn].tags : null;
+            if (!!tags) {
+              tags = tags.filter(function (item) {
+                return item.indexOf(request.term) == 0;
+              });
+            }
+            response(tags);
+          }
+        },
+        singleFieldDelimiter: ";",
+        allowSpaces: false,
+        allowDuplicates: true,
+        singleField: true,
+        removeConfirmation: false,
+        caseSensitive: false,
+        showAutocompleteOnFocus: true,
+        beforeTagAdded: function (e, ui) {
+          var cur = sequence[nowOn];
+          return !cur.strict || cur.tags.indexOf(ui.tagLabel) > -1;
+        },
+        afterTagAdded: function (e, ui) {
+          var cur = sequence[nowOn];
+          ui.tag.addClass(cur.type);
+          data[sequence[nowOn].field] = ui.tagLabel;
+          ++nowOn;
+          return true;
+        },
+        afterTagRemoved: function () {
+          --nowOn;
+          delete data[sequence[nowOn].field];
+          return true;
+        }
+      })
+      .on('change', function (e) {
+        onchange(e, 'value', data);      
+      });
+    }
   };
   
   cls.prototype = {
@@ -4278,8 +4316,15 @@ var jToxEndpoint = (function () {
       var self = this;
       
       // we can redefine onDetails only if there is not one passed and we're asked to show editors at ll
-      if (!!self.settings.showEditors && !self.settings.onDetails)
-        self.settings.onDetails = function (root, data, element) { cls.putEditors(self, root, data.endpoint, data.subcategory); };
+      if (!!self.settings.showEditors && !self.settings.onDetails) {
+        self.edittedValues = {};
+        self.settings.onDetails = function (root, data, element) {
+          self.edittedValues[data.endpoint] = {};
+          cls.putEditors(self, root, data.endpoint, data.subcategory, function (e, field, value) {
+            self.edittedValues[data.endpoint][field] = value;
+          }); 
+        };
+      }
       
       // deal if the selection is chosen
       if (!!self.settings.selectionHandler || !!self.settings.onDetails)
@@ -4331,6 +4376,31 @@ var jToxEndpoint = (function () {
         jT.$('h3 a', self.rootElement).remove();
       else
         jT.ui.installMultiSelect(self.rootElement, null, function (el) { return el.parentNode.parentNode.nextElementSibling; });
+    },
+    
+    getValues: function (needle) {
+      var self = this;
+      
+      var filter = null;
+      if (!needle)
+        filter = function (end) { return true; };
+      else if (typeof needle != 'function')
+        filter = function (end) { return end.indexOf(needle) >= 0; };
+      else 
+        filter = needle;
+
+      var data = {};
+      for (var endpoint in self.edittedValues) {
+        if (!filter(endpoint))
+          continue;
+        var edit = self.edittedValues[endpoint];
+        data[endpoint] = {
+          endpoint: edit.endpoint,
+          interpretation: edit.interpretation_result,
+          value: edit.value
+        };
+      }
+      return data;
     },
     
     updateStats: function (name) {
@@ -4694,12 +4764,18 @@ jT.templates['all-endpoint']  =
 
 jT.templates['editor-endpoint']  = 
 "	  <div id=\"jtox-endeditor\" class=\"jt-endeditor\">" +
-"	    <div class=\"jtox-details\" class=\"end-name\">Endpoint name</div>" +
-"	    <input type=\"text\" placeholder=\"Endpoint_\" class=\"end-name\"/>" +
-"	    <div class=\"jtox-details\" class=\"end-name\">Value range</div>" +
-"	    <input type=\"text\" placeholder=\"Value_\" class=\"end-value\"/>" +
-"	    <div class=\"jtox-details\" class=\"end-intepret\">Intepretation results</div>" +
-"	    <input type=\"text\" placeholder=\"Intepretation\" class=\"end-interpret\"/>" +
+"	    <div class=\"jtox-medium-box box-endpoint\">" +
+"  	    <div class=\"jtox-details font-heavy\">Endpoint name</div>" +
+"  	    <input type=\"text\" placeholder=\"Endpoint_\"/>" +
+"	    </div>" +
+"	    <div class=\"jtox-medium-box box-value\">" +
+"  	    <div class=\"jtox-details font-heavy\">Value range</div>" +
+"  	    <input type=\"text\"/>" +
+"	    </div>" +
+"      <div class=\"jtox-medium-box box-interpretation_result\">" +
+"  	    <div class=\"jtox-details font-heavy\">Intepretation of the results</div>" +
+"  	    <input type=\"text\" placeholder=\"Intepretation\"/>" +
+"      </div>" +
 "	  </div>" +
 ""; // end of #jtox-end-editor 
 
