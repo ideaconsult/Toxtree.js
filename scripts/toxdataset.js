@@ -91,7 +91,9 @@ var jToxDataset = (function () {
       
       if (!self.settings.noInterface)
         jT.$(self.table).dataTable().fnClearTable();
-      jT.call(self, uri, function (result) {
+      jT.call(self, uri, function (result, jhr) {
+        if (!result && jhr.status == 404)
+          result = { dataset: [] }; // empty one...
         if (!!result) {
           self.dataset = result.dataset;
           if (!self.settings.noInterface)

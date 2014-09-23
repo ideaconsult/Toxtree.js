@@ -928,7 +928,10 @@ window.jT.ui = {
   },
   
   putTable: function (kit, root, config, settings) {
-    var onRow = kit.settings.onRow || settings.onRow;
+    var onRow = kit.settings.onRow;
+    if (onRow === undefined && settings != null)
+      onRow = settings.onRow;
+      
     var opts = jT.$.extend({
       "bPaginate": false,
       "bProcessing": true,
@@ -2275,14 +2278,15 @@ var jToxCompound = (function () {
     },
     
     // make the actual query for the (next) portion of data.
-    queryEntries: function(from, size) {
+    queryEntries: function(from, size, dataset) {
       var self = this;
       var scope = { 'from': from, 'size': size };
       var qUri = self.queryUri(scope);
       jT.$('.jtox-controls select', self.rootElement).val(scope.size);
       self.dataset = null;
 
-      jT.call(self, qUri, function(dataset){
+      // the function for filling
+      var fillFn = function(dataset) {
         if (!!dataset){
           // first, arrange the page markers
           self.pageSize = scope.size;
@@ -2302,7 +2306,13 @@ var jToxCompound = (function () {
         }
         // time to call the supplied function, if any.
         ccLib.fireCallback(self.settings.onLoaded, self, dataset);
-      });
+      };
+  
+      // we may be passed dataset, if the initial, setup query was 404: Not Found - to avoid second such query...
+      if (dataset != null)
+        fillFn(dataset)
+      else
+        jT.call(self, qUri, fillFn);
     },
     
     /* Makes a query to the server for particular dataset, asking for feature list first, so that the table(s) can be 
@@ -2321,7 +2331,13 @@ var jToxCompound = (function () {
       // remember the _original_ datasetUri and make a call with one size length to retrieve all features...
       self.datasetUri = (datasetUri.indexOf('http') !=0 ? self.settings.baseUrl : '') + datasetUri;
 
-      jT.call(self, ccLib.addParameter(self.datasetUri, "page=0&pagesize=1"), function (dataset) {
+      jT.call(self, ccLib.addParameter(self.datasetUri, "page=0&pagesize=1"), function (dataset, jhr) {
+        var empty = false;
+        if (!dataset && jhr.status == 404) {
+          empty = true;
+          dataset = { feature: {}, dataEntry: [] }; // an empty set, to make it show the table...
+        }
+
         if (!!dataset) {
           self.feature = dataset.feature;
           cls.processFeatures(self.feature, self.settings.configuration.baseFeatures);
@@ -2368,7 +2384,8 @@ var jToxCompound = (function () {
             self.equalizeTables(); // to make them nicer, while waiting...
             ccLib.fireCallback(self.settings.onPrepared, self, dataset, self);
           }
-          self.queryEntries(self.pageStart, self.pageSize); // and make the query for actual data
+          
+          self.queryEntries(self.pageStart, self.pageSize, empty ? dataset : null); // and make the query for actual data
         }
       });
     },
@@ -2586,7 +2603,9 @@ var jToxDataset = (function () {
       
       if (!self.settings.noInterface)
         jT.$(self.table).dataTable().fnClearTable();
-      jT.call(self, uri, function (result) {
+      jT.call(self, uri, function (result, jhr) {
+        if (!result && jhr.status == 404)
+          result = { dataset: [] }; // empty one...
         if (!!result) {
           self.dataset = result.dataset;
           if (!self.settings.noInterface)
@@ -2746,7 +2765,10 @@ var jToxModel = (function () {
       self.modelUri = uri;
       if (!self.settings.noInterface)
         jT.$(self.table).dataTable().fnClearTable();
-      jT.call(self, uri, function (result) {
+      jT.call(self, uri, function (result, jhr) {
+        if (!result && jhr.status == 404)
+          result = { model: [] }; // empty one
+          
         if (!!result) {
           self.models = result.model;
           if (!self.settings.noInterface)
@@ -2765,7 +2787,9 @@ var jToxModel = (function () {
         uri = ccLib.addParameter(uri, 'search=' + needle);
       if (!self.settings.noInterface)
         jT.$(self.table).dataTable().fnClearTable();
-      jT.call(self, uri, function (result) {
+      jT.call(self, uri, function (result, jhr) {
+        if (!result && jhr.status == 404)
+          result = { algorithm: [] }; // empty one
         if (!!result) {
           self.algorithm = result.algorithm;
           if (!self.settings.noInterface)
@@ -2970,7 +2994,9 @@ var jToxSubstance = (function () {
         
       var qStart = Math.floor(from / size);
       var qUri = ccLib.addParameter(self.substanceUri, "page=" + qStart + "&pagesize=" + size);
-      jT.call(self, qUri, function (result) {
+      jT.call(self, qUri, function (result, jhr) {
+        if (!result && jhr.status == 404)
+          result = { substabce: [] }; // empty one
         if (!!result) {
           self.pageSize = size;
           self.pageStart = from;
@@ -4471,7 +4497,9 @@ var jToxEndpoint = (function () {
         self.settings.baseUrl = jT.grabBaseUrl(uri);
 
       // make the call...
-      jT.call(self, uri, function (result) {
+      jT.call(self, uri, function (result, jhr) {
+        if (!result && jhr.status == 404)
+          result = { facet: [] }; // empty one
         if (!!result) {
           self.summary = result.facet;
           if (!self.settings.noInterface)

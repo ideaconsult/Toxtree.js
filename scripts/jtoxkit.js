@@ -540,7 +540,10 @@ window.jT.ui = {
   },
   
   putTable: function (kit, root, config, settings) {
-    var onRow = kit.settings.onRow || settings.onRow;
+    var onRow = kit.settings.onRow;
+    if (onRow === undefined && settings != null)
+      onRow = settings.onRow;
+      
     var opts = jT.$.extend({
       "bPaginate": false,
       "bProcessing": true,

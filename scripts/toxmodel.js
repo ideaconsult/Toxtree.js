@@ -130,7 +130,10 @@ var jToxModel = (function () {
       self.modelUri = uri;
       if (!self.settings.noInterface)
         jT.$(self.table).dataTable().fnClearTable();
-      jT.call(self, uri, function (result) {
+      jT.call(self, uri, function (result, jhr) {
+        if (!result && jhr.status == 404)
+          result = { model: [] }; // empty one
+          
         if (!!result) {
           self.models = result.model;
           if (!self.settings.noInterface)
@@ -149,7 +152,9 @@ var jToxModel = (function () {
         uri = ccLib.addParameter(uri, 'search=' + needle);
       if (!self.settings.noInterface)
         jT.$(self.table).dataTable().fnClearTable();
-      jT.call(self, uri, function (result) {
+      jT.call(self, uri, function (result, jhr) {
+        if (!result && jhr.status == 404)
+          result = { algorithm: [] }; // empty one
         if (!!result) {
           self.algorithm = result.algorithm;
           if (!self.settings.noInterface)
