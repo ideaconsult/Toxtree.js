@@ -1,5 +1,4 @@
 TODO:
-- add the possibility in jToxLog to reconfigure the UI by disabling UI and using callback. Use jBox instead.
 - History of searches in jToxSearch component (along with type of search and additional parameters)
 
 - make proper deleting process

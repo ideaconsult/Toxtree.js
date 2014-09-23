@@ -42,7 +42,6 @@ function onDetailedRow(row, data, event) {
   } } ) );
 }
 
-
 var jToxAssessment = {
 	createForm: null,
 	rootElement: null,

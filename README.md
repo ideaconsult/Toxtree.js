@@ -937,7 +937,7 @@ There are few things that can be setup from outside:
 - **`rightSide`** (attr. `data-right-side`): Whether to put the status thumb on the right side of the logger. Default: _false_.
 - **`hasDetails`** (attr. `data-has-details`): Whether clicking on each line's status will open a detailed info for the request (if any). Default: _true_.
 - **`onStatus`** (attr. `data-on-status`): A handler which is called when a new status has happenned, the format is `function (newstatus, oldstatus)`. Both can be `connecting`, `success` or `error`. Default: _null_.
-- **`formatLine`** (attr. `data-on-line`): A handler which is called to format a newly adding line (or already existing one, upon status change). The format is `function (service, params, status, jhr)` and it is called within calling kit's context (ie. _this_ parameter). _Params_ are reflecting the `jTokKit.call()` argument, while _status_ and _jhr_ - the ones returned on `onSuccess` or `onError`. The function should return an object with two properties: `header` and `details`, which a refilled in the logger line, respectfully. There is default implementation.
+- **`formatEvent`** (attr. `data-on-line`): A handler which is called to format a newly adding line (or already existing one, upon status change). The format is `function (service, params, status, jhr)` and it is called within calling kit's context (ie. _this_ parameter). _Params_ are reflecting the `jTokKit.call()` argument, while _status_ and _jhr_ - the ones returned on `onSuccess` or `onError`. The function should return an object with two properties: `header` and `details`, which a refilled in the logger line, respectfully. There is default implementation.
 
 ##### Methods
 

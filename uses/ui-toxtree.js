@@ -451,7 +451,7 @@ $(document).ready(function(){
   $('#sidebar .side-title>div').on('click', switchView);
   switchView('single');
   
-  $('#logger').on('mouseover', function () { $(this).removeClass('hidden'); }).on('mouseout', function () { $(this).addClass('hidden');});
+  $('#logger').on('click', function () { $(this).toggleClass('hidden'); });
   
   $(window).on('resize', function () { updateSize(); });
   updateSize();

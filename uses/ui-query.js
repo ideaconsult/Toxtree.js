@@ -90,5 +90,5 @@ $(document).ready(function(){
   $('#sidebar div.side-title').on('click', toggleBar);
   $('#sidebar').on('mouseover', function () { $(this).removeClass('hidden'); }).on('mouseout', function () { $(this).addClass('hidden');});
   jT.ui.installMultiSelect($('#sidebar')[0], onSelectedUpdate);
-  $('#logger').on('mouseover', function () { $(this).removeClass('hidden'); }).on('mouseout', function () { $(this).addClass('hidden');});
+  $('#logger').on('click', function (e) { $(this).toggleClass('hidden'); });
 });
