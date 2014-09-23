@@ -3993,20 +3993,18 @@ var jToxLog = (function () {
     
     // line formatting function - function (service, state, params, jhr) -> { header: "", details: "" }
     formatEvent: function (service, state, params, jhr) {
-      var info = {
-        'status': state,
-        'service': service
-      };
-      
-      if (params != null) {
-        info['header'] = params.method.toUpperCase() + ": " + service;
-        info['details'] = "...";
-      }
+      if (params != null)
+        return {
+          header: params.method.toUpperCase() + ": " + service,
+          details: "..."
+        };
       else if (jhr != null)
         // by returning only the details part, we leave the header as it is.
-        info['details'] = jhr.status + " " + jhr.statusText + '<br/>' + jhr.getAllResponseHeaders();
-        
-      return info;
+        return {
+          details: jhr.status + " " + jhr.statusText + '<br/>' + jhr.getAllResponseHeaders()
+        };
+      else
+        return null;
     }       
   };
   
@@ -4111,7 +4109,7 @@ var jToxLog = (function () {
     self.handlers = {
       onConnect: function (service, params) {
         var info = ccLib.fireCallback(self.settings.formatEvent, this, service, "connecting", params, null);
-        ccLib.fireCallback(self.settings.onEvent, this, info);
+        ccLib.fireCallback(self.settings.onEvent, this, service, "connecting", info);
         if (!self.settings.noInterface) {
           setStatus("connecting");
           var line = addLine(info);
@@ -4124,7 +4122,7 @@ var jToxLog = (function () {
       },
       onSuccess: function (service, status, jhr) {
         var info = ccLib.fireCallback(self.settings.formatEvent, this, service, "success", null, jhr);
-        ccLib.fireCallback(self.settings.onEvent, this, info);
+        ccLib.fireCallback(self.settings.onEvent, this, service, "success", info);
         if (!self.settings.noInterface) {
           setStatus("success");
           var line = self.events[service];
@@ -4142,7 +4140,7 @@ var jToxLog = (function () {
       },
       onError: function (service, status, jhr) {
         var info = ccLib.fireCallback(self.settings.formatEvent, this, service, "error", null, jhr);
-        ccLib.fireCallback(self.settings.onEvent, this, info);
+        ccLib.fireCallback(self.settings.onEvent, this, service, "error", info);
         if (!self.settings.noInterface) {
           setStatus("error");
           var line = self.events[service];
