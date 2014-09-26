@@ -1424,7 +1424,9 @@ var jToxSearch = (function () {
           params.search = this.settings.defaultNeedle;
           this.setAuto(params.search);
       }
-        
+
+      if (type == "auto" && form.regexp.checked)
+        params['condition'] = "regexp";        
       if (type == 'similarity')
         params.threshold = form.threshold.value;
       
@@ -4560,6 +4562,11 @@ jT.templates['widget-search']  =
 "			    <label for=\"searchurl\" title=\"Enter dataset URL\">URL</label>" +
 "  			</div>" +
 "    		<div class=\"jtox-inline float-right search-pane\">" +
+"  			  <div class=\"dynamic auto-hide searchauto hidden jtox-inline\">" +
+"  			    <div>" +
+"    			    <input type=\"checkbox\" name=\"regexp\" title=\"fadsfas\"/><span>Is regular expression</span>" +
+"  			    </div>" +
+"  			  </div>" +
 "  			  <div class=\"dynamic auto-hide searchsimilarity hidden jtox-inline\">" +
 "      			<select name='threshold' title ='Tanimoto similarity threshold'>" +
 "    					<option value='0.9' selected=\"selected\">0.9</option>" +

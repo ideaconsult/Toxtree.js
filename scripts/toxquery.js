@@ -303,7 +303,9 @@ var jToxSearch = (function () {
           params.search = this.settings.defaultNeedle;
           this.setAuto(params.search);
       }
-        
+
+      if (type == "auto" && form.regexp.checked)
+        params['condition'] = "regexp";        
       if (type == 'similarity')
         params.threshold = form.threshold.value;
       

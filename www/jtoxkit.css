@@ -353,7 +353,7 @@ button.jt-toggle.active {
   font-size: 1.1em;
   margin-top: 2px;
   display: inline-block;
-  vertical-align: top;
+  vertical-align: baseline;
 }
 
 .jtox-search .search-pane .jtox-inline select {
@@ -381,6 +381,10 @@ button.jt-toggle.active {
 
 .jtox-search .searchsimilarity select {
   width: 5em;
+}
+
+.jtox-search .searchauto.dynamic>div {
+  white-space: nowrap;
 }
 
 .jtox-search .search-pane .dynamic {
