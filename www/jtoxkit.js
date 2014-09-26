@@ -2538,7 +2538,12 @@ var jToxDataset = (function () {
     configuration: { 
       columns : {
         dataset: {
-          'Id': { iOrder: 0, sTitle: "Id", mData: "URI", sWidth: "50px"},
+          'Id': { iOrder: 0, sTitle: "Id", mData: "URI", sWidth: "50px", mRender: function (data, type, full) {
+            var num = parseInt(data.match(/https{0,1}:\/\/.*\/dataset\/(\d+).*/)[1]);
+            if (type != 'display')
+              return num;
+            return '<a target="_blank" href="' + data + '/metadata"><span class="ui-icon ui-icon-link jtox-inline"></span> D' + num + '</a>';
+          }},
           'Title': { iOrder: 1, sTitle: "Title", mData: "title", sDefaultContent: "-" },
           'Stars': { iOrder: 2, sTitle: "Stars", mData: "stars", sWidth: "160px" },
           'Info': { iOrder: 3, sTitle: "Info", mData: "rights", mRender: function (data, type, full) {
@@ -2573,13 +2578,6 @@ var jToxDataset = (function () {
       // arrange certain things on the columns first - like dealing with short/long stars
       self.settings.configuration.columns.dataset.Stars.mRender = function (data, type, full) {
         return type != 'display' ? data : jT.ui.putStars(self, data, "Dataset quality stars rating (worst) 1-10 (best)");
-      };
-      
-      self.settings.configuration.columns.dataset.Id.mRender = function (data, type, full) {
-        var num = parseInt(data.match(/https{0,1}:\/\/.*\/dataset\/(\d+).*/)[1]);
-        if (type != 'display')
-          return num;
-        return '<a target="_blank" href="' + self.settings.baseUrl + '/ui/_dataset?dataset_uri=' + encodeURIComponent(data) + '"><span class="ui-icon ui-icon-link jtox-inline"></span> D' + num + '</a>';
       };
       
       if (self.settings.shortStars)
