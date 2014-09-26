@@ -148,8 +148,8 @@ var ccLib = {
   },
   
   getJsonValue: function (json, field){
-    var value = undefined;
-    if (field !== undefined) {
+    var value = json[field];
+    if (value === undefined && field != null) {
       try {
         eval("value = json." + field);
       } 

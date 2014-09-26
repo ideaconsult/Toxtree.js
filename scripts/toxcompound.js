@@ -746,6 +746,10 @@ var jToxCompound = (function () {
       jT.$(self.fixTable).dataTable().fnAddData(dataFeed);
       jT.$(self.varTable).dataTable().fnAddData(dataFeed);
       jT.$('.jt-feeding', self.rootElement).html(self.settings.oLanguage.sZeroRecords || 'No records matching the filter.');
+
+      ccLib.fillTree(jT.$('.jtox-controls', self.rootElement)[0], {
+        "filtered-text": !needle ? " " : ' (filtered to <span class="high">' + dataFeed.length + '</span>) '
+      });
       
       if (self.settings.showTabs){
         self.suspendEqualization = true;
@@ -775,7 +779,7 @@ var jToxCompound = (function () {
       var pane = jT.$('.jtox-controls', self.rootElement)[0];
       ccLib.fillTree(pane, {
         "pagestart": qSize > 0 ? qStart + 1 : 0,
-        "pageend": qStart + qSize,
+        "pageend": qStart + qSize
       });
       
       var nextBut = jT.$('.next-field', pane);
