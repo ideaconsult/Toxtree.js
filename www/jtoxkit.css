@@ -215,6 +215,8 @@
   background-size: 16px 16px;
   text-fill-color: rgba(0, 0, 0, 0);
   color: rgba(0, 0, 0, 0);
+  min-width: 16px;
+  min-height: 16px;
 }
 
 .jtox-toolkit input[type="password"],
@@ -462,6 +464,21 @@ button.jt-toggle.active {
 
 .jtox-ds-tables {
   position: relative;  
+}
+
+.jtox-ds-tables .jt-processing {
+  position: absolute;
+  width: 400px;
+  left: 50%;
+  text-align: center;
+  margin-left: -200px;
+  border: 1px solid black;
+  border-radius: 5px;
+  display: none;
+}
+
+.jtox-ds-tables .jt-processing span {
+  vertical-align: middle;
 }
 
 .jtox-ds-tables .jtox-details-box {

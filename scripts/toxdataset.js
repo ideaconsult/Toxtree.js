@@ -11,11 +11,10 @@ var jToxDataset = (function () {
     selectionHandler: null,   // selection handler to be attached on checkbox, for jToxQuery integration
     noInterface: false,       // run in interface-less mode, with data retrieval and callback calling only
     sDom: "<Fif>rt",          // passed with dataTable settings upon creation
-    oLanguage: null,          // passed with dataTable settings upon creation
     onLoaded: null,           // callback called when the is available
     loadOnInit: false,        // whether to make an (empty) call when initialized.
     oLanguage: {
-      "sLoadingRecords": "No datasets found.",
+      "sLoadingRecords": "Loading dataset list.",
       "sZeroRecords": "No datasets found.",
       "sEmptyTable": "No datasets available.",
       "sInfo": "Showing _TOTAL_ dataset(s) (_START_ to _END_)"

@@ -26,6 +26,7 @@ var jToxCompound = (function () {
     "onPrepared": null,       // invoked when the initial call for determining the tabs/columns is ready
     "onDetails": null,        // invoked when a details pane is openned
     "preDetails": null,       // invoked prior of details pane creation to see if it is going to happen at all
+    "oLanguage": {},          // some default language settings, which apply to first (static) table only
     "fnAccumulate": function(fId, oldVal, newVal, features) {
       if (ccLib.isNull(newVal))
         return oldVal;
@@ -594,7 +595,6 @@ var jToxCompound = (function () {
       jT.ui.sortColDefs(fixCols);
       self.fixTable = (jT.$(".jtox-ds-fixed table", self.rootElement).dataTable({
         "bPaginate": false,
-        "bProcessing": true,
         "bLengthChange": false,
 				"bAutoWidth": true,
         "sDom" : "rt",
@@ -614,9 +614,7 @@ var jToxCompound = (function () {
             }, 50);
           });
         },
-        "oLanguage" : {
-          "sEmptyTable" : '<span id="jtox-ds-message-' + self.instanceNo + '">Loading data...</span>',
-        }
+        "oLanguage" : { "sEmptyTable": self.settings.oLanguage.sProcess || 'Feeding data...' }
       }))[0];
 
       // we need to put a fake column to stay, when there is no other column here, or when everything is hidden..
@@ -625,6 +623,7 @@ var jToxCompound = (function () {
       jT.ui.sortColDefs(varCols);
       self.varTable = (jT.$(".jtox-ds-variable table", self.rootElement).dataTable({
         "bPaginate": false,
+        "bProcessing": true,
         "bLengthChange": false,
 				"bAutoWidth": false,
         "sDom" : "rt",
@@ -649,7 +648,7 @@ var jToxCompound = (function () {
           if (rlen > 0)
             jT.$(self.fixTable).dataTable().fnSort([[1, "asc"]]);
         },
-        "oLanguage" : { "sEmptyTable" : " - " }
+        "oLanguage" : {}
       }))[0];
     },
 
@@ -840,7 +839,7 @@ var jToxCompound = (function () {
       // we may be passed dataset, if the initial, setup query was 404: Not Found - to avoid second such query...
       if (dataset != null)
         fillFn(dataset)
-      else
+      else 
         jT.call(self, qUri, fillFn);
     },
     
@@ -859,6 +858,10 @@ var jToxCompound = (function () {
       
       // remember the _original_ datasetUri and make a call with one size length to retrieve all features...
       self.datasetUri = (datasetUri.indexOf('http') !=0 ? self.settings.baseUrl : '') + datasetUri;
+      
+      var procDiv = jT.$('.jt-processing', self.rootElement).show()[0];
+      if (!!self.settings.oLanguage.sLoadingRecords)
+        jT.$('.message', procDiv).html(self.settings.oLanguage.sLoadingRecords);
 
       jT.call(self, ccLib.addParameter(self.datasetUri, "page=0&pagesize=1"), function (dataset, jhr) {
         var empty = false;
@@ -866,7 +869,9 @@ var jToxCompound = (function () {
           empty = true;
           dataset = { feature: {}, dataEntry: [] }; // an empty set, to make it show the table...
         }
-
+        
+        // remove the loading pane in anyways..
+        jT.$(procDiv).hide();
         if (!!dataset) {
           self.feature = dataset.feature;
           cls.processFeatures(self.feature, self.settings.configuration.baseFeatures);

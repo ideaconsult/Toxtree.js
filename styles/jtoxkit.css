@@ -215,6 +215,8 @@
   background-size: 16px 16px;
   text-fill-color: rgba(0, 0, 0, 0);
   color: rgba(0, 0, 0, 0);
+  min-width: 16px;
+  min-height: 16px;
 }
 
 .jtox-toolkit input[type="password"],
