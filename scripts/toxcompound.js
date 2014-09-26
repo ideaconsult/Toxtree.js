@@ -614,7 +614,7 @@ var jToxCompound = (function () {
             }, 50);
           });
         },
-        "oLanguage" : { "sEmptyTable": self.settings.oLanguage.sProcess || 'Feeding data...' }
+        "oLanguage" : { "sEmptyTable": '<span class="jt-feeding">' + (self.settings.oLanguage.sProcess || 'Feeding data...') + '</span>' }
       }))[0];
 
       // we need to put a fake column to stay, when there is no other column here, or when everything is hidden..
@@ -648,7 +648,7 @@ var jToxCompound = (function () {
           if (rlen > 0)
             jT.$(self.fixTable).dataTable().fnSort([[1, "asc"]]);
         },
-        "oLanguage" : {}
+        "oLanguage" : { "sEmptyTable": "-"}
       }))[0];
     },
 
@@ -745,7 +745,7 @@ var jToxCompound = (function () {
       jT.$(self.varTable).dataTable().fnClearTable();
       jT.$(self.fixTable).dataTable().fnAddData(dataFeed);
       jT.$(self.varTable).dataTable().fnAddData(dataFeed);
-      jT.$('#jtox-ds-message-' + self.instanceNo).html('No records matching the filter.');
+      jT.$('.jt-feeding', self.rootElement).html(self.settings.oLanguage.sZeroRecords || 'No records matching the filter.');
       
       if (self.settings.showTabs){
         self.suspendEqualization = true;
