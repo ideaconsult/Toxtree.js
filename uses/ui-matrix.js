@@ -341,7 +341,7 @@ var jToxAssessment = {
     	  self.substanceKit = new jToxSubstance(root, { crossDomain: true, selectionHandler: "onSelectSubstance" });
   	  }
   	  
-      self.substanceKit.query(jT.settings.baseUrl + '/data/substance?type=related&compound_uri=http%3A%2F%2Fapps.ideaconsult.net%3A8080%2Fdata%2Fcompound%2F21219%2Fconformer%2F39738');
+      self.substanceKit.query(jT.settings.baseUrl + "/substance?type=related&compound_uri=http%3A%2F%2Fapps.ideaconsult.net%3A8080%2Fdata%2Fcompound%2F21219%2Fconformer%2F39738");
 	  }
 	  else {// i.e. endpoints
   	  if (sub.firstElementChild == null) {
