@@ -1946,7 +1946,7 @@ var jToxCompound = (function () {
       // prepare the function for column switching...      
       var fnShowColumn = function() {
         var dt = $(this).data();
-        var cells = jT.$(dt.sel + ' table tr>*:nth-child(' + (dt.idx + 1) + ')', self.rootElement);
+        var cells = jT.$(dt.sel + ' table tr .' + dt.column, self.rootElement);
         if (this.checked) {
           jT.$(cells).show();
           jT.$("table tr .blank-col", self.rootElement).addClass('jtox-hidden');
@@ -2057,7 +2057,10 @@ var jToxCompound = (function () {
           
           // finally - assign column switching to the checkbox of main tab.
           var colList = !!feature.primary ? fixCols : varCols;
-          jT.$('.jtox-ds-features input.jtox-checkbox[value="' + fId + '"]', self.rootElement).data({ sel: !!feature.primary ? '.jtox-ds-fixed' : '.jtox-ds-variable', idx: colList.length, id: fId}).on('change', fnShowColumn)
+          var colId = 'col-' + colList.length;
+          col.sClass += ' ' + colId;
+
+          jT.$('.jtox-ds-features input.jtox-checkbox[value="' + fId + '"]', self.rootElement).data({ sel: !!feature.primary ? '.jtox-ds-fixed' : '.jtox-ds-variable', column: colId, id: fId}).on('change', fnShowColumn)
           
           // and push it into the proper list.
           colList.push(col);

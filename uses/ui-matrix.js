@@ -324,7 +324,7 @@ var jToxAssessment = {
   		});
   		
 /*   		self.matrixKit.query("http://apps.ideaconsult.net:8080/data/substanceowner/IUC5-8DA74AF7-C7DD-4E38-8D8E-8FC765D5D15F/dataset"); */
-  		self.matrixKit.query("http://apps.ideaconsult.net:8080/data/substanceowner/IUC4-44BF02D8-47C5-385D-B203-9A8F315911CB/dataset");
+  		self.matrixKit.query(jT.settings.baseUrl + "/substanceowner/IUC4-44BF02D8-47C5-385D-B203-9A8F315911CB/dataset");
 		}
 	},
 	
@@ -341,7 +341,7 @@ var jToxAssessment = {
     	  self.substanceKit = new jToxSubstance(root, { crossDomain: true, selectionHandler: "onSelectSubstance" });
   	  }
   	  
-      self.substanceKit.query('http://apps.ideaconsult.net:8080/data/substance?type=related&compound_uri=http%3A%2F%2Fapps.ideaconsult.net%3A8080%2Fdata%2Fcompound%2F21219%2Fconformer%2F39738');
+      self.substanceKit.query(jT.settings.baseUrl + '/data/substance?type=related&compound_uri=http%3A%2F%2Fapps.ideaconsult.net%3A8080%2Fdata%2Fcompound%2F21219%2Fconformer%2F39738');
 	  }
 	  else {// i.e. endpoints
   	  if (sub.firstElementChild == null) {
