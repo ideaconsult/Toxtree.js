@@ -135,11 +135,15 @@ var jToxSubstance = (function () {
             result.substance[i].index = i + from + 1;
 
           self.substance = result.substance;
+          
+          if (result.substance.length < self.pageSize) // we've reached the end!!
+            self.entriesCount = from + result.substance.length;
+
           if (!self.settings.noInterface) {
             jT.$(self.table).dataTable().fnClearTable();
             jT.$(self.table).dataTable().fnAddData(result.substance);
             
-            self.updateControls(qStart, result.substance.length);
+            self.updateControls(from, result.substance.length);
           }
         }
         // time to call the supplied function, if any.
