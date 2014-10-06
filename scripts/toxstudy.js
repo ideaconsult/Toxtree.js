@@ -519,13 +519,7 @@ var jToxStudy = (function () {
           substance = substance.substance[0];
            
           substance["showname"] = substance.publicname || substance.name;
-          var flags = '';
-          for (var i = 0, iLen = substance.externalIdentifiers.length; i < iLen; ++i) {
-            if (i > 0)
-              flags += ', ';
-            flags += substance.externalIdentifiers[i].id || '';
-          }
-          substance["IUCFlags"] = flags;
+          substance["IUCFlags"] = jToxSubstance.formatExtIdentifiers(substance.externalIdentifiers, 'display', substance);
           self.substance = substance;
             
           ccLib.fillTree(self.rootElement, substance);

@@ -38,8 +38,7 @@ var jToxSubstance = (function () {
             return (type != 'display') ? data.i5uuid : jT.ui.shortenedData('<a target="_blank" href="' + data.uri + '">' + data.i5uuid + '</a>', "Press to copy the UUID in the clipboard", data.i5uuid);
           } },
           'Owner': { sTitle: "Owner", mData: "ownerName", sDefaultContent: '-'},
-          'Info': { sTitle: "Info", mData: "externalIdentifiers", mRender: function (data, type, full) { return ccLib.joinDeep(data, 'type', ', '); }
-          }
+          'Info': { sTitle: "Info", mData: "externalIdentifiers", mRender: function (data, type, full) { return jToxSubstance.formatExtIdentifiers(data, type, full); } }
         }
       }
     }
@@ -74,6 +73,20 @@ var jToxSubstance = (function () {
     // finally, if provided - make the query
     if (!!self.settings.substanceUri)
       self.querySubstance(self.settings.substanceUri)
+  };
+  
+  // format the external identifiers column
+  cls.formatExtIdentifiers = function (data, type, full) {
+    if (type != 'display')
+      return ccLib.joinDeep(data, 'id', ', ');
+    
+    var html = '';
+    for (var i = 0;i < data.length;++i) {
+      if (i > 0)
+        html += '<br/>';
+      html += data[i].type + '&nbsp;=&nbsp;' + data[i].id;
+    }
+    return html;
   };
   
   cls.prototype = {
