@@ -24,14 +24,19 @@ html, body, #jtox-assessment {
   bottom: -120px;
 }
 
+#jtox-assessment textarea,
+.popup-box textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: none;
+}
 
 #jtox-identifiers form div.actions {
 	margin-top: 15px;
 	font-size: 80%;
 }
 
-#jtox-identifiers form input,
-#jtox-identifiers form textarea {
+#jtox-identifiers form input {
 	width: 100%;
 }
 
@@ -41,10 +46,9 @@ html, body, #jtox-assessment {
 }
 
 #jtox-structures td textarea {
+  min-width: 150px;
   height: 150px;
-  resize: none;
   overflow-x: none;
-  box-sizing: border-box;
   margin: 0px;
   border: 0px;
 }
@@ -102,6 +106,16 @@ body.structlist #browser {
 
 /* Now come info and edit box declarations
 */
+.popup-box .box-reference {
+  width: 100%;
+}
+
+.popup-box .box-reference input {
+  font-size: 110%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .popup-box th,
 .popup-box td {
   padding: 2px 5px 2px 5px;

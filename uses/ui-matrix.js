@@ -308,6 +308,7 @@ var jToxAssessment = {
       		  else { // edit mode
               var parse = featureId.substr(self.matrixKit.settings.baseUrl.length).match(/property\/([^\/]+)\/([^\/]+)\/.+/);
               
+              // we're taking the original jToxEndpoint editor here and glue our part after it.
               boxOptions.content = jT.getTemplate('#jtox-endeditor').innerHTML + editDiv.innerHTML;
               boxOptions.title = parse[2];
               boxOptions.closeButton = "box";
@@ -326,7 +327,6 @@ var jToxAssessment = {
     		}
   		});
   		
-/*   		self.matrixKit.query("http://apps.ideaconsult.net:8080/data/substanceowner/IUC5-8DA74AF7-C7DD-4E38-8D8E-8FC765D5D15F/dataset"); */
   		self.matrixKit.query(jT.settings.baseUrl + "/substanceowner/IUC4-44BF02D8-47C5-385D-B203-9A8F315911CB/dataset");
 		}
 	},
