@@ -72,6 +72,17 @@ var jToxAssessment = {
   	}
   },
   
+  parseFeatureId: function (featureId, kit) {
+    var parse = featureId.substr(kit.settings.baseUrl.length).match(/property\/([^\/]+)\/([^\/]+)\/.+/);
+    if (parse == null)
+      return null;
+    else
+      return {
+        topcategory: parse[1].replace("+", " "),
+        category: parse[2].replace("+", " ")
+      };
+  },
+  
 	init: function (root, settings) {
 		var self = this;
 
@@ -191,8 +202,17 @@ var jToxAssessment = {
                 continue;
               if (html.length > 0)
                 html += '<br/>';
+                
+              var catId = self.parseFeatureId(fId, kit).category,
+                  config = jT.$.extend(true, {}, kit.settings.configuration.columns["_"], kit.settings.configuration.columns[catId]),
+                  val = '';
               
-              html += '<a class="info-popup" data-feature="' + fId + '" href="#">' + jT.ui.valueWithUnits(full.values[fId], f.units) + '</a>';
+              if (ccLib.getJsonValue(config, 'effects.endpoint.bVisible') !== false)
+                val += f.title.replace(" ", '&nbsp;') + "&nbsp;=&nbsp;";
+              val += jT.ui.valueWithUnits(full.values[fId], f.units);
+
+              // now - ready to produce HTML
+              html += '<a class="info-popup" data-feature="' + fId + '" href="#">' + val + '</a>';
               html += '<sup class="helper"><a target="jtox-study" href="' + full.compound.URI + '/study?property_uri=' + encodeURIComponent(fId) + '">?</a></sup>';
             }
             
@@ -208,7 +228,7 @@ var jToxAssessment = {
       	  if (feat.sameAs == null || feat.sameAs.indexOf("echaEndpoints.owl#") < 0)
       	    continue;
           
-          var catId = fId.match(/.*\/property\/([\w\+\s\_\-]+)\/.*/)[1];
+          var catId = self.parseFeatureId(fId, kit).topcategory;
           var grp = groups[catId];
           if (grp == null)
             groups[catId] = grp = [];
@@ -306,11 +326,11 @@ var jToxAssessment = {
               new jBox('Tooltip', boxOptions).open();
       		  }
       		  else { // edit mode
-              var parse = featureId.substr(self.matrixKit.settings.baseUrl.length).match(/property\/([^\/]+)\/([^\/]+)\/.+/);
+              var parse = self.parseFeatureId(featureId, kit);
               
               // we're taking the original jToxEndpoint editor here and glue our part after it.
               boxOptions.content = jT.getTemplate('#jtox-endeditor').innerHTML + editDiv.innerHTML;
-              boxOptions.title = parse[2];
+              boxOptions.title = parse.category;
               boxOptions.closeButton = "box";
               boxOptions.confirmButton = "Add";
               boxOptions.cancelButton = "Cancel";
@@ -319,7 +339,7 @@ var jToxAssessment = {
               };
               
               boxOptions.onOpen = function () {
-                jToxEndpoint.linkEditors(self.matrixKit, this.content[0], parse[2].replace("+", " "), parse[1].replace("+", " "), endSetValue);
+                jToxEndpoint.linkEditors(self.matrixKit, this.content[0], parse.category, parse.topcategory, endSetValue);
               };
               new jBox('Modal', boxOptions).open();
       		  }
