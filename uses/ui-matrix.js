@@ -178,7 +178,6 @@ var jToxAssessment = {
       	};
       	
       	var endpoints = {};
-      	var grp = [];
       	
       	var fRender = function (feat, theId) {
       	  return function (data, type, full) {
@@ -209,7 +208,12 @@ var jToxAssessment = {
       	  if (feat.sameAs == null || feat.sameAs.indexOf("echaEndpoints.owl#") < 0)
       	    continue;
           
-          if (endpoints[feat.sameAs] == undefined) {
+          var catId = fId.match(/.*\/property\/([\w\+\s\_\-]+)\/.*/)[1];
+          var grp = groups[catId];
+          if (grp == null)
+            groups[catId] = grp = [];
+
+          if (endpoints[feat.sameAs] == null) {
             endpoints[feat.sameAs] = true;
             feat.render = fRender(feat, fId);
             feat.title = feat.sameAs.substr(feat.sameAs.indexOf('#') + 1);
@@ -217,7 +221,6 @@ var jToxAssessment = {
           }
       	}
       		
-      	groups["Endpoints"] = grp;
       	return groups;
       }
 		
