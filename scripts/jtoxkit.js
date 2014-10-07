@@ -629,11 +629,11 @@ window.jT.ui = {
     if (count == null)
       count = 0;
     if (total == null) {
-      re = /([^(]*)\(([\d\?]+)\)/;
+      re = /\(([\d\?]+)\)$/;
       add = '' + count;
     }
     else {
-      re = /([^(]*)\(([\d\?]+\/[\d\?\+-]+)\)/;
+      re = /\(([\d\?]+\/[\d\?\+-]+)\)$/;
       add = '' + count + '/' + total;
     }
     
@@ -641,7 +641,7 @@ window.jT.ui = {
     if (!str.match(re))
       str += ' (' + add + ')';
     else
-      str = str.replace(re, "$1(" + add + ")");
+      str = str.replace(re, "(" + add + ")");
     
     return str;
   },

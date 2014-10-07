@@ -87,6 +87,11 @@ body>div.jtox-toolkit {
   height: 100%;
 }
 
+.counter-field {
+  font-size: 110%;
+  margin-bottom: 5px;
+}
+
 #tt-models-panel {
   width: 59%;
   height: 100%;
@@ -175,7 +180,7 @@ div.tt-algorithm div.tt-classification {
   overflow: scroll;
   box-sizing: border-box;
   font-size: 90%;
-  padding: 5px;
+  padding: 0px 5px 0px 5px;
 }
 
 #tt-features .tt-feature {

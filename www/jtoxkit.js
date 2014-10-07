@@ -204,9 +204,11 @@ var ccLib = {
     for (var i = 0, dl = data.length; i < dl; ++i) {
       var el = temp.cloneNode(true);
       el.removeAttribute('id');
+      if (this.fireCallback(enumFn, el, data[i]) === false)
+        continue;
+    
       root.appendChild(el);
       this.fillTree(el, data[i]);
-      this.fireCallback(enumFn, el, data[i]);
     }
     
     root.style.display = oldDisp;
@@ -1017,11 +1019,11 @@ window.jT.ui = {
     if (count == null)
       count = 0;
     if (total == null) {
-      re = /([^(]*)\(([\d\?]+)\)/;
+      re = /\(([\d\?]+)\)$/;
       add = '' + count;
     }
     else {
-      re = /([^(]*)\(([\d\?]+\/[\d\?\+-]+)\)/;
+      re = /\(([\d\?]+\/[\d\?\+-]+)\)$/;
       add = '' + count + '/' + total;
     }
     
@@ -1029,7 +1031,7 @@ window.jT.ui = {
     if (!str.match(re))
       str += ' (' + add + ')';
     else
-      str = str.replace(re, "$1(" + add + ")");
+      str = str.replace(re, "(" + add + ")");
     
     return str;
   },
@@ -1289,8 +1291,8 @@ var jToxSearch = (function () {
     var radios = jT.$('.jq-buttonset', root).buttonset();
     var onTypeClicked = function () {
       form.searchbox.placeholder = jT.$(this).data('placeholder');
-      jT.$('.search-pane .auto-hide', self.rootElement).addClass('hidden').width(0);
-      jT.$('.search-pane .' + this.id, self.rootElement).removeClass('hidden').width('');
+      jT.$('.search-pane .auto-hide', self.rootElement).addClass('hidden');
+      jT.$('.search-pane .' + this.id, self.rootElement).removeClass('hidden');
       self.search.queryType = this.value;
       if (this.value == 'url') {
         jT.$(form.drawbutton).addClass('hidden');
@@ -1394,11 +1396,18 @@ var jToxSearch = (function () {
     });
 
     // finally - parse the URL-passed parameters and setup the values appropriately.
-    if (!!self.settings.b64search)
+    var doQuery = false;
+    if (!!self.settings.b64search) {
       self.setMol($.base64.decode(self.settings.b64search));
-    else if (!!self.settings.search)
+      doQuery = true;
+    }
+    else if (!!self.settings.search) {
       self.setAuto(self.settings.search);
-      
+      doQuery = true;
+    }
+
+    if (doQuery)
+      setTimeout(function () { self.queryKit.query(); }, 250);      
     // and very finally - install the handlers...
     jT.ui.installHandlers(self);
   };
@@ -2444,7 +2453,7 @@ var jToxCompound = (function () {
       var feat = jT.$.extend({}, features[fId]);
       feat.value = entry.values[fId];
       if (!!feat.title) {
-        if (ccLib.fireCallback(callback, null, feat, fId)) {
+        if (ccLib.fireCallback(callback, null, feat, fId) !== false) {
           if (!feat.value)
             feat.value = '-';
           data.push(feat);
@@ -4612,6 +4621,7 @@ jT.templates['widget-search']  =
 "  			  <div class=\"dynamic auto-hide searchsmarts hidden jtox-inline\">" +
 "  			    <select name=\"smarts\" title =\"Predefined functional groups\"></select>" +
 "  			  </div>" +
+"  			  <div class=\"dynamic auto-hide searchurl hidden jtox-inline\"> </div>" +
 "  			  <div class=\"jtox-inline\">" +
 "            <input type=\"text\" name=\"searchbox\"/>" +
 "            <button name=\"searchbutton\" class=\"jtox-handler\" title=\"Search/refresh\" data-handler=\"query\"><span class=\"ui-icon ui-icon-search\"/></button>" +

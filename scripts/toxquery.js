@@ -168,8 +168,8 @@ var jToxSearch = (function () {
     var radios = jT.$('.jq-buttonset', root).buttonset();
     var onTypeClicked = function () {
       form.searchbox.placeholder = jT.$(this).data('placeholder');
-      jT.$('.search-pane .auto-hide', self.rootElement).addClass('hidden').width(0);
-      jT.$('.search-pane .' + this.id, self.rootElement).removeClass('hidden').width('');
+      jT.$('.search-pane .auto-hide', self.rootElement).addClass('hidden');
+      jT.$('.search-pane .' + this.id, self.rootElement).removeClass('hidden');
       self.search.queryType = this.value;
       if (this.value == 'url') {
         jT.$(form.drawbutton).addClass('hidden');
@@ -273,11 +273,18 @@ var jToxSearch = (function () {
     });
 
     // finally - parse the URL-passed parameters and setup the values appropriately.
-    if (!!self.settings.b64search)
+    var doQuery = false;
+    if (!!self.settings.b64search) {
       self.setMol($.base64.decode(self.settings.b64search));
-    else if (!!self.settings.search)
+      doQuery = true;
+    }
+    else if (!!self.settings.search) {
       self.setAuto(self.settings.search);
-      
+      doQuery = true;
+    }
+
+    if (doQuery)
+      setTimeout(function () { self.queryKit.query(); }, 250);      
     // and very finally - install the handlers...
     jT.ui.installHandlers(self);
   };

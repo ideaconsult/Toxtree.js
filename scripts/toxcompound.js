@@ -971,7 +971,7 @@ var jToxCompound = (function () {
       var feat = jT.$.extend({}, features[fId]);
       feat.value = entry.values[fId];
       if (!!feat.title) {
-        if (ccLib.fireCallback(callback, null, feat, fId)) {
+        if (ccLib.fireCallback(callback, null, feat, fId) !== false) {
           if (!feat.value)
             feat.value = '-';
           data.push(feat);

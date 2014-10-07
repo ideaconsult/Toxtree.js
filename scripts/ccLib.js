@@ -204,9 +204,11 @@ var ccLib = {
     for (var i = 0, dl = data.length; i < dl; ++i) {
       var el = temp.cloneNode(true);
       el.removeAttribute('id');
+      if (this.fireCallback(enumFn, el, data[i]) === false)
+        continue;
+    
       root.appendChild(el);
       this.fillTree(el, data[i]);
-      this.fireCallback(enumFn, el, data[i]);
     }
     
     root.style.display = oldDisp;
