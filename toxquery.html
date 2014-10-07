@@ -24,7 +24,6 @@
   <script src="tests/jquery.js"></script>
   <script src="tests/jquery.base64.min.js"></script>
   <script src="tests/jquery-migrate-1.2.1.min.js"></script>
-  <script src="tests/colResizable-1.3.min.js"></script>
   <script src="tests/jquery-ui.js"></script>
   <script src="tests/jquery.dataTables.js"></script>
 
@@ -34,7 +33,7 @@
 </head>
 <body>
   <div class="jtox-toolkit" data-kit="query" data-initial-query="yes">
-    <div class="jtox-toolkit jtox-widget" data-kit="search"></div>
+    <div class="jtox-toolkit jtox-widget" data-kit="search" data-hide-options="context"></div>
 	  <div class="jtox-toolkit" data-kit="compound" data-cross-domain="true" data-show-tabs="false"></div>
   </div>
 	<div class="jtox-template">
@@ -51,7 +50,7 @@
   			  <input type="radio" id="searchurl" value="url" name="searchtype" data-placeholder="Enter URL to be examined..."/>
 			    <label for="searchurl" title="Enter dataset URL">URL</label>
   			</div>
-    		<div class="jtox-inline float-right search-pane">
+    		<div class="float-right search-pane">
   			  <div class="dynamic auto-hide searchauto hidden jtox-inline">
   			    <div>
     			    <input type="checkbox" name="regexp" title="fadsfas"/><span>Enable fragment search<sup class="helper"><a target="_blank" href="http://en.wikipedia.org/wiki/Regular_expression">?</a></sup></span>
@@ -73,7 +72,6 @@
   			  <div class="dynamic auto-hide searchsmarts hidden jtox-inline">
   			    <select name="smarts" title ="Predefined functional groups"></select>
   			  </div>
-  			  <div class="dynamic auto-hide searchurl hidden jtox-inline"> </div>
   			  <div class="jtox-inline">
             <input type="text" name="searchbox"/>
             <button name="searchbutton" class="jtox-handler" title="Search/refresh" data-handler="query"><span class="ui-icon ui-icon-search"/></button>

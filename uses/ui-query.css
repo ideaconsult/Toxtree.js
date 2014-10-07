@@ -78,7 +78,6 @@
 
 #browser {
   position: relative;
-  top: 0px;
 	transition: top 0.3s ease 0.2s;
 	-moz-transition: top 0.3s ease 0.2s;
 	-webkit-transition: top 0.3s ease 0.2s;

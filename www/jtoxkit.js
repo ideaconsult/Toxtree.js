@@ -4599,7 +4599,7 @@ jT.templates['widget-search']  =
 "  			  <input type=\"radio\" id=\"searchurl\" value=\"url\" name=\"searchtype\" data-placeholder=\"Enter URL to be examined...\"/>" +
 "			    <label for=\"searchurl\" title=\"Enter dataset URL\">URL</label>" +
 "  			</div>" +
-"    		<div class=\"jtox-inline float-right search-pane\">" +
+"    		<div class=\"float-right search-pane\">" +
 "  			  <div class=\"dynamic auto-hide searchauto hidden jtox-inline\">" +
 "  			    <div>" +
 "    			    <input type=\"checkbox\" name=\"regexp\" title=\"fadsfas\"/><span>Enable fragment search<sup class=\"helper\"><a target=\"_blank\" href=\"http://en.wikipedia.org/wiki/Regular_expression\">?</a></sup></span>" +
@@ -4621,7 +4621,6 @@ jT.templates['widget-search']  =
 "  			  <div class=\"dynamic auto-hide searchsmarts hidden jtox-inline\">" +
 "  			    <select name=\"smarts\" title =\"Predefined functional groups\"></select>" +
 "  			  </div>" +
-"  			  <div class=\"dynamic auto-hide searchurl hidden jtox-inline\"> </div>" +
 "  			  <div class=\"jtox-inline\">" +
 "            <input type=\"text\" name=\"searchbox\"/>" +
 "            <button name=\"searchbutton\" class=\"jtox-handler\" title=\"Search/refresh\" data-handler=\"query\"><span class=\"ui-icon ui-icon-search\"/></button>" +
