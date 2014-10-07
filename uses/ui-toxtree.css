@@ -169,7 +169,9 @@ div.tt-algorithm div.tt-classification {
 
 #tt-browser-panel .tt-controls {
   vertical-align: bottom;
-  float: right;
+  position: absolute;
+  right: 0px;
+  top: 0px;
 }
 
 #tt-features {

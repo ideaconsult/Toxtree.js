@@ -398,6 +398,8 @@ window.jT = window.jToxKit = {
 		taskPoll: { method: 'GET', service: "/task/{id}" },
 	},
 	
+	callId: 0,
+	
 	templates: { },        // html2js routine will fill up this variable
 	tools: { },            // additional, external tools added with html2js
 
@@ -686,8 +688,9 @@ window.jT = window.jToxKit = {
 		// on some queries, like tasks, we DO have baseUrl at the beginning
 		if (service.indexOf("http") != 0)
 			service = settings.baseUrl + service;
-			
-		ccLib.fireCallback(settings.onConnect, kit, service, params);
+
+    var myId = self.callId++;
+		ccLib.fireCallback(settings.onConnect, kit, service, params, myId);
 			
 		// now make the actual call
 		self.$.ajax(service, {
@@ -699,11 +702,11 @@ window.jT = window.jToxKit = {
 			data: params.data,
 			jsonp: settings.jsonp ? 'callback' : false,
 			error: function(jhr, status, error){
-			  ccLib.fireCallback(settings.onError, kit, service, status, jhr);
+			  ccLib.fireCallback(settings.onError, kit, service, status, jhr, myId);
 				callback(null, jhr);
 			},
 			success: function(data, status, jhr){
-			  ccLib.fireCallback(settings.onSuccess, kit, service, status, jhr);
+			  ccLib.fireCallback(settings.onSuccess, kit, service, status, jhr, myId);
 				callback(data, jhr);
 			}
 		});
@@ -4147,25 +4150,27 @@ var jToxLog = (function () {
     
     // now the handlers - needed no matter if we have interface or not    
     self.handlers = {
-      onConnect: function (service, params) {
+      onConnect: function (service, params, id) {
         var info = ccLib.fireCallback(self.settings.formatEvent, this, service, "connecting", params, null);
         ccLib.fireCallback(self.settings.onEvent, this, service, "connecting", info);
         if (!self.settings.noInterface) {
           setStatus("connecting");
           var line = addLine(info);
-          self.events[service] = line;
+          self.events[id] = line;
           setIcon(line, 'connecting');
           jT.$(line).data('status', "connecting");
+          
+          console.log("Connecting [" + id + ": " + service);
         }
         if (!!self.settings.resend && this._handlers != null)
-          ccLib.fireCallback(this._handlers.onConnect, this, service, params);
+          ccLib.fireCallback(this._handlers.onConnect, this, service, params, id);
       },
-      onSuccess: function (service, status, jhr) {
+      onSuccess: function (service, status, jhr, id) {
         var info = ccLib.fireCallback(self.settings.formatEvent, this, service, "success", null, jhr);
         ccLib.fireCallback(self.settings.onEvent, this, service, "success", info);
         if (!self.settings.noInterface) {
           setStatus("success");
-          var line = self.events[service];
+          var line = self.events[id];
           if (!line) {
             console.log("jToxLog: missing line for:" + service);
             return;
@@ -4174,16 +4179,18 @@ var jToxLog = (function () {
           setIcon(line, 'success');
           ccLib.fillTree(line, info);
           jT.$(line).data('status', "success");
+
+          console.log("Success [" + id + ": " + service);
         }
         if (!!self.settings.resend && this._handlers != null)
-          ccLib.fireCallback(this._handlers.onSuccess, this, service, status, jhr);
+          ccLib.fireCallback(this._handlers.onSuccess, this, service, status, jhr, id);
       },
-      onError: function (service, status, jhr) {
+      onError: function (service, status, jhr, id) {
         var info = ccLib.fireCallback(self.settings.formatEvent, this, service, "error", null, jhr);
         ccLib.fireCallback(self.settings.onEvent, this, service, "error", info);
         if (!self.settings.noInterface) {
           setStatus("error");
-          var line = self.events[service];
+          var line = self.events[id];
           if (!line) {
             console.log("jToxLog: missing line for:" + service + "(" + status + ")");
             return;
@@ -4192,9 +4199,11 @@ var jToxLog = (function () {
           setIcon(line, 'error');
           ccLib.fillTree(line, info);
           jT.$(line).data('status', "error");
+
+          console.log("Error [" + id + ": " + service);
         }
         if (!!self.settings.resend && this._handlers != null)
-          ccLib.fireCallback(this._handlers.onError, this, service, status, jhr);
+          ccLib.fireCallback(this._handlers.onError, this, service, status, jhr, id);
       }
     };
     

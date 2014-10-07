@@ -132,25 +132,27 @@ var jToxLog = (function () {
     
     // now the handlers - needed no matter if we have interface or not    
     self.handlers = {
-      onConnect: function (service, params) {
+      onConnect: function (service, params, id) {
         var info = ccLib.fireCallback(self.settings.formatEvent, this, service, "connecting", params, null);
         ccLib.fireCallback(self.settings.onEvent, this, service, "connecting", info);
         if (!self.settings.noInterface) {
           setStatus("connecting");
           var line = addLine(info);
-          self.events[service] = line;
+          self.events[id] = line;
           setIcon(line, 'connecting');
           jT.$(line).data('status', "connecting");
+          
+          console.log("Connecting [" + id + ": " + service);
         }
         if (!!self.settings.resend && this._handlers != null)
-          ccLib.fireCallback(this._handlers.onConnect, this, service, params);
+          ccLib.fireCallback(this._handlers.onConnect, this, service, params, id);
       },
-      onSuccess: function (service, status, jhr) {
+      onSuccess: function (service, status, jhr, id) {
         var info = ccLib.fireCallback(self.settings.formatEvent, this, service, "success", null, jhr);
         ccLib.fireCallback(self.settings.onEvent, this, service, "success", info);
         if (!self.settings.noInterface) {
           setStatus("success");
-          var line = self.events[service];
+          var line = self.events[id];
           if (!line) {
             console.log("jToxLog: missing line for:" + service);
             return;
@@ -159,16 +161,18 @@ var jToxLog = (function () {
           setIcon(line, 'success');
           ccLib.fillTree(line, info);
           jT.$(line).data('status', "success");
+
+          console.log("Success [" + id + ": " + service);
         }
         if (!!self.settings.resend && this._handlers != null)
-          ccLib.fireCallback(this._handlers.onSuccess, this, service, status, jhr);
+          ccLib.fireCallback(this._handlers.onSuccess, this, service, status, jhr, id);
       },
-      onError: function (service, status, jhr) {
+      onError: function (service, status, jhr, id) {
         var info = ccLib.fireCallback(self.settings.formatEvent, this, service, "error", null, jhr);
         ccLib.fireCallback(self.settings.onEvent, this, service, "error", info);
         if (!self.settings.noInterface) {
           setStatus("error");
-          var line = self.events[service];
+          var line = self.events[id];
           if (!line) {
             console.log("jToxLog: missing line for:" + service + "(" + status + ")");
             return;
@@ -177,9 +181,11 @@ var jToxLog = (function () {
           setIcon(line, 'error');
           ccLib.fillTree(line, info);
           jT.$(line).data('status', "error");
+
+          console.log("Error [" + id + ": " + service);
         }
         if (!!self.settings.resend && this._handlers != null)
-          ccLib.fireCallback(this._handlers.onError, this, service, status, jhr);
+          ccLib.fireCallback(this._handlers.onError, this, service, status, jhr, id);
       }
     };
     

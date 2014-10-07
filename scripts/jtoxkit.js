@@ -8,6 +8,8 @@ window.jT = window.jToxKit = {
 		taskPoll: { method: 'GET', service: "/task/{id}" },
 	},
 	
+	callId: 0,
+	
 	templates: { },        // html2js routine will fill up this variable
 	tools: { },            // additional, external tools added with html2js
 
@@ -296,8 +298,9 @@ window.jT = window.jToxKit = {
 		// on some queries, like tasks, we DO have baseUrl at the beginning
 		if (service.indexOf("http") != 0)
 			service = settings.baseUrl + service;
-			
-		ccLib.fireCallback(settings.onConnect, kit, service, params);
+
+    var myId = self.callId++;
+		ccLib.fireCallback(settings.onConnect, kit, service, params, myId);
 			
 		// now make the actual call
 		self.$.ajax(service, {
@@ -309,11 +312,11 @@ window.jT = window.jToxKit = {
 			data: params.data,
 			jsonp: settings.jsonp ? 'callback' : false,
 			error: function(jhr, status, error){
-			  ccLib.fireCallback(settings.onError, kit, service, status, jhr);
+			  ccLib.fireCallback(settings.onError, kit, service, status, jhr, myId);
 				callback(null, jhr);
 			},
 			success: function(data, status, jhr){
-			  ccLib.fireCallback(settings.onSuccess, kit, service, status, jhr);
+			  ccLib.fireCallback(settings.onSuccess, kit, service, status, jhr, myId);
 				callback(data, jhr);
 			}
 		});
