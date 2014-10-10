@@ -5,7 +5,9 @@ outdir='../www'
 jsdir='../scripts'
 cssdir='../styles'
 htmldir='..'
-target='toxstudy'
+target='toxquery toxcompound toxdataset toxmodel toxsubstance toxcomposition toxstudy toxauth toxlog toxendpoint'
+libs=()
+tools=''
 append=0
 
 # test the parameters first
@@ -19,7 +21,7 @@ while (( "$#" )); do
 		--output)
 			append=0
 			shift
-			outdir=$1
+			outdir=$1			
 			;;
 		--css)
 			append=0
@@ -35,23 +37,34 @@ while (( "$#" )); do
 			append=0
 			minimize=1
 			;;
-		--target|-t)
+		--target)
 			target=''
 			append=1
+			;;
+		--lib|-l)
+			shift
+			libs+=($1)
+			;;
+		--tool|-t)
+			shift
+			libs+=($1)
+			tools="$tools $1 "
 			;;
 		--help|-h)
 			echo "Usage: build.sh [options]"
 			echo "Options can be one or more from the following:"
 			echo
-			echo "    [--min | -m]           : run minification of the output js, producing additional .min.js file."
-			echo "    [--html <html dir>]    : the directory where html files live. Default is [..]."
-			echo "    [--out <output dir>]   : the directory where output files should be put. Default is [../www]."
-			echo "    [-css <styles dir>]    : the directory where styling files live. Default is [../styles]."
-			echo "    [--js <js dir>]        : the directory where script files live. Default is [../scripts]."
-			echo "    [--target <kit list>]  : list of kits to be included. Omit jtoxkit. Default [toxstudy]."
-			echo "    [--help | -h]          : this help."
+			echo "    [--min | -m]            : run minification of the output js, producing additional .min.js file."
+			echo "    [--html <html dir>]     : the directory where html files live. Default is [..]."
+			echo "    [--out <output dir>]    : the directory where output files should be put. Default is [../www]."
+			echo "    [-css <styles dir>]     : the directory where styling files live. Default is [../styles]."
+			echo "    [--js <js dir>]         : the directory where script files live. Default is [../scripts]."
+			echo "    [--target <kit list>]   : list of kits to be included. Omit jtoxkit. Default are all of them."
+			echo "    [--lib | -l <filename>] : html file name, referring to some external library (tool)."
+			echo "    [--tool | -t <filename>]: html file name, referring to some internal tool."
+			echo "    [--help | -h]           : this help."
 			echo 
-			echo "Default is like: build.sh --html .. --out ../www --css ../styles --js ../script --target jtoxkit toxstudy"
+			echo "Better call like this: build.sh -m"
 			exit -1
 			;;
 		*)
@@ -63,15 +76,36 @@ while (( "$#" )); do
 	shift
 done
 
+echo "Clearing old files..."
+pushd $outdir > /dev/null
+rm -rf *
+outdir=`pwd`
+popd > /dev/null
+
 outJS="$outdir/jtoxkit.js"
 outCSS="$outdir/jtoxkit.css"
 
-echo "Clearing old files..."
-rm -f $outJS
-rm -f $outCSS
+# First prepare the libraries, if any
+curdir=`pwd`
 
+for l in "${libs[@]}"; do
+	base=$(basename $l)
+	name="${base%.*}"
+	
+	echo "Backing tool [$name]..."
+	pushd $(dirname $l) > /dev/null
+	if [[ "$tools" =~ "$name" ]]; then
+		"$curdir/htmlextract.pl" --css --include $name <$base >"$outdir/$name.css"
+		"$curdir/htmlextract.pl" --js --include $name <$base >"$outdir/$name.js"
+	else
+		"$curdir/htmlextract.pl" --css --exclude jquery <$base >"$outdir/$name.css"
+		"$curdir/htmlextract.pl" --js --exclude jquery <$base >"$outdir/$name.js"
+	fi
+	"$curdir/html2js.pl" --trim --body-var "jT.tools['$name']" <$base >>"$outdir/$name.js"
+	popd > /dev/null
+done
 # form the final target list
-target="common toxdataset $target jtoxkit"
+target="ccLib jtoxkit $target"
 
 # start the building process...
 echo "Processing targets [$target]..."
@@ -82,10 +116,10 @@ for t in ${target[@]}; do
 	fi
 done
 
-echo "Adding html2js transformed ones from [$htmldir]..."
+echo "Adding html->js transformed ones from [$htmldir]..."
 for t in ${target[@]}; do
 	if [ -e "$htmldir/$t.html" ]; then
-		./html2js.pl "$htmldir/$t.html" >> $outJS
+		./html2js.pl < "$htmldir/$t.html" >> $outJS
 	fi
 done
 

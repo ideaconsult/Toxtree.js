@@ -1,0 +1,76 @@
+.jtox-log div.icon {
+  display: inline-block;
+  vertical-align: middle;
+  color: rgba(0, 0, 0, 0);
+  width: 16px;
+  height: 16px;
+}
+
+.jtox-log .status {
+  background: #fff;
+  position: absolute;
+  top: 1px;
+  width: 32px;
+  height: 24px;
+  text-align: center;
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  border-left: 1px solid black;
+  border-top: 1px solid black;
+  border-right: 1px solid black;
+  border-bottom: 0px;
+}
+
+.jtox-log .jt-faded {
+  opacity: 0.2;
+}
+
+.jtox-log .list-wrap {
+  background: #fff;
+  position: absolute;
+  box-sizing: border-box;
+  top: 0px;
+  width: 100%;
+  border: 1px solid black;
+  border-radius: 5px;
+  border-top-left-radius: 0px;
+  min-height: 50px;
+  height: 100%;
+  overflow: scroll;
+  margin-top: 25px;
+  padding-left: 8px;
+}
+
+.jtox-log .list-wrap.right-side {
+  border-top-right-radius: 0px;
+  border-top-left-radius: 5px;
+}
+
+.jtox-log .list-root {
+  margin-bottom: 24px;
+  margin-right: 8px;
+}
+
+.jtox-log .logline {
+  margin-top: 2px;
+  background: inherit;
+  border: 0px;
+  font-style: italic;
+  font-size: 90%;
+  overflow: hidden;
+
+  -moz-transition: height ease 300ms;
+  -ms-transition: height ease 300ms;
+  -o-transition: height ease 300ms;
+  -webkit-transition: height ease 300ms;
+  transition: height ease 300ms;
+}
+
+.jtox-log .logline .content {
+  vertical-align: middle;
+}
+
+.jtox-log .logline .details {
+  margin-left: 18px;
+  vertical-align: top;
+}

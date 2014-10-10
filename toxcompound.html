@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+
+  <title>ToxCompound development page</title>
+  <link rel="stylesheet" href="tests/base.css">
+	<link rel="stylesheet" href="tests/skeleton.css">
+	<link rel="stylesheet" href="tests/layout.css">
+	<link rel="stylesheet" href="tests/jquery-ui.css">
+	<link rel="stylesheet" href="tests/jquery.dataTables.css">
+
+	<link rel="stylesheet" href="styles/toxcompound.css">
+	<link rel="stylesheet" href="styles/jtoxkit.css">
+
+
+  <script src="tests/jquery.js"></script>
+  <script src="tests/jquery-ui.js"></script>
+  <script src="tests/jquery.dataTables.js"></script>
+
+  <script src="scripts/ccLib.js"></script>
+  <script src="scripts/jtoxkit.js"></script>
+  <script src="scripts/toxcompound.js"></script>
+  
+  <script language="javascript">
+    $(document).ready(function(){
+      window['ds'] = new jToxCompound($(".jtox-toolkit")[0], {crossDomain: true, rememberChecks: true, hideEmpty: true} );
+      ds.queryDataset("http://apps.ideaconsult.net:8080/data/dataset/18?feature_uris[]=http://apps.ideaconsult.net:8080/toxbank/model/6/predicted");
+/*       ds.queryDataset("https://apps.ideaconsult.net/enanomapper/query/compound/search/all?type=auto&search=%5BAu%5D&page=0&pagesize=1"); */
+/*       ds.queryDataset("http://apps.ideaconsult.net:8080/ambit2/dataset/1945542");  */
+/*       ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/query/similarity?search=c1ccccc1O&threshold=0.5"); */
+/*       ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/compound/8666?feature_uris[]=http://apps.ideaconsult.net:8080/toxbank/model/2/predicted");  */
+    });
+  </script>
+</head>
+<body>
+	<div class="jtox-toolkit" data-kit="compound" data-manual-init="yes" data-show-features="yes" data-show-export="yes"></div>
+  <div class="jtox-template">
+<!--[[ jT.templates['all-compound'] -->
+	  <div id="jtox-compound" class="jtox-compound">
+	    <div class="jtox-ds-features"></div>
+	    <div class="jtox-controls">
+	      Showing from <span class="data-field high" data-field="pagestart">?</span> to <span class="data-field high" data-field="pageend">?</span><span class="data-field" data-field="filtered-text"> </span>in pages of <select class="data-field" data-field="pagesize">
+          <option value="10" selected="yes">10</option>
+          <option value="20">20</option>
+          <option value="30">30</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select> entries
+	      <a class="paginate_disabled_previous prev-field" tabindex="0" role="button">Previous</a><a class="paginate_enabled_next next-field" tabindex="0" role="button">Next</a>
+	      <input type="text" class="filterbox" placeholder="Filter..." />
+	    </div>
+	    <div class="jtox-ds-tables">
+	      <div class="jt-processing">	        
+          <span class="message">Loading compounds...</span>
+	      </div>
+	      <div class="jtox-ds-fixed">
+	        <table></table>
+	      </div><div class="jtox-ds-variable">
+	        <table></table>
+	      </div>
+	    </div>
+	  </div>
+<!-- // end of #jtox-compound ]]-->
+<!--[[ jT.templates['compound-one-tab'] -->
+    <div id="jtox-ds-selection" class="jtox-selection">
+      <a href="#" class="multi-select select">select all</a>&nbsp;<a href="#" class="multi-select unselect">unselect all</a>
+    </div>
+<!-- // end of #compound-one-tab ]]-->
+<!--[[ jT.templates['compound-one-feature'] -->
+    <div id="jtox-ds-feature" class="jtox-ds-feature"><input type="checkbox" checked="yes" class="jtox-checkbox" /><span class="data-field jtox-title" data-field="title"> ? </span><sup class="helper"><a target="_blank" class="data-field attribute" data-attribute="href" data-field="uri">?</a></sup></div>
+<!-- // end of #jtox-ds-feature ]]-->
+<!--[[ jT.templates['compound-download'] -->
+    <div id="jtox-ds-download" class="jtox-inline jtox-ds-download">
+      <a target="_blank"><img class="borderless"/></a>
+    </div>
+<!-- // end of #jtox-ds-download ]]-->
+<!--[[ jT.templates['compound-export'] -->
+    <div id="jtox-ds-export">
+      <div class="jtox-inline">Download dataset as: </div>
+      <div class="jtox-inline jtox-exportlist"></div>
+    </div>
+<!-- // end of #jtox-ds-export ]]-->
+  </div>
+</body>
+</html>

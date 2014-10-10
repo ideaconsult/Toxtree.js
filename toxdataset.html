@@ -9,89 +9,31 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
 
   <title>ToxDataset development page</title>
-  <link rel="stylesheet" href="styles/base.css">
-	<link rel="stylesheet" href="styles/skeleton.css">
+  <link rel="stylesheet" href="tests/base.css">
+	<link rel="stylesheet" href="tests/skeleton.css">
 	<link rel="stylesheet" href="tests/layout.css">
-	<link rel="stylesheet" href="styles/jquery-ui.css">
-	<link rel="stylesheet" href="styles/jquery.dataTables.css">
-	<link rel="stylesheet" href="styles/toxdataset.css">
+	<link rel="stylesheet" href="tests/jquery-ui.css">
+	<link rel="stylesheet" href="tests/jquery.dataTables.css">
+
 	<link rel="stylesheet" href="styles/jtoxkit.css">
 
-  <script src="scripts/jquery.js"></script>
-  <script src="scripts/jquery.ui.core.js"></script>
-  <script src="scripts/jquery.ui.widget.js"></script>
-  <script src="scripts/jquery.ui.tabs.js"></script>
-  <script src="scripts/jquery.dataTables.js"></script>
+  <script src="tests/jquery.js"></script>
+  <script src="tests/jquery-ui.js"></script>
+  <script src="tests/jquery.dataTables.js"></script>
 
-  <script src="scripts/common.js"></script>
+  <script src="scripts/ccLib.js"></script>
   <script src="scripts/jtoxkit.js"></script>
   <script src="scripts/toxdataset.js"></script>
   
-  <script src="scripts/config-dataset.js"></script>
-  <script language="javascript">
-    $(document).ready(function(){
-      var ds = new jToxDataset($(".jtox-toolkit")[0], {crossDomain: true, configuration: config_dataset } );
-      ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/dataset/18?feature_uris[]=http://apps.ideaconsult.net:8080/toxbank/model/6/predicted");
-/*       ds.queryDataset("http://apps.ideaconsult.net:8080/ambit2/dataset/1945542");  */
-/*       ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/query/similarity?search=c1ccccc1O&threshold=0.5"); */
-/*       ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/compound/8666?feature_uris[]=http://apps.ideaconsult.net:8080/toxbank/model/2/predicted");  */
-    });
-  </script>
 </head>
 <body>
-	<div class="jtox-toolkit" data-kit="dataset" data-manual-init="yes" data-show-features="yes" data-show-export="yes"></div>
+	<div class="jtox-toolkit" data-kit="dataset" data-load-on-init="true" data-base-url="http://apps.ideaconsult.net:8080/data"></div>
   <div class="jtox-template">
-<!--[[ jToxKit.templates['all-dataset'] -->
-	  <div id="jtox-dataset">
-	    <div class="jtox-ds-features"></div>
-	    <div class="jtox-ds-control">
-	      Showing from <span class="data-field from-field" data-field="pagestart"> ? </span> to <span class="data-field" data-field="pageend"> ? </span> in pages of <select class="data-field" data-field="pagesize">
-          <option value="10" selected="yes">10</option>
-          <option value="20">20</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
-          <option value="200">200</option>
-          <option value="500">500</option>
-        </select> entries
-	      <a class="paginate_disabled_previous prev-field" tabindex="0" role="button">Previous</a><a class="paginate_enabled_next next-field" tabindex="0" role="button">Next</a>
-	      <input type="text" class="filterbox" placeholder="Filter..." />
-	    </div>
-	    <div class="jtox-ds-tables">
-	      <div class="jtox-ds-fixed">
-	        <table></table>
-	      </div><div class="jtox-ds-variable">
-	        <table></table>
-	      </div>
-	    </div>
+<!--[[ jT.templates['all-dataset'] -->
+	  <div id="jtox-dataset" class="jtox-dataset">
+      <table></table>
 	  </div>
 <!-- // end of #jtox-dataset ]]-->
-<!--[[ jToxKit.templates['dataset-one-feature'] -->
-    <div id="jtox-ds-feature" class="jtox-ds-feature"><input type="checkbox" checked="yes" class="jtox-checkbox" /><span class="data-field jtox-title" data-field="title"> ? </span><sup><a target="_blank" class="data-field attribute" data-attribute="href" data-field="uri">?</a></sup></div>
-<!-- // end of #jtox-ds-feature ]]-->
-<!--[[ jToxKit.templates['dataset-download'] -->
-    <div id="jtox-ds-download" class="jtox-inline jtox-ds-download">
-      <a target="_blank"><img class="borderless"/></a>
-    </div>
-<!-- // end of #jtox-ds-download ]]-->
-<!--[[ jToxKit.templates['dataset-export'] -->
-    <div id="jtox-ds-export">
-      <div class="jtox-inline">Download dataset as: </div>
-      <div class="jtox-inline jtox-exportlist"></div>
-    </div>
-<!-- // end of #jtox-ds-export ]]-->
-<!--[[ jToxKit.templates['dataset-one-detail'] -->
-    <table>
-      <tbody>
-        <tr id="jtox-one-detail">
-          <th class="right"><span class="data-field" data-field="title"> ? </span><sup><a target="_blank" class="data-field attribute" data-attribute="href" data-field="uri">?</a></sup></th>
-          <td class="left data-field" data-field="value"> ? </td>
-        </tr>
-      </tbody>
-    </table>
-<!-- // end of #jtox-one-detail ]]-->
-<!--[[ jToxKit.templates['dataset-details-table'] -->
-    <table id="jtox-details-table" class="jtox-details-table"></table>
-<!-- // end of #jtox-details-table ]]-->
   </div>
 </body>
 </html>

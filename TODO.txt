@@ -1,7 +1,23 @@
 TODO:
+- History of searches in jToxSearch component (along with type of search and additional parameters)
 
-- make appropriate message when there is no internet
-- make appropriate loading waiting cursor.
+- make proper deleting process
+- improve data recording process
 
-- (global) extractFeature(dataset, featureId) - return an array of values of that feature for each entry in the dataset. (Can be used for diagram)
-- make toxtree part of jToxKit
+- make it possible to add more than one edit-box line
+- ?? make endpoint name and study type show directly into the matrix table
+
+DOCS:
+- new handling mechanism with 'handler' property in each kit
+- onRow universal handler
+- jToxComoluns column ordering via 'order' field in feature definition
+
+
+FUTURE / IDEAS
+- deferred re-query (postpone)
+- Reduce network calls in ToxTree on run-all - postopone the call until the last model has ran.
+- 
+
+Assessment:
+- Ability to re-use the built tab/features structures? Additional setting?
+- 

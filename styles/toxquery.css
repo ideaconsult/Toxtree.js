@@ -1,0 +1,94 @@
+/* toxtstudy.css - Styling for toxstudy engine
+*/
+
+.jtox-search input[type="text"] {
+  min-width: 380px;
+  height: 20px;
+  -moz-transition: width 0.3s ease-out;
+  -webkit-transition: width 0.3s ease-out;
+  transition: width 0.3s ease-out;
+  margin-bottom: 0px;
+}
+
+#searchcontext input {
+  height: auto;
+  width: 99%;
+  box-sizing: border-box;
+}
+
+.jtox-search .search-pane .jtox-inline input,
+.jtox-search .search-pane .jtox-inline select {
+  font-size: 1.1em;
+  margin-top: 2px;
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+.jtox-search .search-pane .jtox-inline select {
+  margin: 6px;
+  height: 26px;
+}
+
+.jtox-search form {
+  margin: 0px;
+}
+
+.jtox-search form>div {
+  margin: 2px 4px 4px 4px;
+  box-sizing: border-box;
+}
+
+.jtox-search form div.jq-buttonset {
+  margin-top: 6px;
+}
+
+.jtox-search .search-pane button {
+  vertical-align: top;
+  margin-bottom: 0px;
+}
+
+.jtox-search .searchsimilarity select {
+  width: 5em;
+}
+
+.jtox-search .searchauto.dynamic>div {
+  white-space: nowrap;
+  padding-top: 10px;
+}
+
+.jtox-search .search-pane div.dynamic {
+  min-height: 40px;
+  float: left;
+}
+
+.jtox-search .search-pane .dynamic.hidden {
+  display: none;
+}
+
+.jtox-search .ketcher {
+  display: block;
+  height: auto;
+  position: relative;
+  left: 0px;
+  -moz-transition: all 0.5s ease, opacity 0.2s;
+  -webkit-transition: all 0.5s ease, opacity 0.2s;
+  transition: all 0.5s ease, opacity 0.2s;
+}
+
+.jtox-search .ketcher.shrinken {
+  left: 100%;
+/*   opacity: 0.0; */
+}
+
+.jtox-search .ketcher .toolEmptyCell {
+  vertical-align: middle;
+}
+
+.jtox-search .ketcher .toolEmptyCell button {
+  margin: 0px;
+  padding: 4px 8px;
+}
+
+.jtox-search .ketcher .toolEmptyCell button span {
+  display: inline-block;
+}

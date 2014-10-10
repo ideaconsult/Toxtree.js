@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+
+  <title>ToxEndpoint development page</title>
+  <link rel="stylesheet" href="tests/base.css">
+	<link rel="stylesheet" href="tests/skeleton.css">
+	<link rel="stylesheet" href="tests/layout.css">
+	<link rel="stylesheet" href="tests/jquery-ui.css">
+	<link rel="stylesheet" href="tests/jquery.dataTables.css">
+	<link rel="stylesheet" href="tests/jquery.tagit.css">
+
+	<link rel="stylesheet" href="styles/jtoxkit.css">
+
+  <script src="tests/jquery.js"></script>
+  <script src="tests/jquery-ui.js"></script>
+  <script src="tests/jquery.dataTables.js"></script>
+  <script src="tests/tag-it.js"></script>
+
+  <script src="scripts/ccLib.js"></script>
+  <script src="scripts/jtoxkit.js"></script>
+  <script src="scripts/toxendpoint.js"></script>
+  <script src="uses/config-study.js"></script>
+  
+</head>
+<body>
+	<div class="jtox-toolkit" data-kit="endpoint" data-load-on-init="true" data-base-url="http://apps.ideaconsult.net:8080/data" data-hide-empty="true" data-selection-handler="test" data-show-editors="true" data-configuration="config_study"></div>
+  <div class="jtox-template">
+<!--[[ jT.templates['all-endpoint'] -->
+	  <div id="jtox-endpoint" class="jtox-endpoint">
+	    <div class="size-full filter-box" style="height: 35px"><input type="text" class="float-right ui-input" placeholder="Filter..." /></div>
+	    <div class="jtox-categories">
+    		<h3 class="P-CHEM" data-cat="P-CHEM">P-Chem <div class="float-right jtox-inline jtox-details"><a href="#" class="select-all">select all</a>&nbsp;<a href="#" class="unselect-all">unselect all</a><span style="margin-left: 10px"></span></div></h3>
+    		<div>
+    		  <table class="P-CHEM"></table>
+    		</div>
+    		<h3 class="ENV_FATE" data-cat="ENV_FATE">Env Fate <div class="float-right jtox-inline jtox-details"><a href="#" class="select-all">select all</a>&nbsp;<a href="#" class="unselect-all">unselect all</a><span style="margin-left: 10px"></span></div></h3>
+    		<div>
+      		<table class="ENV_FATE"></table>
+    		</div>
+    		<h3 class="ECOTOX" data-cat="ECOTOX">Eco Tox <div class="float-right jtox-inline jtox-details"><a href="#" class="select-all">select all</a>&nbsp;<a href="#" class="unselect-all">unselect all</a><span style="margin-left: 10px"></span></div></h3>
+    		<div>
+      		<table class="ECOTOX"></table>
+    		</div>
+    		<h3 class="TOX" data-cat="TOX">Tox <div class="float-right jtox-inline jtox-details"><a href="#" class="select-all">select all</a>&nbsp;<a href="#" class="unselect-all">unselect all</a><span style="margin-left: 10px"></span></div></h3>
+    		<div>
+    		  <table class="TOX"></table>
+    		</div>
+	    </div>
+	  </div>
+<!-- // end of #jtox-endpoint ]]-->
+<!--[[ jT.templates['editor-endpoint'] -->
+	  <div id="jtox-endeditor" class="jt-endeditor">
+	    <div class="jtox-medium-box box-endpoint">
+  	    <div class="jtox-details font-heavy">Endpoint name</div>
+  	    <input type="text" placeholder="Endpoint_"/>
+	    </div>
+	    <div class="jtox-medium-box box-value">
+  	    <div class="jtox-details font-heavy">Value range</div>
+  	    <input type="text"/>
+	    </div>
+      <div class="jtox-medium-box box-interpretation_result">
+  	    <div class="jtox-details font-heavy">Intepretation of the results</div>
+  	    <input type="text" placeholder="Intepretation"/>
+      </div>
+	  </div>
+<!-- // end of #jtox-end-editor ]]-->
+  </div>
+</body>
+</html>

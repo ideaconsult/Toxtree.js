@@ -1,0 +1,135 @@
+/* toxtcompound.css - Styling for tox-compound engine
+*/
+
+.jtox-ds-fixed,
+.jtox-ds-variable {
+  border: 0px;
+  padding: 0px;
+  margin: 0px;
+  vertical-align: top;
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+
+.jtox-ds-fixed {
+  display: inline-block;
+  width: 450px;
+  float: left;
+  overflow-x: hidden;
+}
+
+.jtox-ds-feature {
+  display: inline-block;
+  width: 250px;
+  border: 0px;
+  padding: 0px;
+  margin: 2px 15px 2px 2px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.jtox-selection {
+  font-size: 80%;
+  float: right;
+  vertical-align: top;
+}
+
+.jtox-ds-tables {
+  position: relative;  
+}
+
+.jtox-ds-tables .jt-processing {
+  text-align: center;
+  display: none;
+}
+
+.jtox-ds-tables .jt-processing .message {
+  background: url("../images/waiting_big.gif") left center no-repeat;
+  background-size: 30px 30px;
+  width: auto;
+  min-height: 30px;
+  padding-left: 35px;
+  padding-top: 8px;
+  overflow: visible;
+  display: inline-block;
+}
+
+.jtox-ds-tables .jtox-details-box {
+  position: absolute;
+  margin: 0px;
+  left: 0px;
+  top: 0px;
+  padding: 0px;
+  z-index: 10;
+  height: auto;
+}
+
+.jtox-ds-tables .jtox-inline,
+.jtox-ds-tables td {
+  vertical-align: top;
+}
+
+.jtox-ds-tables td .shortened {
+  max-width: 75px;  
+}
+
+.jtox-ds-export {
+  float: right !important;
+}
+
+.jtox-ds-download {
+  padding:0px 5px 0px 5px;
+}
+
+.jtox-ds-details * {
+  font-size: small;
+}
+
+.jtox-ds-details .ui-tabs {
+  padding: 0px;
+  border: 0px;
+  margin: 0px;
+}
+
+div.jtox-details-table {
+  padding: 12px 0px 0px 0px !important;
+}
+
+.jtox-details-table table {
+  width: 100%;
+  height: auto;  
+  vertical-align: baseline;
+}
+
+.jtox-controls {
+  padding: 10px;
+  vertical-align: baseline;
+}
+
+.jtox-controls .paginate_disabled_previous,
+.jtox-controls .paginate_enabled_previous,
+.jtox-controls .paginate_disabled_next,
+.jtox-controls .paginate_enabled_next {
+  float: none;
+}
+
+.jtox-controls select {
+  width: 75px;
+}
+
+.jtox-controls select,
+.jtox-controls input {
+  display: inline-block;
+  font-size: 1.1em;
+}
+
+.jtox-controls input {
+  position: absolute;
+  right:10px;
+  width: 25%;
+}
+
+.jtox-controls span.high {
+  font-weight: bold;
+  font-size: 1.1em;
+}

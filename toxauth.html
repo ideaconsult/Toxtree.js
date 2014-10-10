@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+
+  <title>ToxAuth development page</title>
+  <link rel="stylesheet" href="tests/base.css">
+	<link rel="stylesheet" href="tests/skeleton.css">
+	<link rel="stylesheet" href="tests/layout.css">
+	<link rel="stylesheet" href="tests/jquery-ui.css">
+	<link rel="stylesheet" href="tests/jquery.dataTables.css">
+
+	<link rel="stylesheet" href="styles/jtoxkit.css">
+
+  <script src="tests/jquery.js"></script>
+  <script src="tests/jquery-ui.js"></script>
+  <script src="tests/jquery.dataTables.js"></script>
+
+  <script src="scripts/ccLib.js"></script>
+  <script src="scripts/jtoxkit.js"></script>
+  <script src="scripts/toxauth.js"></script>
+  <script language="JavaScript">
+  function errorHandler(service, status, jhr) {
+    var message = '(' + jhr.status + ') ' + jhr.statusText;
+
+    try {
+      var obj = JSON.parse(jhr.responseText);
+      if (obj != null) {
+        if (!!obj.error)
+          message = obj.error;
+        else if (obj.task != null && obj.task.length > 0 && !!obj.task[0].error)
+          message = obj.task[0].error;
+      }
+    }
+    catch (e) { ; }
+      
+    console.log("Auth error on [" + service + "]: " + message);
+  }
+  </script>
+</head>
+<body>
+	<div class="jtox-toolkit" data-kit="policy" data-base-url="http://apps.ideaconsult.net:8080/data" data-load-on-init="true" data-on-error="errorHandler"></div>
+  <div class="jtox-template">
+<!--[[ jT.templates['policy'] -->
+	  <div id="jtox-policy" class="jtox-auth">
+      <table></table>
+	  </div>
+<!-- // end of #jtox-model ]]-->
+  </div>
+</body>
+</html>

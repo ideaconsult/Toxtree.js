@@ -2,7 +2,7 @@
 */
 
 div.jtox-study,
-div.jtox-composition,
+div.jtox-compo-tab,
 div.jtox-substance {
   display: block;
   font-size: small;
@@ -10,53 +10,25 @@ div.jtox-substance {
   padding: 5px 5px 35px 5px;
 }
 
-.jtox-study.folded table,
-.jtox-study.folded div.dataTables_wrapper {
-  display: none;
-}
-
-.jtox-compoblock {
+.jtox-compo-tab {
   margin-top: 25px;
   margin-bottom: 45px;  
 }
 
-.jtox-toolkit table.composition-info.dataTable td,
-.jtox-toolkit table.composition-info.dataTable th {
-  border: 0px;
-  padding-bottom: 0px;
-  padding-top: 0px;
+div.jtox-study-tab.unloaded  {
+  background: url(../images/waiting_big.gif) center center no-repeat;
+  background-size: 30px 30px;
 }
 
-.jtox-toolkit table.composition-info.dataTable th {
-  width: 20%;
-  text-align: right;
-}
-
-div.jtox-study.unloaded .jtox-study-title,
-div.jtox-study.unloaded.folded .jtox-study-title {
-  background: url(../images/waiting_small.gif) right top no-repeat;
-  background-size: 16px 16px;
-}
-
-.jtox-toolkit .unloaded table {
+div.jtox-study-tab.unloaded div.jtox-study {
   display: none;
-}
-
-div.jtox-study.loaded.folded .jtox-study-title {
-  background: url(../images/sort_desc.png) right top no-repeat;
-  background-size: 19px 19px;
-}
-
-div.jtox-study.loaded .jtox-study-title {
-  background: url(../images/sort_asc.png) right top no-repeat;
-  background-size: 19px 19px;
 }
 
 div.jtox-study.folded {
   padding-bottom: 5px;
 }
 
-div.jtox-study .jtox-study-title {
+div.jtox-study .title {
   font-weight: bold;
   clear: both;
   padding: 0px;
@@ -65,8 +37,9 @@ div.jtox-study .jtox-study-title {
   width: 100%;
 }
 
-.jtox-study-filter {
-  width: 50% !important;
+div.jtox-foldable.jtox-study.unloaded>.title {
+  background: url(../images/waiting_small.png) right top no-repeat;
+  background-size: 16px 16px;
 }
 
 div.jtox-study-tab.ui-tabs-panel {
@@ -77,13 +50,18 @@ div.jtox-study-tab.ui-tabs-panel {
   height: 100%;
 }
 
+div.jtox-study-tab div button {
+	font-size: 80%;
+	padding:4px 8px 4px 8px;
+}
+
 div.jtox-study-tab .dataTables_wrapper {
   overflow: hidden;  
   width: 100%;
 }
 
-div.jtox-study-tab table.dataTable th {
-  text-transform: capitalize;
+.jtox-toolkit .jtox-study table td {
+  word-wrap: break-word;
 }
 
 /* Start of table-related classes */
