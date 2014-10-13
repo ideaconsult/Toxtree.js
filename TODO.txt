@@ -11,6 +11,7 @@ DOCS:
 - new handling mechanism with 'handler' property in each kit
 - onRow universal handler
 - jToxComoluns column ordering via 'order' field in feature definition
+- jToxSearch slideInput property
 
 
 FUTURE / IDEAS
