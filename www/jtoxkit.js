@@ -2026,7 +2026,7 @@ var jToxCompound = (function () {
               var tabTable = document.createElement('table');
               parent.appendChild(tabTable);
               jT.$(tabTable).dataTable({
-                "bPaginate": true,
+                "bPaginate": false,
                 "bProcessing": true,
                 "bLengthChange": false,
         				"bAutoWidth": true,
