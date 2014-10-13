@@ -71,7 +71,8 @@ function createGroups(miniset, kit) {
 	groups["Other"] = function (name, miniset) {
     var arr = [];
     for (var f in miniset.feature) {
-      if (!miniset.feature[f].used && !miniset.feature[f].basic) {
+      var feat = miniset.feature[f];
+      if (!feat.used && !feat.basic) {
         arr.push(f);
         if (feat.title.indexOf('explanation') > 0)
           feat.visibility = "details";
