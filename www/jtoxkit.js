@@ -4163,8 +4163,6 @@ var jToxLog = (function () {
           self.events[id] = line;
           setIcon(line, 'connecting');
           jT.$(line).data('status', "connecting");
-          
-          console.log("Connecting [" + id + ": " + service);
         }
         if (!!self.settings.resend && this._handlers != null)
           ccLib.fireCallback(this._handlers.onConnect, this, service, params, id);
@@ -4183,8 +4181,6 @@ var jToxLog = (function () {
           setIcon(line, 'success');
           ccLib.fillTree(line, info);
           jT.$(line).data('status', "success");
-
-          console.log("Success [" + id + ": " + service);
         }
         if (!!self.settings.resend && this._handlers != null)
           ccLib.fireCallback(this._handlers.onSuccess, this, service, status, jhr, id);

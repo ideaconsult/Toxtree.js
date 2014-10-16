@@ -326,7 +326,7 @@ var jToxAssessment = {
               new jBox('Tooltip', boxOptions).open();
       		  }
       		  else { // edit mode
-              var parse = self.parseFeatureId(featureId, kit);
+              var parse = self.parseFeatureId(featureId, self.matrixKit);
               
               // we're taking the original jToxEndpoint editor here and glue our part after it.
               boxOptions.content = jT.getTemplate('#jtox-endeditor').innerHTML + editDiv.innerHTML;
