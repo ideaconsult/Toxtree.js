@@ -318,7 +318,7 @@ var jToxAssessment = {
         		  ccLib.fillTree(infoDiv, {
         		    endpoint: feature.title,
           		  type: feature.type,
-          		  value: this.innerHTML,
+          		  value: jT.ui.valueWithUnits(data.values[featureId], feature.units),
           		  source: '<a target="_blank" href="' + feature.source.URI + '">' + feature.source.type + '</a>'
         		  });
         		  
