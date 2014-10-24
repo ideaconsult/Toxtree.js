@@ -1221,7 +1221,7 @@ var jToxSearch = (function () {
   
   var queries = {
     'auto': "/query/compound/search/all",
-    'url': "/query/compound/url/all",
+    'uri': "/query/compound/url/all",
     'similarity': "/query/similarity",
     'smarts': "/query/smarts"
   };
@@ -1274,7 +1274,7 @@ var jToxSearch = (function () {
       });
     
     var hasAutocomplete = false;
-    if (jT.$('#searchurl', self.rootElement).length > 0) {
+    if (jT.$('#searchuri', self.rootElement).length > 0) {
       hasAutocomplete = true;
       jT.$(form.searchbox).autocomplete({
         minLength: 2,
@@ -1301,7 +1301,7 @@ var jToxSearch = (function () {
       jT.$('.search-pane .auto-hide', self.rootElement).addClass('hidden');
       jT.$('.search-pane .' + this.id, self.rootElement).removeClass('hidden');
       self.search.queryType = this.value;
-      if (this.value == 'url') {
+      if (this.value == 'uri') {
         jT.$(form.drawbutton).addClass('hidden');
         if (hasAutocomplete)
           jT.$(form.searchbox).autocomplete('enable');
@@ -1314,7 +1314,12 @@ var jToxSearch = (function () {
     };
     
     jT.$('.jq-buttonset input', root).on('change', onTypeClicked);
-    ccLib.fireCallback(onTypeClicked, jT.$('.jq-buttonset input', root)[0]);
+
+    var typeEl = jT.$('#search' + self.settings.option, root)[0];
+    if (typeEl != null)
+      jT.$(typeEl).trigger('click');
+    else
+      ccLib.fireCallback(onTypeClicked, jT.$('.jq-buttonset input', root)[0])
         
     // spend some time to setup the SMARTS groups
     if (!!window[self.settings.smartsList]) {
@@ -1413,10 +1418,10 @@ var jToxSearch = (function () {
       doQuery = true;
     }
 
+    jT.ui.installHandlers(self);
     if (doQuery)
       setTimeout(function () { self.queryKit.query(); }, 250);      
     // and very finally - install the handlers...
-    jT.ui.installHandlers(self);
   };
   
   cls.prototype = {
@@ -1427,7 +1432,7 @@ var jToxSearch = (function () {
       var type = this.search.queryType;
       
       if (type == "auto" && params.type == 'auto' && form.searchbox.value.indexOf('http') == 0)
-        type = "url";
+        type = "uri";
         
       var res = queries[type] + (uri.indexOf('?') > -1 ? '' : '?') + uri;
 
@@ -4348,8 +4353,8 @@ var jToxEndpoint = (function () {
     };
         
     // deal with endpoint name itself
-    putAutocomplete('endpoint', '/admin/stats/experiment_endpoints', 'effects.endpoint');
-    putAutocomplete('interpretation_result', '/admin/stats/interpretation_result', 'interpretation.result');
+    putAutocomplete('endpoint', '/query/experiment_endpoints', 'effects.endpoint');
+    putAutocomplete('interpretation_result', '/query/interpretation_result', 'interpretation.result');
     
     // now comes the tagging mechanism... first determine, if we need to show it at all
     var v = ccLib.getJsonValue(config, 'effects.result.bVisible');
@@ -4605,8 +4610,8 @@ jT.templates['widget-search']  =
 "			    <label for=\"searchsimilarity\" title=\"Enter SMILES or draw structure\">Similarity</label>" +
 "  			  <input type=\"radio\" id=\"searchsmarts\" value=\"smarts\" name=\"searchtype\" data-placeholder=\"Enter SMARTS_\"/>" +
 "			    <label for=\"searchsmarts\" title=\"Enter or draw a SMARTS query\">Substructure</label>" +
-"  			  <input type=\"radio\" id=\"searchurl\" value=\"url\" name=\"searchtype\" data-placeholder=\"Enter URL to be examined...\"/>" +
-"			    <label for=\"searchurl\" title=\"Enter dataset URL\">URL</label>" +
+"  			  <input type=\"radio\" id=\"searchuri\" value=\"uri\" name=\"searchtype\" data-placeholder=\"Enter URL to be examined...\"/>" +
+"			    <label for=\"searchuri\" title=\"Enter dataset URL\">URL</label>" +
 "  			</div>" +
 "    		<div class=\"float-right search-pane\">" +
 "  			  <div class=\"dynamic auto-hide searchauto hidden jtox-inline\">" +
