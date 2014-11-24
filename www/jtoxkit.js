@@ -235,14 +235,16 @@ var ccLib = {
 	  });
   },
   
-  serializeForm: function (form) {
-    var arrForm = window.jQuery(form).serializeArray();
+  packData: function (data) {
     var out = {};
-    for (var i = 0;i < arrForm.length; ++i) {
-      var e = arrForm[i];
-      out[e.name] = e.value;
-    }
+    ccLib.enumObject(data, function (val, name) {
+      out[name] = val;
+    });
     return out;
+  },
+  
+  serializeForm: function (form) {
+    return this.packData(window.jQuery(form).serializeArray());
   },
 	 
   flexSize: function (root) {
@@ -399,14 +401,6 @@ function ccNonEmptyFilter(v) {
 window.jT = window.jToxKit = {
 	templateRoot: null,
 
-	/* A single place to hold all necessary queries. Parameters are marked with {id} and formatString() (ccLib.js) is used
-	to prepare the actual URLs
-	*/
-	services: {
-  	// Just an example, since it is not, actually used becuase task URL is passed back from the corresponding method
-		taskPoll: { method: 'GET', service: "/task/{id}" },
-	},
-	
 	callId: 0,
 	
 	templates: { },        // html2js routine will fill up this variable
@@ -722,40 +716,18 @@ window.jT = window.jToxKit = {
 	},
 	
 	/* Encapsulates the process of calling certain service, along with task polling, if needed.
-  	Uses the kit's defined 'services' section, if possible.
   	*/
-	service: function (kit, service, params, data, callback) {
-  	var url;
-  	var info;
+	service: function (kit, service, params, callback) {
   	var self = this;
-  	if (!kit.services || !kit.services[service]) {
-  	  url = service;
-  	  info = params || {};
-  	  if (!info.data)
-  	    info.data = data;
-      else if (typeof data != 'object')
-        callback = data;
-    }
-    else {
-  	  var kitService = kit.services[service];
-  	  url = ccLib.formatString(kitService.service, params);
-  	  info = { 'method': kitService.method };
-  	  info.data = data;
-    }
-    
-  	var theCB;
-  	if (info.method.toUpperCase() == 'GET')
-  	  theCB = callback;
-    else // we need to do some task polling
-      theCB = function (data, jhr) {
-        if (!data)
-          ccLib.fireCallback(callback, kit, data, jhr);
-        else
-          self.pollTask(kit, data, function (task, jhr) { ccLib.fireCallback(callback, kit, !task.error ? task.result : null, jhr); });
-      };
-    // the actual call!
-  	self.call(kit, url, info, theCB);
-	}
+  	var fnCB = !params || params.method === 'GET' || params.method === 'get' || (!params.data && !params.method) ? callback : function (data, jhr) {
+      if (!data)
+        ccLib.fireCallback(callback, kit, data, jhr);
+      else
+        self.pollTask(kit, data, function (task, jhr) { ccLib.fireCallback(callback, kit, !task.error ? task.result : null, jhr); });
+  	};
+  	
+  	this.call(kit, service, params, fnCB);
+  }
 };
 
 /* UI related functions of jToxKit are put here for more convenient usage
@@ -2881,10 +2853,8 @@ var jToxModel = (function () {
     getModel: function (algoUri, callback) {
       var self = this;
       var createIt = function () {
-        jT.call(self, algoUri, { method: 'POST' }, function (result, jhr) {
-          jT.pollTask(self, result, function (task, jhr) {
-            ccLib.fireCallback(callback, self, (!task.error ? task.result : null), jhr);
-          });
+        jT.service(self, algoUri, { method: 'POST' }, function (result, jhr) {
+          ccLib.fireCallback(callback, self, (!task.error ? task.result : null), jhr);
         });
       };
       
@@ -2906,13 +2876,11 @@ var jToxModel = (function () {
       var q = ccLib.addParameter(datasetUri, 'feature_uris[]=' + encodeURIComponent(modelUri + '/predicted'));
 
       var createIt = function () {
-        jT.call(self, modelUri, { method: "POST", data: { dataset_uri: datasetUri } }, function (task, jhr) {
-          jT.pollTask(self, task, function (task, jhr) {
-            if (!task || !!task.error)
-              ccLib.fireCallback(callback, self, null, jhr);
-            else
-              jT.call(self, task.result, callback);
-          });
+        jT.service(self, modelUri, { method: "POST", data: { dataset_uri: datasetUri } }, function (task, jhr) {
+          if (!task || !!task.error)
+            ccLib.fireCallback(callback, self, null, jhr);
+          else
+            jT.call(self, task.result, callback);
         });
       };     
       jT.call(self, q, function (result, jhr) {
@@ -3943,14 +3911,6 @@ var jToxPolicy = (function () {
       }, 3500);
     };
     
-    var dataEnumer = function (data) {
-      var out = {};
-      ccLib.enumObject(data, function (val, name) {
-        out[name] = val;
-      });
-      return out;
-    };
-    
     self.settings.configuration.handlers = {
       changed: function (e) {
         var data = jT.ui.rowData(this);
@@ -3963,19 +3923,17 @@ var jToxPolicy = (function () {
 
           $(el).addClass('loading');
           // now make the update call...
-          jT.call(self, data.uri, { method: 'PUT', data: dataEnumer(myObj) }, function (task) {
-            jT.pollTask(self, task, function (task) {
-              $(el).removeClass('loading');
-              if (!task || !!task.error) {
-                ccLib.setObjValue(el, ccLib.getJsonValue(data, myData)); // i.e. revert the old value
-                alerter(el, '', task);
-              }
-              else {
-                // we need to update the value... in our internal 'policies' array...
-                var idx = $(self.table).dataTable().fnGetPosition($(el).closest('tr')[0]);
-                ccLib.setJsonValue(self.policies[idx], myData, ccLib.getObjValue(el));
-              }
-            });
+          jT.service(self, data.uri, { method: 'PUT', data: ccLib.packData(myObj) }, function (task) {
+            $(el).removeClass('loading');
+            if (!task || !!task.error) {
+              ccLib.setObjValue(el, ccLib.getJsonValue(data, myData)); // i.e. revert the old value
+              alerter(el, '', task);
+            }
+            else {
+              // we need to update the value... in our internal 'policies' array...
+              var idx = $(self.table).dataTable().fnGetPosition($(el).closest('tr')[0]);
+              ccLib.setJsonValue(self.policies[idx], myData, ccLib.getObjValue(el));
+            }
           });
         }
         else {
@@ -3994,14 +3952,12 @@ var jToxPolicy = (function () {
         var el = this;
         var data = jT.ui.rowData(this);
         $(el).addClass('loading');
-        jT.call(self, data.uri, { method: "DELETE" }, function (task, jhr) {
-          jT.pollTask(self, task, function (task) {
-            $(el).removeClass('loading');
-            if (!task || !!task.error)
-              alerter(el, 'ui-icon-closethick', task)
-            else // i.e. - on success - reload them!
-              self.loadPolicies();
-          }, jhr);
+        jT.service(self, data.uri, { method: "DELETE" }, function (task) {
+          $(el).removeClass('loading');
+          if (!task || !!task.error)
+            alerter(el, 'ui-icon-closethick', task)
+          else // i.e. - on success - reload them!
+            self.loadPolicies();
         });
       },
       add: function (e) {
@@ -4009,14 +3965,12 @@ var jToxPolicy = (function () {
         delete data['uri'];
         var el = this;
         $(el).addClass('loading');
-        jT.call(self, '/admin/restpolicy', { method: "POST", data: dataEnumer(data)}, function (task) {
-          jT.pollTask(self, task, function (task) {
-            $(el).removeClass('loading');
-            if (!task || !!task.error)
-              alerter(el, 'ui-icon-plusthick', task)
-            else // i.e. - on success - reload them!
-              self.loadPolicies();
-          });
+        jT.service(self, '/admin/restpolicy', { method: "POST", data: ccLib.packData(data)}, function (task) {
+          $(el).removeClass('loading');
+          if (!task || !!task.error)
+            alerter(el, 'ui-icon-plusthick', task)
+          else // i.e. - on success - reload them!
+            self.loadPolicies();
         });
       },
     };

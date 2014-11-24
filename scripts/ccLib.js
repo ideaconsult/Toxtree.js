@@ -235,14 +235,16 @@ var ccLib = {
 	  });
   },
   
-  serializeForm: function (form) {
-    var arrForm = window.jQuery(form).serializeArray();
+  packData: function (data) {
     var out = {};
-    for (var i = 0;i < arrForm.length; ++i) {
-      var e = arrForm[i];
-      out[e.name] = e.value;
-    }
+    ccLib.enumObject(data, function (val, name) {
+      out[name] = val;
+    });
     return out;
+  },
+  
+  serializeForm: function (form) {
+    return this.packData(window.jQuery(form).serializeArray());
   },
 	 
   flexSize: function (root) {

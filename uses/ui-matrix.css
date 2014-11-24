@@ -6,16 +6,6 @@ html, body, #jtox-bundle {
   overflow: hidden;
 }
 
-#jtox-budnel li.inactive-tab {
-  pointer-events: none;
-  cursor: default;  
-}
-
-#jtox-bundle li.inactive-tab a {
-  color: #999999;
-  pointer-events: none;
-}
-
 #logger {
   position: fixed;
 	height: 144px;

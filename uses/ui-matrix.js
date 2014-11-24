@@ -46,7 +46,6 @@ var jToxBundle = {
 	createForm: null,
 	rootElement: null,
 	bundleUri: null,
-	bundleData: {},
 	
 	collected: {
   	compounds: [],
@@ -106,7 +105,7 @@ var jToxBundle = {
     
     // initialize the tab structure for several versions of dataTables.
     $(root).tabs({
-/*     	"disabled": [1, 2, 3, 4], */
+      "disabled": [1, 2, 3, 4],
       "heightStyle": "fill",
       "select" : function(event, ui) {
         loadPanel(ui.panel);
@@ -439,7 +438,7 @@ var jToxBundle = {
         self.createForm.assStart.style.display = 'none';
         
         // and enable the structures tab
-        $('li.jtox-structures', self.rootElement).removeClass('inactive-tab');
+        $(self.rootElement).tabs('enable', 1);
     	}
   	});
 	},
