@@ -1,4 +1,11 @@
+For Nina:
+- bundle status and dates during creation.
+- Can you updata just part of the bundle attributes?
+- 
+
 TODO:
+- Change jToxModel and jToxAuth to use the new jT.service() method
+
 - History of searches in jToxSearch component (along with type of search and additional parameters)
 
 - make proper deleting process

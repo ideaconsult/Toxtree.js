@@ -42,23 +42,27 @@
 <body>
   <div id="logger" class="jtox-toolkit jtox-widget hidden" data-kit="log" data-resend="false"></div>  
 
-  <div id="jtox-assessment" class="jtox-toolkit" data-kit="assessment">
+  <div id="jtox-bundle" class="jtox-toolkit" data-kit="bundle" data-bundle-uri="http://apps.ideaconsult.net:8080/data/bundle/5">
     <ul>
       <li><a href="#jtox-identifiers">Assessment identifier</a></li>
-      <li><a href="#jtox-structures">Collect structures</a></li>
-      <li><a href="#jtox-endpoints">Endpoint data used</a></li>
-        <li><a href="#jtox-matrix">Assessment details</a></li>
-      <li><a href="#jtox-report">Report</a></li>
+      <li class="inactive-tab jtox-structures"><a href="#jtox-structures">Collect structures</a></li>
+      <li class="inactive-tab jtox-endpoints"><a href="#jtox-endpoints">Endpoint data used</a></li>
+      <li class="inactive-tab jtox-matrix"><a href="#jtox-matrix">Assessment details</a></li>
+      <li class="inactive-tab jtox-report"><a href="#jtox-report">Report</a></li>
     </ul>
     <div id="jtox-identifiers" data-action="onIdentifiers">
 	  	<form>
 	      <table class="dataTable">
 	        <thead>
 	          <tr><th class="right size-third">Assessment</th><th class="data-field" data-field="id"></th></tr>
-	          <tr><td class="right size-third">Name:</td><td><input class="data-field first-time validate" data-field="name" name="name"></input></td></tr>
-	          <tr><td class="right size-third">Number:</td><td><input class="data-field first-time validate" data-field="number" name="number"></input></td></tr>
+	          <tr><td class="right size-third">Name:</td><td><input class="data-field first-time validate" data-field="title" name="title"></input></td></tr>
+	          <tr><td class="right size-third">Source:</td><td><input class="data-field first-time validate" data-field="source" name="source"></input></td></tr>
+	          <tr><td class="right size-third">Source URL:</td><td><input class="data-field first-time validate" data-field="url" name="url"></input></td></tr>
+	          <tr><td class="right size-third">License:</td><td><input class="data-field first-time validate" data-field="license" name="license"></input></td></tr>
+	          <tr><td class="right size-third">Rights holder:</td><td><input class="data-field first-time validate" data-field="rightsHolder" name="rightsHolder"></input></td></tr>
+	          <tr><td class="right size-third">Maintainer:</td><td><input class="data-field first-time validate" data-field="maintainer" name="maintainer"></input></td></tr>
+
 	          <tr><td class="right top size-third">Purpose:</td><td><textarea class="validate nomargin data-field" data-field="purpose" name="purpose"></textarea></td></tr>
-	          <tr><td class="right size-third">Owner:</td><td class="data-field" data-field="owner"></td></tr>
 	          <tr><td class="right size-third">Version:</td><td class="data-field" data-field="version">?.?</td></tr>
 	          <tr><td class="right size-third">Status:</td><td class="data-field" data-field="status"></td></tr>
 	          <tr><td class="right size-third">Date started:</td><td class="data-field" data-field="started"></td></tr>
@@ -86,18 +90,19 @@
 	          	<td class="right size-third">Use allowed:</td>
 	          	<td>
 		          	<div class="jq-buttonset">
-								  <input type="radio" id="use-yes" value="true" name="useallowed"><label for="use-yes">Yes</label></input>
-								  <input type="radio" id="use-no" value="false" name="useallowed" checked="checked"><label for="use-no">No</label></input>
+								  <input type="radio" id="use-yes" value="true" name="useAllowed"><label for="use-yes">Yes</label></input>
+								  <input type="radio" id="use-no" value="false" name="useAllowed" checked="checked"><label for="use-no">No</label></input>
 								</div>
 							</td>
 						</tr>
+	          <tr><td class="right size-third">Rating:</td><td class="data-stars-field"><input type="hidden" name="stars" value="0"></input></td></tr>
 	        </thead>
 	      </table>
 	      <div class="actions">
 		      <button name="assStart">Start</button>
+		      <button name="assUpdate">Update</button>
 		      <button name="assFinalize">Finalize</button>
 		      <button name="assDuplicate">Duplicate</button>
-		      <button name="assUpdate">Update</button>
 	      </div>
 	  	</form>
 	  </div>

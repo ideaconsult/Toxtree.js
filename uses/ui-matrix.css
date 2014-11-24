@@ -1,9 +1,19 @@
 /* toxtmatrix.css - jToxMatrix tool styles
 */
-html, body, #jtox-assessment {
+html, body, #jtox-bundle {
   width: 100%;
   height: 100%;
   overflow: hidden;
+}
+
+#jtox-budnel li.inactive-tab {
+  pointer-events: none;
+  cursor: default;  
+}
+
+#jtox-bundle li.inactive-tab a {
+  color: #999999;
+  pointer-events: none;
 }
 
 #logger {
@@ -24,7 +34,7 @@ html, body, #jtox-assessment {
   bottom: -120px;
 }
 
-#jtox-assessment textarea,
+#jtox-bundle textarea,
 .popup-box textarea {
   width: 100%;
   box-sizing: border-box;
@@ -65,7 +75,7 @@ body.structlist #browser {
   margin-top: 10px;
 }
 
-#jtox-assessment>div.ui-tabs-panel {
+#jtox-bundle>div.ui-tabs-panel {
   position: relative;
   overflow-x: hidden !important;
   overflow-y: scroll !important;
