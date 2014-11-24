@@ -167,10 +167,8 @@ var jToxModel = (function () {
     getModel: function (algoUri, callback) {
       var self = this;
       var createIt = function () {
-        jT.call(self, algoUri, { method: 'POST' }, function (result, jhr) {
-          jT.pollTask(self, result, function (task, jhr) {
-            ccLib.fireCallback(callback, self, (!task.error ? task.result : null), jhr);
-          });
+        jT.service(self, algoUri, { method: 'POST' }, function (result, jhr) {
+          ccLib.fireCallback(callback, self, (!task.error ? task.result : null), jhr);
         });
       };
       
@@ -192,13 +190,11 @@ var jToxModel = (function () {
       var q = ccLib.addParameter(datasetUri, 'feature_uris[]=' + encodeURIComponent(modelUri + '/predicted'));
 
       var createIt = function () {
-        jT.call(self, modelUri, { method: "POST", data: { dataset_uri: datasetUri } }, function (task, jhr) {
-          jT.pollTask(self, task, function (task, jhr) {
-            if (!task || !!task.error)
-              ccLib.fireCallback(callback, self, null, jhr);
-            else
-              jT.call(self, task.result, callback);
-          });
+        jT.service(self, modelUri, { method: "POST", data: { dataset_uri: datasetUri } }, function (task, jhr) {
+          if (!task || !!task.error)
+            ccLib.fireCallback(callback, self, null, jhr);
+          else
+            jT.call(self, task.result, callback);
         });
       };     
       jT.call(self, q, function (result, jhr) {

@@ -318,6 +318,7 @@ window.jT = window.jToxKit = {
 	/* Encapsulates the process of calling certain service, along with task polling, if needed.
   	*/
 	service: function (kit, service, params, callback) {
+  	var self = this;
   	var fnCB = !params || params.method === 'GET' || params.method === 'get' || (!params.data && !params.method) ? callback : function (data, jhr) {
       if (!data)
         ccLib.fireCallback(callback, kit, data, jhr);
@@ -326,6 +327,7 @@ window.jT = window.jToxKit = {
   	};
   	
   	this.call(kit, service, params, fnCB);
+  }
 };
 
 /* UI related functions of jToxKit are put here for more convenient usage

@@ -80,14 +80,6 @@ var jToxPolicy = (function () {
       }, 3500);
     };
     
-    var dataEnumer = function (data) {
-      var out = {};
-      ccLib.enumObject(data, function (val, name) {
-        out[name] = val;
-      });
-      return out;
-    };
-    
     self.settings.configuration.handlers = {
       changed: function (e) {
         var data = jT.ui.rowData(this);
@@ -100,19 +92,17 @@ var jToxPolicy = (function () {
 
           $(el).addClass('loading');
           // now make the update call...
-          jT.call(self, data.uri, { method: 'PUT', data: dataEnumer(myObj) }, function (task) {
-            jT.pollTask(self, task, function (task) {
-              $(el).removeClass('loading');
-              if (!task || !!task.error) {
-                ccLib.setObjValue(el, ccLib.getJsonValue(data, myData)); // i.e. revert the old value
-                alerter(el, '', task);
-              }
-              else {
-                // we need to update the value... in our internal 'policies' array...
-                var idx = $(self.table).dataTable().fnGetPosition($(el).closest('tr')[0]);
-                ccLib.setJsonValue(self.policies[idx], myData, ccLib.getObjValue(el));
-              }
-            });
+          jT.service(self, data.uri, { method: 'PUT', data: ccLib.packData(myObj) }, function (task) {
+            $(el).removeClass('loading');
+            if (!task || !!task.error) {
+              ccLib.setObjValue(el, ccLib.getJsonValue(data, myData)); // i.e. revert the old value
+              alerter(el, '', task);
+            }
+            else {
+              // we need to update the value... in our internal 'policies' array...
+              var idx = $(self.table).dataTable().fnGetPosition($(el).closest('tr')[0]);
+              ccLib.setJsonValue(self.policies[idx], myData, ccLib.getObjValue(el));
+            }
           });
         }
         else {
@@ -131,14 +121,12 @@ var jToxPolicy = (function () {
         var el = this;
         var data = jT.ui.rowData(this);
         $(el).addClass('loading');
-        jT.call(self, data.uri, { method: "DELETE" }, function (task, jhr) {
-          jT.pollTask(self, task, function (task) {
-            $(el).removeClass('loading');
-            if (!task || !!task.error)
-              alerter(el, 'ui-icon-closethick', task)
-            else // i.e. - on success - reload them!
-              self.loadPolicies();
-          }, jhr);
+        jT.service(self, data.uri, { method: "DELETE" }, function (task) {
+          $(el).removeClass('loading');
+          if (!task || !!task.error)
+            alerter(el, 'ui-icon-closethick', task)
+          else // i.e. - on success - reload them!
+            self.loadPolicies();
         });
       },
       add: function (e) {
@@ -146,14 +134,12 @@ var jToxPolicy = (function () {
         delete data['uri'];
         var el = this;
         $(el).addClass('loading');
-        jT.call(self, '/admin/restpolicy', { method: "POST", data: dataEnumer(data)}, function (task) {
-          jT.pollTask(self, task, function (task) {
-            $(el).removeClass('loading');
-            if (!task || !!task.error)
-              alerter(el, 'ui-icon-plusthick', task)
-            else // i.e. - on success - reload them!
-              self.loadPolicies();
-          });
+        jT.service(self, '/admin/restpolicy', { method: "POST", data: ccLib.packData(data)}, function (task) {
+          $(el).removeClass('loading');
+          if (!task || !!task.error)
+            alerter(el, 'ui-icon-plusthick', task)
+          else // i.e. - on success - reload them!
+            self.loadPolicies();
         });
       },
     };
