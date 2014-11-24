@@ -304,6 +304,8 @@ var jToxEndpoint = (function () {
       jT.$('h3', self.rootElement).each(function () {
         var name = jT.$(this).data('cat');
         var cat = ends[name.replace("_", " ")];
+        if (cat == null)
+          return;
         
         var table = self.tables[name];
         table.fnClearTable();

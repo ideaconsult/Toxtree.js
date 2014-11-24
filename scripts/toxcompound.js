@@ -22,7 +22,7 @@ var jToxCompound = (function () {
     "rememberChecks": false,  // whether to remember feature-checkbox settings between queries
     "metricFeature": "http://www.opentox.org/api/1.1#Similarity",   // This is the default metric feature, if no other is specified
     "onTab": null,            // invoked after each group's tab is created - function (element, tab, name, isMain);
-    "onLoaded": null,         // invoked when a set of compound is loaded.
+    "onLoaded": null,         // invoked when a set of compounds is loaded.
     "onPrepared": null,       // invoked when the initial call for determining the tabs/columns is ready
     "onDetails": null,        // invoked when a details pane is openned
     "preDetails": null,       // invoked prior of details pane creation to see if it is going to happen at all
