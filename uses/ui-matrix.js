@@ -10,38 +10,6 @@ function jTConfigurator(kit) {
   return jTConfig.matrix;
 }
 
-function onSelectStructure(e) {
-  var what = $(this).hasClass('target') ? 'target' : 'source';
-  var uri = $(this).data('data');
-  console.log("Structure [" + uri + "] selected as <" + what + ">");
-}
-
-function onSelectSubstance(e) {
-  var uri = this.value;
-  console.log("Substance [" + uri + "] selected");
-}
-
-function onSelectEndpoint(e) {
-  var uri = this.value;
-  console.log("Endpoint [" + uri + "] selected");  
-}
-
-function onDetailedRow(row, data, event) {
-  var el = $('.jtox-details-composition', row)[0];
-  if (!el)
-    return;
-  var uri = this.settings.baseUrl + '/substance?type=related&compound_uri=' + encodeURIComponent(data.compound.URI);
-  el = $(el).parents('table')[0];
-  el = el.parentNode;
-  $(el).empty();
-  $(el).addClass('paddingless');
-  var div = document.createElement('div');
-  el.appendChild(div);
-  new jToxSubstance(div, $.extend(true, {}, this.settings, {crossDomain: true, selectionHandler: null, substanceUri: uri, showControls: false, onDetails: function (root, data, element) {
-    new jToxStudy(root, $.extend({}, this.settings, {substanceUri: data.URI}));
-  } } ) );
-}
-
 var jToxBundle = {
 	createForm: null,
 	rootElement: null,
@@ -398,14 +366,14 @@ var jToxBundle = {
     	  self.substanceKit = new jToxSubstance(root, { crossDomain: true, embedComposition: true, selectionHandler: "onSelectSubstance", configuration: jTConfig.matrix });
   	  }
   	  
-      self.substanceKit.query(jT.settings.baseUrl + "/substance?type=related&compound_uri=http%3A%2F%2Fapps.ideaconsult.net%3A8080%2Fdata%2Fcompound%2F21219%2Fconformer%2F39738");
+      self.substanceKit.query(self.bundleUri + '/substance');
 	  }
 	  else {// i.e. endpoints
   	  if (sub.firstElementChild == null) {
     	  var root = document.createElement('div');
     	  sub.appendChild(root);
     	  self.endpointKit = new jToxEndpoint(root, { selectionHandler: "onSelectEndpoint" });
-    	  self.endpointKit.loadEndpoints();
+    	  self.endpointKit.loadEndpoints(self.bundleUri + '/studysummary');
   	  }
 	  }
 	},
@@ -442,7 +410,74 @@ var jToxBundle = {
     	}
   	});
 	},
+	
+	selectStructure: function (uri, what, el) {
+  	var self = this;
+  	$(el).addClass('loading');
+  	jT.service(self, self.bundleUri + '/compound', { 
+      method: 'PUT', 
+      data: { 
+        compound_uri: uri, 
+        command: $(el).hasClass('active') ? 'delete' : 'add', 
+        compound_role: what 
+      } 
+    }, function (result) {
+    	$(el).removeClass('loading');
+    	if (!!result) {
+      	$(el).toggleClass('active');
+        console.log("Structure [" + uri + "] selected as <" + what + ">");
+      }
+  	});
+	},
+	
+	structuresLoaded: function (kit, dataset) {
+    if (document.body.className == 'structlist')
+      $(this.rootElement).tabs(dataset.dataEntry.length > 0 ? 'enable' : 'disable', 2);
+	},
+	
+	selectSubstance: function (uri, el) {
+    console.log("Substance [" + uri + "] selected");
+	},
+	
+	selectEndpoint: function (uri, el) {
+    console.log("Endpoint [" + uri + "] selected");  
+	}
 };
+
+// Now some handlers - they should be outside, because they are called within windows' context.
+function onSelectStructure(e) {
+  jToxBundle.selectStructure($(this).data('data'), $(this).hasClass('target') ? 'target' : 'source', this);
+}
+
+function onBrowserFilled(dataset) {
+  jToxBundle.structuresLoaded(this, dataset);
+}
+
+function onSelectSubstance(e) {
+  jToxBundle.selectSubstance(this.value, this);
+}
+
+function onSelectEndpoint(e) {
+  jToxBundle.selectEndpoint(this.value, this);
+}
+
+function onDetailedRow(row, data, event) {
+  var el = $('.jtox-details-composition', row)[0];
+  if (!el)
+    return;
+  var uri = this.settings.baseUrl + '/substance?type=related&compound_uri=' + encodeURIComponent(data.compound.URI);
+  el = $(el).parents('table')[0];
+  el = el.parentNode;
+  $(el).empty();
+  $(el).addClass('paddingless');
+  var div = document.createElement('div');
+  el.appendChild(div);
+  new jToxSubstance(div, $.extend(true, {}, this.settings, {crossDomain: true, selectionHandler: null, substanceUri: uri, showControls: false, onLoaded: null, onDetails: function (root, data, element) {
+    new jToxStudy(root, $.extend({}, this.settings, {substanceUri: data.URI}));
+  } } ) );
+}
+
+
 
 $(document).ready(function(){
   $('#logger').on('mouseover', function () { $(this).removeClass('hidden'); }).on('mouseout', function () { $(this).addClass('hidden');});

@@ -1,10 +1,14 @@
 For Nina:
 - bundle status and dates during creation.
-- Can you updata just part of the bundle attributes?
+- Can you update just part of the bundle attributes?
+- When adding a compound you should be able to specify either "source" or "target" - this is missing right now.
+- What's the difference between POST and PUT there?
+- 415: Media not supported on POST /compound
+- How to determine whether a compound is already in the set? what happens if adding the same more than once?
+- Doesn't seem to delete anything
 - 
 
 TODO:
-- Change jToxModel and jToxAuth to use the new jT.service() method
 
 - History of searches in jToxSearch component (along with type of search and additional parameters)
 
