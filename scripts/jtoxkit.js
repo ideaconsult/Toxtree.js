@@ -1,13 +1,6 @@
 window.jT = window.jToxKit = {
 	templateRoot: null,
 
-	/* A single place to hold all necessary queries. Parameters are marked with {id} and formatString() (ccLib.js) is used
-	to prepare the actual URLs
-	*/
-	queries: {
-		taskPoll: { method: 'GET', service: "/task/{id}" },
-	},
-	
 	callId: 0,
 	
 	templates: { },        // html2js routine will fill up this variable
@@ -313,14 +306,26 @@ window.jT = window.jToxKit = {
 			jsonp: settings.jsonp ? 'callback' : false,
 			error: function(jhr, status, error){
 			  ccLib.fireCallback(settings.onError, kit, service, status, jhr, myId);
-				callback(null, jhr);
+			  ccLib.fireCallback(callback, kit, null, jhr);
 			},
 			success: function(data, status, jhr){
 			  ccLib.fireCallback(settings.onSuccess, kit, service, status, jhr, myId);
-				callback(data, jhr);
+			  ccLib.fireCallback(callback, kit, data, jhr);
 			}
 		});
-	}
+	},
+	
+	/* Encapsulates the process of calling certain service, along with task polling, if needed.
+  	*/
+	service: function (kit, service, params, callback) {
+  	var fnCB = !params || params.method === 'GET' || params.method === 'get' || (!params.data && !params.method) ? callback : function (data, jhr) {
+      if (!data)
+        ccLib.fireCallback(callback, kit, data, jhr);
+      else
+        self.pollTask(kit, data, function (task, jhr) { ccLib.fireCallback(callback, kit, !task.error ? task.result : null, jhr); });
+  	};
+  	
+  	this.call(kit, service, params, fnCB);
 };
 
 /* UI related functions of jToxKit are put here for more convenient usage

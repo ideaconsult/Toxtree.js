@@ -221,20 +221,28 @@ var ccLib = {
 	  var $ = window.jQuery;
 
 		// first - attach the accumulators handler.	  
-	  $('.accumulate', form).each(function (){
-		  $(this).on('change', function (e) {
-			  var target = $(this).data('accumulate');
-			  if (!!target) {
-			  	target = this.form[target];
-			  	var val = target.value.replace(new RegExp('(' + this.value + ')'), '');
-			  	if (this.checked)
-				  	val += ',' + this.value;
+	  $('.accumulate', form).on('change', function (e) {
+		  var target = $(this).data('accumulate');
+		  if (!!target) {
+		  	target = this.form[target];
+		  	var val = target.value.replace(new RegExp('(' + this.value + ')'), '');
+		  	if (this.checked)
+			  	val += ',' + this.value;
 
-				  target.value = val.replace(/,,/g, ',').replace(/^,/g, '').replace(/,$/g, ''); // change double commas with one, and replaces commas at the beginning and at the end
-			  }
-				return false;
-		  })
+			  target.value = val.replace(/,,/g, ',').replace(/^,/g, '').replace(/,$/g, ''); // change double commas with one, and replaces commas at the beginning and at the end
+		  }
+			return false;
 	  });
+  },
+  
+  serializeForm: function (form) {
+    var arrForm = window.jQuery(form).serializeArray();
+    var out = {};
+    for (var i = 0;i < arrForm.length; ++i) {
+      var e = arrForm[i];
+      out[e.name] = e.value;
+    }
+    return out;
   },
 	 
   flexSize: function (root) {

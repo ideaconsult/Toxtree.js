@@ -221,20 +221,28 @@ var ccLib = {
 	  var $ = window.jQuery;
 
 		// first - attach the accumulators handler.	  
-	  $('.accumulate', form).each(function (){
-		  $(this).on('change', function (e) {
-			  var target = $(this).data('accumulate');
-			  if (!!target) {
-			  	target = this.form[target];
-			  	var val = target.value.replace(new RegExp('(' + this.value + ')'), '');
-			  	if (this.checked)
-				  	val += ',' + this.value;
+	  $('.accumulate', form).on('change', function (e) {
+		  var target = $(this).data('accumulate');
+		  if (!!target) {
+		  	target = this.form[target];
+		  	var val = target.value.replace(new RegExp('(' + this.value + ')'), '');
+		  	if (this.checked)
+			  	val += ',' + this.value;
 
-				  target.value = val.replace(/,,/g, ',').replace(/^,/g, '').replace(/,$/g, ''); // change double commas with one, and replaces commas at the beginning and at the end
-			  }
-				return false;
-		  })
+			  target.value = val.replace(/,,/g, ',').replace(/^,/g, '').replace(/,$/g, ''); // change double commas with one, and replaces commas at the beginning and at the end
+		  }
+			return false;
 	  });
+  },
+  
+  serializeForm: function (form) {
+    var arrForm = window.jQuery(form).serializeArray();
+    var out = {};
+    for (var i = 0;i < arrForm.length; ++i) {
+      var e = arrForm[i];
+      out[e.name] = e.value;
+    }
+    return out;
   },
 	 
   flexSize: function (root) {
@@ -394,7 +402,8 @@ window.jT = window.jToxKit = {
 	/* A single place to hold all necessary queries. Parameters are marked with {id} and formatString() (ccLib.js) is used
 	to prepare the actual URLs
 	*/
-	queries: {
+	services: {
+  	// Just an example, since it is not, actually used becuase task URL is passed back from the corresponding method
 		taskPoll: { method: 'GET', service: "/task/{id}" },
 	},
 	
@@ -703,13 +712,49 @@ window.jT = window.jToxKit = {
 			jsonp: settings.jsonp ? 'callback' : false,
 			error: function(jhr, status, error){
 			  ccLib.fireCallback(settings.onError, kit, service, status, jhr, myId);
-				callback(null, jhr);
+			  ccLib.fireCallback(callback, kit, null, jhr);
 			},
 			success: function(data, status, jhr){
 			  ccLib.fireCallback(settings.onSuccess, kit, service, status, jhr, myId);
-				callback(data, jhr);
+			  ccLib.fireCallback(callback, kit, data, jhr);
 			}
 		});
+	},
+	
+	/* Encapsulates the process of calling certain service, along with task polling, if needed.
+  	Uses the kit's defined 'services' section, if possible.
+  	*/
+	service: function (kit, service, params, data, callback) {
+  	var url;
+  	var info;
+  	var self = this;
+  	if (!kit.services || !kit.services[service]) {
+  	  url = service;
+  	  info = params || {};
+  	  if (!info.data)
+  	    info.data = data;
+      else if (typeof data != 'object')
+        callback = data;
+    }
+    else {
+  	  var kitService = kit.services[service];
+  	  url = ccLib.formatString(kitService.service, params);
+  	  info = { 'method': kitService.method };
+  	  info.data = data;
+    }
+    
+  	var theCB;
+  	if (info.method.toUpperCase() == 'GET')
+  	  theCB = callback;
+    else // we need to do some task polling
+      theCB = function (data, jhr) {
+        if (!data)
+          ccLib.fireCallback(callback, kit, data, jhr);
+        else
+          self.pollTask(kit, data, function (task, jhr) { ccLib.fireCallback(callback, kit, !task.error ? task.result : null, jhr); });
+      };
+    // the actual call!
+  	self.call(kit, url, info, theCB);
 	}
 };
 

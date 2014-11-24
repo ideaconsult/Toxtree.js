@@ -42,22 +42,11 @@ function onDetailedRow(row, data, event) {
   } } ) );
 }
 
-var jToxAssessment = {
+var jToxBundle = {
 	createForm: null,
 	rootElement: null,
-	queries: {
-		'assess_create': { method: "POST", service: "/assessment"},
-		'assess_update': { method: "PUT", service: "/assessment/{id}/metadata"},
-		'add_compound': { method: 'PUT', service: "/assessment/{id}"},
-		'del_compound': { method: 'DELETE', service: "/assessment/{id}/compound?compound_uri={compoundUri}"},
-		'get_compounds': { method: 'GET', service: "/assessment/{id}/compounds"},
-		'get_substances': { method: 'GET', service: "/assessment/{id}/substances"},
-		'add_substance': { method: 'PUT', service: "/assessment/{id}/substances"},
-		'del_substance': { method: 'DELETE', service: "/assessment/{id}/substances?substance={substanceUri}"},
-		'get_endpoints': { method: 'GET', service: ""},
-		'add_endpoint': { method: 'PUT', service: "/assessment/{id}/feature"},
-		'del_endpoint': { method: 'DELETE', service: "/assessment/{id}/feature?feature={featureUri}"},
-	},
+	bundleUri: null,
+	bundleData: {},
 	
 	collected: {
   	compounds: [],
@@ -65,6 +54,7 @@ var jToxAssessment = {
 		
   settings: {
   	studyTypeList: _i5.qaSettings["Study result type"],
+  	maxStars: 10,
   	configuration: {
     	columns: {
       	
@@ -104,7 +94,7 @@ var jToxAssessment = {
 	    ccLib.fireCallback(self[method], self, this.id, $(this).closest('.ui-tabs-panel')[0], false);
 		};
 		
-    var loadPanel = function(panel){
+    var loadPanel = function(panel) {
       if (panel){
         var subs = $('.jq-buttonset.action input:checked', panel);
         if (subs.length > 0)
@@ -134,38 +124,83 @@ var jToxAssessment = {
     $('.jq-buttonset', root).buttonset();
     $('.jq-buttonset.action input', root).on('change', loadAction);
     
-    // finally, if provided - load the given assessmentUri
-    if (!ccLib.isNull(self.settings.assessmentUri)) {
-	    self.load(self.settings.assessmentUri);
+    self.onIdentifiers(null, $('#jtox-identifiers', self.rootElement)[0]);
+    // finally, if provided - load the given bundleUri
+    if (!ccLib.isNull(self.settings.bundleUri)) {
+	    self.load(self.settings.bundleUri);
     }
     
     return self;
 	},
 	
-	onIdentifiers: function (id, panel) {
-	  var self = this;
-    var checkForm = function () {
-    	this.placeholder = "You need to fill this box";
-    	return this.value.length > 0;
-    };
-    
-    self.createForm = $('form', panel)[0];
-    self.createForm.assStart.onclick = function (e) {
-    	if (ccLib.validateForm(self.createForm, checkForm)) {
-		    jT.service(self, 'assess_create', null, function (task) {
-			    console.log("Data set created: " + JSON.stringify(task));
-		    });
-		  }
-		  return false;
-    };
-    self.createForm.assFinalize.style.display = 'none';
-    self.createForm.assUpdate.style.display = 'none';
-    self.createForm.assDuplicate.style.display = 'none';
-    
-    ccLib.prepareForm(self.createForm);
+	starHighlight: function (root, stars) {
+    $('span', root).each(function (idx) {
+      if (idx < stars)
+        $(this).removeClass('transparent');
+      else
+        $(this).addClass('transparent');
+    });
 	},
 	
-	// called when a sub-action in assessment details tab is called
+	onIdentifiers: function (id, panel) {
+	  var self = this;
+	  if (!$(panel).hasClass('initialized')) {
+  	  $(panel).addClass('initialized');
+      var checkForm = function () {
+      	this.placeholder = "You need to fill this box";
+      	return this.value.length > 0;
+      };
+      
+      self.createForm = $('form', panel)[0];
+      self.createForm.assStart.onclick = function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      	if (ccLib.validateForm(self.createForm, checkForm)) {
+  		    jT.service(self, '/bundle', { method: 'POST', data: ccLib.serializeForm(self.createForm)}, function (bundleUri) {
+    		    self.load(bundleUri);
+  			    console.log("Data set created: " + JSON.stringify(bundleUri));
+  		    });
+  		  }
+      };
+
+      self.createForm.assUpdate.onclick = function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      	if (ccLib.validateForm(self.createForm, checkForm)) {
+  		    jT.service(self, self.bundleUri, { method: 'PUT' }, ccLib.serializeForm(self.createForm), function (result) {
+    		    if (!result) // i.e. on error - request the old data
+    		      self.load(self.bundleUri);
+  		    });
+  		  }
+      };
+      
+      self.createForm.assFinalize.style.display = 'none';
+      self.createForm.assUpdate.style.display = 'none';
+      self.createForm.assDuplicate.style.display = 'none';
+      
+      var starsEl = $('.data-stars-field', self.createForm)[0];
+      starsEl.innerHTML += jT.ui.putStars(self, 0, "Assessment rating");
+      $('span.ui-icon-star', starsEl)
+      .on('mouseover', function (e) {
+        for (var el = this; !!el; el = el.previousElementSibling)
+          $(el).removeClass('transparent');
+        for (var el = this.nextElementSibling; !!el; el = el.nextElementSibling)
+          $(el).addClass('transparent');
+      })
+      .on('click', function (e) {
+        var cnt = 0;
+        for (var el = this; !!el; el = el.previousElementSibling, ++cnt);
+        self.createForm.stars.value = cnt;
+      })
+      .parent().on('mouseout', function (e) {
+        self.starHighlight(this, parseInt(self.createForm.stars.value));
+      });
+      
+      ccLib.prepareForm(self.createForm);
+    }
+	},
+	
+	// called when a sub-action in bundle details tab is called
 	onMatrix: function (id, panel) {
 	  var self = this;
 		if (!$(panel).hasClass('initialized')) {
@@ -378,15 +413,35 @@ var jToxAssessment = {
 	
 	// called when a sub-action in structures selection tab is called
 	onStructures: function (id, panel) {
+  	var self = this;
 	  if (!self.queryKit)
   	  self.queryKit = jT.kit($('#jtox-query')[0]);
     
-    if (!!self.queryKit)
+    if (id == 'structlist')
+      self.queryKit.kit().queryDataset(self.bundleUri + '/compound');
+    else
       self.queryKit.query();
 	},
 	
-	load: function(assessmentUri) {
-		
+	load: function(bundleUri) {
+  	var self = this;
+  	jT.call(self, bundleUri, function (bundle) {
+    	if (!!bundle) {
+      	bundle = bundle.dataset[0];
+      	self.bundleUri = bundle.URI;
+      	ccLib.fillTree(self.createForm, bundle);
+      	self.starHighlight($('.data-stars-field div', self.createForm)[0], bundle.stars);
+      	
+      	// now take care for enabling proper buttons on the Indetifiers page
+        self.createForm.assFinalize.style.display = '';
+        self.createForm.assUpdate.style.display = '';
+        self.createForm.assDuplicate.style.display = '';
+        self.createForm.assStart.style.display = 'none';
+        
+        // and enable the structures tab
+        $('li.jtox-structures', self.rootElement).removeClass('inactive-tab');
+    	}
+  	});
 	},
 };
 
