@@ -136,10 +136,12 @@ var jToxModel = (function () {
           
         if (!!result) {
           self.models = result.model;
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
           if (!self.settings.noInterface)
             jT.$(self.table).dataTable().fnAddData(result.model);
         }
-        ccLib.fireCallback(self.settings.onLoaded, self, result);
+        else
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
       });
     },
     
@@ -157,10 +159,12 @@ var jToxModel = (function () {
           result = { algorithm: [] }; // empty one
         if (!!result) {
           self.algorithm = result.algorithm;
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
           if (!self.settings.noInterface)
             jT.$(self.table).dataTable().fnAddData(result.algorithm);
         }
-        ccLib.fireCallback(self.settings.onLoaded, self, result);
+        else
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
       });
     },
     

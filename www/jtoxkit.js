@@ -2342,6 +2342,8 @@ var jToxCompound = (function () {
           
           // then process the dataset
           self.dataset = cls.processDataset(dataset, self.feature, self.settings.fnAccumulate, self.pageStart);
+          // time to call the supplied function, if any.
+          ccLib.fireCallback(self.settings.onLoaded, self, dataset);
           if (!self.settings.noInterface) {
             // ok - go and update the table, filtering the entries, if needed            
             self.updateTables();
@@ -2350,8 +2352,8 @@ var jToxCompound = (function () {
               self.updateControls(qStart, dataset.dataEntry.length);
           }
         }
-        // time to call the supplied function, if any.
-        ccLib.fireCallback(self.settings.onLoaded, self, dataset);
+        else
+          ccLib.fireCallback(self.settings.onLoaded, self, dataset);
       };
   
       // we may be passed dataset, if the initial, setup query was 404: Not Found - to avoid second such query...
@@ -2659,12 +2661,14 @@ var jToxDataset = (function () {
           result = { dataset: [] }; // empty one...
         if (!!result) {
           self.dataset = result.dataset;
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
           if (!self.settings.noInterface)
             jT.$(self.table).dataTable().fnAddData(result.dataset);
         }
-        else
+        else {
           self.dataset = null;
-        ccLib.fireCallback(self.settings.onLoaded, self, result);
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
+        }
       });
     },
     
@@ -2822,10 +2826,12 @@ var jToxModel = (function () {
           
         if (!!result) {
           self.models = result.model;
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
           if (!self.settings.noInterface)
             jT.$(self.table).dataTable().fnAddData(result.model);
         }
-        ccLib.fireCallback(self.settings.onLoaded, self, result);
+        else
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
       });
     },
     
@@ -2843,10 +2849,12 @@ var jToxModel = (function () {
           result = { algorithm: [] }; // empty one
         if (!!result) {
           self.algorithm = result.algorithm;
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
           if (!self.settings.noInterface)
             jT.$(self.table).dataTable().fnAddData(result.algorithm);
         }
-        ccLib.fireCallback(self.settings.onLoaded, self, result);
+        else
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
       });
     },
     
@@ -3076,6 +3084,8 @@ var jToxSubstance = (function () {
           if (result.substance.length < self.pageSize) // we've reached the end!!
             self.entriesCount = from + result.substance.length;
 
+          // time to call the supplied function, if any.
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
           if (!self.settings.noInterface) {
             jT.$(self.table).dataTable().fnClearTable();
             jT.$(self.table).dataTable().fnAddData(result.substance);
@@ -3083,8 +3093,8 @@ var jToxSubstance = (function () {
             self.updateControls(from, result.substance.length);
           }
         }
-        // time to call the supplied function, if any.
-        ccLib.fireCallback(self.settings.onLoaded, self, result);
+        else
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
       });
     },
     
@@ -3251,6 +3261,7 @@ var jToxComposition = (function () {
             }
           }
           
+          ccLib.fireCallback(self.settings.onLoaded, self, json.composition);
           // now make the actual filling
           if (!self.settings.noInterface) {
             for (var i in substances) {
@@ -3265,9 +3276,9 @@ var jToxComposition = (function () {
               self.prepareTable(substances[i].composition, panel);
             }
           }
-          
-          ccLib.fireCallback(self.settings.onLoaded, self, json.composition);
         }
+        else
+          ccLib.fireCallback(self.settings.onLoaded, self, json.composition);
       });
     },   
     
@@ -4576,12 +4587,14 @@ var jToxEndpoint = (function () {
           result = { facet: [] }; // empty one
         if (!!result) {
           self.summary = result.facet;
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
           if (!self.settings.noInterface)
             self.fillEntries(result.facet);
         }
-        else
+        else {
           self.facet = null;
-        ccLib.fireCallback(self.settings.onLoaded, self, result);
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
+        }
       });
     },
     

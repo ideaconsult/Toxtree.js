@@ -1,11 +1,4 @@
 For Nina:
-- bundle status and dates during creation.
-- Can you update just part of the bundle attributes?
-- When adding a compound you should be able to specify either "source" or "target" - this is missing right now.
-- What's the difference between POST and PUT there?
-- 415: Media not supported on POST /compound
-- How to determine whether a compound is already in the set? what happens if adding the same more than once?
-- Doesn't seem to delete anything
 - 
 
 TODO:

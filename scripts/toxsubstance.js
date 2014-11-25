@@ -152,6 +152,8 @@ var jToxSubstance = (function () {
           if (result.substance.length < self.pageSize) // we've reached the end!!
             self.entriesCount = from + result.substance.length;
 
+          // time to call the supplied function, if any.
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
           if (!self.settings.noInterface) {
             jT.$(self.table).dataTable().fnClearTable();
             jT.$(self.table).dataTable().fnAddData(result.substance);
@@ -159,8 +161,8 @@ var jToxSubstance = (function () {
             self.updateControls(from, result.substance.length);
           }
         }
-        // time to call the supplied function, if any.
-        ccLib.fireCallback(self.settings.onLoaded, self, result);
+        else
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
       });
     },
     
