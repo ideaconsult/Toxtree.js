@@ -130,19 +130,7 @@ var jToxBundle = {
   		  }
       };
 
-      self.createForm.assUpdate.onclick = function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-      	if (ccLib.validateForm(self.createForm, checkForm)) {
-  		    jT.service(self, self.bundleUri, { method: 'PUT' }, ccLib.serializeForm(self.createForm), function (result) {
-    		    if (!result) // i.e. on error - request the old data
-    		      self.load(self.bundleUri);
-  		    });
-  		  }
-      };
-      
       self.createForm.assFinalize.style.display = 'none';
-      self.createForm.assUpdate.style.display = 'none';
       self.createForm.assDuplicate.style.display = 'none';
       
       var starsEl = $('.data-stars-field', self.createForm)[0];
@@ -158,9 +146,29 @@ var jToxBundle = {
         var cnt = 0;
         for (var el = this; !!el; el = el.previousElementSibling, ++cnt);
         self.createForm.stars.value = cnt;
+        $(self.createForm.stars).trigger('change');
       })
       .parent().on('mouseout', function (e) {
         self.starHighlight(this, parseInt(self.createForm.stars.value));
+      });
+      
+      // install change handlers so that we can update the values
+      $('input', self.createForm).on('change', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!self.bundleUri)
+          return;
+        var el = this;
+        if (ccLib.fireCallback(checkForm, el, e)) {
+        	var data = {};
+        	data[el.name] = el.value;
+        	$(el).addClass('loading');
+  		    jT.service(self, self.bundleUri, { method: 'PUT', data: data } , function (result) {
+    		    $(el).removeClass('loading');
+    		    if (!result) // i.e. on error - request the old data
+    		      self.load(self.bundleUri);
+  		    });
+  		  }
       });
       
       ccLib.prepareForm(self.createForm);
@@ -366,7 +374,7 @@ var jToxBundle = {
     	  self.substanceKit = new jToxSubstance(root, { crossDomain: true, embedComposition: true, selectionHandler: "onSelectSubstance", configuration: jTConfig.matrix });
   	  }
   	  
-      self.substanceKit.query(self.bundleUri + '/substance');
+      self.substanceKit.query('/substance?type=related&bundle_uri=' + encodeURIComponent(self.bundleUri));
 	  }
 	  else {// i.e. endpoints
   	  if (sub.firstElementChild == null) {
@@ -398,10 +406,10 @@ var jToxBundle = {
       	self.bundleUri = bundle.URI;
       	ccLib.fillTree(self.createForm, bundle);
       	self.starHighlight($('.data-stars-field div', self.createForm)[0], bundle.stars);
+      	self.createForm.stars.value = bundle.stars;
       	
       	// now take care for enabling proper buttons on the Indetifiers page
         self.createForm.assFinalize.style.display = '';
-        self.createForm.assUpdate.style.display = '';
         self.createForm.assDuplicate.style.display = '';
         self.createForm.assStart.style.display = 'none';
         
@@ -436,7 +444,15 @@ var jToxBundle = {
 	},
 	
 	selectSubstance: function (uri, el) {
-    console.log("Substance [" + uri + "] selected");
+  	var self = this;
+  	$(el).addClass('loading');
+  	jT.service(self, self.bundleUri + '/substance', { method: 'PUT', data: { substance_uri: uri, command: el.checked ? 'add' : 'delete' } }, function (result) {
+    	$(el).removeClass('loading');
+    	if (!result)
+    	  el.checked = !el.checked; // i.e. revert
+      else
+        console.log("Substance [" + uri + "] selected");
+  	})
 	},
 	
 	selectEndpoint: function (uri, el) {

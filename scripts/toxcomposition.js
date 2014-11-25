@@ -141,6 +141,7 @@ var jToxComposition = (function () {
             }
           }
           
+          ccLib.fireCallback(self.settings.onLoaded, self, json.composition);
           // now make the actual filling
           if (!self.settings.noInterface) {
             for (var i in substances) {
@@ -155,9 +156,9 @@ var jToxComposition = (function () {
               self.prepareTable(substances[i].composition, panel);
             }
           }
-          
-          ccLib.fireCallback(self.settings.onLoaded, self, json.composition);
         }
+        else
+          ccLib.fireCallback(self.settings.onLoaded, self, json.composition);
       });
     },   
     

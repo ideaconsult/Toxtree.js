@@ -831,6 +831,8 @@ var jToxCompound = (function () {
           
           // then process the dataset
           self.dataset = cls.processDataset(dataset, self.feature, self.settings.fnAccumulate, self.pageStart);
+          // time to call the supplied function, if any.
+          ccLib.fireCallback(self.settings.onLoaded, self, dataset);
           if (!self.settings.noInterface) {
             // ok - go and update the table, filtering the entries, if needed            
             self.updateTables();
@@ -839,8 +841,8 @@ var jToxCompound = (function () {
               self.updateControls(qStart, dataset.dataEntry.length);
           }
         }
-        // time to call the supplied function, if any.
-        ccLib.fireCallback(self.settings.onLoaded, self, dataset);
+        else
+          ccLib.fireCallback(self.settings.onLoaded, self, dataset);
       };
   
       // we may be passed dataset, if the initial, setup query was 404: Not Found - to avoid second such query...

@@ -95,12 +95,14 @@ var jToxDataset = (function () {
           result = { dataset: [] }; // empty one...
         if (!!result) {
           self.dataset = result.dataset;
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
           if (!self.settings.noInterface)
             jT.$(self.table).dataTable().fnAddData(result.dataset);
         }
-        else
+        else {
           self.dataset = null;
-        ccLib.fireCallback(self.settings.onLoaded, self, result);
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
+        }
       });
     },
     

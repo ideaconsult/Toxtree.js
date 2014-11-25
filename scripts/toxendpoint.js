@@ -326,12 +326,14 @@ var jToxEndpoint = (function () {
           result = { facet: [] }; // empty one
         if (!!result) {
           self.summary = result.facet;
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
           if (!self.settings.noInterface)
             self.fillEntries(result.facet);
         }
-        else
+        else {
           self.facet = null;
-        ccLib.fireCallback(self.settings.onLoaded, self, result);
+          ccLib.fireCallback(self.settings.onLoaded, self, result);
+        }
       });
     },
     
