@@ -381,8 +381,9 @@ var jToxBundle = {
     	  var root = document.createElement('div');
     	  sub.appendChild(root);
     	  self.endpointKit = new jToxEndpoint(root, { selectionHandler: "onSelectEndpoint" });
-    	  self.endpointKit.loadEndpoints(self.bundleUri + '/studysummary');
   	  }
+
+  	  self.endpointKit.loadEndpoints(self.bundleUri + '/studysummary');
 	  }
 	},
 	
@@ -452,11 +453,19 @@ var jToxBundle = {
     	  el.checked = !el.checked; // i.e. revert
       else
         console.log("Substance [" + uri + "] selected");
-  	})
+  	});
 	},
 	
 	selectEndpoint: function (uri, el) {
-    console.log("Endpoint [" + uri + "] selected");  
+  	var self = this;
+  	$(el).addClass('loading');
+  	jT.service(self, self.bundleUri + '/property', { method: 'PUT', data: { substance_uri: uri, command: el.checked ? 'add' : 'delete' } }, function (result) {
+    	$(el).removeClass('loading');
+    	if (!result)
+    	  el.checked = !el.checked; // i.e. revert
+      else
+        console.log("Endpoint [" + uri + "] selected");  
+  	});
 	}
 };
 
