@@ -104,6 +104,11 @@ body.structlist #browser {
   padding-left: 15px;
 }
 
+#jtox-endpoints .tab-points>div.check-all {
+  margin-bottom: -16px;
+  z-index: 100;
+}
+
 /* Now come info and edit box declarations
 */
 .popup-box .box-reference {

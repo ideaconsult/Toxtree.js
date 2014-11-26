@@ -30,7 +30,7 @@ var jToxEndpoint = (function () {
     configuration: { 
       columns : {
         endpoint: {
-          'Id': { sTitle: "Id", mData: "endpoint", bSortable: false, sWidth: "30px", mRender: function (data, type, full) { return ''; } },
+          'Id': { sTitle: "Id", mData: "uri", bSortable: false, sWidth: "30px", mRender: function (data, type, full) { return ''; } },
           'Name': { sTitle: "Name", mData: "value", sDefaultContent: "-", mRender: function (data, type, full) {
             return data + '<span class="float-right jtox-details">(<a title="Click to view substances" target="_blank" href="' + full.uri + '">' + full.substancescount + '</a>) [<span title="Number of values">' + full.count + '</span>]</span>';
           } },
@@ -303,13 +303,12 @@ var jToxEndpoint = (function () {
       // now, as we're ready - go and fill everything
       jT.$('h3', self.rootElement).each(function () {
         var name = jT.$(this).data('cat');
-        var cat = ends[name.replace("_", " ")];
-        if (cat == null)
-          return;
-        
         var table = self.tables[name];
         table.fnClearTable();
-        table.fnAddData(cat);
+
+        var cat = ends[name.replace("_", " ")];
+        if (cat != null)
+          table.fnAddData(cat);
       });
     },
     

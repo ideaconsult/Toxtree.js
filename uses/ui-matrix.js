@@ -14,6 +14,11 @@ var jToxBundle = {
 	createForm: null,
 	rootElement: null,
 	bundleUri: null,
+	bundleSummary: {
+  	compounds: 0,
+  	substances: 0,
+  	endpoints: 0,
+	},
 	
 	collected: {
   	compounds: [],
@@ -357,7 +362,7 @@ var jToxBundle = {
     		}
   		});
   		
-  		self.matrixKit.query(jT.settings.baseUrl + "/substanceowner/IUC4-44BF02D8-47C5-385D-B203-9A8F315911CB/dataset");
+  		self.matrixKit.query(self.bundleUri + '/dataset');
 		}
 	},
 	
@@ -377,13 +382,16 @@ var jToxBundle = {
       self.substanceKit.query('/substance?type=related&bundle_uri=' + encodeURIComponent(self.bundleUri));
 	  }
 	  else {// i.e. endpoints
-  	  if (sub.firstElementChild == null) {
+  	  var checkAll = $('input', sub)[0];
+  	  if (sub.childNodes.length == 1) {
     	  var root = document.createElement('div');
     	  sub.appendChild(root);
     	  self.endpointKit = new jToxEndpoint(root, { selectionHandler: "onSelectEndpoint" });
+    	  $(checkAll).on('change', function (e) {
+          self.endpointKit.loadEndpoints(!this.checked ? self.bundleUri + '/studysummary' : null);
+    	  });
   	  }
-
-  	  self.endpointKit.loadEndpoints(self.bundleUri + '/studysummary');
+  	  $(checkAll).trigger('change'); // i.e. initiating a proper reload
 	  }
 	},
 	
@@ -405,6 +413,9 @@ var jToxBundle = {
     	if (!!bundle) {
       	bundle = bundle.dataset[0];
       	self.bundleUri = bundle.URI;
+      	if (!!bundle.summary)
+      	  self.bundleSummary = bundle.summary;
+      	  
       	ccLib.fillTree(self.createForm, bundle);
       	self.starHighlight($('.data-stars-field div', self.createForm)[0], bundle.stars);
       	self.createForm.stars.value = bundle.stars;
@@ -414,10 +425,15 @@ var jToxBundle = {
         self.createForm.assDuplicate.style.display = '';
         self.createForm.assStart.style.display = 'none';
         
-        // and enable the structures tab
         $(self.rootElement).tabs('enable', 1);
+        self.progressTabs();
     	}
   	});
+	},
+	
+	progressTabs: function () {
+    $(this.rootElement).tabs(this.bundleSummary.compounds > 0 ? 'enable' : 'disable', 2);
+    $(this.rootElement).tabs(this.bundleSummary.substances > 0  && this.bundleSummary.endpoints > 0 ? 'enable' : 'disable', 3);
 	},
 	
 	selectStructure: function (uri, what, el) {
@@ -434,14 +450,21 @@ var jToxBundle = {
     	$(el).removeClass('loading');
     	if (!!result) {
       	$(el).toggleClass('active');
+      	if ($(el).hasClass('active'))
+      	  self.bundleSummary.compounds++;
+        else
+          self.bundleSummary.compounds--;
+        self.progressTabs();
         console.log("Structure [" + uri + "] selected as <" + what + ">");
       }
   	});
 	},
 	
 	structuresLoaded: function (kit, dataset) {
-    if (document.body.className == 'structlist')
-      $(this.rootElement).tabs(dataset.dataEntry.length > 0 ? 'enable' : 'disable', 2);
+    if (document.body.className == 'structlist') {
+      this.bundleSummary.compounds = dataset.dataEntry.length;
+      this.progressTabs();
+    }
 	},
 	
 	selectSubstance: function (uri, el) {
@@ -451,20 +474,39 @@ var jToxBundle = {
     	$(el).removeClass('loading');
     	if (!result)
     	  el.checked = !el.checked; // i.e. revert
-      else
+      else {
+        if (el.checked)
+          self.bundleSummary.substances++;
+        else
+          self.bundleSummary.substances--;
+        self.progressTabs();
         console.log("Substance [" + uri + "] selected");
+      }
   	});
 	},
 	
-	selectEndpoint: function (uri, el) {
+	selectEndpoint: function (topcategory, endpoint, el) {
   	var self = this;
   	$(el).addClass('loading');
-  	jT.service(self, self.bundleUri + '/property', { method: 'PUT', data: { substance_uri: uri, command: el.checked ? 'add' : 'delete' } }, function (result) {
+  	jT.service(self, self.bundleUri + '/property', { 
+      method: 'PUT', 
+      data: { 
+        'topcategory': topcategory, 
+        'endpointcategory': endpoint,
+        'command': el.checked ? 'add' : 'delete' 
+      } 
+    }, function (result) {
     	$(el).removeClass('loading');
     	if (!result)
     	  el.checked = !el.checked; // i.e. revert
-      else
-        console.log("Endpoint [" + uri + "] selected");  
+      else {
+        if (el.checked)
+          self.bundleSummary.endpoints++;
+        else
+          self.bundleSummary.endpoints--;
+        self.progressTabs();
+        console.log("Endpoint [" + endpoint + "] selected");  
+      }
   	});
 	}
 };
@@ -483,7 +525,8 @@ function onSelectSubstance(e) {
 }
 
 function onSelectEndpoint(e) {
-  jToxBundle.selectEndpoint(this.value, this);
+  var rowData = jT.ui.rowData(this);
+  jToxBundle.selectEndpoint(rowData.subcategory, rowData.endpoint, this);
 }
 
 function onDetailedRow(row, data, event) {
@@ -501,8 +544,6 @@ function onDetailedRow(row, data, event) {
     new jToxStudy(root, $.extend({}, this.settings, {substanceUri: data.URI}));
   } } ) );
 }
-
-
 
 $(document).ready(function(){
   $('#logger').on('mouseover', function () { $(this).removeClass('hidden'); }).on('mouseout', function () { $(this).addClass('hidden');});
