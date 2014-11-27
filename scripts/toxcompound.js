@@ -585,7 +585,7 @@ var jToxCompound = (function () {
           // finally - assign column switching to the checkbox of main tab.
           var colList = !!feature.primary ? fixCols : varCols;
           var colId = 'col-' + colList.length;
-          col.sClass += ' ' + colId;
+          col.sClass = (!!col.sClass ? col.sClass + ' ' : '') + colId;
 
           jT.$('.jtox-ds-features input.jtox-checkbox[value="' + fId + '"]', self.rootElement).data({ sel: !!feature.primary ? '.jtox-ds-fixed' : '.jtox-ds-variable', column: colId, id: fId}).on('change', fnShowColumn)
           

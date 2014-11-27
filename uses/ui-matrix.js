@@ -78,7 +78,7 @@ var jToxBundle = {
     
     // initialize the tab structure for several versions of dataTables.
     $(root).tabs({
-      "disabled": [1, 2, 3, 4],
+      "disabled": [1, 2], //, 3, 4],
       "heightStyle": "fill",
       "select" : function(event, ui) {
         loadPanel(ui.panel);
@@ -211,12 +211,10 @@ var jToxBundle = {
       	      return '-';
 
             var html = '';
-            for (var fId in miniset.feature) {
-              var f = miniset.feature[fId];
+            for (var fId in self.matrixKit.dataset.feature) {
+              var f = self.matrixKit.dataset.feature[fId];
               if (f.sameAs != feat.sameAs || full.values[fId] == null)
                 continue;
-              if (html.length > 0)
-                html += '<br/>';
                 
               var catId = self.parseFeatureId(fId, kit).category,
                   config = jT.$.extend(true, {}, kit.settings.configuration.columns["_"], kit.settings.configuration.columns[catId]),
@@ -227,13 +225,13 @@ var jToxBundle = {
               val += jT.ui.valueWithUnits(full.values[fId], f.units);
 
               // now - ready to produce HTML
+              html += '<span class="ui-icon ui-icon-circle-minus delete-popup" data-feature="' + theId + '"></span>&nbsp;';
               html += '<a class="info-popup" data-feature="' + fId + '" href="#">' + val + '</a>';
               html += '<sup class="helper"><a target="jtox-study" href="' + full.compound.URI + '/study?property_uri=' + encodeURIComponent(fId) + '">?</a></sup>';
+              html += '<br/>';
             }
             
-            if (!html)
-              html += '<span class="ui-icon ui-icon-circle-plus edit-popup" data-feature="' + theId + '"></span>';
-
+            html += '<span class="ui-icon ui-icon-circle-plus edit-popup" data-feature="' + theId + '"></span>';
       	    return  html;
           };
         };
@@ -250,8 +248,8 @@ var jToxBundle = {
 
           if (endpoints[feat.sameAs] == null) {
             endpoints[feat.sameAs] = true;
-            feat.render = fRender(feat, fId);
             feat.title = feat.sameAs.substr(feat.sameAs.indexOf('#') + 1);
+            feat.render = fRender(feat, fId);
             grp.push(fId);
           }
       	}
@@ -285,7 +283,7 @@ var jToxBundle = {
     		hasDetails: false,
     		configuration: conf,
     		onRow: function (row, data, index) {
-      		$('.info-popup, .edit-popup', row).on('click', function () {
+      		$('.info-popup, .edit-popup, .delete-popup', row).on('click', function () {
       		  var boxOptions = { 
         		  overlay: true,
         		  closeOnEsc: true,
@@ -433,7 +431,7 @@ var jToxBundle = {
 	
 	progressTabs: function () {
     $(this.rootElement).tabs(this.bundleSummary.compounds > 0 ? 'enable' : 'disable', 2);
-    $(this.rootElement).tabs(this.bundleSummary.substances > 0  && this.bundleSummary.endpoints > 0 ? 'enable' : 'disable', 3);
+//     $(this.rootElement).tabs(this.bundleSummary.substances > 0  && this.bundleSummary.endpoints > 0 ? 'enable' : 'disable', 3);
 	},
 	
 	selectStructure: function (uri, what, el) {

@@ -109,6 +109,15 @@ body.structlist #browser {
   z-index: 100;
 }
 
+#jtox-matrix table.dataTable td  {
+  white-space: nowrap;
+}
+
+#jtox-matrix table.dataTable td span.ui-icon {
+  display: inline-block;
+  vertical-align: bottom;
+}
+
 /* Now come info and edit box declarations
 */
 .popup-box .box-reference {
