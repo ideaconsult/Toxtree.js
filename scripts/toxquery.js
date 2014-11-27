@@ -42,7 +42,7 @@ var jToxQuery = (function () {
     
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
     if (!!self.settings.initialQuery)
-      setTimeout(function () { self.query(); }, 200);
+      self.initialQueryTimer = setTimeout(function () { self.query(); }, 200);
   };
   
   cls.prototype = {
@@ -57,6 +57,11 @@ var jToxQuery = (function () {
       return this.mainKit;
     },
         
+    cancelInitialQuery: function () {
+      if (!!this.initialQueryTimer)
+        clearTimeout(this.initialQueryTimer);
+    },
+    
     /* Perform the actual query, traversing all the widgets and asking them to
     alter the given URL, then - makes the call */
     query: function () {
@@ -293,8 +298,10 @@ var jToxSearch = (function () {
     }
 
     jT.ui.installHandlers(self);
-    if (doQuery)
-      setTimeout(function () { self.queryKit.query(); }, 250);      
+    if (doQuery) {
+      self.queryKit.cancelInitialQuery();
+      setTimeout(function () { self.queryKit.query(); }, 250);
+    }
     // and very finally - install the handlers...
   };
   
