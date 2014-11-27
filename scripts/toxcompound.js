@@ -20,6 +20,7 @@ var jToxCompound = (function () {
     "pageSize": 20,           // what is the default (startint) page size.
     "pageStart": 0,           // what is the default startint point for entries retrieval
     "rememberChecks": false,  // whether to remember feature-checkbox settings between queries
+    "featureUri": null,       // an URI for retrieving all feature for the dataset, rather than 1-sized initial query, which is by default
     "metricFeature": "http://www.opentox.org/api/1.1#Similarity",   // This is the default metric feature, if no other is specified
     "onTab": null,            // invoked after each group's tab is created - function (element, tab, name, isMain);
     "onLoaded": null,         // invoked when a set of compounds is loaded.
@@ -852,40 +853,45 @@ var jToxCompound = (function () {
         jT.call(self, qUri, fillFn);
     },
     
-    /* Makes a query to the server for particular dataset, asking for feature list first, so that the table(s) can be 
-    prepared.
-    */
-    queryDataset: function (datasetUri) {
+    /* Retrieve features for provided dataserUri, using settings.featureUri, if provided, or making automatice page=0&pagesize=1 query
+      */
+    queryFeatures: function (callback) {
       var self = this;
-      // if some oldies exist...
-      this.clearDataset();
-      this.init();
+      var dataset = null;
 
-      datasetUri = jT.grabPaging(self, datasetUri);
+      // first, build the proper      
+        var queryUri;
+      if (!!self.settings.featureUri) {
+        queryUri = self.settings.featureUri;
+/*
+        if (!jT.$.isArray(self.settings.featureUris))
+          self.settings.featureUris = [self.settings.featureUris];
+        var cnt = 0;
+        if (queryUri.indexOf('?') < 0)
+          queryUri += '?';
+        for (var i = 0; i < self.settings.featureUris.length; ++i) {
+          var uri = self.settings.featureUris[i];
+          queryUri += 'feature_uris[]=' + encodeURIComponent(uri) + '&';
+        }
+*/
+      }
+      else // this is the automatic way, which makes a false query in the beginning
+        queryUri = ccLib.addParameter(self.datasetUri, "page=0&pagesize=1");
 
-      self.settings.baseUrl = self.settings.baseUrl || jT.grabBaseUrl(datasetUri);
-      
-      // remember the _original_ datasetUri and make a call with one size length to retrieve all features...
-      self.datasetUri = (datasetUri.indexOf('http') !=0 ? self.settings.baseUrl : '') + datasetUri;
-      
-      var procDiv = jT.$('.jt-processing', self.rootElement).show()[0];
-      if (!!self.settings.oLanguage.sLoadingRecords)
-        jT.$('.message', procDiv).html(self.settings.oLanguage.sLoadingRecords);
-
-      jT.call(self, ccLib.addParameter(self.datasetUri, "page=0&pagesize=1"), function (dataset, jhr) {
-        var empty = false;
-        if (!dataset && jhr.status == 404) {
-          empty = true;
+      // now make the actual call...
+      jT.call(self, queryUri, function (result, jhr) {
+        if (!result && jhr.status == 404) {
           dataset = { feature: {}, dataEntry: [] }; // an empty set, to make it show the table...
         }
         
         // remove the loading pane in anyways..
-        jT.$(procDiv).hide();
-        if (!!dataset) {
-          self.feature = dataset.feature;
+        if (!!result) {
+          self.feature = result.feature;
+
           cls.processFeatures(self.feature, self.settings.configuration.baseFeatures);
+          var miniset = { dataEntry: [], feature: self.feature };
           if (!self.settings.noInterface) {
-            self.prepareGroups(dataset);
+            self.prepareGroups(miniset);
             if (self.settings.showTabs) {
               // tabs feature building
               var nodeFn = function (id, name, parent) {
@@ -925,11 +931,39 @@ var jToxCompound = (function () {
             
             self.prepareTables(); // prepare the tables - we need features to build them - we have them!
             self.equalizeTables(); // to make them nicer, while waiting...
-            ccLib.fireCallback(self.settings.onPrepared, self, dataset, self);
           }
-          
-          self.queryEntries(self.pageStart, self.pageSize, empty ? dataset : null); // and make the query for actual data
+  
+          ccLib.fireCallback(self.settings.onPrepared, self, miniset, self);
+  
+          // finally make the callback for
+          callback(dataset);
         }
+      });
+    },
+    
+    /* Makes a query to the server for particular dataset, asking for feature list first, so that the table(s) can be 
+    prepared.
+    */
+    queryDataset: function (datasetUri) {
+      var self = this;
+      // if some oldies exist...
+      this.clearDataset();
+      this.init();
+
+      datasetUri = jT.grabPaging(self, datasetUri);
+
+      self.settings.baseUrl = self.settings.baseUrl || jT.grabBaseUrl(datasetUri);
+      
+      // remember the _original_ datasetUri and make a call with one size length to retrieve all features...
+      self.datasetUri = (datasetUri.indexOf('http') !=0 ? self.settings.baseUrl : '') + datasetUri;
+      
+      var procDiv = jT.$('.jt-processing', self.rootElement).show()[0];
+      if (!!self.settings.oLanguage.sLoadingRecords)
+        jT.$('.message', procDiv).html(self.settings.oLanguage.sLoadingRecords);
+      
+      self.queryFeatures(function (dataset) {
+        jT.$(procDiv).hide();
+        self.queryEntries(self.pageStart, self.pageSize, dataset);
       });
     },
     
