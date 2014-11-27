@@ -370,12 +370,12 @@ var jToxCompound = (function () {
       }
     },
     
-    featureValue: function (fId, data, type) {
+    featureValue: function (fId, entry, type) {
       var self = this;
       var feature = self.feature[fId];
-      var val = (feature.data !== undefined) ? (ccLib.getJsonValue(data, jT.$.isArray(feature.data) ? feature.data[0] : feature.data)) : data.values[fId];
+      var val = (feature.data !== undefined) ? (ccLib.getJsonValue(entry, jT.$.isArray(feature.data) ? feature.data[0] : feature.data)) : entry.values[fId];
       return (typeof feature.render == 'function') ? 
-        feature.render(val, !!type ? type : 'filter', data) : 
+        feature.render(val, !!type ? type : 'filter', entry) : 
         jT.ui.valueWithUnits(val, !!feature.units && (type == 'display' || type == 'details') ? feature.units : null)
     },
     
@@ -396,9 +396,9 @@ var jToxCompound = (function () {
         var title = feat.title;
         feat.value = self.featureValue(fId, entry, scope);
         if (!!title && (!self.settings.hideEmptyDetails || !!feat.value)) {
-          data.push(feat)
           if (!feat.value)
             feat.value = '-';
+          data.push(feat);
         }
       });
       
@@ -421,22 +421,24 @@ var jToxCompound = (function () {
       else if (!ccLib.isNull(feature.column))
         col = jT.$.extend(col, feature.column);
       
-      if (feature.data !== undefined)
-        col["mData"] = feature.data;
-      else {
-        col["mData"] = 'values';
-        col["mRender"] = (function(featureId) { return function(data, type, full) { var val = data[featureId]; return ccLib.isEmpty(val) ? '-' : val }; })(fId);
+      col["mData"] = (feature.data != null) ? feature.data : 'values';
+
+      if (feature.render != null) {
+        if (feature.data != null)
+          col["mRender"] = feature.render;
+        else
+          col["mRender"] = function (data, type, full) { return feature.render(full.values[fId], type, full); }
       }
+      else if (!!feature.shorten)
+        col["mRender"] = function(data, type, full) { return (type != "display") ? '' + data : jT.ui.shortenedData(data, "Press to copy the value in the clipboard"); };
+      else if (feature.data == null) // in other cases we want the default presenting of the plain value
+        col["mRender"] = (function(featureId) { return function(data, type, full) { var val = full.values[featureId]; return ccLib.isEmpty(val) ? '-' : val }; })(fId);
       
       // other convenient cases
-      if (!!feature.shorten) {
-        col["mRender"] = function(data, type, full) { return (type != "display") ? '' + data : jT.ui.shortenedData(data, "Press to copy the value in the clipboard"); };
+      if (!!feature.shorten)
         col["sWidth"] = "75px";
-      }
   
       // finally - this one.          
-      if (feature.render !== undefined)
-        col["mRender"] = feature.render;
       if (feature.order != null)
         col["iOrder"] = feature.order;
       return col;

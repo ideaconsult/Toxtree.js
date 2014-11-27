@@ -1,4 +1,5 @@
 var jTConfig = {};
+var jtModelKit = null;
 
 function onSideLoaded(result) {
   if (!result)
@@ -37,6 +38,17 @@ function onDetailedRow(row, data, element) {
   } } ) );
 }
 
+function runPredict(el) {
+  if (!jtModelKit)
+    jtModelKit = new jToxModel(null, { noInterface: true, forceCreate: false, });
+  $(el).addClass('loading');
+  var feat = jToxCompound.kits[0].feature[$(el).data('featureId')];
+  jtModelKit.runPrediction($(el).data('compoundUri'), feat.source.URI, function (result) {
+    $(el).removeClass('loading');
+    console.log(JSON.stringify(result));
+  });
+}
+
 function createGroups(miniset, kit) {
   var groups = {
     "Identifiers" : [
@@ -65,6 +77,12 @@ function createGroups(miniset, kit) {
       groups[src] = [];
     if (feat.title.indexOf('explanation') > 0)
       feat.visibility = "details";
+    else if (feat.isModelPredictionFeature)
+      feat.render = (function (featureId) { return function (data, type, full) {
+        if (type != 'display')
+          return data || '-';
+        return !!data ? data : '<button class="jt-toggle jtox-handler" data-feature-id="' + featureId + '" data-compound-uri="' + full.compound.URI + '" data-handler="runPredict" title="Run prediction with the algorithm on current compound">▶︎</button>';
+      }; })(fId);
     groups[src].push(fId);
 	}
 	groups["Substances"] = [ "http://www.opentox.org/api/1.1#CompositionInfo" ];
