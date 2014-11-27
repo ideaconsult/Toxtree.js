@@ -376,7 +376,7 @@ var jToxBundle = {
   	  if (sub.firstElementChild == null) {
     	  var root = document.createElement('div');
     	  sub.appendChild(root);
-    	  self.substanceKit = new jToxSubstance(root, { crossDomain: true, embedComposition: true, selectionHandler: "onSelectSubstance", configuration: jTConfig.matrix });
+    	  self.substanceKit = new jToxSubstance(root, { crossDomain: true, showDiagrams: true, embedComposition: true, selectionHandler: "onSelectSubstance", configuration: jTConfig.matrix });
   	  }
   	  
       self.substanceKit.query('/substance?type=related&bundle_uri=' + encodeURIComponent(self.bundleUri));
