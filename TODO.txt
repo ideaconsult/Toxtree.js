@@ -1,7 +1,7 @@
-For Nina:
-- 
-
 TODO:
+- (-) icon for RA matrix on existings values.
+- (+) icon even on cells with existings values (multiple value adding).
+- 
 
 - History of searches in jToxSearch component (along with type of search and additional parameters)
 
