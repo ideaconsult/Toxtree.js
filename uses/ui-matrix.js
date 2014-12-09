@@ -114,6 +114,10 @@ var jToxBundle = {
     });
 	},
 	
+	modifyUri: function (uri) {
+  	return ccLib.addParameter(uri, "bundle_uri=" + encodeURIComponent(this.bundleUri));
+	},
+	
 	onIdentifiers: function (id, panel) {
 	  var self = this;
 	  if (!$(panel).hasClass('initialized')) {
@@ -374,7 +378,18 @@ var jToxBundle = {
   	  if (sub.firstElementChild == null) {
     	  var root = document.createElement('div');
     	  sub.appendChild(root);
-    	  self.substanceKit = new jToxSubstance(root, { crossDomain: true, showDiagrams: true, embedComposition: true, selectionHandler: "onSelectSubstance", configuration: jTConfig.matrix });
+    	  self.substanceKit = new jToxSubstance(root, { 
+      	  crossDomain: true, 
+      	  showDiagrams: true, 
+      	  embedComposition: true, 
+      	  selectionHandler: "onSelectSubstance", 
+      	  configuration: jTConfig.matrix,
+      	  onRow: function (row, data, index) {
+        	  var bundleInfo = data.bundles[self.bundleUri];
+        	  if (!!bundleInfo && bundleInfo.tag == "selected")
+        	    $('input.jtox-handler', row).attr('checked', 'checked');
+      	  }
+        });
   	  }
   	  
       self.substanceKit.query('/substance?type=related&bundle_uri=' + encodeURIComponent(self.bundleUri));
@@ -384,7 +399,14 @@ var jToxBundle = {
   	  if (sub.childNodes.length == 1) {
     	  var root = document.createElement('div');
     	  sub.appendChild(root);
-    	  self.endpointKit = new jToxEndpoint(root, { selectionHandler: "onSelectEndpoint" });
+    	  self.endpointKit = new jToxEndpoint(root, { 
+      	  selectionHandler: "onSelectEndpoint",
+      	  onRow: function (row, data, index) {
+        	  var bundleInfo = data.bundles[self.bundleUri];
+        	  if (!!bundleInfo && bundleInfo.tag == "selected")
+        	    $('input.jtox-handler', row).attr('checked', 'checked');
+      	  }
+        });
     	  $(checkAll).on('change', function (e) {
           self.endpointKit.loadEndpoints(!this.checked ? self.bundleUri + '/studysummary' : null);
     	  });
@@ -396,8 +418,18 @@ var jToxBundle = {
 	// called when a sub-action in structures selection tab is called
 	onStructures: function (id, panel) {
   	var self = this;
-	  if (!self.queryKit)
+	  if (!self.queryKit) {
   	  self.queryKit = jT.kit($('#jtox-query')[0]);
+  	  self.queryKit.setWidget("bundle", self.rootElement);
+  	  // provid onRow function so the buttons can be se properly...
+  	  self.queryKit.kit().settings.onRow = function (row, data, index) {
+    	  var bundleInfo = data.bundles[self.bundleUri];
+    	  if (!!bundleInfo) {
+          $('button.jt-toggle.' + bundleInfo.tag.toLowerCase(), row).addClass('active');
+          $('textarea.remark', row).html(bundleInfo.remarks);
+    	  }
+  	  };
+    }
     
     if (id == 'structlist')
       self.queryKit.kit().queryDataset(self.bundleUri + '/compound');
