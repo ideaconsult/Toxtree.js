@@ -15,9 +15,9 @@ var jToxBundle = {
 	rootElement: null,
 	bundleUri: null,
 	bundleSummary: {
-  	compounds: 0,
-  	substances: 0,
-  	endpoints: 0,
+  	compound: 0,
+  	substance: 0,
+  	property: 0,
 	},
 	
 	collected: {
@@ -411,8 +411,6 @@ var jToxBundle = {
     	if (!!bundle) {
       	bundle = bundle.dataset[0];
       	self.bundleUri = bundle.URI;
-      	if (!!bundle.summary)
-      	  self.bundleSummary = bundle.summary;
       	  
       	ccLib.fillTree(self.createForm, bundle);
       	self.starHighlight($('.data-stars-field div', self.createForm)[0], bundle.stars);
@@ -424,14 +422,23 @@ var jToxBundle = {
         self.createForm.assStart.style.display = 'none';
         
         $(self.rootElement).tabs('enable', 1);
-        self.progressTabs();
+        // now request and process the bundle summary
+        jT.call(self, bundle.URI + "/summary", function (summary) {
+          if (!!summary) {
+            for (var i = 0, sl = summary.facet.length; i < sl; ++i) {
+              var facet = summary.facet[i];
+              self.bundleSummary[facet.value] = facet.count;
+            }  
+          }
+          self.progressTabs();
+        });
     	}
   	});
 	},
 	
 	progressTabs: function () {
-    $(this.rootElement).tabs(this.bundleSummary.compounds > 0 ? 'enable' : 'disable', 2);
-//     $(this.rootElement).tabs(this.bundleSummary.substances > 0  && this.bundleSummary.endpoints > 0 ? 'enable' : 'disable', 3);
+    $(this.rootElement).tabs(this.bundleSummary.compound > 0 ? 'enable' : 'disable', 2);
+    $(this.rootElement).tabs(this.bundleSummary.substance > 0  && this.bundleSummary.property > 0 ? 'enable' : 'disable', 3);
 	},
 	
 	selectStructure: function (uri, what, el) {
@@ -449,9 +456,9 @@ var jToxBundle = {
     	if (!!result) {
       	$(el).toggleClass('active');
       	if ($(el).hasClass('active'))
-      	  self.bundleSummary.compounds++;
+      	  self.bundleSummary.compound++;
         else
-          self.bundleSummary.compounds--;
+          self.bundleSummary.compound--;
         self.progressTabs();
         console.log("Structure [" + uri + "] selected as <" + what + ">");
       }
@@ -460,7 +467,7 @@ var jToxBundle = {
 	
 	structuresLoaded: function (kit, dataset) {
     if (document.body.className == 'structlist') {
-      this.bundleSummary.compounds = dataset.dataEntry.length;
+      this.bundleSummary.compound = dataset.dataEntry.length;
       this.progressTabs();
     }
 	},
@@ -474,9 +481,9 @@ var jToxBundle = {
     	  el.checked = !el.checked; // i.e. revert
       else {
         if (el.checked)
-          self.bundleSummary.substances++;
+          self.bundleSummary.substance++;
         else
-          self.bundleSummary.substances--;
+          self.bundleSummary.substance--;
         self.progressTabs();
         console.log("Substance [" + uri + "] selected");
       }
@@ -499,9 +506,9 @@ var jToxBundle = {
     	  el.checked = !el.checked; // i.e. revert
       else {
         if (el.checked)
-          self.bundleSummary.endpoints++;
+          self.bundleSummary.property++;
         else
-          self.bundleSummary.endpoints--;
+          self.bundleSummary.property--;
         self.progressTabs();
         console.log("Endpoint [" + endpoint + "] selected");  
       }
