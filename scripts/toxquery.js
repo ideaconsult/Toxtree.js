@@ -56,6 +56,10 @@ var jToxQuery = (function () {
         
       return this.mainKit;
     },
+    
+    setWidget: function (id, dom) {
+      this.settings.dom.widgets[id] = dom;
+    },
         
     cancelInitialQuery: function () {
       if (!!this.initialQueryTimer)
