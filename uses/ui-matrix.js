@@ -425,8 +425,10 @@ var jToxBundle = {
   	  self.queryKit.kit().settings.onRow = function (row, data, index) {
     	  var bundleInfo = data.bundles[self.bundleUri];
     	  if (!!bundleInfo) {
-          $('button.jt-toggle.' + bundleInfo.tag.toLowerCase(), row).addClass('active');
-          $('textarea.remark', row).html(bundleInfo.remarks);
+      	  if (!!bundleInfo.tag)
+            $('button.jt-toggle.' + bundleInfo.tag.toLowerCase(), row).addClass('active');
+          if (!!bundleInfo.remarks)
+            $('textarea.remark', row).html(bundleInfo.remarks);
     	  }
   	  };
     }
@@ -488,11 +490,14 @@ var jToxBundle = {
     	if (!!result) {
       	$(el).toggleClass('active');
       	if ($(el).hasClass('active'))
+      	{
       	  self.bundleSummary.compound++;
+      	  what = (what == "target" ? "source" : "target");
+      	  $('button.' + what, el.parentNode).removeClass('active');
+        }
         else
           self.bundleSummary.compound--;
         self.progressTabs();
-        console.log("Structure [" + uri + "] selected as <" + what + ">");
       }
   	});
 	},
