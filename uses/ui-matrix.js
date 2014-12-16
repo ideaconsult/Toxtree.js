@@ -385,6 +385,8 @@ var jToxBundle = {
       	  selectionHandler: "onSelectSubstance", 
       	  configuration: jTConfig.matrix,
       	  onRow: function (row, data, index) {
+	      	  if (!data.bundles)
+	      	  	return;
         	  var bundleInfo = data.bundles[self.bundleUri];
         	  if (!!bundleInfo && bundleInfo.tag == "selected")
         	    $('input.jtox-handler', row).attr('checked', 'checked');
@@ -402,6 +404,8 @@ var jToxBundle = {
     	  self.endpointKit = new jToxEndpoint(root, { 
       	  selectionHandler: "onSelectEndpoint",
       	  onRow: function (row, data, index) {
+	      	  if (!data.bundles)
+	      	  	return;
         	  var bundleInfo = data.bundles[self.bundleUri];
         	  if (!!bundleInfo && bundleInfo.tag == "selected")
         	    $('input.jtox-handler', row).attr('checked', 'checked');
@@ -423,6 +427,8 @@ var jToxBundle = {
   	  self.queryKit.setWidget("bundle", self.rootElement);
   	  // provid onRow function so the buttons can be se properly...
   	  self.queryKit.kit().settings.onRow = function (row, data, index) {
+      	  if (!data.bundles)
+      	  	return;
     	  var bundleInfo = data.bundles[self.bundleUri];
     	  if (!!bundleInfo) {
       	  if (!!bundleInfo.tag)
