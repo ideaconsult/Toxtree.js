@@ -98,9 +98,10 @@ var jToxBundle = {
     
     self.onIdentifiers(null, $('#jtox-identifiers', self.rootElement)[0]);
     // finally, if provided - load the given bundleUri
-    if (!ccLib.isNull(self.settings.bundleUri)) {
+    if (!ccLib.isNull(self.settings.bundleUri))
 	    self.load(self.settings.bundleUri);
-    }
+	  else
+	  	self.progressTabs();
     
     return self;
 	},
@@ -427,15 +428,34 @@ var jToxBundle = {
   	  self.queryKit.setWidget("bundle", self.rootElement);
   	  // provid onRow function so the buttons can be se properly...
   	  self.queryKit.kit().settings.onRow = function (row, data, index) {
-      	  if (!data.bundles)
-      	  	return;
-    	  var bundleInfo = data.bundles[self.bundleUri];
-    	  if (!!bundleInfo) {
-      	  if (!!bundleInfo.tag)
-            $('button.jt-toggle.' + bundleInfo.tag.toLowerCase(), row).addClass('active');
-          if (!!bundleInfo.remarks)
-            $('textarea.remark', row).html(bundleInfo.remarks);
-    	  }
+    	  if (!data.bundles)
+    	  	return;
+    	  	
+    	  var bundleInfo = data.bundles[self.bundleUri] || {};
+    	  // we need to setup remarks field regardless of bundleInfo presence
+				var noteEl = $('textarea.remark', row).on('change', function (e) {
+					var data = jT.ui.rowData(this);
+					var el = this;
+					$(el).addClass('loading');
+			  	jT.service(self, self.bundleUri + '/compound', { 
+			      'method': 'PUT', 
+			      'data': { 
+			        compound_uri: data.compound.URI, 
+			        command: 'add', 
+			        compound_role: data.bundles[self.bundleUri].tag,
+			        remarks: $(el).val()
+			      } 
+			    }, function (result) {
+				  	$(el).removeClass('loading');    
+			    });
+				});
+
+    	  if (!!bundleInfo.tag) {
+          $('button.jt-toggle.' + bundleInfo.tag.toLowerCase(), row).addClass('active');
+          noteEl.val(bundleInfo.remarks);
+        }
+        else
+        	noteEl.prop('disabled', true);
   	  };
     }
     
@@ -483,19 +503,22 @@ var jToxBundle = {
 	
 	selectStructure: function (uri, what, el) {
   	var self = this;
+  	var activate = !$(el).hasClass('active');
   	$(el).addClass('loading');
+  	var noteEl = $('textarea.remark', self.queryKit.kit().getVarRow(el))[0];
   	jT.service(self, self.bundleUri + '/compound', { 
       method: 'PUT', 
       data: { 
         compound_uri: uri, 
-        command: $(el).hasClass('active') ? 'delete' : 'add', 
-        compound_role: what 
+        command: activate ? 'add': 'delete',
+        compound_role: what,
+        remarks: $(noteEl).val()
       } 
     }, function (result) {
     	$(el).removeClass('loading');
     	if (!!result) {
       	$(el).toggleClass('active');
-      	if ($(el).hasClass('active'))
+      	if (activate)
       	{
       	  self.bundleSummary.compound++;
       	  what = (what == "target" ? "source" : "target");
@@ -503,6 +526,8 @@ var jToxBundle = {
         }
         else
           self.bundleSummary.compound--;
+
+      	$(noteEl).prop('disabled', !activate).attr('placeholder', "Reason for selection_");
         self.progressTabs();
       }
   	});

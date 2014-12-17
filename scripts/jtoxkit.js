@@ -501,6 +501,12 @@ window.jT.ui = {
     return $(table).dataTable().fnGetData(row);
   },
   
+  rowIndex: function (el) {
+    var row = $(el).closest('tr')[0];
+    var table = $(row).closest('table')[0];
+    return $(table).dataTable().fnGetPosition(row);
+  },
+  
   rowInline: function (el, base) {
     var row = $(el).closest('tr')[0];
     var data = $.extend({}, base);

@@ -1,11 +1,20 @@
 TODO:
+- Reason / remark for bundle compounds.
+- Related substance query should be different.
+- Related to chosen substance in bundle (filterbybundle).
+- Remove related substances from endpoint (-1), the link should be standalone.
+- Provide bundle_uri on endpoint query.
+- Not refreshing the assessment details on endpoint selection change - use flagging.
+- Type & source should be removed from value popup, guidance: to take it from creator, shortened, if needed.
+- When adding new endpoint value - form a JSON, similar to study.
+- Collect matrix changes and send them at once.
+- Delete popup - a confirmation and explanation.
+- New bundle procedure and 
+
 - History of searches in jToxSearch component (along with type of search and additional parameters)
 
 - make proper deleting process
 - improve data recording process
-
-- make it possible to add more than one edit-box line
-- ?? make endpoint name and study type show directly into the matrix table
 
 DOCS:
 - new handling mechanism with 'handler' property in each kit
@@ -16,7 +25,7 @@ DOCS:
 
 FUTURE / IDEAS
 - deferred re-query (postpone)
-- Reduce network calls in ToxTree on run-all - postopone the call until the last model has ran.
+- Reduce network calls in ToxTree on run-all - postpone the call until the last model has ran.
 - 
 
 Assessment:
