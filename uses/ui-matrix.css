@@ -125,6 +125,12 @@ body.structlist #browser {
 	font-size: 80%;
 }
 
+#jtox-matrix button.save-button.jt-disabled {
+	background: none;
+	border: none;
+	color: #999;
+}
+
 /* Now come info and edit box declarations
 */
 .popup-box .box-reference {
