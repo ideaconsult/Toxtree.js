@@ -444,6 +444,13 @@ var jToxCompound = (function () {
       return col;
     },
     
+    getVarRow: function (idx) {
+	  	if (idx.tagName != null)
+	  		idx = jT.ui.rowIndex(idx);
+	  	
+      return document.getElementById('jtox-var-' + this.instanceNo + '-' + idx);
+    },
+    
     prepareTables: function() {
       var self = this;
       var varCols = [];
@@ -513,7 +520,7 @@ var jToxCompound = (function () {
 
         // now go and expand both fixed and variable table details' cells.
         fnExpandCell(cell, toShow);
-        var varCell = document.getElementById('jtox-var-' + self.instanceNo + '-' + idx).firstElementChild;
+        var varCell = self.getVarRow(idx).firstElementChild;
         fnExpandCell(varCell, toShow);
         
         jT.$('.jtox-details-open', row).toggleClass('ui-icon-folder-open ui-icon-folder-collapsed');

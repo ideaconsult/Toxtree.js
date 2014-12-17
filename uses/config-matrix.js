@@ -43,7 +43,7 @@ jTConfig.matrix = {
 			"column": { sWidth: "300px", sClass: "paddingless" },
 			"render" : function(data, type, full) {
 			  data = data || '';
-			  return (type != 'display') ? data : '<textarea class="remark" placeholder="Reason for selection_"></textarea>';
+			  return (type != 'display') ? data : '<textarea class="remark"></textarea>';
       }
 		},
 		"#IdRow" : {
