@@ -4,8 +4,8 @@ TODO:
 + Related to chosen substance in bundle (filterbybundle).
 + Remove related substances from endpoint (-1), the link should be standalone.
 + Provide bundle_uri on endpoint query.
-- Type & source should be removed from value popup, guidance: to take it from creator, shortened, if needed.
-- Not refreshing the assessment details on endpoint selection change - use flagging.
++ Type & source should be removed from value popup, guidance: to take it from creator, shortened, if needed.
++ Not refreshing the assessment details on endpoint selection change - use flagging.
 - When adding new endpoint value - form a JSON, similar to study.
 - Collect matrix changes and send them at once.
 - Delete popup - a confirmation and explanation.
