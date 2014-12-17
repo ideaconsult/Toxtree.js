@@ -271,11 +271,13 @@ var jToxBundle = {
   		var dressButton = function() {
 	  		if ($.isEmptyObject(self.edit.added) && $.isEmptyObject(self.edit.deleted)) {
 	  			saveButton.disabled = true;
-	  			$(saveButton).removeClass('jt-alert');
+	  			$(saveButton).removeClass('jt-alert').addClass('jt-disabled');
+	  			saveButton.innerHTML = "Saved";
 	  		}
 	  		else {
 	  			saveButton.disabled = false;
-	  			$(saveButton).addClass('jt-alert');
+	  			$(saveButton).addClass('jt-alert').removeClass('jt-disabled');
+	  			saveButton.innerHTML = "Save";
 	  		}
   		};
   		
