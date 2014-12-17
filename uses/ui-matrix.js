@@ -459,7 +459,7 @@ var jToxBundle = {
           noteEl.val(bundleInfo.remarks);
         }
         else
-        	noteEl.prop('disabled', true);
+        	noteEl.prop('disabled', true).val(' ');
   	  };
     }
     
@@ -531,7 +531,7 @@ var jToxBundle = {
         else
           self.bundleSummary.compound--;
 
-      	$(noteEl).prop('disabled', !activate).attr('placeholder', "Reason for selection_");
+      	$(noteEl).prop('disabled', !activate).val(activate ? "" : " ");
         self.progressTabs();
       }
   	});
