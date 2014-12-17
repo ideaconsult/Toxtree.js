@@ -374,6 +374,7 @@ var jToxBundle = {
 	  var self = this;
 	  var sub = $(".tab-" + id.substr(3), panel)[0];
 	  sub.parentNode.style.left = (-sub.offsetLeft) + 'px';
+	  var bUri = encodeURIComponent(self.bundleUri);
 	  
 	  if (id == "endsubstance") {
   	  if (sub.firstElementChild == null) {
@@ -395,7 +396,7 @@ var jToxBundle = {
         });
   	  }
   	  
-      self.substanceKit.query('/substance?type=related&bundle_uri=' + encodeURIComponent(self.bundleUri));
+      self.substanceKit.query('/query/substance/related?filterbybundle=' + bUri + '&bundle_uri=' + bUri);
 	  }
 	  else {// i.e. endpoints
   	  var checkAll = $('input', sub)[0];
@@ -413,7 +414,10 @@ var jToxBundle = {
       	  }
         });
     	  $(checkAll).on('change', function (e) {
-          self.endpointKit.loadEndpoints(!this.checked ? self.bundleUri + '/studysummary' : null);
+	    	  var qUri = "/query/study?bundle_uri=" + bUri;
+	    	  if (!this.checked)
+	    	  	qUri += "&filterbybundle=" + bUri;
+          self.endpointKit.loadEndpoints(qUri);
     	  });
   	  }
   	  $(checkAll).trigger('change'); // i.e. initiating a proper reload
@@ -442,7 +446,7 @@ var jToxBundle = {
 			      'data': { 
 			        compound_uri: data.compound.URI, 
 			        command: 'add', 
-			        compound_role: data.bundles[self.bundleUri].tag,
+			        tag: data.bundles[self.bundleUri].tag,
 			        remarks: $(el).val()
 			      } 
 			    }, function (result) {
@@ -511,7 +515,7 @@ var jToxBundle = {
       data: { 
         compound_uri: uri, 
         command: activate ? 'add': 'delete',
-        compound_role: what,
+        tag: what,
         remarks: $(noteEl).val()
       } 
     }, function (result) {

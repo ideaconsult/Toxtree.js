@@ -32,7 +32,7 @@ var jToxEndpoint = (function () {
         endpoint: {
           'Id': { sTitle: "Id", mData: "uri", bSortable: false, sWidth: "30px", mRender: function (data, type, full) { return ''; } },
           'Name': { sTitle: "Name", mData: "value", sDefaultContent: "-", mRender: function (data, type, full) {
-            return data + '<span class="float-right jtox-details">(<a title="Click to view substances" target="_blank" href="' + full.uri + '">' + full.substancescount + '</a>) [<span title="Number of values">' + full.count + '</span>]</span>';
+            return data + '<span class="float-right jtox-details">[<span title="Number of values">' + full.count + '</span>]<sup class="helper"><a title="Click to view substances" target="_blank" href="' + full.uri + '">?</a></sup></span>';
           } },
         }
       }
@@ -271,13 +271,11 @@ var jToxEndpoint = (function () {
         // now make the summary...
         var html = '';
         if (iTotal > 0) {
-          var substances = 0, count = 0;
+          var count = 0;
           var data = this.fnGetData();
-          for (var i = iStart; i <= iEnd && i < iMax; ++i) {
+          for (var i = iStart; i <= iEnd && i < iMax; ++i)
             count += data[i].count;
-            substances += data[i].substancescount;
-          }
-          html = "(" + substances + ") [" + count + "]";
+          html = "[" + count + "]";
         }
         else
           html = '';
