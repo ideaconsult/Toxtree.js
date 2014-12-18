@@ -17,6 +17,7 @@ var jToxCompound = (function () {
     "hasDetails": true,       // whether browser should provide the option for per-item detailed info rows.
     "hideEmptyDetails": true, // hide feature values, when they are empty (only in detailed view)
     "detailsHeight": "fill",  // what is the tabs' heightStyle used for details row
+    "fixedWidth": null,				// the width (in css units) of the left (non-scrollable) part of the table
     "pageSize": 20,           // what is the default (startint) page size.
     "pageStart": 0,           // what is the default startint point for entries retrieval
     "rememberChecks": false,  // whether to remember feature-checkbox settings between queries
@@ -605,6 +606,9 @@ var jToxCompound = (function () {
       }
       
       // now - sort columns and create the tables...
+      if (self.settings.fixedWidth != null)
+      	jT.$(".jtox-ds-fixed", self.rootElement).width(self.settings.fixedWidth);
+      	
       jT.ui.sortColDefs(fixCols);
       self.fixTable = (jT.$(".jtox-ds-fixed table", self.rootElement).dataTable({
         "bPaginate": false,

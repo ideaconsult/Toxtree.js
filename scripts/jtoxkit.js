@@ -437,6 +437,20 @@ window.jT.ui = {
     return colDefs;
   },
   
+  renderMulti: function (data, type, full, render) {
+    var dlen = data.length;
+    if (dlen < 2)
+      return render(data[0], type, full);
+
+    var df = '<table>';
+    for (var i = 0, dlen = data.length; i < dlen; ++i) {
+      df += '<tr class="' + (i % 2 == 0 ? 'even' : 'odd') + '"><td class="center">' + render(data[i], type, full, i) + '</td></tr>';
+    }
+    
+    df += '</table>';
+    return df;
+  },
+  
   inlineChanger: function (location, breed, holder, handler) {
     if (handler == null)
       handler = "changed";

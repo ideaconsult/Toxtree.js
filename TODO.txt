@@ -11,6 +11,10 @@ TODO:
 - Delete popup - a confirmation and explanation.
 + New bundle procedure and inaprorpately initilized tabs
 
+- Make size of fixed table configurable
+- universal multi-column redenring
+
+
 - History of searches in jToxSearch component (along with type of search and additional parameters)
 
 - make proper deleting process

@@ -837,6 +837,20 @@ window.jT.ui = {
     return colDefs;
   },
   
+  renderMulti: function (data, type, full, render) {
+    var dlen = data.length;
+    if (dlen < 2)
+      return render(data[0], type, full);
+
+    var df = '<table>';
+    for (var i = 0, dlen = data.length; i < dlen; ++i) {
+      df += '<tr class="' + (i % 2 == 0 ? 'even' : 'odd') + '"><td class="center">' + render(data[i], type, full, i) + '</td></tr>';
+    }
+    
+    df += '</table>';
+    return df;
+  },
+  
   inlineChanger: function (location, breed, holder, handler) {
     if (handler == null)
       handler = "changed";
@@ -1545,6 +1559,7 @@ var jToxCompound = (function () {
     "hasDetails": true,       // whether browser should provide the option for per-item detailed info rows.
     "hideEmptyDetails": true, // hide feature values, when they are empty (only in detailed view)
     "detailsHeight": "fill",  // what is the tabs' heightStyle used for details row
+    "fixedWidth": null,				// the width (in css units) of the left (non-scrollable) part of the table
     "pageSize": 20,           // what is the default (startint) page size.
     "pageStart": 0,           // what is the default startint point for entries retrieval
     "rememberChecks": false,  // whether to remember feature-checkbox settings between queries
@@ -2133,6 +2148,9 @@ var jToxCompound = (function () {
       }
       
       // now - sort columns and create the tables...
+      if (self.settings.fixedWidth != null)
+      	jT.$(".jtox-ds-fixed", self.rootElement).width(self.settings.fixedWidth);
+      	
       jT.ui.sortColDefs(fixCols);
       self.fixTable = (jT.$(".jtox-ds-fixed table", self.rootElement).dataTable({
         "bPaginate": false,
@@ -3449,21 +3467,6 @@ var jToxStudy = (function () {
       return value;
     },
     
-    renderMulti: function (data, type, full, format) {
-      var self = this;
-      var dlen = data.length;
-      if (dlen < 2)
-        return self.getFormatted(data[0], type, format);
-  
-      var df = '<table>';
-      for (var i = 0, dlen = data.length; i < dlen; ++i) {
-        df += '<tr class="' + (i % 2 == 0 ? 'even' : 'odd') + '"><td class="center">' + self.getFormatted(data[i], type, format) + '</td></tr>';
-      }
-      
-      df += '</table>';
-      return df;
-    },
-    
     createCategory: function(tab, category) {
       var self = this;
   
@@ -3497,9 +3500,9 @@ var jToxStudy = (function () {
       if (!jT.$(theTable).hasClass('dataTable')) {
 	      var defaultColumns = [
 	        { "sTitle": "Name", "sClass": "center middle", "sWidth": "20%", "mData": "protocol.endpoint" }, // The name (endpoint)
-	        { "sTitle": "Endpoint", "sClass": "center middle jtox-multi", "sWidth": "15%", "mData": "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, "endpoint");  } },   // Effects columns
-	        { "sTitle": "Result", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, function (data, type) { return formatValue(data.result, type) }); } },
-	        { "sTitle": "Text", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, function (data, type) { return !!data.result.textValue  ? data.result.textValue : '-'; }); } },
+	        { "sTitle": "Endpoint", "sClass": "center middle jtox-multi", "sWidth": "15%", "mData": "effects", "mRender": function (data, type, full) { return jT.ui.renderMulti(data, type, full, function (data, type) { return self.getFormatted(data, type, "endpoint"); }); } },   // Effects columns
+	        { "sTitle": "Result", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { return jT.ui.renderMulti(data, type, full, function (data, type) { return formatValue(data.result, type) }); } },
+	        { "sTitle": "Text", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { return jT.ui.renderMulti(data, type, full, function (data, type) { return !!data.result.textValue  ? data.result.textValue : '-'; }); } },
 	        { "sTitle": "Guideline", "sClass": "center middle", "sWidth": "15%", "mData": "protocol.guideline", "mRender" : "[,]", "sDefaultContent": "-"  },    // Protocol columns
 	        { "sTitle": "Owner", "sClass": "center middle", "sWidth": "15%", "mData": "citation.owner", "sDefaultContent": "-" },
 	        { "sTitle": "Citation", "sClass": "center middle", "sWidth": "15%", "mData": "citation", "mRender": function (data, type, full) { return (data.title || "") + ' ' + (!!data.year && data.year.length > 1 ? data.year : ""); }  },
@@ -3610,7 +3613,7 @@ var jToxStudy = (function () {
             return null;
           
           col["mRender"] = function(data, type, full) {
-            return self.renderMulti(data, type, full, function(data, type) { 
+            return jT.ui.renderMulti(data, type, full, function(data, type) { 
               return formatValue(data.conditions[c], data.conditions[c + " unit"], type); 
             }); 
           };

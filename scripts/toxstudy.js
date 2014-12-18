@@ -97,21 +97,6 @@ var jToxStudy = (function () {
       return value;
     },
     
-    renderMulti: function (data, type, full, format) {
-      var self = this;
-      var dlen = data.length;
-      if (dlen < 2)
-        return self.getFormatted(data[0], type, format);
-  
-      var df = '<table>';
-      for (var i = 0, dlen = data.length; i < dlen; ++i) {
-        df += '<tr class="' + (i % 2 == 0 ? 'even' : 'odd') + '"><td class="center">' + self.getFormatted(data[i], type, format) + '</td></tr>';
-      }
-      
-      df += '</table>';
-      return df;
-    },
-    
     createCategory: function(tab, category) {
       var self = this;
   
@@ -145,9 +130,9 @@ var jToxStudy = (function () {
       if (!jT.$(theTable).hasClass('dataTable')) {
 	      var defaultColumns = [
 	        { "sTitle": "Name", "sClass": "center middle", "sWidth": "20%", "mData": "protocol.endpoint" }, // The name (endpoint)
-	        { "sTitle": "Endpoint", "sClass": "center middle jtox-multi", "sWidth": "15%", "mData": "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, "endpoint");  } },   // Effects columns
-	        { "sTitle": "Result", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, function (data, type) { return formatValue(data.result, type) }); } },
-	        { "sTitle": "Text", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { return self.renderMulti(data, type, full, function (data, type) { return !!data.result.textValue  ? data.result.textValue : '-'; }); } },
+	        { "sTitle": "Endpoint", "sClass": "center middle jtox-multi", "sWidth": "15%", "mData": "effects", "mRender": function (data, type, full) { return jT.ui.renderMulti(data, type, full, function (data, type) { return self.getFormatted(data, type, "endpoint"); }); } },   // Effects columns
+	        { "sTitle": "Result", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { return jT.ui.renderMulti(data, type, full, function (data, type) { return formatValue(data.result, type) }); } },
+	        { "sTitle": "Text", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { return jT.ui.renderMulti(data, type, full, function (data, type) { return !!data.result.textValue  ? data.result.textValue : '-'; }); } },
 	        { "sTitle": "Guideline", "sClass": "center middle", "sWidth": "15%", "mData": "protocol.guideline", "mRender" : "[,]", "sDefaultContent": "-"  },    // Protocol columns
 	        { "sTitle": "Owner", "sClass": "center middle", "sWidth": "15%", "mData": "citation.owner", "sDefaultContent": "-" },
 	        { "sTitle": "Citation", "sClass": "center middle", "sWidth": "15%", "mData": "citation", "mRender": function (data, type, full) { return (data.title || "") + ' ' + (!!data.year && data.year.length > 1 ? data.year : ""); }  },
@@ -258,7 +243,7 @@ var jToxStudy = (function () {
             return null;
           
           col["mRender"] = function(data, type, full) {
-            return self.renderMulti(data, type, full, function(data, type) { 
+            return jT.ui.renderMulti(data, type, full, function(data, type) { 
               return formatValue(data.conditions[c], data.conditions[c + " unit"], type); 
             }); 
           };
