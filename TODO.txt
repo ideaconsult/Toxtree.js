@@ -25,6 +25,9 @@ DOCS:
 - onRow universal handler
 - jToxComoluns column ordering via 'order' field in feature definition
 - jToxSearch slideInput property
+- jToxCompound fixedWidth
+- jToxKit.ui renderMulti
+- 
 
 
 FUTURE / IDEAS
