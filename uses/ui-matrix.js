@@ -329,6 +329,7 @@ var jToxBundle = {
     		showDiagrams: true,
     		showUnits: false,
     		hasDetails: false,
+    		fixedWidth: "560px",
     		configuration: conf,
     		onLoaded: function () {
 	    		self.edit.refreshMatrix = false;
