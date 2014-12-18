@@ -589,6 +589,10 @@ window.jT.ui = {
           if (res === false)
             return;
         }
+        
+        // equalize multi-rows, if there are any
+        ccLib.equalizeHeights.apply(window, jT.$('td.jtox-multi table tbody', nRow).toArray());
+        
         // handle a selection click.. if any
         jT.ui.installHandlers(kit, nRow);
         if (typeof kit.settings.selectionHandler == "function")

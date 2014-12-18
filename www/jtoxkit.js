@@ -989,6 +989,10 @@ window.jT.ui = {
           if (res === false)
             return;
         }
+        
+        // equalize multi-rows, if there are any
+        ccLib.equalizeHeights.apply(window, jT.$('td.jtox-multi table tbody', nRow).toArray());
+        
         // handle a selection click.. if any
         jT.ui.installHandlers(kit, nRow);
         if (typeof kit.settings.selectionHandler == "function")
@@ -2164,6 +2168,10 @@ var jToxCompound = (function () {
           if (self.settings.hasDetails)
             jT.$('.jtox-details-open', nRow).on('click', function(e) { fnShowDetails(nRow, e); });
           jT.$(nRow).data('jtox-index', iDataIndex);
+
+	        // equalize multi-rows, if there are any
+	        ccLib.equalizeHeights.apply(window, jT.$('td.jtox-multi table tbody', nRow).toArray());
+          
           ccLib.fireCallback(self.settings.onRow, self, nRow, aData, iDataIndex);
           jT.ui.installHandlers(self, nRow);
           jT.$('.jtox-diagram span.ui-icon', nRow).on('click', function () {
@@ -2191,6 +2199,10 @@ var jToxCompound = (function () {
         "bScrollCollapse": true,
         "fnCreatedRow": function( nRow, aData, iDataIndex ) {
           nRow.id = 'jtox-var-' + self.instanceNo + '-' + iDataIndex;
+
+	        // equalize multi-rows, if there are any
+	        ccLib.equalizeHeights.apply(window, jT.$('td.jtox-multi table tbody', nRow).toArray());
+          
           jT.$(nRow).addClass('jtox-row');
           jT.$(nRow).data('jtox-index', iDataIndex);
           ccLib.fireCallback(self.settings.onRow, self, nRow, aData, iDataIndex);
