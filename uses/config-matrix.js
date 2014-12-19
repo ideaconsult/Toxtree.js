@@ -46,6 +46,12 @@ jTConfig.matrix = {
 			  return (type != 'display') ? data : '<textarea class="remark" placeholder="Reason for selection_"></textarea>';
       }
 		},
+		"#SubstanceName": { title: "Substance Name", data: "compound.name", accumulate: true, basic: true, primary: true },
+		"#SubstanceDataSource": { title: "Data source", data: "compound.einecs", accumulate: false, primary: true },
+		"#ConstituentName": { title: "Constituent Name", data: "compound.name", accumulate: false, primary: true },
+    "#ConstituentContent": { title: "Content", data: "compound.name", accumulate: false, primary: true },
+    "#ConstituentContainedAs": { title: "Contained As", data: "compound.name", accumulate: false, primary: true },
+		
 		"#IdRow" : {
 			"data": "compound.URI",
 			"column": { sWidth: "80px", sClass: "text-top" },

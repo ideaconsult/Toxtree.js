@@ -3,6 +3,9 @@
 html, body, #jtox-bundle {
   width: 100%;
   height: 100%;
+}
+
+#jtox-bundle {
   overflow: hidden;
   position: relative;
 }
@@ -64,6 +67,10 @@ body.structlist #browser {
 
 #jtox-matrix .jtox-toolkit {
   margin-top: 10px;
+}
+
+#jtox-matrix .jtox-ds-tables .jtox-ds-fixed {
+	overflow-x: scroll;
 }
 
 #jtox-bundle>div.ui-tabs-panel {

@@ -623,9 +623,6 @@ var jToxCompound = (function () {
             jT.$('.jtox-details-open', nRow).on('click', function(e) { fnShowDetails(nRow, e); });
           jT.$(nRow).data('jtox-index', iDataIndex);
 
-	        // equalize multi-rows, if there are any
-	        ccLib.equalizeHeights.apply(window, jT.$('td.jtox-multi table tbody', nRow).toArray());
-          
           ccLib.fireCallback(self.settings.onRow, self, nRow, aData, iDataIndex);
           jT.ui.installHandlers(self, nRow);
           jT.$('.jtox-diagram span.ui-icon', nRow).on('click', function () {
@@ -950,11 +947,12 @@ var jToxCompound = (function () {
               });
             }
             
+          	ccLib.fireCallback(self.settings.onPrepared, self, miniset, self);
             self.prepareTables(); // prepare the tables - we need features to build them - we have them!
             self.equalizeTables(); // to make them nicer, while waiting...
           }
-  
-          ccLib.fireCallback(self.settings.onPrepared, self, miniset, self);
+          else
+          	ccLib.fireCallback(self.settings.onPrepared, self, miniset, self);
   
           // finally make the callback for
           callback(dataset);
@@ -1002,7 +1000,7 @@ var jToxCompound = (function () {
   cls.processEntry = function (entry, features, fnValue) {
     for (var fid in features) {
       var feature = features[fid];
-      var newVal = entry.values[fid];
+      var newVal = entry.value != null ? entry.values[fid] : undefined;
       
       // if applicable - location the feature value to a specific location whithin the entry
       if (!!feature.accumulate && newVal !== undefined && feature.data !== undefined) {
@@ -1015,8 +1013,7 @@ var jToxCompound = (function () {
           ccLib.setJsonValue(entry, accArr[v], ccLib.fireCallback(fn, this, fid,  /* oldVal */ ccLib.getJsonValue(entry, accArr[v]), newVal, features));
       }
       
-      if (feature.process !== undefined)
-        ccLib.fireCallback(feature.process, this, entry, fid, features);
+      ccLib.fireCallback(feature.process, this, entry, fid, features);
     }
     
     return entry;
