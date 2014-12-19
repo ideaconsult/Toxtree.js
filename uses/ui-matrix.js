@@ -29,11 +29,19 @@ var jToxBundle = {
   settings: {
   	studyTypeList: _i5.qaSettings["Study result type"],
   	maxStars: 10,
-  	configuration: {
-    	columns: {
-      	
-    	}
-  	}
+  	matrixIdentifiers: [
+      "#DetailedInfoRow",
+      "http://www.opentox.org/api/1.1#CASRN",
+      "#SubstanceName",
+      "http://www.opentox.org/api/1.1#IUCLID5_UUID",
+      "#SubstanceDataSource",
+    ],
+  	matrixMultiRows: [
+      "http://www.opentox.org/api/1.1#Diagram",
+      "#ConstituentName",
+      "#ConstituentContent",
+      "#ConstituentContainedAs"
+  	]
   },
   
   parseFeatureId: function (featureId, kit) {
@@ -190,24 +198,7 @@ var jToxBundle = {
 	  var self = this;
 		if (!$(panel).hasClass('initialized')) {
       jTConfig.matrix.groups = function (miniset, kit) {
-        var groups = {
-          "Identifiers" : [
-            "http://www.opentox.org/api/1.1#Diagram", 
-            "#DetailedInfoRow",
-            "http://www.opentox.org/api/1.1#CASRN", 
-            "http://www.opentox.org/api/1.1#EINECS",
-            "http://www.opentox.org/api/1.1#IUCLID5_UUID",
-            // Now some names
-            "http://www.opentox.org/api/1.1#ChemicalName",
-            "http://www.opentox.org/api/1.1#TradeName",
-            "http://www.opentox.org/api/1.1#IUPACName",
-            "http://www.opentox.org/api/1.1#SMILES",
-            "http://www.opentox.org/api/1.1#InChIKey",
-            "http://www.opentox.org/api/1.1#InChI",
-            "http://www.opentox.org/api/1.1#REACHRegistrationDate"
-          ]
-      	};
-      	
+        var groups = { "Identifiers" : self.settings.matrixIdentifiers.concat(self.settings.matrixMultiRows) };
       	var endpoints = {};
       	
       	var fRender = function (feat, theId) {
@@ -296,7 +287,7 @@ var jToxBundle = {
 	  		dressButton();
   		};
   		
-  		var deleteFeature = function (compoundUri, featureId) {
+  		var deleteFeature = function (compoundUri, featureId, reason) {
 	  		var compound = self.edit.added[compoundUri];
 	  		if (compound != null && compound[featureId] != null)
 	  			delete compound[featureId];
@@ -304,7 +295,7 @@ var jToxBundle = {
 	  			compound = self.edit.deleted[compoundUri];
 		  		if (compound == null)
 		  			self.edit.deleted[compoundUri] = compound = [];
-		  		compound.push(featureId);
+		  		compound.push({ 'featureId': featureId, 'reason': reason});
 		  	}
 	  		dressButton();
   		};
@@ -329,12 +320,47 @@ var jToxBundle = {
     		showDiagrams: true,
     		showUnits: false,
     		hasDetails: false,
-    		fixedWidth: "560px",
+    		fixedWidth: "600px",
     		configuration: conf,
-    		onLoaded: function () {
+    		onPrepared: function (miniset, kit) {
+	    		// this is when we have the features combined, so we can make the multi stuff
+		      var getRender = function (fId, oldData, oldRender) {
+			      return function (data, type, full) {
+				      return typeof data != 'object' ? '-' : jT.ui.renderMulti(data, type, full, function (_data, _type, _full){
+					      var dt = ccLib.getJsonValue(_data, (fId.indexOf('#Diagram') > 0 ? 'component.' : '') + oldData);
+				      	return (typeof oldRender == 'function' ? oldRender(dt, _type, fId.indexOf('#Diagram') > 0 ? _data.component : _data) : dt);
+				      });
+			      };
+		      };
+		      
+		      for (var i = 0, mrl = self.settings.matrixMultiRows.length;i < mrl; ++i) {
+			      var fId = self.settings.matrixMultiRows[i];
+			      var mr = miniset.feature[fId];
+			      mr.render = getRender(fId, mr.data, mr.render);
+		      	mr.data = 'composition';
+			      var col = mr.column;
+			      if (col == null)
+			      	mr.column = col = { sClass: "jtox-multi" };
+			      else if (col.sClass == null)
+			      	col.sClass = "jtox-multi";
+			      else
+			      	col.sClass += " jtox-multi";
+		      }
+    		},
+    		onLoaded: function (dataset) {
 	    		self.edit.refreshMatrix = false;
+	    		// we need to process
+	    		for (var i = 0, dl = dataset.dataEntry.length; i < dl; ++i) {
+		    		var data = dataset.dataEntry[i];
+		    		if (data.composition != null)
+		    			for (var j = 0;j < data.composition.length; ++j)
+								jToxCompound.processEntry(data.composition[j].component, this.feature);
+	    		}
     		},
     		onRow: function (row, data, index) {
+	        // equalize multi-rows, if there are any
+	        ccLib.equalizeHeights.apply(window, jT.$('td.jtox-multi table tbody', row).toArray());
+          
       		$('.info-popup, .edit-popup, .delete-popup', row).on('click', function () {
       		  var boxOptions = { 
         		  overlay: true,
@@ -392,7 +418,7 @@ var jToxBundle = {
 	              boxOptions.onOpen = function () {
 		              var box = this;
 		              var content = this.content[0];
-		              $('button.jt-alert', content).on('click', function (){ deleteFeature(data.compound.URI, featureId); box.close(); });
+		              $('button.jt-alert', content).on('click', function (){ deleteFeature(data.compound.URI, featureId, $('textarea', content).val()); box.close(); });
               	};
         		  }
         		  else

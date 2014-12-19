@@ -8,11 +8,7 @@ TODO:
 + Not refreshing the assessment details on endpoint selection change - use flagging.
 - When adding new endpoint value - form a JSON, similar to study.
 - Collect matrix changes and send them at once.
-- Delete popup - a confirmation and explanation.
 + New bundle procedure and inaprorpately initilized tabs
-
-- Make size of fixed table configurable
-- universal multi-column redenring
 
 
 - History of searches in jToxSearch component (along with type of search and additional parameters)
