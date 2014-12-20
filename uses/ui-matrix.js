@@ -32,8 +32,10 @@ var jToxBundle = {
   	matrixIdentifiers: [
       "#DetailedInfoRow",
       "http://www.opentox.org/api/1.1#CASRN",
-      "#SubstanceName",
-      "http://www.opentox.org/api/1.1#IUCLID5_UUID",
+      "http://apps.ideaconsult.net:8080/data/identifier/tradename",
+      "http://apps.ideaconsult.net:8080/data/identifier/uuid",
+//       "http://www.opentox.org/api/1.1#TradeName",
+//       "http://www.opentox.org/api/1.1#IUCLID5_UUID",
       "#SubstanceDataSource",
     ],
   	matrixMultiRows: [
@@ -359,7 +361,11 @@ var jToxBundle = {
     		},
     		onRow: function (row, data, index) {
 	        // equalize multi-rows, if there are any
-	        ccLib.equalizeHeights.apply(window, jT.$('td.jtox-multi table tbody', row).toArray());
+          jT.$('td.jtox-multi .jtox-diagram span.ui-icon', row).on('click', function () {
+            setTimeout(function () {
+              ccLib.equalizeHeights.apply(window, jT.$('td.jtox-multi table tbody', row).toArray());
+            }, 50);
+          });
           
       		$('.info-popup, .edit-popup, .delete-popup', row).on('click', function () {
       		  var boxOptions = { 

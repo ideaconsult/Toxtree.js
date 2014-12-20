@@ -117,8 +117,21 @@ body.structlist #browser {
   z-index: 100;
 }
 
+#jtox-matrix div.jtox-toolkit {
+  font-size: 80%;
+}
+
 #jtox-matrix table.dataTable td  {
   white-space: nowrap;
+}
+
+#jtox-matrix td.jtox-multi table td  {
+  height: 65px;
+}
+
+#jtox-matrix td.jtox-multi table td  img.jtox-smalldiagram {
+  height: 63px;
+  width: 63px;
 }
 
 #jtox-matrix table.dataTable td span.ui-icon {
