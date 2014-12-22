@@ -65,6 +65,11 @@ body.structlist #browser {
   margin-top: 5px;  
 }
 
+#jtox-matrix tr>.col-4 {
+  word-wrap:break-word;
+  word-break: break-all;
+}
+
 #jtox-matrix .jtox-toolkit {
   margin-top: 10px;
 }
