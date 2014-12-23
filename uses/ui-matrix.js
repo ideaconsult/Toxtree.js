@@ -245,7 +245,8 @@ var jToxBundle = {
 
           if (endpoints[feat.sameAs] == null) {
             endpoints[feat.sameAs] = true;
-            feat.title = feat.sameAs.substr(feat.sameAs.indexOf('#') + 1);
+            if (!feat.title)
+              feat.title = feat.sameAs.substr(feat.sameAs.indexOf('#') + 1);
             feat.render = fRender(feat, fId);
             grp.push(fId);
           }
