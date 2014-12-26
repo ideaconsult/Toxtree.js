@@ -3,7 +3,6 @@ TODO:
 - Collect matrix changes and send them at once.
 
 - History of searches in jToxSearch component (along with type of search and additional parameters)
-
 - make proper deleting process
 - improve data recording process
 
