@@ -385,12 +385,14 @@ var jToxBundle = {
     		},
     		onLoaded: function (dataset) {
 	    		self.edit.refreshMatrix = false;
+	    		jToxCompound.processFeatures(dataset.feature, this.feature);
+	    		
 	    		// we need to process
 	    		for (var i = 0, dl = dataset.dataEntry.length; i < dl; ++i) {
 		    		var data = dataset.dataEntry[i];
 		    		if (data.composition != null)
 		    			for (var j = 0;j < data.composition.length; ++j)
-								jToxCompound.processEntry(data.composition[j].component, this.feature);
+								jToxCompound.processEntry(data.composition[j].component, dataset.feature);
 	    		}
     		},
     		onRow: function (row, data, index) {

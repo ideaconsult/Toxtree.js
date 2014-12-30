@@ -279,7 +279,7 @@ function showCompound() {
   var kit = tt.browserKit;
 
   if (kit.dataset.dataEntry[tt.compoundIdx] != null) {
-    $('#tt-diagram img.toxtree-diagram')[0].src = kit.dataset.dataEntry[tt.compoundIdx].compound.diagramUri;
+    $('#tt-diagram img.toxtree-diagram')[0].src = jT.ui.diagramUri(kit.dataset.dataEntry[tt.compoundIdx].compound.URI);
     updateSize('#tt-browser-panel');
   }
 
