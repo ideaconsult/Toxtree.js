@@ -264,11 +264,11 @@ var jToxBundle = {
         if (!full.composition || typeof full.composition != 'object' || !full.composition.length)
           return html;
         for (var i = 0, cl = full.composition.length;i < cl; ++i) {
-          var bInfo = full.composition[i].component.compound.bundles[self.bundleUri];
+          var bInfo = full.composition[i].component.bundles[self.bundleUri];
           if (!bInfo)
             continue;
           if (!!bInfo.tag)
-            html += '<button class="jt-toggle active" disabled="true">' + (bInfo.tag == 'source' ? 'S' : 'T') + '</button>';
+            html += '<button class="jt-toggle active" disabled="true"' + (!bInfo.remarks ? '' : 'title="' + bInfo.remarks + '"') + '>' + (bInfo.tag == 'source' ? 'S' : 'T') + '</button>';
           if (!!bInfo.remarks)
             html += '<sup class="helper" title="' + bInfo.remarks + '">?</sup>';
         }
@@ -365,7 +365,7 @@ var jToxBundle = {
 		      if (!nameFeature.column)
 		        nameFeature.column = {};
 		      nameFeature.column.sClass = "breakable word-break";
-		      		      
+		      
 		      // and now - process the multi-row columns
 		      for (var i = 0, mrl = self.settings.matrixMultiRows.length;i < mrl; ++i) {
 			      var fId = self.settings.matrixMultiRows[i];
