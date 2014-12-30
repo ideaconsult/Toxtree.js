@@ -400,20 +400,7 @@ In the full configuration, shown below example of using last two can be seen for
 
       "baseFeatures": {
       	"http://www.opentox.org/api/1.1#Similarity": {title: "Similarity", location: "compound.metric", search: true, used: true},
-      	"http://www.opentox.org/api/1.1#Diagram": {title: "Diagram", search: false, used: true, 
-      	  process: function(entry) {
-            entry.compound.diagramUri = entry.compound.URI.replace(/(.+)(\/conformer.*)/, "$1") + "?media=image/png";
-      	  },
-      	  render: function(col){
-      	    col["mData"] = "compound.diagramUri";
-            col["mRender"] = function(data, type, full) {
-              return (type != "display") ? "-" : '<img src="' + data + '" class="jtox-ds-smalldiagram jtox-details-open"/>';  
-            };
-            col["sClass"] = "paddingless";
-            col["sWidth"] = "125px";
-            return col;
-          },
-          visibility: "main"
+      	"http://www.opentox.org/api/1.1#Diagram": {title: "Diagram", search: false, used: true, visibility: "main", ... },
       	},
       }
     }

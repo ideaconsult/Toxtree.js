@@ -650,6 +650,10 @@ window.jT.ui = {
     }
   },
   
+  diagramUri: function (URI) {
+    return !!URI && (typeof URI == 'string') ? URI.replace(/(.+)(\/conformer.*)/, "$1") + "?media=image/png" : '';
+  },
+  
   valueWithUnits: function (val, unit) {
     var out = '';
     if (val != null) {

@@ -84,10 +84,7 @@ var jToxComposition = (function () {
         cols.push(jT.$.extend({}, diagFeature.column, { 
           sTitle: 'Structure', 
           mData: "component", 
-          mRender: function (val, type, full) {
-            diagFeature.process(val);
-            return diagFeature.render(val.compound.diagramUri, type, val);
-          } 
+          mRender: function (val, type, full) { return diagFeature.render(val.compound.URI, type, val); } 
         }));
       }
       // READYY! Go and prepare THE table.
