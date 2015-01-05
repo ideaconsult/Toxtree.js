@@ -135,7 +135,7 @@ var jToxCompound = (function () {
       },
       "columns": {
         "compound": {
-          "Name": { sTitle: "Name", mData: 'title', mRender: function (data, type, full) { return '<span>' + data + '</span><sup class="helper"><a target="_blank" href="' + full.URI + '">?</a></sup>'; } },
+          "Name": { sTitle: "Name", mData: 'title', mRender: function (data, type, full) { return '<span>' + data + '</span>' + jT.ui.putInfo(full.URI); } },
           "Value": { sTitle: "Value", mData: 'value', sDefaultContent: "-" },
           "SameAs": { sTitle: "SameAs", mData: 'sameAs', sDefaultContent: "-" },
           "Source": { sTitle: "Source", mData: 'source', sDefaultContent: "-", mRender: function (data, type, full) { return !data || !data.type ? '-' : '<a target="_blank" href="' + data.URI + '">' + data.type + '</a>'; } }

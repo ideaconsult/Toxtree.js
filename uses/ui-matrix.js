@@ -223,7 +223,7 @@ var jToxBundle = {
               // now - ready to produce HTML
               html += '<span class="ui-icon ui-icon-circle-minus delete-popup" data-feature="' + theId + '"></span>&nbsp;';
               html += '<a class="info-popup" data-feature="' + fId + '" href="#">' + val + '</a>';
-              html += '<sup class="helper"><a target="jtox-study" href="' + full.compound.URI + '/study?property_uri=' + encodeURIComponent(fId) + '">?</a></sup>';
+              html += jT.ui.putInfo(full.compound.URI + '/study?property_uri=' + encodeURIComponent(fId));
               html += '<br/>';
             }
             
@@ -270,7 +270,7 @@ var jToxBundle = {
           if (!!bInfo.tag)
             html += '<button class="jt-toggle active" disabled="true"' + (!bInfo.remarks ? '' : 'title="' + bInfo.remarks + '"') + '>' + (bInfo.tag == 'source' ? 'S' : 'T') + '</button>';
           if (!!bInfo.remarks)
-            html += '<sup class="helper" title="' + bInfo.remarks + '">?</sup>';
+            html += jT.ui.putInfo(null, bInfo.remarks);
         }
         
         return html;
