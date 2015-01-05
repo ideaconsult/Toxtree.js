@@ -25,7 +25,7 @@ jTConfig.matrix = {
       return type != 'display' ? '' + data.value : jToxComposition.formatConcentration(data.precision, data.value, data.unit);
     } },
     "#ConstituentContainedAs": { title: "Contained As", data: "relation", accumulate: false, primary: true, column: { sClass: "center" }, render: function (data, type, full) { 
-      return (type != 'display') ? data : '<span>' + data.substring(4).toLowerCase() + '</span><sup class="helper"><a target="_blank" href="' + (full.substance.URI + '/composition') + '" title="' + full.compositionName + '(' + full.compositionUUID + ')">?</a></sup>'      
+      return (type != 'display') ? data : '<span>' + data.substring(4).toLowerCase() + '</span>' + jT.ui.putInfo(full.substance.URI + '/composition', full.compositionName);      
     } },
 		
 		"#IdRow" : {
