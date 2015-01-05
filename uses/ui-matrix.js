@@ -31,9 +31,9 @@ var jToxBundle = {
   	maxStars: 10,
   	matrixIdentifiers: [
       "http://www.opentox.org/api/1.1#CASRN",
-      "http://www.opentox.org/api/1.1#TradeName",
-      "http://www.opentox.org/api/1.1#IUCLID5_UUID",
-      "http://www.opentox.org/api/1.1#SubstanceDataSource",
+      "#SubstanceName",
+      "#SubstanceUUID",
+      "#SubstanceDataSource",
     ],
   	matrixMultiRows: [
       "http://www.opentox.org/api/1.1#Diagram",
@@ -357,14 +357,6 @@ var jToxBundle = {
 				      });
 			      };
 		      };
-		      
-		      // some name feature tweaks
-		      var nameFeature = miniset.feature['http://www.opentox.org/api/1.1#TradeName'];
-		      nameFeature.primary = true;
-		      nameFeature.title = "Substance Name";
-		      if (!nameFeature.column)
-		        nameFeature.column = {};
-		      nameFeature.column.sClass = "breakable word-break";
 		      
 		      // and now - process the multi-row columns
 		      for (var i = 0, mrl = self.settings.matrixMultiRows.length;i < mrl; ++i) {
