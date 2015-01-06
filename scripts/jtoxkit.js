@@ -633,6 +633,48 @@ window.jT.ui = {
     return res;
   },
   
+  renderRange: function (data, unit, type, prefix) {
+    var out = "";
+    if (typeof data == 'string' || typeof data == 'number')
+      out += (type != 'display') ? data : ((!!prefix ? prefix + "&nbsp;=&nbsp;" : '') + jT.ui.valueWithUnits(data, unit));
+    else if (typeof data == 'object' && data != null) {
+      data.loValue = ccLib.trim(data.loValue);
+      data.upValue = ccLib.trim(data.upValue);
+      if (!ccLib.isEmpty(data.loValue) && !ccLib.isEmpty(data.upValue)) {
+        if (!!prefix)
+          out += prefix + "&nbsp;=&nbsp;";
+        out += (data.loQualifier == ">=") ? "[" : "(";
+        out += data.loValue + ", " + data.upValue;
+        out += (data.upQualifier == "<=") ? "]" : ") ";
+      }
+      else // either of them is non-undefined
+      {
+        var fnFormat = function (q, v) {
+          return (!!q ? q : "=") + " " + v;
+        };
+        
+        if (!!prefix)
+          out += prefix + ' ';
+        if (!ccLib.isEmpty(data.loValue))
+          out += fnFormat(data.loQualifier, data.loValue);
+        else if (!ccLib.isEmpty(data.upValue))
+          out += fnFormat(data.upQualifier, data.upValue);
+        else
+          out += '-';
+      }
+      
+      out = out.replace(/ /g, "&nbsp;");
+      if (type == 'display') {
+        unit = ccLib.trim(data.unit || unit);
+        if (!!unit)
+          out += '&nbsp;<span class="units">' + unit.replace(/ /g, "&nbsp;") + '</span>';
+      }
+    }
+    else
+      out += '-';
+    return out;
+  },
+  
   putInfo: function (href, title) {
     return '<sup class="helper"><a target="_blank" href="' + (href || '#') + '" title="' + (title || href) + '"><span class="ui-icon ui-icon-info"></span></a></sup>';
   },
