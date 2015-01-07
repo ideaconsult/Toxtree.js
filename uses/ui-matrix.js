@@ -759,5 +759,5 @@ function onDetailedRow(row, data, event) {
 }
 
 $(document).ready(function(){
-  $('#logger').on('mouseover', function () { $(this).removeClass('hidden'); }).on('mouseout', function () { $(this).addClass('hidden');});
+  $('#logger').on('click', function () { $(this).toggleClass('hidden'); });
 });
