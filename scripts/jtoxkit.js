@@ -323,7 +323,7 @@ window.jT = window.jToxKit = {
       if (!data)
         ccLib.fireCallback(callback, kit, data, jhr);
       else
-        self.pollTask(kit, data, function (task, jhr) { ccLib.fireCallback(callback, kit, !task.error ? task.result : null, jhr); });
+        self.pollTask(kit, data, function (task, jhr) { ccLib.fireCallback(callback, kit, !!task && !task.error ? task.result : null, jhr); });
   	};
   	
   	this.call(kit, service, params, fnCB);

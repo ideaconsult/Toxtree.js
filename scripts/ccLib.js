@@ -237,9 +237,13 @@ var ccLib = {
   
   packData: function (data) {
     var out = {};
-    ccLib.enumObject(data, function (val, name) {
-      out[name] = val;
-    });
+    for (var i in data) {
+      if (!data.hasOwnProperty(i))
+        continue;
+      var o = data[i];
+      out[o.name] = o.value;
+    }
+      
     return out;
   },
   
