@@ -237,9 +237,13 @@ var ccLib = {
   
   packData: function (data) {
     var out = {};
-    ccLib.enumObject(data, function (val, name) {
-      out[name] = val;
-    });
+    for (var i in data) {
+      if (!data.hasOwnProperty(i))
+        continue;
+      var o = data[i];
+      out[o.name] = o.value;
+    }
+      
     return out;
   },
   
@@ -723,7 +727,7 @@ window.jT = window.jToxKit = {
       if (!data)
         ccLib.fireCallback(callback, kit, data, jhr);
       else
-        self.pollTask(kit, data, function (task, jhr) { ccLib.fireCallback(callback, kit, !task.error ? task.result : null, jhr); });
+        self.pollTask(kit, data, function (task, jhr) { ccLib.fireCallback(callback, kit, !!task && !task.error ? task.result : null, jhr); });
   	};
   	
   	this.call(kit, service, params, fnCB);

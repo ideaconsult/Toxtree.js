@@ -141,9 +141,12 @@ var jToxBundle = {
         e.preventDefault();
         e.stopPropagation();
       	if (ccLib.validateForm(self.createForm, checkForm)) {
-  		    jT.service(self, '/bundle', { method: 'POST', data: ccLib.serializeForm(self.createForm)}, function (bundleUri) {
-    		    self.load(bundleUri);
-  			    console.log("Data set created: " + JSON.stringify(bundleUri));
+  		    jT.service(self, '/bundle', { method: 'POST', data: ccLib.serializeForm(self.createForm)}, function (bundleUri, jhr) {
+    		    if (!!bundleUri)
+    		      self.load(bundleUri);
+    		    else
+    		      // TODO: report an error
+              console.log("Error on creating bundle [" + jhr.status + ": " + jhr.statusText);
   		    });
   		  }
       };
