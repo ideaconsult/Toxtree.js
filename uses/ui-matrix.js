@@ -18,6 +18,7 @@ var jToxBundle = {
   	compound: 0,
   	substance: 0,
   	property: 0,
+  	matrix: 0,
 	},
 	
 	edit: {
@@ -196,7 +197,7 @@ var jToxBundle = {
 	},
 	
 	// called when a sub-action in bundle details tab is called
-	onMatrix: function (id, panel) {
+	onMatrix: function (panId, panel) {
 	  var self = this;
 		if (!$(panel).hasClass('initialized')) {
       jTConfig.matrix.groups = function (miniset, kit) {
@@ -500,20 +501,43 @@ var jToxBundle = {
 		
 		// finally decide what query to make, depending on the 
 		var queryUri = null;
-		if (id == 'xinitial') {
+		if (panId == 'xinitial') {
   		self.edit.matrixEditable = false;
   		queryUri = self.bundleUri + '/dataset';
-		}
-		else if (id == 'xworking') {
-  		self.edit.matrixEditable = true;
-  		queryUri = self.bundleUri + '/matrix';
+  		$('.save-button', panel).hide();
+  		$('.create-button', panel).hide();
 		}
 		else {
-  		self.edit.matrixEditable = false;
-  		queryUri = self.bundleUri + '/matrix';
+  		if (self.bundleSummary.matrix > 0) {
+  		  $('.create-button', panel).hide();
+        queryUri = self.bundleUri + '/matrix';
+        if (panId == 'xworking')
+          $('.save-button', panel).show();
+        else
+          $('.save-button', panel).show();
+        self.edit.matrixEditable = (panId == 'xworking');
+  		}
+  		else {
+  		  $('.jtox-toolkit', panel).hide();
+  		  $('.create-button', panel).show().on('click', function () {
+    		  var el = this;
+    		  $(el).addClass('loading');
+  		    jT.service(self, self.bundleUri + '/matrix', { method: 'POST', data: { deletematrix:	false } }, function (result, jhr) {
+      		  $(el).removeClass('loading');
+      		  if (!!result) {
+        		  $('.jtox-toolkit', panel).show();
+              $('.save-button', panel).show();
+        		  $('.create-button', panel).hide();
+        		  self.bundleSummary.matrix++;
+        		  self.matrixKit.query(self.bundleUri + '/matrix');
+      		  }
+    		  });
+    		});
+  		}
 		}
 
-		self.matrixKit.query(queryUri);
+    if (!!queryUri)
+		  self.matrixKit.query(queryUri);
 	},
 	
 	// called when a sub-action in endpoint selection tab is called

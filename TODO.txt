@@ -1,4 +1,5 @@
 TODO:
+- "Create working copy" button
 - When adding new endpoint value - form a JSON, similar to study.
 - Collect matrix changes and send them at once.
 
