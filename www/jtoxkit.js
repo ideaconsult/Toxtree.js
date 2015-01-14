@@ -702,7 +702,7 @@ window.jT = window.jToxKit = {
 		// now make the actual call
 		self.$.ajax(service, {
 			dataType: params.dataType || (settings.plainText ? "text": (settings.jsonp ? 'jsonp' : 'json')),
-			headers: { Accept: accType },
+			headers: self.$.extend({ Accept: accType }, params.headers),
 			crossDomain: settings.crossDomain || settings.jsonp,
 			timeout: parseInt(settings.timeout),
 			type: params.method,
@@ -4487,18 +4487,25 @@ var jToxEndpoint = (function () {
           ui.tag.addClass(cur.type);
           data[sequence[nowOn].field] = ui.tagLabel;
           ++nowOn;
+          onchange(e, 'value', data);
           return true;
         },
-        afterTagRemoved: function () {
+        afterTagRemoved: function (e, ui) {
           --nowOn;
           delete data[sequence[nowOn].field];
+          onchange(e, 'value', data);
           return true;
         }
-      })
-      .on('change', function (e) {
-        onchange(e, 'value', data);      
       });
     }
+    
+    // now initialize other fields, marked with box-field
+    jT.$('.box-field', root).each(function () {
+      var name = jT.$(this).data('name');
+      jT.$('input, textarea, select', this).on('change', function (e) {
+        onchange(e, name, jT.$(this).val());
+      });
+    });
   };
   
   cls.prototype = {

@@ -298,7 +298,7 @@ window.jT = window.jToxKit = {
 		// now make the actual call
 		self.$.ajax(service, {
 			dataType: params.dataType || (settings.plainText ? "text": (settings.jsonp ? 'jsonp' : 'json')),
-			headers: { Accept: accType },
+			headers: self.$.extend({ Accept: accType }, params.headers),
 			crossDomain: settings.crossDomain || settings.jsonp,
 			timeout: parseInt(settings.timeout),
 			type: params.method,
