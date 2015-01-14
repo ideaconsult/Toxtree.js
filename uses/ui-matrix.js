@@ -308,6 +308,7 @@ var jToxBundle = {
 	  		    $(saveButton).removeClass('loading');
 	  		    if (!!result) {
 	  		      self.edit.added = [];
+	  		      self.matrixKit.query(self.bundleUri + '/matrix');
               dressButton();
             }
   	  		});
