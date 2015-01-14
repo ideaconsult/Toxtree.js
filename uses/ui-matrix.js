@@ -375,7 +375,7 @@ var jToxBundle = {
     		    endpoint: feature.title,
     		    guidance: feature.creator,
       		  value: jT.ui.renderRange(val[valueIdx], feature.units, 'display'),
-//           		  source: '<a target="_blank" href="' + feature.source.URI + '">' + feature.source.type + '</a>'
+//             source: '<a target="_blank" href="' + feature.source.URI + '">' + feature.source.type + '</a>'
     		  });
     		  
     		  if (isDelete) {
