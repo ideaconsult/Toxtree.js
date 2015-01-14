@@ -103,7 +103,7 @@ var ccLib = {
     if (obj !== undefined || obj != null) {
       if (typeof obj == 'object') {
         for (var i in obj) {
-          if (obj[i] != null) {
+          if (obj.hasOwnProperty(i)) {
             empty = false;
             break;
           }

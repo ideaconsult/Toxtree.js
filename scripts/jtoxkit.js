@@ -640,7 +640,7 @@ window.jT.ui = {
     else if (typeof data == 'object' && data != null) {
       data.loValue = ccLib.trim(data.loValue);
       data.upValue = ccLib.trim(data.upValue);
-      if (!ccLib.isEmpty(data.loValue) && !ccLib.isEmpty(data.upValue)) {
+      if (!!data.loValue && !!data.upValue && !!data.upQualifier && data.loQualifier != '=') {
         if (!!prefix)
           out += prefix + "&nbsp;=&nbsp;";
         out += (data.loQualifier == ">=") ? "[" : "(";
