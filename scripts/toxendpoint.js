@@ -17,7 +17,7 @@ var jToxEndpoint = (function () {
     oLanguage: null,          // passed with dataTable settings upon creation
     onLoaded: null,           // callback called when the is available
     loadOnInit: false,        // whether to make an (empty) call when initialized.
-    units: ['uSv', 'kg', 'mg/l', 'mg/kg bw', '°C', 'mg/kg bw/day', 'ppm', '%'],
+    units: ['uSv', 'kg', 'mg/l', 'mg/kg bw', '°C', 'mg/kg bw/day', 'ppm', '%', 'h', 'd'],
     loTags: ['>', '>=', '='],
     hiTags: ['<', '<='],
     oLanguage: {

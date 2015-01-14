@@ -655,9 +655,9 @@ window.jT.ui = {
         
         if (!!prefix)
           out += prefix + ' ';
-        if (!ccLib.isEmpty(data.loValue))
+        if (!!data.loValue)
           out += fnFormat(data.loQualifier, data.loValue);
-        else if (!ccLib.isEmpty(data.upValue))
+        else if (!!data.upValue)
           out += fnFormat(data.upQualifier, data.upValue);
         else
           out += '-';

@@ -1,6 +1,7 @@
 TODO:
-- When adding new endpoint value - form a JSON, similar to study.
-- Collect matrix changes and send them at once.
+- Change the endpoint value editor to be without tag-it. Check autocomplete in the middle of the box.
+- Add conditions with value-editing depending on the configuration.
+- Move ketcher within our repository as sub-module
 
 - History of searches in jToxSearch component (along with type of search and additional parameters)
 - make proper deleting process
