@@ -1,0 +1,4 @@
+[submodule "ketcher"]
+	path = ketcher
+	url = https://github.com/thejonan/ketcher.git
+	branch = master
