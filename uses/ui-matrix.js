@@ -472,6 +472,11 @@ var jToxBundle = {
         f.creator = value.protocol.guideline[0];
         f.isMultiValue = true;
         f.annotation = [];
+        for (var cId in value.effects[0].conditions)
+          f.annotation.push({
+            'p': cId,
+            'o': jT.ui.renderRange(value.effects[0].conditions[cId])
+          });
         
         data.values[fId] = [value.effects[0].result];
         
