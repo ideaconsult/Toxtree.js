@@ -4469,7 +4469,9 @@ var jToxEndpoint = (function () {
               var f = parsers[pi].fields[i];
               obj[f] = parse[i];
             }
-          
+
+          if (!obj.loQualifier)
+            obj.loQualifier = '=';
           if (parsers[pi].adjust)
             parsers[pi].adjust(obj, parse);
           break;
@@ -4478,8 +4480,6 @@ var jToxEndpoint = (function () {
         if (pi >= parsers.length)
           obj.textValue = ccLib.trim(text);
           
-        
-        console.log("Parsed: '" + text + "' -> " + JSON.stringify(obj));
         return obj;
       };
       
