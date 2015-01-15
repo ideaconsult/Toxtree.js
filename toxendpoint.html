@@ -57,19 +57,29 @@
 <!-- // end of #jtox-endpoint ]]-->
 <!--[[ jT.templates['editor-endpoint'] -->
 	  <div id="jtox-endeditor" class="jt-endeditor">
-	    <div class="jtox-medium-box box-endpoint">
+	    <div class="jtox-medium-box box-endpoint" data-field="endpoint">
   	    <div class="jtox-details font-heavy">Endpoint name</div>
   	    <input type="text" placeholder="Endpoint_"/>
 	    </div>
-	    <div class="jtox-medium-box box-value">
+	    <div class="jtox-medium-box box-value" data-field="value">
   	    <div class="jtox-details font-heavy">Value range</div>
   	    <input type="text"/>
 	    </div>
-      <div class="jtox-medium-box box-interpretation_result">
+      <div class="jtox-medium-box box-interpretation" data-field="interpretation_result">
   	    <div class="jtox-details font-heavy">Intepretation of the results</div>
   	    <input type="text" placeholder="Intepretation"/>
       </div>
+      <div class="size-full box-conditions">
+	      <div class="jtox-details font-heavy">Conditions</div>
+        <div class="jtox-border-box"></div>
+      </div>
 	  </div>
+<!-- // end of #jtox-end-editor ]]-->
+<!--[[ jT.templates['editor-endpoint-condition'] -->
+    <div id="jtox-endcondition" class="jtox-medium-box">
+      <div class="jtox-details font-heavy data-field" data-field="title">?</div>
+      <input type="text" placeholder="Intepretation"/>
+    </div>
 <!-- // end of #jtox-end-editor ]]-->
   </div>
 </body>

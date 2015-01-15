@@ -429,7 +429,8 @@ var jToxBundle = {
             interpretation: { },
             reliability: { },
             effects: [{
-              result: { }
+              result: { },
+              conditions: { }
             }]
           };
           
@@ -440,13 +441,17 @@ var jToxBundle = {
           boxOptions.confirmButton = "Add";
           boxOptions.cancelButton = "Cancel";
           var endSetValue = function (e, field, value) {
-            ccLib.setJsonValue(featureJson, valueMap[field], value);
+            var f = valueMap[field];
+            if (!f)
+              featureJson.effects[0].conditions[field] = value;
+            else
+            ccLib.setJsonValue(featureJson, f, value);
           };
           
           boxOptions.onOpen = function () {
             var box = this;
             var content = this.content[0];
-            jToxEndpoint.linkEditors(self.matrixKit, content, parse.category, parse.topcategory, endSetValue);
+            jToxEndpoint.linkEditors(self.matrixKit, content, { category: parse.category, top: parse.topcategory, onchange: endSetValue, conditions: true });
             $('input[type=button]', content).on('click', function (){ addFeature(data, featureId, featureJson, jel[0]); box.close();});	              
           };
           new jBox('Modal', boxOptions).open();

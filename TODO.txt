@@ -1,6 +1,4 @@
 TODO:
-- Change the endpoint value editor to be without tag-it. Check autocomplete in the middle of the box.
-- Add conditions with value-editing depending on the configuration.
 - Move ketcher within our repository as sub-module
 
 - History of searches in jToxSearch component (along with type of search and additional parameters)
