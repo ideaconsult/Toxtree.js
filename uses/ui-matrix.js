@@ -399,7 +399,7 @@ var jToxBundle = {
           var valueMap = {
             endpoint: 'effects[0].endpoint',
             value: 'effects[0].result',
-            interpretation: 'interpretation.result',
+            interpretation_result: 'interpretation.result',
             
             type: 'reliability.r_studyResultType',
             reference: 'citation.title',
@@ -472,11 +472,13 @@ var jToxBundle = {
         f.creator = value.protocol.guideline[0];
         f.isMultiValue = true;
         f.annotation = [];
-        for (var cId in value.effects[0].conditions)
+        for (var cId in value.effects[0].conditions) {
+          var c = value.effects[0].conditions[cId];
           f.annotation.push({
             'p': cId,
-            'o': jT.ui.renderRange(value.effects[0].conditions[cId])
+            'o': jT.ui.renderRange(c) + (c.units || '')
           });
+        }
         
         data.values[fId] = [value.effects[0].result];
         
