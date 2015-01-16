@@ -660,7 +660,7 @@ window.jT.ui = {
         else if (!!data.upValue)
           out += fnFormat(data.upQualifier, data.upValue);
         else
-          out += '-';
+          out += type == 'display' ? '-' : '';
       }
       
       out = out.replace(/ /g, "&nbsp;");

@@ -99,7 +99,7 @@ var jToxEndpoint = (function () {
       
       // and the change functon
       if (!options.change) options.change = function (e, ui) {
-        options.onchange.call(this, e, field, !ui.item ? '' : ui.item.value);
+        settings.onchange.call(this, e, field, !ui.item ? '' : ui.item.value);
       };
       
       // and the final parameter
@@ -301,18 +301,11 @@ var jToxEndpoint = (function () {
       else 
         filter = needle;
 
-      var data = {};
       for (var endpoint in self.edittedValues) {
-        if (!filter(endpoint))
-          continue;
-        var edit = self.edittedValues[endpoint];
-        data[endpoint] = {
-          endpoint: edit.endpoint,
-          interpretation: edit.interpretation_result,
-          value: edit.value
-        };
+        if (filter(endpoint))
+          return self.edittedValues[endpoint];
       }
-      return data;
+      return null;
     },
     
     updateStats: function (name) {
