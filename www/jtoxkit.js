@@ -4448,7 +4448,7 @@ var jToxEndpoint = (function () {
         var parsers = [
           {
             regex: /[\s=]*([\(\[])\s*([\d\.]*)\s*,\s*([\d\.]*)\s*([\)\]])\s*([^\s,]*)\s*/,
-            fields: ['', 'loQualifier', 'loValue', 'upValue', 'upQualifier', 'units'],
+            fields: ['', 'loQualifier', 'loValue', 'upValue', 'upQualifier', 'unit'],
             // adjust the parsed value, if needed
             adjust: function (obj, parse) {
               obj.loQualifier = parse[1] == '[' ? '>=' : '>';
@@ -4457,7 +4457,7 @@ var jToxEndpoint = (function () {
           },
           {
             regex: /\s*([>=]*)\s*([\d\.]+)\s*([^\s,]*)\s*([<=]*)\s*([\d\.]*)\s*([^\s,]*)\s*/,
-            fields: ['', 'loQualifier', 'loValue', 'units', 'upQualifier', 'upValue', 'units']
+            fields: ['', 'loQualifier', 'loValue', 'unit', 'upQualifier', 'upValue', 'unit']
           }
         ];
         
