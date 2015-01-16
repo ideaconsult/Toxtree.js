@@ -4536,7 +4536,9 @@ var jToxEndpoint = (function () {
     }
       
     // now comes the value editing mechanism
-    putValueComplete(jT.$('.box-value', root), jT.$.extend(true, {}, ccLib.getJsonValue(config, 'effects.result'), ccLib.getJsonValue(config, 'effects.text')));
+    var confRange = ccLib.getJsonValue(config, 'effects.result') || {};
+    var confText = ccLib.getJsonValue(config, 'effects.text') || {};
+    putValueComplete(jT.$('.box-value', root), confRange.bVisible === false ? confText : confRange);
     
     // now initialize other fields, marked with box-field
     jT.$('.box-field', root).each(function () {
