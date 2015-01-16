@@ -4414,8 +4414,8 @@ var jToxEndpoint = (function () {
       // finally - configure the autocomplete options, themselves to initialize the component itself
       if (!options.source) options.source = function( request, response ) {
         jT.call(kit, service, { method: "GET", data: { 
-          'category': options.category,
-          'top': options.top,
+          'category': settings.category,
+          'top': settings.top,
           'max': kit.settings.maxHits || defaultSettings.maxHits,
           'search': request.term }
         } , function (data) {
