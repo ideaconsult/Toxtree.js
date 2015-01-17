@@ -638,13 +638,14 @@ window.jT.ui = {
     if (typeof data == 'string' || typeof data == 'number')
       out += (type != 'display') ? data : ((!!prefix ? prefix + "&nbsp;=&nbsp;" : '') + jT.ui.valueWithUnits(data, unit));
     else if (typeof data == 'object' && data != null) {
-      data.loValue = ccLib.trim(data.loValue);
-      data.upValue = ccLib.trim(data.upValue);
-      if (!!data.loValue && !!data.upValue && !!data.upQualifier && data.loQualifier != '=') {
+      var loValue = ccLib.trim(data.loValue),
+          upValue = ccLib.trim(data.upValue);
+
+      if (!!loValue && !!upValue && !!data.upQualifier && data.loQualifier != '=') {
         if (!!prefix)
           out += prefix + "&nbsp;=&nbsp;";
         out += (data.loQualifier == ">=") ? "[" : "(";
-        out += data.loValue + ", " + data.upValue;
+        out += loValue + ", " + upValue;
         out += (data.upQualifier == "<=") ? "]" : ") ";
       }
       else // either of them is non-undefined
@@ -655,10 +656,10 @@ window.jT.ui = {
         
         if (!!prefix)
           out += prefix + ' ';
-        if (!!data.loValue)
-          out += fnFormat(data.loQualifier, data.loValue);
+        if (!!loValue)
+          out += fnFormat(data.loQualifier, loValue);
         else if (!!data.upValue)
-          out += fnFormat(data.upQualifier, data.upValue);
+          out += fnFormat(data.upQualifier, upValue);
         else
           out += type == 'display' ? '-' : '';
       }

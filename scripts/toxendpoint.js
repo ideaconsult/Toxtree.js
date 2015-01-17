@@ -115,18 +115,32 @@ var jToxEndpoint = (function () {
         var obj = {};
         var parsers = [
           {
-            regex: /^[\s=]*([\(\[])\s*(\-?\d*[\.eE]?\-?\d*)\s*,\s*(\-?\d*[\.eE]?\-?\d*)\s*([\)\]])\s*([^\s,]*)\s*$/,
+            regex: /^[\s=]*([\(\[])\s*(\-?\d*[\.eE]?\-?\d*)\s*,\s*(\-?\d*[\.eE]?\-?\d*)\s*([\)\]])\s*([^\d,]*)\s*$/,
             fields: ['', 'loQualifier', 'loValue', 'upValue', 'upQualifier', 'unit'],
             // adjust the parsed value, if needed
             adjust: function (obj, parse) {
               obj.loQualifier = parse[1] == '[' ? '>=' : '>';
-              obj.upQualifier = parse[4] == ']' ? '<=' : '<';  
+              obj.upQualifier = parse[4] == ']' ? '<=' : '<';
+              if (!obj.upValue)
+                delete obj.upQualifier;
+              if (!obj.loValue)
+                delete obj.loQualifier;
+              if (!!obj.unit)
+                obj.unit = obj.unit.trim();
             }
           },
           {
-            regex: /^\s*([>=]*)\s*(\-?\d+[\.eE]?\-?\d*)\s*([^\s,]*)\s*([<=]*)\s*(\-?\d*[\.eE]?\-?\d*)\s*([^\s,]*)\s*$/,
+            regex: /^\s*(=|>|>=)?\s*(\-?\d+[\.eE]?\-?\d*)\s*([^\d,<=]*)\s*(<|<=)?\s*(\-?\d*[\.eE]?\-?\d*)\s*([^\d,]*)\s*$/,
             fields: ['', 'loQualifier', 'loValue', 'unit', 'upQualifier', 'upValue', 'unit'],
-            adjust: function (obj, parse) { if (!obj.loQualifier) obj.loQualifier = '='; }
+            adjust: function (obj, parse) { 
+              if (!obj.loQualifier) obj.loQualifier = '='; 
+              if (!!obj.unit) obj.unit = obj.unit.trim();
+            }
+          },
+          {
+            regex: /^\s*(<|<=)?\s*(\-?\d+[\.eE]?\-?\d*)\s*([^\d,]*)\s*$/,
+            fields: ['', 'upQualifier', 'upValue', 'unit'],
+            adjust: function (obj, parse) {  if (!!obj.unit) obj.unit = obj.unit.trim(); }
           }
         ];
         
