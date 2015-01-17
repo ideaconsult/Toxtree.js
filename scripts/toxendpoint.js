@@ -99,7 +99,7 @@ var jToxEndpoint = (function () {
       
       // and the change functon
       if (!options.change) options.change = function (e, ui) {
-        settings.onchange.call(this, e, field, !ui.item ? '' : ui.item.value);
+        settings.onchange.call(this, e, field, !ui.item ? ccLib.trim(this.value) : ui.item.value);
       };
       
       // and the final parameter
@@ -115,7 +115,7 @@ var jToxEndpoint = (function () {
         var obj = {};
         var parsers = [
           {
-            regex: /[\s=]*([\(\[])\s*([\d\.]*)\s*,\s*([\d\.]*)\s*([\)\]])\s*([^\s,]*)\s*/,
+            regex: /^[\s=]*([\(\[])\s*(\-?\d*[\.eE]?\-?\d*)\s*,\s*(\-?\d*[\.eE]?\-?\d*)\s*([\)\]])\s*([^\s,]*)\s*$/,
             fields: ['', 'loQualifier', 'loValue', 'upValue', 'upQualifier', 'unit'],
             // adjust the parsed value, if needed
             adjust: function (obj, parse) {
@@ -124,7 +124,7 @@ var jToxEndpoint = (function () {
             }
           },
           {
-            regex: /\s*([>=]*)\s*([\d\.]+)\s*([^\s,]*)\s*([<=]*)\s*([\d\.]*)\s*([^\s,]*)\s*/,
+            regex: /^\s*([>=]*)\s*(\-?\d+[\.eE]?\-?\d*)\s*([^\s,]*)\s*([<=]*)\s*(\-?\d*[\.eE]?\-?\d*)\s*([^\s,]*)\s*$/,
             fields: ['', 'loQualifier', 'loValue', 'unit', 'upQualifier', 'upValue', 'unit']
           }
         ];
