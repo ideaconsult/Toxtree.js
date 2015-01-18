@@ -29,13 +29,10 @@
   
   <script language="javascript">
     $(document).ready(function(){
-      window['ds'] = new jToxCompound($(".jtox-toolkit")[0], {crossDomain: true, rememberChecks: true, hideEmpty: true, featureUri: "http://apps.ideaconsult.net:8080/data/dataset/1/feature"} );
+      window['ds'] = new jToxCompound($(".jtox-toolkit")[0], {crossDomain: true, rememberChecks: true, hideEmpty: true} );
 //       ds.queryDataset("http://apps.ideaconsult.net:8080/data/dataset/18?feature_uris[]=http://apps.ideaconsult.net:8080/toxbank/model/6/predicted");
-      ds.queryDataset("http://apps.ideaconsult.net:8080/data/dataset/1"); 
-/*       ds.queryDataset("https://apps.ideaconsult.net/enanomapper/query/compound/search/all?type=auto&search=%5BAu%5D&page=0&pagesize=1"); */
-//       ds.queryDataset("http://apps.ideaconsult.net:8080/ambit2/dataset/1945542"); 
-/*       ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/query/similarity?search=c1ccccc1O&threshold=0.5"); */
-/*       ds.queryDataset("http://apps.ideaconsult.net:8080/toxbank/compound/8666?feature_uris[]=http://apps.ideaconsult.net:8080/toxbank/model/2/predicted");  */
+//       ds.queryDataset("http://apps.ideaconsult.net:8080/data/dataset/1", "http://apps.ideaconsult.net:8080/data/dataset/1/feature"); 
+      ds.queryDataset("https://apps.ideaconsult.net/data/bundle/1/dataset");
     });
   </script>
 </head>
