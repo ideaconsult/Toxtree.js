@@ -676,6 +676,26 @@ window.jT.ui = {
     return out;
   },
   
+	renderObjValue: function (data, units, type, pre) {
+		if (!data)
+		  return type == 'display' ? '-' : '';
+		  
+		var val = jT.ui.renderRange(data, units, type, pre);
+		if (ccLib.trim(val) == '-')
+		  val = '';
+		if (!!val && type != 'display' && !!data.units)
+		  val += '&nbsp;' + data.units;
+		if (!!data.textValue) {
+  		if (!!val && type == 'display')
+  		  val += '&nbsp;/&nbsp;';
+  		val += data.textValue;
+		}
+		
+		if (!val)
+		  val = '-';
+		return val;
+	},
+  
   putInfo: function (href, title) {
     return '<sup class="helper"><a target="_blank" href="' + (href || '#') + '" title="' + (title || href) + '"><span class="ui-icon ui-icon-info"></span></a></sup>';
   },
