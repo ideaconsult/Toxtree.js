@@ -118,7 +118,7 @@ The actual kit initialization procedure - it determines the kit that need to be 
 ```
 jToxKit.kit(element)
 ```
-Returns the instance of the kit that has the passed `element` as its root. When passed a _<div>_ element, marked with `jtox-toolkit` class - this method will return the instance that was created during kit's initialization, i.e. - during `initKit()` call.
+Returns the instance of the kit that has the passed `element` as its root. When passed a `<div>` element, marked with `jtox-toolkit` class - this method will return the instance that was created during kit's initialization, i.e. - during `initKit()` call.
 
 
 ```
