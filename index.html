@@ -5,23 +5,23 @@
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>Toxtree.js by ideaconsult</title>
 
-	<link rel="stylesheet" href="http://apps.ideaconsult.net:8080/ambit2/style/skeleton/base.css" type="text/css">
-	<link rel="stylesheet" href="http://apps.ideaconsult.net:8080/ambit2/style/skeleton/skeleton-fluid.css" type="text/css">
-	<link rel="stylesheet" href="http://apps.ideaconsult.net:8080/ambit2/style/skeleton/layout.css" type="text/css">
+	<link rel="stylesheet" href="https://apps.ideaconsult.net/ambit2/style/skeleton/base.css" type="text/css">
+	<link rel="stylesheet" href="https://apps.ideaconsult.net/ambit2/style/skeleton/skeleton-fluid.css" type="text/css">
+	<link rel="stylesheet" href="https://apps.ideaconsult.net/ambit2/style/skeleton/layout.css" type="text/css">
 
     
     
-    <script type='text/javascript' src='http://apps.ideaconsult.net:8080/ambit2/jquery/jquery-1.7.1.min.js'></script>
-	<script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js'></script>
-	<script type='text/javascript' charset='utf8' src='http://apps.ideaconsult.net:8080/ambit2/jquery/jquery.dataTables-1.9.4.min.js'></script>
-<script type='text/javascript' src='http://apps.ideaconsult.net:8080/ambit2/jquery/purl.js'></script>
+    <script type='text/javascript' src='https://apps.ideaconsult.net/ambit2/jquery/jquery-1.10.2.js'></script>
+	<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js'></script>
+	<script type='text/javascript' charset='utf8' src='http://apps.ideaconsult.net/ambit2/jquery/jquery.dataTables-1.9.4.min.js'></script>
+<script type='text/javascript' src='https://apps.ideaconsult.net/ambit2/jquery/purl.js'></script>
 
   <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/black-tie/jquery-ui.min.css" type="text/css">
-	<link rel="stylesheet" href="http://apps.ideaconsult.net:8080/ambit2/style/jquery.dataTables.css" type="text/css">
+	<link rel="stylesheet" href="https://apps.ideaconsult.net/ambit2/style/jquery.dataTables.css" type="text/css">
 
-  <link rel="shortcut icon" href="http://apps.ideaconsult.net:8080/ambit2/images/favicon.ico">
+  <link rel="shortcut icon" href="https://apps.ideaconsult.net/ambit2/images/favicon.ico">
     
- <script type='text/javascript' src='http://apps.ideaconsult.net:8080/ambit2/scripts/jtoxkit.js'></script>
+ <script type='text/javascript' src='https://apps.ideaconsult.net/ambit2/scripts/jtoxkit.js'></script>
     
 
 <link rel="stylesheet" href="http://apps.ideaconsult.net:8080/ambit2/style/jtoxkit.css"/>
@@ -30,7 +30,7 @@
 
 	$(document).ready(function() {
 	var purl = $.url();
-	var dataset_uri = purl.param('dataset_uri')===undefined?'http://apps.ideaconsult.net:8080/ambit2/dataset/1967255':purl.param('dataset_uri');
+	var dataset_uri = purl.param('dataset_uri')===undefined?'https://apps.ideaconsult.net/ambit2/dataset/1967255':purl.param('dataset_uri');
 
       		//var dataset_uri = "http://apps.ideaconsult.net:8080/ambit2/dataset/1967255";
 	  	var ds = new jToxDataset($(".jtox-toolkit")[0],config_dataset);
@@ -52,10 +52,10 @@
 	<div class="fourteen columns">
 	<h3>Demo (WikiPathways)</h3>
 	<h4>More examples:
-	<a href='http://apps.ideaconsult.net:8080/data/ui/_dataset?dataset_uri=http%3A%2F%2Fapps.ideaconsult.net%3A8080%2Fdata%2Fdataset%2F45'>ONS Melting point 33</a>
-	|<a href='http://apps.ideaconsult.net:8080/biodeg/ui/_search'>Search</a>
-	|<a href='http://apps.ideaconsult.net:8080/data/substances'>Substances</a>
-	|<a href='http://apps.ideaconsult.net:8080/enanomapper/substance'>Nanomaterials</a>
+	<a href='https://apps.ideaconsult.net/data/ui/_dataset?dataset_uri=https%3A%2F%2Fapps.ideaconsult.net%2Fdata%2Fdataset%2F45'>ONS Melting point 33</a>
+	|<a href='https://apps.ideaconsult.net/data/ui/_search'>Search</a>
+	|<a href='https://apps.ideaconsult.net/data/substances'>Substances</a>
+	|<a href='https://apps.ideaconsult.net:8080/enmtest/substance'>Nanomaterials</a>
 	
 	</h4>
 	</div>
@@ -167,9 +167,9 @@ var config_dataset = {
 						sOut += '<li><a href="'+fvalue.title+ '" title="'+fvalue.title+'" target="wp">' 
 						+ fvalue.value + '</a> ';
 
-						var q =  'http://apps.ideaconsult.net:8080/ambit2/query/compound/search/all?search='+
+						var q =  'https://apps.ideaconsult.net/ambit2/query/compound/search/all?search='+
 							encodeURIComponent(fvalue.value) + 
-							"&feature_uris[]=http://apps.ideaconsult.net:8080/ambit2/dataset/1967255/feature";
+							"&feature_uris[]=https://apps.ideaconsult.net/ambit2/dataset/1967255/feature";
 						sOut += '<a href="'+ root + encodeURIComponent(q)+'" title="Structures participating in this pathway">'+
 							'<span class="ui-icon ui-icon-search" style="float: right; margin-right: .3em;"></span>'+
 							'</a>';
