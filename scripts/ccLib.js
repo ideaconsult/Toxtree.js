@@ -396,9 +396,18 @@ var ccLib = {
       relative: (a.href.match(/tps?:\/\/[^\/]+(.+)/) || [,''])[1],
       segments: a.pathname.replace(/^\//,'').split('/')
     };
-  }    
+  }
 };
 
 function ccNonEmptyFilter(v) {
-  return v !== undefined && v != null && v != '';  
+  return v !== undefined && v != null && v != '';
+}
+
+// Formats JavaScript timestamp into human-readable presentation
+function formatDate(timestamp) {
+  var d = new Date(timestamp),
+      day = d.getDate(),
+      month = d.getMonth()+1,
+      year = d.getFullYear();
+  return ((day<10)?'0':'') + day + '.' + ((month<10)?'0':'') + month + '.' + d.getFullYear();
 }
