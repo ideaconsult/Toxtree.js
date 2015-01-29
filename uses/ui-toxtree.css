@@ -112,9 +112,11 @@ body>div.jtox-toolkit {
  color: #0c7908;
 }
 
-div.tt-algorithm div.jtox-inline.float-right {
+div.tt-algorithm div.jtox-inline.command-buttons {
   margin-right: 20px;
   vertical-align: top;
+  position: absolute;
+  right: 10px;  
 }
 
 div.tt-algorithm div.tt-classification {

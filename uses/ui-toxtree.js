@@ -255,7 +255,7 @@ function addFeatures(data, className) {
 
 function clearSlate(all) {
   $(tt.featuresList).empty();
-  $('#tt-diagram img.toxtree-diagram')[0].src = '';
+  $('#tt-diagram img.toxtree-diagram')[0].src = '../images/empty.png';
   updateSize();
   $('#tt-models-panel .tt-algorithm button.predict').removeClass('active');
   $('#tt-models-panel .tt-algorithm .tt-explanation').empty();
