@@ -3031,7 +3031,7 @@ var jToxModel = (function () {
       var self = this;
       var createIt = function () {
         jT.service(self, algoUri, { method: 'POST' }, function (result, jhr) {
-          ccLib.fireCallback(callback, self, (!task.error ? task.result : null), jhr);
+          ccLib.fireCallback(callback, self, result, jhr);
         });
       };
       
