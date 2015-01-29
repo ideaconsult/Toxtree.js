@@ -624,8 +624,9 @@ var jToxCompound = (function () {
         "sDom" : "rt",
         "aoColumns": fixCols,
         "bSort": false,
-        "fnCreatedRow": function( nRow, aData, iDataIndex ) {
+        "fnCreatedRow": function( nRow, aData) {
           // attach the click handling
+          var iDataIndex = aData.index;          
           if (self.settings.hasDetails)
             jT.$('.jtox-details-open', nRow).on('click', function(e) { fnShowDetails(nRow, e); });
           jT.$(nRow).data('jtox-index', iDataIndex);
@@ -655,7 +656,8 @@ var jToxCompound = (function () {
         "bSort": true,
         "aoColumns": varCols,
         "bScrollCollapse": true,
-        "fnCreatedRow": function( nRow, aData, iDataIndex ) {
+        "fnCreatedRow": function( nRow, aData ) {
+          var iDataIndex = aData.index;
           nRow.id = 'jtox-var-' + self.instanceNo + '-' + iDataIndex;
 
 	        // equalize multi-rows, if there are any
