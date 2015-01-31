@@ -1,18 +1,7 @@
 TODO:
-- Move ketcher within our repository as sub-module
-
 - History of searches in jToxSearch component (along with type of search and additional parameters)
 - make proper deleting process
 - improve data recording process
-
-DOCS:
-- new handling mechanism with 'handler' property in each kit
-- onRow universal handler
-- jToxComoluns column ordering via 'order' field in feature definition
-- jToxSearch slideInput property
-- jToxCompound fixedWidth
-- jToxKit.ui renderMulti
-- 
 
 
 FUTURE / IDEAS

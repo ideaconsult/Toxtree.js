@@ -8,7 +8,9 @@ Each different front-end is referred as _kit_. Currently available are:
 - `compound` - viewer for compound datasets and query results... [more](#jtoxcompound)
 - `dataset` - viewer and selector of list of datasets... [more](#jtoxdataset)
 - `model` - view and selector of list of available models/algorithms... [more](#jtoxmodel)
+- `endpoint` - view and edit mechanism for endpoint categories & values... [more](#jtoxendpoint)
 - `substance` - browser for substances... [more](#jtoxsubstance)
+- `composition` - a small widget for obtaining composition(s) relevant ot a sustance... [more](#jtoxcomposition)
 - `study` - [IUCLID5](http://iuclid.eu/) substance studies visualizer... [more](#jtoxstudy)
 - `query` - a wrapper around other kits and widgets, making them work together... [more](#jtoxquery).
 - `search` - the search banner, integrating with jToxQuery, providing different search methods... [more](#jtoxsearch).
@@ -92,6 +94,16 @@ Although different kits can have different configuration parameters, these are c
 - **`onError`** (attr. `data-on-error`): a function name, or function to be called when there's an error on AJAX call. The passed _callback_ to `jT.call()` is still called, but with _null_ result.
 - **`onLoaded`** (attr. `data-on-loaded`): another kit-specific callback, which is called from the kit itself, when it's main querying result has arrived, be it _dataset_, _model_ or whatever. The callback is called within kit's context (i.e. the kit instance is `this`) and the returned set is passed as first agrument, which is _null_ upon erroneous result from the server. Default _null_.
 - **`onDetails`** (attr. `data-on-details`): If this is not-null, it instructs the kit (_jToxCompound_, _jToxSubstance_, _jToxModel_ or _jToxDataset_) to add expand/collapse icon in the first cell of each row and include the mechanism for handling it. The handler provided here (either as _string_ or _function_) is of formt: `function (root, data, element)`, with _root_ being the details-row, cell, spawning on all but first column, _data_ is the data for the whole row and _element_ is the one that launched the openning. Default: _null_.
+- **`onRow`** (attr. `data-on-row`): For all kits that use dataTables to visualize their data (i.e. most of the kits), this is the way to provide a mechanism to be called on each _dataTable's_ `onRow` event. It is called right after a `<tr>` element for the row is created. If you passed this handler and return `false` from it (boolean's _false_, not _null_) - the normal `onRow` calling inside the kit will be skipped.
+
+Each kit's configuration can have a `handlers` object, which provides a jToxKit's universal way of action handling. Each element inside a kit which is marked with `jtox-handler` class is installed an `click` or `change` event, which name is taken from `data-handler` property of the element. The actual handler is obtained in one of the following methods:
+
+- kit's **configuration** has a property with that name inside its `handlers` object. If not...
+- ... a global function with that name is taken, if exists. If not...
+- ... no handler is installed.
+
+This procedure is performed on kit's initialization, not during event handling itself. On `<input>`, `<select>` and `<textarea>` elements the handler is installed on `change` event, and on all others - on the `click` event.
+
 
 ##### Miscellaneous
 
@@ -141,6 +153,11 @@ The `params` parameter (if present) can have the following properties:
 - `method` - the HTTP method to be used. The default is _GET_, but if some `data` is passed - it defaults to _POST_.
 - `dataType` - if you want to change the expected server response to something different from JSON - use this one.
 
+```
+jToxKit.service(kit, service, params, callback)
+```
+A wrapper for `jToxKit.call()` which takes care to poll tasks, if such is returned. This happens on all but **GET** methods. The result finally given to the callback is the result after the task is finished or _null_ on error.
+
 ### UI methods
 
 There is a bunch of methods, which are responsible for some pure UI-related stuff within jToxKit. They can be found in `jToxKit.ui` or `jT.ui`, and although most of them are internally used by the kits, here is a short explanation of most important ones:
@@ -171,14 +188,19 @@ jToxKit.ui.bindControls(kit, handlers)
 The two most important kits - [jToxCompound](#jtoxcompound) and [jToxSubstance](#jtoxsubstance) have their own paging and filtering mechanism. This function puts the necessary controls _and_ handling so that they start to work. Look at the code for more details.
 
 ```
-jToxKit.putActions(kit, col, defs)
+jToxKit.ui.putActions(kit, col, defs)
 ```
 Alters the given `col`umn's _mRender_ function so that it includes also _selection_ and/or _details_ icons - depending on provided `defs`. Check the code of [jToxSubstance](#jtoxsubstance), [jToxModel](#jtoxmodel) and [jToxDataset](#jtoxdataset) for more details.
 
 ```
-jToxKit.updateCounter(str, count, total)
+jToxKit.ui.updateCounter(str, count, total)
 ```
 Update a counter within a given `str`. The counter can be either of this form: `(1/14)`, or just a simple number: `(14)` - which is the case when `total` is not passed. This method find old such form, if exists, and updates it.
+
+```
+jToxKit.ui.renderMulti: function (data, type, full, render)
+```
+Used in multi-row cells as used in _jToxStudy_, _jToxBundle_, etc. This is normal _dataTable's_ render function that can be passed additional renderer - it considers `data` to be an array and renders all it's values separately on a separate row each one.
 
 
 ### Kit instance common methods
@@ -227,6 +249,7 @@ Parameters that can be passed either with data-XXX attributes or when initialize
 - **`tabsFolded`** (attr. `data-tabe-folded`): If set to _true_ initializes the feature-selection tabs to be initially all closed. Has no meaning when `showTabs` is _false_. Default is _false_.
 - **`showExport`** (attr. `data-show-export`): Determines if the **Export** tab should be added to the right of feature-tabs, filled with possible export parameters. If `showTabs` is false, this has not effect, of course. Default: *true*.
 - **`showControls`** (attr. `data-show-controls`): Determines whether to show the block with filter and pagination controls, which include: information for current view items, dropdown menu for choosing the page size, next and previous page and filtering box. Default: *true*.
+- **`fixedWidth`** (attr. `data-fixed-width`): The width of the left (non-scrollable) part of the table. In CSS units. It is used only if provided. Default is _null_.
 - **`pageStart`** (attr. `data-page-start`):From which item the referenced dataset should be visualized. Counted from 0. Default: *0*.
 - **`pageSize`** (attr. `data-page-size`): Initial page size for queries - can later be changed either with `queryEntries()` call, or with dropdown menu, if visible. Default: *20*. 
 - **`hideEmpty`** (attr. `data-hide-empty`): Determines whether to hide empty group tabs instead of make them inactive. Default: _false_.
@@ -318,6 +341,7 @@ All of them are optional, and it is good to remember that these are merged with 
 - **`used`**, _boolean_: In the process of grouping features, this one is used to mark when a feature is already placed in some group. You can use it if you want to keep a feature away from going into any (default) group. Default: _false_.
 - **`visibility`**, _none_ | _all_ | _main_ | _details_: Where do you want to have this feature shown - either on feature-selection tab only (_main_, example: _#Diagram_), in detailed view, tabs only (_details_) on both (_all_) or neither (_none_). Default: _all_.
 - **`column`**, _object_ or _function_: This is a normal _dataTable_'s column definition that will be merged with automatically built one, if present. If function is passed - it is expected to with this definition: `function(column, featureId)` and should return the new column definition. Default: _null_.
+- **`order`**, _number_: This value helps the _jToxCompound_ kit to order the columns - the smaller, the more to the left a columns is. Normally columns follow the order they are listed in corresponding feature Id's in the group definition.
 - **`render`**, _function_: The value render function for this feature. It has the dataTable's `mRender` syntax: `function (data, type, full)` and it is, actually used for that purpose, if present (taking precedence over _mRender_ property of `column` object). There is one difference - one more _type_ of rendering is given: _details_, which gives the configurator the ability to have different rendering for that special purpose - value of feature within details pane.
 - **`process`**, _function_: This one is used during dataset preprocessing and is called for each entry and feature (if given at all). It's definition should be of this form: `function process(entry, featureId, features)`. Default: _null_.
 
@@ -877,6 +901,7 @@ There are few things that can be setup from outside:
 - **`smartsList`** (attr. `data-smarts-list`): The hierarchy for SMARTS, need to be defined outside - this is either the list object itself (when kit is manually initialized), or the name of a global variable containing the list. Default is _funcgroups_.
 - **`hideOptions`** (attr. `data-hide-options`): Comma separated list of search options to be hidden - they are described above: `auto`, `similarity`, `smarts` and `url`. Default is _null_, i.e. - show everything.
 - **`contextUri`** (attr. `data-context-uri`): When you need to limit the search to certain context, like - search only within a given dataset - this is the way to do it, by providing here the _URI_ which will be added as `dataset_uri` parameter on each query. Default is _null_.
+- **`slideInput`** (attr. `data-slide-input`): Whether to slide the input field when selected. Default is _false_.
 
 ##### Methods
 
