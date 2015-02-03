@@ -616,47 +616,75 @@ var jToxBundle = {
     		}
   		});
 		}
-		
-		// finally decide what query to make, depending on the 
+
+
+    $('.create-button', panel).on('click', function () {
+      var el = this;
+      $(el).addClass('loading');
+      jT.service(self, self.bundleUri + '/matrix/working', { method: 'POST', data: { deletematrix:  false } }, function (result, jhr) {
+        $(el).removeClass('loading');
+        if (!!result) {
+          $('.jtox-toolkit', panel).show();
+          $('.save-button', panel).show();
+          $('.create-button', panel).hide();
+          self.bundleSummary.matrix++;
+          self.edit.matrixEditable = true;
+          self.matrixKit.query(self.bundleUri + '/matrix/working');
+        }
+      });
+    });
+
+    $('.create-final-button', panel).on('click', function () {
+      var el = this;
+      $(el).addClass('loading');
+      jT.service(self, self.bundleUri + '/matrix/final', { method: 'POST', data: { deletematrix:  false } }, function (result, jhr) {
+        $(el).removeClass('loading');
+        if (!!result) {
+          $('.jtox-toolkit', panel).show();
+          $('.save-button', panel).show();
+          $('.create-final-button', panel).hide();
+          self.bundleSummary['matrix/final']++;
+          self.edit.matrixEditable = true;
+          self.matrixKit.query(self.bundleUri + '/matrix/final');
+        }
+      });
+    });
+
+		// finally decide what query to make, depending on the
+    $('.save-button', panel).hide();
+    $('.create-button', panel).hide();
+    $('.create-final-button', panel).hide();
 		var queryUri = null;
 		if (panId == 'xinitial') {
+      $('.jtox-toolkit', panel).show();
   		self.edit.matrixEditable = false;
   		queryUri = self.bundleUri + '/dataset';
-  		$('.save-button', panel).hide();
-  		$('.create-button', panel).hide();
 		}
 		else {
-  		if (self.bundleSummary.matrix > 0) {
-  		  $('.create-button', panel).hide();
-        queryUri = self.bundleUri + '/matrix';
-        if (panId == 'xworking')
-          $('.save-button', panel).show();
-        else
-          $('.save-button', panel).show();
-        self.edit.matrixEditable = (panId == 'xworking');
+      var queryPath = (panId == 'xfinal') ? '/matrix/final' : '/matrix/working';
+      var m = (panId == 'xfinal') ? 'matrix/final' : 'matrix';
+      var editable = (panId == 'xfinal') ? false : true;
+      if (self.bundleSummary[m] > 0) {
+        $('.jtox-toolkit', panel).show();
+        queryUri = self.bundleUri + queryPath;
+        self.edit.matrixEditable = editable;
+        if (editable) $('.save-button', panel).show();
   		}
   		else {
   		  $('.jtox-toolkit', panel).hide();
-  		  $('.create-button', panel).show().on('click', function () {
-    		  var el = this;
-    		  $(el).addClass('loading');
-  		    jT.service(self, self.bundleUri + '/matrix', { method: 'POST', data: { deletematrix:	false } }, function (result, jhr) {
-      		  $(el).removeClass('loading');
-      		  if (!!result) {
-        		  $('.jtox-toolkit', panel).show();
-              $('.save-button', panel).show();
-        		  $('.create-button', panel).hide();
-        		  self.bundleSummary.matrix++;
-        		  self.edit.matrixEditable = true;
-        		  self.matrixKit.query(self.bundleUri + '/matrix');
-      		  }
-    		  });
-    		});
+        if (self.bundleSummary.matrix > 0) {
+          $('.create-final-button', panel).show();
+        }
+        else {
+    		  $('.create-button', panel).show();
+        }
   		}
 		}
 
-    if (!!queryUri)
+    if (!!queryUri) {
 		  self.matrixKit.query(queryUri);
+    }
+
 	},
 	
 	// called when a sub-action in endpoint selection tab is called
