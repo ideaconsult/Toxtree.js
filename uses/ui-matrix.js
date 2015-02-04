@@ -824,7 +824,7 @@ var jToxBundle = {
   progressTabs: function () {
     $(this.rootElement).tabs(this.bundleSummary.compound > 0 ? 'enable' : 'disable', 2);
     $(this.rootElement).tabs(this.bundleSummary.substance > 0  && this.bundleSummary.property > 0 ? 'enable' : 'disable', 3);
-    if (this.bundleSummary.matrix > 0) {
+    if (this.bundleSummary.matrix > 0 || this.bundleSummary['matrix/final'] > 0) {
       $('#xfinal').button('enable');
     }
     else {
