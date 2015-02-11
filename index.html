@@ -13,7 +13,7 @@
     
     <script type='text/javascript' src='https://apps.ideaconsult.net/ambit2/jquery/jquery-1.10.2.js'></script>
 	<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js'></script>
-	<script type='text/javascript' charset='utf8' src='http://apps.ideaconsult.net/ambit2/jquery/jquery.dataTables-1.9.4.min.js'></script>
+	<script type='text/javascript' charset='utf8' src='http://apps.ideaconsult.net/data/jquery/jquery.dataTables-1.9.4.min.js'></script>
 <script type='text/javascript' src='https://apps.ideaconsult.net/ambit2/jquery/purl.js'></script>
 
   <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/black-tie/jquery-ui.min.css" type="text/css">
@@ -22,7 +22,9 @@
   <link rel="shortcut icon" href="https://apps.ideaconsult.net/ambit2/images/favicon.ico">
     
  <script type='text/javascript' src='https://apps.ideaconsult.net/ambit2/scripts/jtoxkit.js'></script>
-    
+ 
+ <script type='text/javascript' src='https://apps.ideaconsult.net/ambit2/scripts/dataset/ui-query.js'></script>
+<script type='text/javascript' src='https://apps.ideaconsult.net/ambit2/scripts/dataset/config-dataset.js'></script>
 
 <link rel="stylesheet" href="https://apps.ideaconsult.net/ambit2/style/jtoxkit.css"/>
 
@@ -30,10 +32,10 @@
 
 	$(document).ready(function() {
 	var purl = $.url();
-	var dataset_uri = purl.param('dataset_uri')===undefined?'https://apps.ideaconsult.net/ambit2/dataset/1967255':purl.param('dataset_uri');
+	var dataset_uri = purl.param('dataset_uri')===undefined?'https://apps.ideaconsult.net/data/dataset/54':purl.param('dataset_uri');
 
       		//var dataset_uri = "http://apps.ideaconsult.net:8080/ambit2/dataset/1967255";
-	  	var ds = new jToxDataset($(".jtox-toolkit")[0],config_dataset);
+	  	var ds = new jToxCompound($(".jtox-toolkit")[0],config_dataset);
         	ds.queryDataset(dataset_uri);
 	});
 </script>
@@ -67,11 +69,14 @@
 
 <div class="fourteen columns ">
 
-<div class="jtox-toolkit" data-kit="dataset" 
+<div class="jtox-toolkit" data-kit="compound" 
 	data-manual-init="yes" 
 	data-show-features="yes" 
 	data-cross-domain="true"	
 	data-show-export="yes" 
+	 data-show-diagrams="true"
+ data-timeout="1000"
+
 	data-jsonp="true"></div>
 
 <div class="one column">&nbsp;</div>
@@ -97,7 +102,7 @@
             pageTracker._trackPageview();
             } catch(err) {}
           </script>
-
+<!--
 <script>
 var config_dataset = {
 	
@@ -199,6 +204,6 @@ var config_dataset = {
 	}    
 }	
 </script>
-
+-->
   </body>
 </html>
