@@ -647,7 +647,7 @@ var jToxBundle = {
           $('.save-button', panel).show();
           $('.create-final-button', panel).hide();
           self.bundleSummary['matrix/final']++;
-          self.edit.matrixEditable = true;
+          self.edit.matrixEditable = false;
           self.matrixKit.query(self.bundleUri + '/matrix/final');
         }
       });
@@ -671,7 +671,12 @@ var jToxBundle = {
         $('.jtox-toolkit', panel).show();
         queryUri = self.bundleUri + queryPath;
         self.edit.matrixEditable = editable;
-        if (editable) $('.save-button', panel).show();
+        if (editable) {
+          $('.save-button', panel).show();
+        }
+        else {
+          $('.save-button', panel).hide();
+        }
       }
       else {
         $('.jtox-toolkit', panel).hide();
