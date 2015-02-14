@@ -276,30 +276,22 @@ Feature enabling-disabling functions and dataset entry detailed visualization re
 }
 ```
 The `<array>` option, means an array of feature IDs, the `<function>` option is a function with following syntax: `function (groupName, miniDataset)` which should return (again) an array of feature IDs that are part of that group. It can either be function object itself, or function-name, if configuration is passed via external _json_.
-The first parameter (`groupName`) is the name of the group being filled, and the second parameter - `miniDataset` is the 1-sized dataset that _jToxStudy_ queried to obtain the available features, with `features` property pre-processed. The context in which the function is called is the _jToxKit_ instance (i.e. `this` parameter).
-A special case is when one (or more) of the member of the array is (are) objects and not string. This is used when certain bunch of features need to be grouped in one checkbox. The format of the object should be:
 
-```
-{ "name": "Group name", "features": [ ... <array of features> ] };
-```
-This can be part of the array. For example the default _Names_ group can look like this:
+The first parameter (`groupName`) is the name of the group being filled, and the second parameter - `miniDataset` is the feature-query dataset that _jToxCompound_ uses to obtain the available features, with `features` property being pre-processed. The context in which the function is called is the _jToxKit_ instance (i.e. `this` parameter).
+
+For example the default _Names_ group can look like this:
 
 ```
     "Names": [
-      "http://www.opentox.org/api/1.1#ChemicalName",
-      "http://www.opentox.org/api/1.1#TradeName",
-      "http://www.opentox.org/api/1.1#IUPACName",
-      { "name": "Formulas",
-        "features": [
+          "http://www.opentox.org/api/1.1#ChemicalName",
+          "http://www.opentox.org/api/1.1#TradeName",
+          "http://www.opentox.org/api/1.1#IUPACName",
           "http://www.opentox.org/api/1.1#SMILES",
           "http://www.opentox.org/api/1.1#InChIKey",
           "http://www.opentox.org/api/1.1#InChI",
-        ]
-      },
-      "http://www.opentox.org/api/1.1#REACHRegistrationDate"
+          "http://www.opentox.org/api/1.1#REACHRegistrationDate"
     ],
 ```
-Which will result in all formula-related features to be grouped in one, named _Formulas_ and thus, turning on and off can be done from single checkbox.
 
 Another aspect that can be configured from there is the list of possible exports, it has the following format:
 
