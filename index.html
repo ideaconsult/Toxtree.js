@@ -15,6 +15,54 @@
     <link rel="stylesheet" href="https://apps.ideaconsult.net/ambit2/style/jquery.dataTables.css" type="text/css">
     <link rel="stylesheet" href="https://apps.ideaconsult.net/ambit2/style/jtoxkit.css"/>
 
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 100%;
+      }
+      h1 {
+        font-size: 28px;
+        line-height: 34px;
+        margin-bottom: 8px;
+      }
+      nav {
+        color: #181818;
+        font-family: "Georgia","Times New Roman",serif;
+        font-size: 21px;
+        line-height: 30px;
+        margin-bottom: 4px;
+      }
+      a.qxternal {
+        background: url("https://apps.ideaconsult.net/data/images/external.jpg") no-repeat right center transparent;
+        padding-right: 20px;
+      }
+      .container {
+        padding: 20px 5%;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+      .jtox-ds-fixed {
+        width: 100%;
+      }
+      .jtox-ds-fixed .dataTable {
+        width: 100% !important;
+      }
+      .jtox-ds-variable {
+        display: none;
+      }
+      .jtox-controls {
+        position: relative;
+        padding: 10px 0;
+      }
+      .jtox-controls input {
+        right: 0;
+      }
+      .jtox-ds-tables td .shortened {
+        display: inline-block;
+        max-width: 225px;
+      }
+    </style>
+
     <script type='text/javascript' src='https://apps.ideaconsult.net/ambit2/jquery/jquery-1.10.2.js'></script>
     <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js'></script>
     <script type='text/javascript' charset='utf8' src='http://apps.ideaconsult.net/data/jquery/jquery.dataTables-1.9.4.min.js'></script>
@@ -32,7 +80,7 @@
         var dataset_uri = purl.param('dataset_uri')===undefined?'https://apps.ideaconsult.net/data/dataset/54':purl.param('dataset_uri');
 
         //var dataset_uri = "http://apps.ideaconsult.net:8080/ambit2/dataset/1967255";
-        var ds = new jToxCompound($(".jtox-toolkit")[0],config_dataset);
+        var ds = new jToxCompound($(".jtox-toolkit")[0], config_dataset);
         ds.queryDataset(dataset_uri);
       });
     </script>
@@ -44,27 +92,19 @@
   <body>
 
 
-    <div class="container" style="margin:0;padding:0;">
+    <div class="container">
 
-      <div class="row half-bottom" style="margin-left:10px;margin-right:20px;padding:ppx;">
-        <div class="one column">&nbsp;</div>
-        <div class="fourteen columns">
-          <h3>Demo (WikiPathways)</h3>
-          <h4>More examples:
-            <a href='https://apps.ideaconsult.net/data/ui/_dataset?dataset_uri=https%3A%2F%2Fapps.ideaconsult.net%2Fdata%2Fdataset%2F45'>ONS Melting point 33</a>
-            |<a href='https://apps.ideaconsult.net/data/ui/_search'>Search</a>
-            |<a href='https://apps.ideaconsult.net/data/substances'>Substances</a>
-            |<a href='https://apps.ideaconsult.net/enmtest/substance'>Nanomaterials</a>
-          </h4>
-        </div>
-        <div class="one column">&nbsp;</div>
-      </div>
+      <header class="row half-bottom">
+        <h1>Demo (WikiPathways)</h1>
+        <nav>More examples:
+          <a href='https://apps.ideaconsult.net/data/ui/_dataset?dataset_uri=https%3A%2F%2Fapps.ideaconsult.net%2Fdata%2Fdataset%2F45'>ONS Melting point 33</a>
+          |<a href='https://apps.ideaconsult.net/data/ui/_search'>Search</a>
+          |<a href='https://apps.ideaconsult.net/data/substances'>Substances</a>
+          |<a href='https://apps.ideaconsult.net/enmtest/substance'>Nanomaterials</a>
+        </nav>
+      </header>
 
-      <div class="row" style="margin-left:10px;margin-right:20px;padding:ppx;">
-
-      <div class="one column">&nbsp;</div>
-
-      <div class="fourteen columns ">
+      <div class="row">
 
         <div class="jtox-toolkit"
           data-kit="compound"
@@ -75,10 +115,6 @@
           data-show-diagrams="true"
           data-timeout="1000"
           data-jsonp="true">
-        </div>
-
-        <div class="one column">&nbsp;</div>
-
         </div>
 
       </div>
