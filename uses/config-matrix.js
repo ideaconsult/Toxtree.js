@@ -52,13 +52,13 @@ jTConfig.matrix = {
       "#DetailedInfoRow",
       "http://www.opentox.org/api/1.1#CASRN",
       "http://www.opentox.org/api/1.1#EINECS",
-      // The rest of them
-      "http://www.opentox.org/api/1.1#Reasoning",
       "http://www.opentox.org/api/1.1#ChemicalName",
-      "http://www.opentox.org/api/1.1#SMILES",
-      "http://www.opentox.org/api/1.1#InChIKey",
-      "http://www.opentox.org/api/1.1#InChI",
-      "http://www.opentox.org/api/1.1#REACHRegistrationDate"
+      "http://www.opentox.org/api/1.1#Reasoning",
+      // The rest of them
+      //"http://www.opentox.org/api/1.1#SMILES",
+      //"http://www.opentox.org/api/1.1#InChIKey",
+      //"http://www.opentox.org/api/1.1#InChI",
+      //"http://www.opentox.org/api/1.1#REACHRegistrationDate"
     ],
 
     "Substances": [
