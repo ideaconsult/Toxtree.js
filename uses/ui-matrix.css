@@ -8,6 +8,8 @@ html, body, #jtox-bundle {
 #jtox-bundle {
   overflow: hidden;
   position: relative;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 #jtox-bundle textarea,
@@ -46,7 +48,7 @@ body.structlist #jtox-query .jtox-foldable {
 }
 
 body.structlist #browser {
-  margin-top: 5px;  
+  margin-top: 5px;
 }
 
 #jtox-matrix td .breakable {
@@ -150,7 +152,7 @@ body.structlist #browser {
 }
 
 #jtox-matrix a.unsaved-study {
-  background: #ffcccc;  
+  background: #ffcccc;
   border-radius: 3px;
 }
 
@@ -167,7 +169,7 @@ body.structlist #browser {
 }
 
 .popup-box .delete-box td {
-	border: 0px;	
+	border: 0px;
 }
 
 .popup-box table.delete-box {
@@ -213,7 +215,7 @@ body.structlist #browser {
   font-size: 80%;
   font-weight: bold;
   word-wrap: normal;
-  white-space: nowrap;  
+  white-space: nowrap;
 }
 
 .popup-box .the-value {

@@ -268,7 +268,9 @@ var jToxBundle = {
       }
 
       $(panel).addClass('initialized');
+
       var conf = $.extend(true, {}, jTConfig.matrix, config_study);
+
       conf.baseFeatures['#IdRow'] = { used: true, basic: true, data: "number", column: { "sClass": "middle center"}, render: function (data, type, full) {
         if (type != 'display')
           return data || 0;
