@@ -219,8 +219,11 @@ var jToxBundle = {
               var catId = self.parseFeatureId(fId).category,
                   config = jT.$.extend(true, {}, kit.settings.configuration.columns["_"], kit.settings.configuration.columns[catId]);
 
+              console.log( f );
+
               var theData = full.values[fId];
-              var preVal = (ccLib.getJsonValue(config, 'effects.endpoint.bVisible') !== false) ? f.title.replace(" ", '&nbsp;') : null;
+              var preVal = (ccLib.getJsonValue(config, 'effects.endpoint.bVisible') !== false) ? f.title : null;
+              preVal = [f.creator, preVal].filter(function(value){return value!==null}).join(' ');
               if (!f.isMultiValue || !$.isArray(theData))
                 theData = [theData];
 
