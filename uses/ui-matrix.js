@@ -219,8 +219,6 @@ var jToxBundle = {
               var catId = self.parseFeatureId(fId).category,
                   config = jT.$.extend(true, {}, kit.settings.configuration.columns["_"], kit.settings.configuration.columns[catId]);
 
-              console.log( f );
-
               var theData = full.values[fId];
               var preVal = (ccLib.getJsonValue(config, 'effects.endpoint.bVisible') !== false) ? f.title : null;
               preVal = [f.creator, preVal].filter(function(value){return value!==null}).join(' ');
@@ -264,6 +262,21 @@ var jToxBundle = {
             feat.render = fRender(feat, fId);
             feat.column = { sClass: "breakable", sWidth: "80px" };
             grp.push(fId);
+          }
+        }
+
+        /*
+         * Sort columns alphabetically, in this case - by the category number.
+         */
+        for(var grp in groups) {
+          if(grp != 'Identifiers'){
+            var group = groups[grp];
+            group.sort(function(a,b){
+              if (miniset.feature[a].title == miniset.feature[b].title) {
+                return 0;
+              }
+              return (miniset.feature[a].title < miniset.feature[b].title) ? -1 : 1;
+            });
           }
         }
 
