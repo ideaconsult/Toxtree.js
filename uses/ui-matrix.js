@@ -509,7 +509,8 @@ var jToxBundle = {
 
         data.values[fId] = [value.effects[0].result];
 
-        var preVal = (ccLib.getJsonValue(config, 'effects.endpoint.bVisible') !== false) ? f.title.replace(" ", '&nbsp;') : null;
+        var preVal = (ccLib.getJsonValue(config, 'effects.endpoint.bVisible') !== false) ? f.title : null;
+        preVal = [f.creator, preVal].filter(function(value){return value!==null}).join(' ');
 
         var html =  '<span class="ui-icon ui-icon-circle-minus delete-popup" data-index="' + (self.edit.study.length - 1) + '"></span>&nbsp;';
             html += '<a class="info-popup unsaved-study" data-index="0" data-feature="' + fId + '" href="#">' + jT.ui.renderObjValue(value.effects[0].result, null, 'display', preVal) + '</a>';
