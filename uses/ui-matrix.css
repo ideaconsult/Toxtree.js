@@ -30,6 +30,11 @@ html, body, #jtox-bundle {
 	border: 0px;
 }
 
+#jtox-identifiers table th {
+  font-weight: normal;
+  cursor: default;
+}
+
 #jtox-structures .jtox-foldable {
   margin-top: 5px;
   margin-bottom: 5px;

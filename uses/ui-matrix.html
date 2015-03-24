@@ -53,48 +53,29 @@
 	  	<form>
 	      <table class="dataTable">
 	        <thead>
-	          <tr><th class="right size-third">Assessment</th><th class="data-field" data-field="id"></th></tr>
-	          <tr><td class="right size-third">Title:</td><td><input class="data-field first-time validate" data-field="title" name="title"/></td></tr>
-	          <tr><td class="right size-third">Source:</td><td><input class="data-field first-time validate" data-field="seeAlso" name="source"/></td></tr>
-	          <tr><td class="right size-third">Source URL:</td><td><input class="data-field first-time validate" data-field="source" name="url"/></td></tr>
-	          <tr><td class="right size-third">License:</td><td><input class="data-field first-time validate" data-field="rights.URI" name="license"/></td></tr>
-	          <tr><td class="right size-third">Rights holder:</td><td><input class="data-field first-time validate" data-field="rightsHolder" name="rightsHolder"/></td></tr>
-	          <tr><td class="right size-third">Maintainer:</td><td><input class="data-field first-time validate" data-field="maintainer" name="maintainer"/></td></tr>
+	          <tr><th class="right size-third">Title:</th><td><input class="data-field first-time validate" data-field="title" name="title"/></td></tr>
+            <tr><th class="right size-third">Maintainer:</th><td><input class="data-field first-time validate" data-field="maintainer" name="maintainer"/></td></tr>
 
-	          <tr><td class="right top size-third">Purpose:</td><td><textarea class="validate nomargin data-field" data-field="description" name="description"></textarea></td></tr>
-	          <tr><td class="right size-third">Version:</td><td class="data-field" data-field="version">?.?</td></tr>
-	          <tr><td class="right size-third">Status:</td><td class="data-field" data-field="status"></td></tr>
-	          <tr><td class="right size-third">Date started:</td><td class="data-field" data-field="created" data-format="formatDate"></td></tr>
-	          <tr><td class="right size-third">Date finished:</td><td class="data-field" data-field="finished"></td></tr>
-	          <tr>
-	          	<td class="right size-third">Flags:</td>
-	          	<td>
-		          	<div class="jq-buttonset">
-		          		<input type="hidden" name="flags"/>
-								  <input type="checkbox" id="confidential" class="accumulate" data-accumulate="flags" value="confidential"><label for="confidential">Confidential</label></input>
-								  <input type="checkbox" id="internal" class="accumulate" data-accumulate="flags" value="internal"><label for="internal">Internal</label></input>
-								</div>
-							</td>
-						</tr>
-	          <tr>
-	          	<td class="right size-third">Published:</td>
-	          	<td>
-		          	<div class="jq-buttonset">
-								  <input type="radio" id="pub-yes" name="published" value="true"><label for="pub-yes">Yes</label></input>
-								  <input type="radio" id="pub-no" name="published" value="false" checked="checked"><label for="pub-no">No</label></input>
-								</div>
-							</td>
-						</tr>
-	          <tr>
-	          	<td class="right size-third">Use allowed:</td>
-	          	<td>
-		          	<div class="jq-buttonset">
-								  <input type="radio" id="use-yes" value="true" name="useAllowed"><label for="use-yes">Yes</label></input>
-								  <input type="radio" id="use-no" value="false" name="useAllowed" checked="checked"><label for="use-no">No</label></input>
-								</div>
-							</td>
-						</tr>
-	          <tr><td class="right size-third">Rating:</td><td class="data-stars-field"><input type="hidden" name="stars" value="0"/></td></tr>
+            <tr><th class="right top size-third">Purpose:</th><td><textarea class="validate nomargin data-field" data-field="description" name="description"></textarea></td></tr>
+            <tr><th class="right size-third">Version:</th><td class="data-field" data-field="version">?.?</td></tr>
+            <tr><th class="right size-third">Status:</th><td class="data-field" data-field="status"></td></tr>
+            <tr><th class="right size-third">Version start date:</th><td class="data-field" data-field="created" data-format="formatDate"></td></tr>
+            <tr><th class="right size-third">Version last modified on:</th><td class="data-field" data-field="updated" data-format="formatDate"></td></tr>
+            <tr>
+              <th class="right size-third">Published:</th>
+              <td>
+                <select name="published">
+                  <option value="false" checked="checked">No</option>
+                  <option value="true">Yes</option>
+                </select>
+              </td>
+            </tr>
+            <tr><th class="right size-third">License:</th><td><input class="data-field first-time validate" data-field="rights.URI" name="license"/></td></tr>
+            <tr><th class="right size-third">Rights holder:</th><td><input class="data-field first-time validate" data-field="rightsHolder" name="rightsHolder"/></td></tr>
+	          <tr><th class="right size-third">Source:</th><td><input class="data-field first-time validate" data-field="seeAlso" name="source"/></td></tr>
+	          <tr><th class="right size-third">Source URL:</th><td><input class="data-field first-time validate" data-field="source" name="url"/></td></tr>
+            <tr><th class="right size-third">Assessment:</th><td class="data-field" data-field="number"></td></tr>
+	          <tr><th class="right size-third">Rating:</th><td class="data-stars-field"><input type="hidden" name="stars" value="0"/></td></tr>
 	        </thead>
 	      </table>
 	      <div class="actions">
