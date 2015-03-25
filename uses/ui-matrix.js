@@ -279,7 +279,13 @@ var jToxBundle = {
             });
           }
         }
+/*
+        console.log(groups.Identifiers);
 
+        groups.Identifiers.splice(5, 0, '#IdRow');
+
+        console.log(groups.Identifiers);
+*/
         return groups;
       }
 
@@ -287,7 +293,7 @@ var jToxBundle = {
 
       var conf = $.extend(true, {}, jTConfig.matrix, config_study);
 
-      conf.baseFeatures['#IdRow'] = { used: true, basic: true, data: "number", column: { "sClass": "middle center"}, render: function (data, type, full) {
+      conf.baseFeatures['#IdRow'] = { used: true, basic: true, data: "number", column: { "sClass": "center"}, render: function (data, type, full) {
         if (type != 'display')
           return data || 0;
         var html = "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;<br/>";
@@ -478,6 +484,7 @@ var jToxBundle = {
             var content = this.content[0];
             jToxEndpoint.linkEditors(self.matrixKit, content, { category: parse.category, top: parse.topcategory, onchange: endSetValue, conditions: true });
             $('input[type=button]', content).on('click', function (){ addFeature(data, featureId, featureJson, jel[0]); box.close();});
+            console.log(content.innerHTML);
           };
           new jBox('Modal', boxOptions).open();
         }

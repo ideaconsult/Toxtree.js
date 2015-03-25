@@ -2,7 +2,7 @@ window.jT = window.jToxKit = {
 	templateRoot: null,
 
 	callId: 0,
-	
+
 	templates: { },        // html2js routine will fill up this variable
 	tools: { },            // additional, external tools added with html2js
 
@@ -20,19 +20,19 @@ window.jT = window.jToxKit = {
   	onSuccess: null,	    // function (code, mess): called on server request successful return. It is called along with the normal processing. Part of settings.
   	onError: function (s, c, j) { if (!!console && !!console.log) console.log("jT call error [" + c + "]: " + j.responseText + " from request: [" + s + "]"); },		// called on server request error.
   },
-  
+
   // these are used in setting inheritance, so that non-inheritable settings are blanked...
   blankSettings: {
     onDetails: null,
     noInterface: false,
     selectionHandler: null
   },
-	
+
 	// form the "default" baseUrl if no other is supplied
 	formBaseUrl: function(url) {
     return !!url.host ? url.protocol + "://" + url.host + (url.port.length > 0 ? ":" + url.port : '') + '/' + url.segments[0] : null;
 	},
-    
+
   // initializes one kit, based on the kit name passed, either as params, or found within data-XXX parameters of the element
   initKit: function(element) {
     var self = this;
@@ -49,11 +49,11 @@ window.jT = window.jToxKit = {
       	topSettings = self.$.extend(true, topSettings, parent.settings);
     	}
   	});
-  	
+
   	// make us ultimate parent of all
   	if (!parent)
   	  parent = self;
-  	  
+
     dataParams = self.$.extend(true, topSettings, self.blankSettings, dataParams);
     dataParams.baseUrl = self.fixBaseUrl(dataParams.baseUrl);
 
@@ -64,14 +64,14 @@ window.jT = window.jToxKit = {
       // add jTox if it is missing AND there is not existing object/function with passed name. We can initialize ketcher and others like this too.
     	if (!window[kit] && kit.indexOf('jTox') != 0)
   	  	kit = 'jTox' + kit.charAt(0).toUpperCase() + kit.slice(1);
-  
+
     	var fn = window[kit];
     	var obj = null;
       if (typeof fn == 'function')
     	  obj = new fn(element, params);
       else if (typeof fn == "object" && typeof fn.init == "function")
         obj = fn.init(element, params);
-      
+
       if (obj != null) {
         if (fn.kits === undefined)
           fn.kits = [];
@@ -99,28 +99,28 @@ window.jT = window.jToxKit = {
 	      var config = window[dataParams.configuration];
 	      dataParams.configuration = (typeof config != 'function' ? config : config(kit));
       }
-  	  
+
       self.$(element).data('jtKit', realInit(dataParams));
 	  }
   },
-  
+
   // the jToxKit initialization routine, which scans all elements, marked as 'jtox-toolkit' and initializes them
 	init: function(root) {
   	var self = this;
-  	
+
   	if (!root) {
     	self.initTemplates();
-  
+
       // make this handler for UUID copying. Once here - it's live, so it works for all tables in the future
       self.$(document).on('click', '.jtox-toolkit span.ui-icon-copy', function () { ccLib.copyToClipboard(self.$(this).data('uuid')); return false;});
       // install the click handler for fold / unfold
       self.$(document).on('click', '.jtox-foldable>.title', function() { self.$(this).parent().toggleClass('folded'); });
       // install diagram zooming handlers
-      self.$(document).on('click', '.jtox-diagram span.ui-icon', function () { 
+      self.$(document).on('click', '.jtox-diagram span.ui-icon', function () {
         self.$(this).toggleClass('ui-icon-zoomin').toggleClass('ui-icon-zoomout');
-        self.$('img', this.parentNode).toggleClass('jtox-smalldiagram'); 
+        self.$('img', this.parentNode).toggleClass('jtox-smalldiagram');
       });
-      
+
       // scan the query parameter for settings
   		var url = self.settings.fullUrl = ccLib.parseURL(document.location);
   		var queryParams = url.params;
@@ -128,7 +128,7 @@ window.jT = window.jToxKit = {
   		  queryParams.baseUrl = self.formBaseUrl(url);
   		else
     		queryParams.baseUrl = self.fixBaseUrl(queryParams.baseUrl);
-  	
+
       self.settings = self.$.extend(true, self.settings, queryParams); // merge with defaults
       root = document;
   	}
@@ -136,11 +136,11 @@ window.jT = window.jToxKit = {
   	// now scan all insertion divs
   	self.$('.jtox-toolkit', root).each(function(i) { if (!self.$(this).data('manualInit')) self. initKit(this); });
 	},
-	
+
 	kit: function (element) {
   	return $(element).data('jtKit');
 	},
-	
+
 	parentKit: function(name, element) {
 	  var self = this;
     var query = null;
@@ -153,10 +153,10 @@ window.jT = window.jToxKit = {
       if (!name || kit instanceof name)
         query = kit;
     });
-    
+
     return query;
   },
-	
+
 	initTemplates: function() {
 	  var self = this;
 
@@ -166,16 +166,16 @@ window.jT = window.jToxKit = {
     	root.className = 'jtox-template';
     	document.body.appendChild(root);
     }
-    
+
 	  var html = root.innerHTML;
   	for (var t in self.templates) {
     	html += self.templates[t];
   	}
-  	
+
   	root.innerHTML = html;
   	self.templateRoot = root;
 	},
-	
+
 	getTemplate: function(selector) {
   	var el = this.$(selector, this.templateRoot)[0];
   	if (!!el){
@@ -184,7 +184,7 @@ window.jT = window.jToxKit = {
     }
     return el;
 	},
-	
+
 	insertTool: function (name, root) {
 	  var html = this.tools[name];
 	  if (!ccLib.isNull(html)) {
@@ -193,8 +193,8 @@ window.jT = window.jToxKit = {
     }
     return root;
 	},
-  
-	/* Poll a given taskId and calls the callback when a result from the server comes - 
+
+	/* Poll a given taskId and calls the callback when a result from the server comes -
 	be it "running", "completed" or "error" - the callback is always called.
 	*/
 	pollTask : function(kit, task, callback, jhr) {
@@ -214,7 +214,7 @@ window.jT = window.jToxKit = {
 		else
   	  ccLib.fireCallback(callback, kit, task, jhr);
 	},
-	
+
 	/* Fix the baseUrl - remove the trailing slash if any
 	*/
 	fixBaseUrl: function (url) {
@@ -233,7 +233,7 @@ window.jT = window.jToxKit = {
 	},
 
   /* Grab the paging information from the given URL and place it into the settings of passed
-  kit, as <kit>.settings.pageStart and <kit>.settings.pageSize. Pay attention that it is 'pageStart' 
+  kit, as <kit>.settings.pageStart and <kit>.settings.pageSize. Pay attention that it is 'pageStart'
   and not 'pageNo'.
   */
   grabPaging: function (kit, url) {
@@ -244,17 +244,17 @@ window.jT = window.jToxKit = {
         kit.settings.pageSize = kit.pageSize = sz;
       url = ccLib.removeParameter(url, 'pagesize');
     }
-    
+
     if (urlObj.params['page'] !== undefined) {
       var beg = parseInt(urlObj.params['page']);
       if (beg >= 0)
         kit.settings.pageStart = kit.pageStart = beg * kit.settings.pageSize;
       url = ccLib.removeParameter(url, 'page');
     }
-    
+
     return url;
   },
-	
+
 	/* Makes a server call for provided service, with settings form the given kit and calls 'callback' at the end - always.
 	The 'params', if passed, can have following attributes:
 		'method': the HTTP method to be used
@@ -268,20 +268,20 @@ window.jT = window.jToxKit = {
 		}
 		else if (params == null)
 		  params = {};
-		
+
 	  var settings = self.$.extend({}, this.settings, params);
 		if (kit == null)
 		  kit = self;
-		else 
+		else
   		settings = self.$.extend(settings, kit.settings);
 
 		var accType = settings.plainText ? "text/plain" : (settings.jsonp ? "application/x-javascript" : "application/json");
-		
+
 		if (!params.data){
 			params.data = {};
 			if (settings.jsonp)
 				params.data.media = accType;
-				
+
 			if (!params.method)
 				params.method = 'GET';
 		}
@@ -294,7 +294,7 @@ window.jT = window.jToxKit = {
 
     var myId = self.callId++;
 		ccLib.fireCallback(settings.onConnect, kit, service, params, myId);
-			
+
 		// now make the actual call
 		self.$.ajax(service, {
 			dataType: params.dataType || (settings.plainText ? "text": (settings.jsonp ? 'jsonp' : 'json')),
@@ -314,7 +314,7 @@ window.jT = window.jToxKit = {
 			}
 		});
 	},
-	
+
 	/* Encapsulates the process of calling certain service, along with task polling, if needed.
   	*/
 	service: function (kit, service, params, callback) {
@@ -325,7 +325,7 @@ window.jT = window.jToxKit = {
       else
         self.pollTask(kit, data, function (task, jhr) { ccLib.fireCallback(callback, kit, !!task && !task.error ? task.result : null, jhr); });
   	};
-  	
+
   	this.call(kit, service, params, fnCB);
   }
 };
@@ -335,7 +335,7 @@ window.jT = window.jToxKit = {
 window.jT.ui = {
   shortenedData: function (content, message, data) {
     var res = '';
-    
+
     if (ccLib.isNull(data))
       data = content;
     if (data.toString().length <= 5) {
@@ -348,7 +348,7 @@ window.jT.ui = {
     }
     return res;
   },
-  
+
   changeTabsIds: function (root, suffix) {
     jT.$('ul li a', root).each(function() {
       var id = jT.$(this).attr('href').substr(1);
@@ -356,14 +356,14 @@ window.jT.ui = {
       id += suffix;
       el.id = id;
       jT.$(this).attr('href', '#' + id);
-    })  
+    })
   },
-  
+
   addTab: function(root, name, id, content) {
     // first try to see if there is same already...
     if (document.getElementById(id) != null)
       return;
-  
+
     // first, create and add li/a element
     var li = document.createElement('li');
     var a = document.createElement('a');
@@ -371,7 +371,7 @@ window.jT.ui = {
     a.href = '#' + id;
     a.innerHTML = name;
     jT.$('ul', root)[0].appendChild(li);
-    
+
     // then proceed with the panel, itself...
     if (typeof content == 'function')
       content = content(root);
@@ -380,20 +380,20 @@ window.jT.ui = {
       div.innerHTML = content;
       content = div;
     }
-      
+
     content.id = id;
     root.appendChild(content);
     $(root).tabs('refresh');
     return { 'tab': a, 'content': content };
   },
-  
+
   modifyColDef: function (kit, col, category, group) {
     if (col.sTitle === undefined || col.sTitle == null)
       return null;
-      
+
 	  var name = col.sTitle.toLowerCase();
-	  
-	  // helper function for retrieving col definition, if exists. Returns empty object, if no.          
+
+	  // helper function for retrieving col definition, if exists. Returns empty object, if no.
 	  var getColDef = function (cat) {
 	    var catCol = kit.settings.configuration.columns[cat];
 	    if (!ccLib.isNull(catCol)) {
@@ -405,7 +405,7 @@ window.jT.ui = {
         else
 	        catCol = catCol[name];
 	    }
-	
+
 	    if (ccLib.isNull(catCol))
 	      catCol = {};
 	    return catCol;
@@ -415,7 +415,7 @@ window.jT.ui = {
 	  col = jT.$.extend(col, (!!group ? getColDef('_') : {}), getColDef(category));
 	  return ccLib.isNull(col.bVisible) || col.bVisible ? col : null;
   },
-  
+
   sortColDefs: function (colDefs) {
     for (var i = 0, l = colDefs.length; i < l; ++i)
       colDefs[i].iNaturalOrder = i;
@@ -423,10 +423,10 @@ window.jT.ui = {
   	  var res = (a.iOrder || 0) - (b.iOrder || 0);
   	  if (res == 0) // i.e. they are equal
   	    res = a.iNaturalOrder - b.iNaturalOrder;
-  	  return res; 
+  	  return res;
     });
   },
-  
+
   processColumns: function (kit, category) {
     var colDefs = [];
     var catList = kit.settings.configuration.columns[category];
@@ -435,11 +435,11 @@ window.jT.ui = {
       if (col != null)
         colDefs.push(col);
     }
-      
+
     this.sortColDefs(colDefs);
     return colDefs;
   },
-  
+
   renderMulti: function (data, type, full, render) {
     var dlen = data.length;
     if (dlen < 2)
@@ -449,15 +449,15 @@ window.jT.ui = {
     for (var i = 0, dlen = data.length; i < dlen; ++i) {
       df += '<tr class="' + (i % 2 == 0 ? 'even' : 'odd') + '"><td>' + render(data[i], type, full, i) + '</td></tr>';
     }
-    
+
     df += '</table>';
     return df;
   },
-  
+
   inlineChanger: function (location, breed, holder, handler) {
     if (handler == null)
       handler = "changed";
-      
+
     if (breed == "select")
       return function (data, type, full) {
         return type != 'display' ? (data || '') : '<select class="jt-inlineaction jtox-handler" data-handler="' + handler + '" data-data="' + location + '" value="' + (data || '') + '">' + (holder || '') + '</select>';
@@ -471,7 +471,7 @@ window.jT.ui = {
         return type != 'display' ? (data || '') : '<input type="text" class="jt-inlineaction jtox-handler" data-handler="' + handler + '" data-data="' + location + '" value="' + (data || '') + '"' + (!holder ? '' : ' placeholder="' + holder + '"') + '/>';
       };
   },
-    
+
   installMultiSelect: function (root, callback, parenter) {
     if (parenter == null)
       parenter = function (el) { return el.parentNode; };
@@ -486,18 +486,18 @@ window.jT.ui = {
         callback.call(this, e);
     });
   },
-  
+
   installHandlers: function (kit, root) {
     if (root == null)
       root = kit.rootElement;
-      
+
     jT.$('.jtox-handler', root).each(function () {
       var name = jT.$(this).data('handler');
       var handler = null;
       if (kit.settings.configuration != null && kit.settings.configuration.handlers != null)
         handler = kit.settings.configuration.handlers[name];
       handler = handler || window[name];
-      
+
       if (!handler)
         console.log("jToxQuery: referring unknown handler: " + name);
       else if (this.tagName == "INPUT" || this.tagName == "SELECT" || this.tagName == "TEXTAREA")
@@ -506,24 +506,24 @@ window.jT.ui = {
         jT.$(this).on('click', handler);
     });
   },
-  
+
   enterBlur: function (e) {
     if (e.keyCode == 13)
       this.blur();
   },
-  
+
   rowData: function (el) {
     var row = $(el).closest('tr')[0];
     var table = $(row).closest('table')[0];
     return $(table).dataTable().fnGetData(row);
   },
-  
+
   rowIndex: function (el) {
     var row = $(el).closest('tr')[0];
     var table = $(row).closest('table')[0];
     return $(table).dataTable().fnGetPosition(row);
   },
-  
+
   rowInline: function (el, base) {
     var row = $(el).closest('tr')[0];
     var data = $.extend({}, base);
@@ -532,10 +532,10 @@ window.jT.ui = {
       if (loc != null)
         ccLib.setJsonValue(data, loc, ccLib.getObjValue(this));
     });
-    
+
     return data;
   },
-  
+
   columnData: function (cols, data, type) {
     var out = new Array(data.length);
     if (type == null)
@@ -548,18 +548,18 @@ window.jT.ui = {
         var val = ccLib.getJsonValue(d, col.mData) || col.sDefaultValue;
         entry[col.sTitle] = typeof col.mRender != 'function' ? val : col.mRender(val, type, d);
       }
-      
+
       out[i] = entry;
     }
-    
+
     return out;
   },
-  
+
   queryInfo: function (aoData) {
     var info = {};
     for (var i = 0, dl = aoData.length; i < dl; ++i)
       info[aoData[i].name] = aoData[i].value;
-  
+
     if (info.iSortingCols > 0) {
       info.iSortDirection = info.sSortDir_0.toLowerCase();
       info.sSortData = info["mDataProp_" + info.iSortCol_0];
@@ -568,15 +568,15 @@ window.jT.ui = {
       info.iSortDirection = 0;
       info.sSortData = "";
     }
-    
+
     return info;
   },
-  
+
   putTable: function (kit, root, config, settings) {
     var onRow = kit.settings.onRow;
     if (onRow === undefined && settings != null)
       onRow = settings.onRow;
-      
+
     var opts = jT.$.extend({
       "bPaginate": false,
       "bProcessing": true,
@@ -592,10 +592,10 @@ window.jT.ui = {
           if (res === false)
             return;
         }
-        
+
         // equalize multi-rows, if there are any
         ccLib.equalizeHeights.apply(window, jT.$('td.jtox-multi table tbody', nRow).toArray());
-        
+
         // handle a selection click.. if any
         jT.ui.installHandlers(kit, nRow);
         if (typeof kit.settings.selectionHandler == "function")
@@ -603,7 +603,7 @@ window.jT.ui = {
         // other (non-function) handlers are installed via installHandlers().
 
         if (!!kit.settings.onDetails) {
-          jT.$('.jtox-details-toggle', nRow).on('click', function(e) {  
+          jT.$('.jtox-details-toggle', nRow).on('click', function(e) {
             var root = jT.ui.toggleDetails(e, nRow);
             if (!!root) {
               ccLib.fireCallback(kit.settings.onDetails, kit, root, aData, this);
@@ -612,7 +612,7 @@ window.jT.ui = {
         }
       }
     }, settings);
-    
+
     if (opts.aoColumns == null)
       opts.aoColumns = jT.ui.processColumns(kit, config);
     if (opts.oLanguage == null)
@@ -622,17 +622,17 @@ window.jT.ui = {
     jT.$(table).dataTable().fnAdjustColumnSizing();
     return table;
   },
-  
+
   renderRelation: function (data, type, full) {
     if (type != 'display')
       return ccLib.joinDeep(data, 'relation', ',');
-      
+
     var res = '';
     for (var i = 0, il = data.length; i < il; ++i)
       res += '<span>' + data[i].relation.substring(4).toLowerCase() + '</span>' + jT.ui.putInfo(full.URI + '/composition', data[i].compositionName + '(' + data[i].compositionUUID + ')');
     return res;
   },
-  
+
   renderRange: function (data, unit, type, prefix) {
     var out = "";
     if (typeof data == 'string' || typeof data == 'number')
@@ -653,7 +653,7 @@ window.jT.ui = {
         var fnFormat = function (q, v) {
           return (!!q ? q : "=") + " " + v;
         };
-        
+
         if (!!prefix)
           out += prefix + ' ';
         if (!!loValue)
@@ -663,7 +663,7 @@ window.jT.ui = {
         else
           out += type == 'display' ? '-' : '';
       }
-      
+
       out = out.replace(/ /g, "&nbsp;");
       if (type == 'display') {
         unit = ccLib.trim(data.unit || unit);
@@ -675,11 +675,11 @@ window.jT.ui = {
       out += '-';
     return out;
   },
-  
+
 	renderObjValue: function (data, units, type, pre) {
 		if (!data)
 		  return type == 'display' ? '-' : '';
-		  
+
 		var val = jT.ui.renderRange(data, units, type, pre);
 		if (ccLib.trim(val) == '-')
 		  val = '';
@@ -690,16 +690,16 @@ window.jT.ui = {
   		  val += '&nbsp;/&nbsp;';
   		val += data.textValue;
 		}
-		
+
 		if (!val)
 		  val = '-';
 		return val;
 	},
-  
+
   putInfo: function (href, title) {
     return '<sup class="helper"><a target="_blank" href="' + (href || '#') + '" title="' + (title || href) + '"><span class="ui-icon ui-icon-info"></span></a></sup>';
   },
-  
+
   putStars: function (kit, stars, title) {
     if (!kit.settings.shortStars) {
       var res = '<div title="' + title + '">';
@@ -715,11 +715,11 @@ window.jT.ui = {
       return '<span class="ui-icon ui-icon-star jtox-inline" title="' + title + '"></span>' + stars;
     }
   },
-  
+
   diagramUri: function (URI) {
     return !!URI && (typeof URI == 'string') ? URI.replace(/(.+)(\/conformer.*)/, "$1") + "?media=image/png" : '';
   },
-  
+
   valueWithUnits: function (val, unit) {
     var out = '';
     if (val != null) {
@@ -729,7 +729,7 @@ window.jT.ui = {
     }
     return out;
   },
-  
+
   updateCounter: function (str, count, total) {
     var re = null;
     var add = '';
@@ -743,16 +743,16 @@ window.jT.ui = {
       re = /\(([\d\?]+\/[\d\?\+-]+)\)$/;
       add = '' + count + '/' + total;
     }
-    
-    // now the addition    
+
+    // now the addition
     if (!str.match(re))
       str += ' (' + add + ')';
     else
       str = str.replace(re, "(" + add + ")");
-    
+
     return str;
   },
-    
+
   bindControls: function (kit, handlers) {
     var pane = jT.$('.jtox-controls', kit.rootElement)[0];
     if (kit.settings.showControls) {
@@ -779,28 +779,28 @@ window.jT.ui = {
         var html = oldFn(data, type, full);
         if (type != 'display')
           return html;
-          
+
         if (!!ignoreOriginal)
           html = '';
-          
+
         // this is inserted BEFORE the original, starting with given PRE-content
         if (!!kit.settings.selectionHandler)
           html = '<input type="checkbox" value="' + data + '" class="' +
                 (typeof kit.settings.selectionHandler == 'string' ? 'jtox-handler" data-handler="' + kit.settings.selectionHandler + '"' : 'jt-selection"') +
                 '/>' + html;
-                
+
         // strange enough - this is inserted AFTER the original
         if (!!kit.settings.onDetails)
           html += '<span class="jtox-details-toggle ui-icon ui-icon-folder-collapsed" data-data="' + data +'" title="Press to open/close detailed info for this entry"></span>';
 
         return html;
       };
-      
+
       col.mRender = newFn;
     }
     return col;
   },
-  
+
   toggleDetails: function (event, row) {
     self.$(event.currentTarget).toggleClass('ui-icon-folder-collapsed');
     self.$(event.currentTarget).toggleClass('ui-icon-folder-open');
@@ -809,13 +809,13 @@ window.jT.ui = {
       row = self.$(event.currentTarget).parents('tr')[0];
 
     var cell = self.$(event.currentTarget).parents('td')[0];
-    
+
     if (self.$(event.currentTarget).hasClass('jtox-openned')) {
       var detRow = document.createElement('tr');
       var detCell = document.createElement('td');
       detRow.appendChild(detCell);
       self.$(detCell).addClass('jtox-details');
-      
+
       detCell.setAttribute('colspan', self.$(row).children().length - 1);
       row.parentNode.insertBefore(detRow, row.nextElementSibling);
 
@@ -834,7 +834,7 @@ window.jT.ui = {
 // so it'll be too late to make this assignment then. Also - we can use jT.$ from now on :-)
 jT.$ = jQuery; // .noConflict();
 
-  	
+
 jT.$(document).ready(function(){
   jT.init();
 });
