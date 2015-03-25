@@ -603,6 +603,7 @@ var jToxBundle = {
             var content = this.content[0];
             jToxEndpoint.linkEditors(self.matrixKit, content, { category: parse.category, top: parse.topcategory, onchange: endSetValue, conditions: true });
             $('input[type=button]', content).on('click', function (){ addFeature(data, featureId, featureJson, jel[0]); box.close();});
+            console.log(content.innerHTML);
           };
           new jBox('Modal', boxOptions).open();
         }
