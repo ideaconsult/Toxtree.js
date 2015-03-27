@@ -152,8 +152,22 @@ var jToxBundle = {
         }
       };
 
+      self.createForm.assNewVersion.onclick = function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!self.bundleUri)
+          return;
+        jT.service(self, self.bundleUri + '/version', { method: 'POST' }, function (bundleUri, jhr) {
+          if (!!bundleUri)
+            self.load(bundleUri);
+          else
+            // TODO: report an error
+            console.log("Error on creating bundle [" + jhr.status + ": " + jhr.statusText);
+        });
+      };
+
       self.createForm.assFinalize.style.display = 'none';
-      self.createForm.assDuplicate.style.display = 'none';
+      self.createForm.assNewVersion.style.display = 'none';
 
       var starsEl = $('.data-stars-field', self.createForm)[0];
       starsEl.innerHTML += jT.ui.putStars(self, 0, "Assessment rating");
@@ -834,7 +848,7 @@ var jToxBundle = {
 
         // now take care for enabling proper buttons on the Indetifiers page
         self.createForm.assFinalize.style.display = '';
-        self.createForm.assDuplicate.style.display = '';
+        self.createForm.assNewVersion.style.display = '';
         self.createForm.assStart.style.display = 'none';
 
         $(self.rootElement).tabs('enable', 1);
