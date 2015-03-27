@@ -216,8 +216,9 @@ var jToxBundle = {
     var self = this;
     if (!$(panel).hasClass('initialized')) {
       jTConfig.matrix.groups = function (miniset, kit) {
-        var groups = { "Identifiers" : self.settings.matrixIdentifiers.concat(self.settings.matrixMultiRows) };
-        var endpoints = {};
+        var groups = { "Identifiers" : self.settings.matrixIdentifiers.concat(self.settings.matrixMultiRows) },
+            groupids = [],
+            endpoints = {};
 
         var fRender = function (feat, theId) {
           return function (data, type, full) {
@@ -293,6 +294,32 @@ var jToxBundle = {
             });
           }
         }
+
+        /*
+         * Sort groups by the columns titles / category number.
+         * Since we are trying to sort an Object keys, which is
+         * itself nonsense in javaScript, this may fail at any time.
+         */
+        groupids = Object.keys(groups);
+
+        groupids.sort(function(a, b){
+          if (a == 'Identifiers') return -1;
+          if (b == 'Identifiers') return 1;
+          a = groups[a][0], b = groups[b][0];
+          if (miniset.feature[a].title == miniset.feature[b].title) {
+            return 0;
+          }
+          return (miniset.feature[a].title < miniset.feature[b].title) ? -1 : 1;
+        })
+
+        var newgroups = {};
+
+        groupids.forEach(function(i, v){
+          newgroups[i] = groups[i];
+        });
+
+        groups = newgroups;
+
 /*
         console.log(groups.Identifiers);
 
