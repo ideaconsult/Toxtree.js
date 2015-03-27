@@ -175,7 +175,7 @@ var jToxBundle = {
       });
 
       // install change handlers so that we can update the values
-      $('input', self.createForm).on('change', function (e) {
+      $('input, select, textarea', self.createForm).on('change', function (e) {
         e.preventDefault();
         e.stopPropagation();
         if (!self.bundleUri)
