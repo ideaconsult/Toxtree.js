@@ -35,6 +35,7 @@ var jToxBundle = {
       "http://www.opentox.org/api/1.1#SubstanceDataSource",
     ],
     matrixMultiRows: [
+      "#Tag",
       "http://www.opentox.org/api/1.1#Diagram",
       "#ConstituentName",
       "#ConstituentContent",
@@ -298,7 +299,7 @@ var jToxBundle = {
         /*
          * Sort groups by the columns titles / category number.
          * Since we are trying to sort an Object keys, which is
-         * itself nonsense in javaScript, this may fail at any time.
+         * itself nonsense in JavaScript, this may fail at any time.
          */
         groupids = Object.keys(groups);
 
@@ -320,13 +321,6 @@ var jToxBundle = {
 
         groups = newgroups;
 
-/*
-        console.log(groups.Identifiers);
-
-        groups.Identifiers.splice(5, 0, '#IdRow');
-
-        console.log(groups.Identifiers);
-*/
         return groups;
       }
 
@@ -338,20 +332,29 @@ var jToxBundle = {
         if (type != 'display')
           return data || 0;
         var html = "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;<br/>";
-        if (!full.composition || typeof full.composition != 'object' || !full.composition.length)
+        return html;
+      } };
+
+      conf.baseFeatures['#Tag'] = { title: 'Tag', used: false, basic: true, visibility: "main", primary: true, column: { "sClass": "center"}, render: function (data, type, full) {
+
+        if (type != 'display')
+          return data || 0;
+
+        var html = "";
+        var bInfo = full.component.bundles[self.bundleUri];
+        if (!bInfo) {
           return html;
-        for (var i = 0, cl = full.composition.length;i < cl; ++i) {
-          var bInfo = full.composition[i].component.bundles[self.bundleUri];
-          if (!bInfo)
-            continue;
-          if (!!bInfo.tag)
-            html += '<button class="jt-toggle active" disabled="true"' + (!bInfo.remarks ? '' : 'title="' + bInfo.remarks + '"') + '>' + (bInfo.tag == 'source' ? 'S' : 'T') + '</button>';
-          if (!!bInfo.remarks)
-            html += jT.ui.putInfo(null, bInfo.remarks);
+        }
+        if (!!bInfo.tag) {
+          html += '<button class="jt-toggle active" disabled="true"' + (!bInfo.remarks ? '' : 'title="' + bInfo.remarks + '"') + '>' + (bInfo.tag == 'source' ? 'S' : 'T') + '</button><br />';
+        }
+        if (!!bInfo.remarks && bInfo.remarks != '') {
+          html += jT.ui.putInfo(null, bInfo.remarks);
         }
 
         return html;
       } };
+
 
       var featuresInitialized = false;
 
@@ -626,7 +629,7 @@ var jToxBundle = {
         showDiagrams: true,
         showUnits: false,
         hasDetails: false,
-        fixedWidth: "600px",
+        fixedWidth: "650px",
         configuration: conf,
         featureUri: self.bundleUri + '/property',
         onPrepared: function (miniset, kit) {
@@ -659,6 +662,7 @@ var jToxBundle = {
 
           featuresInitialized = true;
         },
+
         onLoaded: function (dataset) {
           jToxCompound.processFeatures(dataset.feature, this.feature);
 
@@ -670,6 +674,7 @@ var jToxBundle = {
                 jToxCompound.processEntry(data.composition[j].component, dataset.feature);
           }
         },
+
         onRow: function (row, data, index) {
           // equalize multi-rows, if there are any
           jT.$('td.jtox-multi .jtox-diagram span.ui-icon', row).on('click', function () {
