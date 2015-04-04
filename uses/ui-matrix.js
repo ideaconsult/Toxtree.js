@@ -105,6 +105,8 @@ var jToxBundle = {
     $('.jq-buttonset', root).buttonset();
     $('.jq-buttonset.action input', root).on('change', loadAction);
 
+    $('.jtox-users-select', root).tokenize();
+
     self.onIdentifiers(null, $('#jtox-identifiers', self.rootElement)[0]);
     // finally, if provided - load the given bundleUri
     var bUri = self.settings.bundleUri || self.settings.bundle_uri;

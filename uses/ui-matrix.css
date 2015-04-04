@@ -256,3 +256,12 @@ tr:first-child .jtox-up {
 tr:last-child .jtox-down {
   display: none;
 }
+
+.jtox-users-select {
+  width: 100%;
+  height: auto;
+}
+
+.jtox-toolkit table.dataTable td.jtox-user-rights {
+  overflow: visible !important;
+}
