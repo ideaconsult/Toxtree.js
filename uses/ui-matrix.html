@@ -97,7 +97,7 @@
             <div id="searchbar" class="jtox-toolkit jtox-widget" data-kit="search" data-hide-options="url,context"></div>
           </div>
         </div>
-        <div id="browser" class="jtox-toolkit" data-kit="compound" data-show-tabs="false" data-details-height="500px" data-hide-empty="true" data-on-details="onDetailedRow" data-show-diagrams="true" data-on-loaded="onBrowserFilled"></div>
+        <div id="browser" class="jtox-toolkit" data-kit="compound" data-show-tabs="false" data-hide-empty="true" data-on-details="onDetailedRow" data-details-height="500px" data-show-diagrams="true" data-on-loaded="onBrowserFilled"></div>
       </div>
     </div>
     <div id="jtox-endpoints">
@@ -107,9 +107,22 @@
 			</div>
 			<div class="size-full">
   			<div class="jtox-slidable">
-          <div class="jtox-inline tab-substance"></div><div class="jtox-inline tab-points"><div class="check-all">
-            <label for="endpointAll"><input type="checkbox" name="endpointAll" id="endpointAll"/> Show all endpoints</label>
-          </div></div>
+
+          <div class="jtox-inline tab-substance">
+            <div class="float-right">
+              <button type="button" id="structures-expand-all">Expand all</button><button type="button" id="structures-collapse-all">Collapse all</button>
+            </div>
+            <div id="jtox-substance-query" class="jtox-toolkit" data-kit="query" data-cross-domain="true" data-configuration="jTConfigurator" data-initial-query="false">
+              <div id="substance-browser" class="jtox-toolkit" data-kit="compound" data-show-tabs="false" data-hide-empty="true" data-pre-details="preDetailedRow" data-show-diagrams="true"></div>
+            </div>
+          </div>
+
+          <div class="jtox-inline tab-points">
+            <div class="check-all">
+              <label for="endpointAll"><input type="checkbox" name="endpointAll" id="endpointAll"/> Show all endpoints</label>
+            </div>
+          </div>
+
   			</div>
   		</div>
 		</div>
