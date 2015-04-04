@@ -774,30 +774,79 @@ var jToxBundle = {
     var bUri = encodeURIComponent(self.bundleUri);
 
     if (id == "endsubstance") {
-      if (sub.firstElementChild == null) {
-        var root = document.createElement('div');
-        sub.appendChild(root);
-        self.substanceKit = new jToxSubstance(root, {
-          crossDomain: true,
-          showDiagrams: true,
-          embedComposition: true,
-          selectionHandler: "onSelectSubstance",
-          configuration: jTConfig.matrix,
-          onRow: function (row, data, index) {
-            if (!data.bundles)
-              return;
-            var bundleInfo = data.bundles[self.bundleUri];
-            if (!!bundleInfo && bundleInfo.tag == "selected")
-              $('input.jtox-handler', row).attr('checked', 'checked');
+
+      if (!self.substancesQueryKit) {
+        self.substancesQueryKit = jT.kit($('#jtox-substance-query')[0]);
+        self.substancesQueryKit.setWidget("bundle", self.rootElement);
+        self.substancesQueryKit.kit().settings.fixedWidth = '100%';
+        self.substancesQueryKit.kit().settings.bUri = self.bundleUri;
+
+        self.substancesQueryKit.kit().settings.bUri = self.bundleUri;
+
+        // Modify the #IdRow not to show tag buttons and add #Tag column that show the selected tag.
+        self.substancesQueryKit.kit().settings.configuration.baseFeatures['#IdRow'] = { used: true, basic: true, data: "number", column: { "sClass": "center"}, render: function (data, type, full) {
+          if (type != 'display')
+            return data || 0;
+          var html = "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;<br/>";
+          html += '<span class="jtox-details-open ui-icon ui-icon-folder-collapsed" title="Press to open/close detailed info for this compound"></span>';
+          return html;
+        } };
+
+        self.substancesQueryKit.kit().settings.configuration.baseFeatures['#Tag'] = { title: 'Tag', used: false, basic: true, visibility: "main", primary: true, column: { "sClass": "center"}, render: function (data, type, full) {
+
+          if (type != 'display')
+            return data || 0;
+
+          var html = "";
+          var bInfo = full.bundles[self.bundleUri];
+          if (!bInfo) {
+            return html;
           }
+          if (!!bInfo.tag) {
+            html += '<button class="jt-toggle active" disabled="true"' + (!bInfo.remarks ? '' : 'title="' + bInfo.remarks + '"') + '>' + (bInfo.tag == 'source' ? 'S' : 'T') + '</button><br />';
+          }
+
+          return html;
+        } };
+
+        self.substancesQueryKit.kit().settings.configuration.groups.Identifiers.push('#Tag');
+
+        // provid onRow function so the buttons can be set properly...
+        self.substancesQueryKit.kit().settings.onRow = function (row, data, index) {
+          if (!data.bundles){
+            return;
+          }
+          var bundleInfo = data.bundles[self.bundleUri] || {};
+          var noteEl = $('textarea.remark', row);
+          if (!!bundleInfo.tag) {
+            $('button.jt-toggle.' + bundleInfo.tag.toLowerCase(), row).addClass('active');
+            noteEl.val(bundleInfo.remarks);
+          }
+          else {
+            noteEl.prop('disabled', true).val(' ');
+          }
+        };
+
+        /* Setup expand/collaps all buttons */
+        $('#structures-expand-all').on('click', function(){
+          $('#jtox-substance-query .jtox-details-open.ui-icon-folder-collapsed').each(function(){
+            this.click();
+          });
         });
+        $('#structures-collapse-all').on('click', function(){
+          $('#jtox-substance-query .jtox-details-open.ui-icon-folder-open').each(function(){
+            this.click();
+          });
+        });
+
       }
 
-      self.substanceKit.query('/query/substance/related?filterbybundle=' + bUri + '&bundle_uri=' + bUri);
+      self.substancesQueryKit.kit().queryDataset(self.bundleUri + '/compound');
+
     }
     else {// i.e. endpoints
       var checkAll = $('input', sub)[0];
-      if (sub.childNodes.length == 1) {
+      if (sub.childElementCount == 1) {
         var root = document.createElement('div');
         sub.appendChild(root);
         self.endpointKit = new jToxEndpoint(root, {
@@ -860,6 +909,7 @@ var jToxBundle = {
           noteEl.prop('disabled', true).val(' ');
         }
       };
+
     }
 
     if (id == 'structlist') {
@@ -1012,6 +1062,69 @@ function onSelectSubstance(e) {
 function onSelectEndpoint(e) {
   var rowData = jT.ui.rowData(this);
   jToxBundle.selectEndpoint(rowData.subcategory, rowData.endpoint, this);
+}
+
+function preDetailedRow(index, cell) {
+
+  var self = this;
+  var data = this.dataset.dataEntry[index];
+  var uri = this.settings.baseUrl + '/substance?type=related&compound_uri=' + encodeURIComponent(data.compound.URI) + '&filterbybundle=' + encodeURIComponent(this.settings.bUri) + '&bundle_uri=' + encodeURIComponent(this.settings.bUri);
+
+  var $row = $(cell.parentNode),
+      $idcell = $row.find('td:first-child'),
+      $button = $row.find('td:first-child > .jtox-details-open');
+
+  if( !!$(cell).data('details') ) {
+    if($(cell).data('details').hasClass('jtox-hidden')){
+      $(cell).data('details').removeClass('jtox-hidden');
+      $idcell.attr('rowspan', '2');
+      $button.removeClass('ui-icon-folder-collapsed').addClass('ui-icon-folder-open');
+    }
+    else {
+      $(cell).data('details').addClass('jtox-hidden');
+      $idcell.removeAttr('rowspan');
+      $button.addClass('ui-icon-folder-collapsed').removeClass('ui-icon-folder-open');
+    }
+  }
+  else {
+
+    var $cell = $('<td class="paddingless"></td>'),
+      $newRow = $('<tr></tr>').append($cell).insertAfter($row).addClass($row[0].className);
+
+    $idcell.attr('rowspan', '2');
+
+    $cell.attr('colspan', $row.find('td:visible').length - 1).removeClass('jtox-hidden');
+
+    var div = document.createElement('div');
+    $cell.append(div);
+
+    new jToxSubstance(div, {
+      crossDomain: true,
+      showDiagrams: true,
+      embedComposition: true,
+      substanceUri: uri,
+      selectionHandler: "onSelectSubstance",
+      configuration: jTConfig.matrix,
+      onRow: function (row, data, index) {
+        if (!data.bundles){
+          return;
+        }
+        var bundleInfo = data.bundles[self.settings.bUri];
+        if (!!bundleInfo && bundleInfo.tag == "selected") {
+          $('input.jtox-handler', row).prop('checked', true);
+        }
+      }
+    });
+
+    $(cell).data('details', $newRow);
+
+    $button.removeClass('ui-icon-folder-collapsed').addClass('ui-icon-folder-open');
+  }
+
+  // Just in case, the variable table is hidden anyway.
+  this.equalizeTables();
+
+  return false;
 }
 
 function onDetailedRow(row, data, event) {
