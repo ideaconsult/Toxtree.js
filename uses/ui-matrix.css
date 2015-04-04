@@ -243,3 +243,16 @@ body.structlist #browser {
 .popup-box .the-send input {
   float: right;
 }
+
+.ui-button-icon-only {
+  height: 2.4em;
+  margin-bottom: 0;
+}
+
+tr:first-child .jtox-up {
+  display: none;
+}
+
+tr:last-child .jtox-down {
+  display: none;
+}

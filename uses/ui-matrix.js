@@ -332,6 +332,8 @@ var jToxBundle = {
         if (type != 'display')
           return data || 0;
         var html = "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;<br/>";
+        html += '<button type="button" class="ui-button ui-button-icon-only jtox-up"><span class="ui-icon ui-icon-triangle-1-n">up</span></button><br />' +
+                '<button type="button" class="ui-button ui-button-icon-only jtox-down"><span class="ui-icon ui-icon-triangle-1-s">down</span></button><br />'
         return html;
       } };
 
@@ -686,6 +688,21 @@ var jToxBundle = {
             if (!$(this).hasClass('delete-popup') || $(this).data('index') == null)
               onEditClick.call(this, data);
           });
+
+          var self = this;
+          $('button.jtox-up', row).on('click', function(){
+            var i = $(self.fixTable).find('> tbody > tr').index(row);
+            var varRow = $(self.varTable).find('> tbody > tr')[i];
+            $(row).insertBefore( $(row.previousElementSibling) );
+            $(varRow).insertBefore( $(varRow.previousElementSibling) );
+          });
+          $('button.jtox-down', row).on('click', function(){
+            var i = $(self.fixTable).find('> tbody > tr').index(row);
+            var varRow = $(self.varTable).find('> tbody > tr')[i];
+            $(row).insertAfter( $(row.nextElementSibling) );
+            $(varRow).insertAfter( $(varRow.nextElementSibling) );
+          });
+
         }
       });
     }
