@@ -359,6 +359,8 @@ var jToxBundle = {
         return html;
       } };
 
+      conf.baseFeatures['http://www.opentox.org/api/1.1#CASRN'].primary = true;
+
 
       var featuresInitialized = false;
 
@@ -800,7 +802,10 @@ var jToxBundle = {
         self.substancesQueryKit.kit().settings.fixedWidth = '100%';
         self.substancesQueryKit.kit().settings.bUri = self.bundleUri;
 
-        self.substancesQueryKit.kit().settings.bUri = self.bundleUri;
+        self.substancesQueryKit.kit().settings.configuration.baseFeatures['http://www.opentox.org/api/1.1#ChemicalName'].primary = true;
+        self.substancesQueryKit.kit().settings.configuration.baseFeatures['http://www.opentox.org/api/1.1#CASRN'].primary = true;
+        self.substancesQueryKit.kit().settings.configuration.baseFeatures['http://www.opentox.org/api/1.1#EINECS'].primary = true;
+        self.substancesQueryKit.kit().settings.configuration.baseFeatures['http://www.opentox.org/api/1.1#Reasoning'].primary = true;
 
         // Modify the #IdRow not to show tag buttons and add #Tag column that show the selected tag.
         self.substancesQueryKit.kit().settings.configuration.baseFeatures['#IdRow'] = { used: true, basic: true, data: "number", column: { "sClass": "center"}, render: function (data, type, full) {
@@ -841,9 +846,7 @@ var jToxBundle = {
             $('button.jt-toggle.' + bundleInfo.tag.toLowerCase(), row).addClass('active');
             noteEl.val(bundleInfo.remarks);
           }
-          else {
-            noteEl.prop('disabled', true).val(' ');
-          }
+          noteEl.prop('readonly', true);
         };
 
         /* Setup expand/collaps all buttons */
@@ -896,7 +899,7 @@ var jToxBundle = {
       self.queryKit = jT.kit($('#jtox-query')[0]);
       self.queryKit.setWidget("bundle", self.rootElement);
       // provid onRow function so the buttons can be se properly...
-      self.queryKit.kit().settings.fixedWidth = '100%';
+      self.queryKit.kit().settings.fixedWidth = '200px';
       self.queryKit.kit().settings.onRow = function (row, data, index) {
         if (!data.bundles)
           return;
