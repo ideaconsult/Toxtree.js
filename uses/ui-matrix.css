@@ -40,7 +40,7 @@ html, body, #jtox-bundle {
   margin-bottom: 5px;
 }
 
-#jtox-structures td textarea {
+#jtox-structures td textarea, #jtox-endpoints td textarea {
   min-width: 150px;
   height: 150px;
   overflow-x: none;

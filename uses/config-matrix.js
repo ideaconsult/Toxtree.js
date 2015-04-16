@@ -4,7 +4,6 @@ jTConfig.matrix = {
 		  "visibility": "details",
 			"title": "Composition",
 			"data": "compound.URI",
-      "primary": true,
 			"column": { bVisible: false },
 			"basic": true,
 			"render" : function(data, type, full) {
@@ -12,12 +11,17 @@ jTConfig.matrix = {
       }
 		},
     "http://www.opentox.org/api/1.1#ChemicalName" : {
-      "primary": true,
+      primary: false
+    },
+    "http://www.opentox.org/api/1.1#CASRN" : {
+      primary: false
+    },
+    "http://www.opentox.org/api/1.1#EINECS" : {
+      primary: false
     },
 		"http://www.opentox.org/api/1.1#Reasoning" : {
 			"title": "Rationale",
 			"data": "compound.URI",
-      "primary": true,
 			"column": { sWidth: "300px", sClass: "paddingless" },
 			"render" : function(data, type, full) {
 			  data = data || '';
