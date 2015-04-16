@@ -238,8 +238,12 @@ var jToxBundle = {
                   config = jT.$.extend(true, {}, kit.settings.configuration.columns["_"], kit.settings.configuration.columns[catId]);
 
               var theData = full.values[fId];
-              var preVal = (ccLib.getJsonValue(config, 'effects.endpoint.bVisible') !== false) ? f.title : null;
-              preVal = [f.creator, preVal].filter(function(value){return value!==null}).join(' ');
+              var preVal = (ccLib.getJsonValue(config, 'effects.endpoint.bVisible') !== false) ? "<strong>"+f.title+"</strong>" : null;
+
+              var icon = f.isModelPredictionFeature?"ui-icon-calculator":"ui-icon-tag";
+              var studyType = "<span class='ui-icon "+icon+"' title='" + f.source.type + "'></span>";
+              //preVal = [preVal, f.source.type].filter(function(value){return value!==null}).join(' : ');
+
               if (!f.isMultiValue || !$.isArray(theData))
                 theData = [theData];
 
@@ -251,7 +255,9 @@ var jToxBundle = {
                 html += '<div>';
                 if (self.edit.matrixEditable)
                   html += '<span class="ui-icon ui-icon-circle-minus delete-popup"></span>&nbsp;';
-                html += '<a class="info-popup" data-index="' + i + '" data-feature="' + fId + '" href="#">' + jT.ui.renderObjValue(d, f.units, 'display', preVal) + '</a>';
+                html += '<a class="info-popup" data-index="' + i + '" data-feature="' + fId + '" href="#">' + jT.ui.renderObjValue(d, f.units, 'display', preVal) + '</a>'
+                     + studyType
+                     + (f.creator===undefined||f.creator==null|| ''==f.creator  || 'null'==f.creator || 'no data'==f.creator?'':(' <span class="shortened" title="'+f.creator+'">'+f.creator + '</span>'));
                 html += jT.ui.putInfo(full.compound.URI + '/study?property_uri=' + encodeURIComponent(fId));
                 html += '</div>';
               }
