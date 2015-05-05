@@ -250,12 +250,18 @@ var jToxBundle = {
               // now - ready to produce HTML
               for (var i = 0, vl = theData.length; i < vl; ++i) {
                 var d = theData[i];
-                if (d.deleted)
+                if (d.deleted && !self.edit.matrixEditable)
                   continue;
                 html += '<div>';
-                if (self.edit.matrixEditable)
-                  html += '<span class="ui-icon ui-icon-circle-minus delete-popup"></span>&nbsp;';
-                html += '<a class="info-popup" data-index="' + i + '" data-feature="' + fId + '" href="#">' + jT.ui.renderObjValue(d, f.units, 'display', preVal) + '</a>'
+                if (self.edit.matrixEditable) {
+                  if (d.deleted){
+                    html += '<span class="ui-icon ui-icon-info delete-popup"></span>&nbsp;';
+                  }
+                  else {
+                    html += '<span class="ui-icon ui-icon-circle-minus delete-popup"></span>&nbsp;';
+                  }
+                }
+                html += '<a class="info-popup' + ((d.deleted) ? ' deleted' : '') + '" data-index="' + i + '" data-feature="' + fId + '" href="#">' + jT.ui.renderObjValue(d, f.units, 'display', preVal) + '</a>'
                      + studyType
                      + (f.creator===undefined||f.creator==null|| ''==f.creator  || 'null'==f.creator || 'no data'==f.creator?'':(' <span class="shortened" title="'+f.creator+'">'+f.creator + '</span>'));
                 html += jT.ui.putInfo(full.compound.URI + '/study?property_uri=' + encodeURIComponent(fId));
@@ -471,11 +477,19 @@ var jToxBundle = {
             boxOptions.onOpen = function () {
               var box = this;
               var content = this.content[0];
-              $('button.jt-alert', content).on('click', function (){ deleteFeature(data, featureId, valueIdx, $('textarea', content).val(), jel[0]); box.close(); });
+              if(val[valueIdx].deleted){
+                // If the value is already deleted, show remarks
+                $('button.jt-alert', content).hide();
+                $('textarea', content).val(val[valueIdx].remarks);
+              }
+              else {
+                $('button.jt-alert', content).on('click', function (){ deleteFeature(data, featureId, valueIdx, $('textarea', content).val(), jel[0]); box.close(); });
+              }
             };
           }
-          else
+          else {
             $('.delete-box', infoDiv).hide();
+          }
 
           boxOptions.content = infoDiv.innerHTML;
           new jBox('Tooltip', boxOptions).open();
