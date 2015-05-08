@@ -1048,44 +1048,56 @@ window.jT.ui = {
 
   renderRange: function (data, unit, type, prefix) {
     var out = "";
-    if (typeof data == 'string' || typeof data == 'number')
+    if (typeof data == 'string' || typeof data == 'number') {
       out += (type != 'display') ? data : ((!!prefix ? prefix + "&nbsp;=&nbsp;" : '') + jT.ui.valueWithUnits(data, unit));
+    }
     else if (typeof data == 'object' && data != null) {
       var loValue = ccLib.trim(data.loValue),
           upValue = ccLib.trim(data.upValue);
 
       if (!!loValue && !!upValue && !!data.upQualifier && data.loQualifier != '=') {
-        if (!!prefix)
+        if (!!prefix) {
           out += prefix + "&nbsp;=&nbsp;";
+        }
         out += (data.loQualifier == ">=") ? "[" : "(";
         out += loValue + ", " + upValue;
         out += (data.upQualifier == "<=") ? "]" : ") ";
       }
-      else // either of them is non-undefined
-      {
-        var fnFormat = function (q, v) {
-          return (!!q ? q : "=") + " " + v;
+      else { // either of them is non-undefined
+
+        var fnFormat = function (p, q, v) {
+          var o = '';
+          if (!!p){
+            o += p + ' ';
+          }
+          if (!!q){
+            o += (!!p || q != '=') ? ( q + ' ') : '';
+          }
+          return o + v;
         };
 
-        if (!!prefix)
-          out += prefix + ' ';
-        if (!!loValue)
-          out += fnFormat(data.loQualifier, loValue);
-        else if (!!data.upValue)
-          out += fnFormat(data.upQualifier, upValue);
-        else
+        if (!!loValue) {
+          out += fnFormat(prefix, data.loQualifier || '=', loValue);
+        }
+        else if (!!data.upValue) {
+          out += fnFormat(prefix, data.upQualifier || '=', upValue);
+        }
+        else {
           out += type == 'display' ? '-' : '';
+        }
       }
 
       out = out.replace(/ /g, "&nbsp;");
       if (type == 'display') {
         unit = ccLib.trim(data.unit || unit);
-        if (!!unit)
+        if (!!unit) {
           out += '&nbsp;<span class="units">' + unit.replace(/ /g, "&nbsp;") + '</span>';
+        }
       }
     }
-    else
+    else {
       out += '-';
+    }
     return out;
   },
 
