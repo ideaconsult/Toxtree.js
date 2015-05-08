@@ -244,8 +244,30 @@ var jToxBundle = {
               var studyType = "<span class='ui-icon "+icon+"' title='" + f.source.type + "'></span>";
               //preVal = [preVal, f.source.type].filter(function(value){return value!==null}).join(' : ');
 
-              if (!f.isMultiValue || !$.isArray(theData))
+              var postVal = '', postValParts = [], parameters = [], conditions = [];
+              for (var i = 0, l = f.annotation.length; i < l; i++){
+                var a = f.annotation[i];
+                if ( a.type == 'conditions' && ccLib.getJsonValue(config, 'conditions.' + a.p.toLowerCase() + '.inMatrix') == true ) {
+                  conditions.push(a.o);
+                }
+                else if (a.type == 'parameters') {
+                  parameters.push(a.o);
+                }
+              }
+              if(parameters.length > 0){
+                postValParts.push('<span>' + parameters.join(', ') + '</span>');
+              }
+              if(conditions.length > 0){
+                postValParts.push('<span>' + conditions.join(', ') + '</span>');
+              }
+              if(f.creator !== undefined && f.creator != null && f.creator != '' && f.creator != 'null' && f.creator != 'no data'){
+                postValParts.push('<span class="shortened" title="'+f.creator+'">'+f.creator + '</span>');
+              }
+              postVal = '(' + postValParts.join(', ') + ')';
+
+              if (!f.isMultiValue || !$.isArray(theData)){
                 theData = [theData];
+              }
 
               // now - ready to produce HTML
               for (var i = 0, vl = theData.length; i < vl; ++i) {
@@ -263,7 +285,7 @@ var jToxBundle = {
                 }
                 html += '<a class="info-popup' + ((d.deleted) ? ' deleted' : '') + '" data-index="' + i + '" data-feature="' + fId + '" href="#">' + jT.ui.renderObjValue(d, f.units, 'display', preVal) + '</a>'
                      + studyType
-                     + (f.creator===undefined||f.creator==null|| ''==f.creator  || 'null'==f.creator || 'no data'==f.creator?'':(' <span class="shortened" title="'+f.creator+'">'+f.creator + '</span>'));
+                     + ' ' + postVal;
                 html += jT.ui.putInfo(full.compound.URI + '/study?property_uri=' + encodeURIComponent(fId));
                 html += '</div>';
               }

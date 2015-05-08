@@ -175,8 +175,11 @@ body.structlist #browser {
 }
 
 #jtox-matrix .jtox-ds-variable .shortened {
-  display: inline-block;
   max-width: 180px;
+}
+
+#jtox-matrix .jtox-ds-variable span {
+  display: inline-block;
   vertical-align: middle;
 }
 
