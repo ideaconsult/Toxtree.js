@@ -105,7 +105,33 @@ var jToxBundle = {
     $('.jq-buttonset', root).buttonset();
     $('.jq-buttonset.action input', root).on('change', loadAction);
 
-    $('.jtox-users-select', root).tokenize();
+    var updateUsers = function(){
+      var el = this.select; // here this refers to the tokenizer
+      $(el.parentNode).addClass('loading');
+      var property = (el[0].id == 'users-write') ? 'canWrite' : 'canRead';
+      var data = 'bundle_number=' + self.bundle.number;
+      var users = el.val();
+      if(users) {
+        for(var i = 0, l = users.length; i < l; i++){
+          data += '&' + property + '=' + users[i];
+        }
+      }
+      jT.service(self, self.settings.baseUrl + '/myaccount/users', { method: 'POST', data: data }, function(result){
+        $(el.parentNode).removeClass('loading');
+        if (!result) { // i.e. on error - request the old data
+          //self.loadUsers(); // this causes infinite loop because it triggers onRemoveToken callback.
+        }
+      });
+    }
+
+    $('.jtox-users-select', root).tokenize({
+      datas: self.settings.baseUrl + '/myaccount/users',
+      searchParam: 'q',
+      valueField: 'id',
+      textField: 'name',
+      onAddToken: updateUsers,
+      onRemoveToken: updateUsers
+    });
 
     self.onIdentifiers(null, $('#jtox-identifiers', self.rootElement)[0]);
     // finally, if provided - load the given bundleUri
@@ -204,8 +230,9 @@ var jToxBundle = {
           $(el).addClass('loading');
           jT.service(self, self.bundleUri, { method: 'PUT', data: data } , function (result) {
             $(el).removeClass('loading');
-            if (!result) // i.e. on error - request the old data
+            if (!result) { // i.e. on error - request the old data
               self.load(self.bundleUri);
+            }
           });
         }
       });
@@ -991,6 +1018,7 @@ var jToxBundle = {
       if (!!bundle) {
         bundle = bundle.dataset[0];
         self.bundleUri = bundle.URI;
+        self.bundle = bundle;
 
         ccLib.fillTree(self.createForm, bundle);
         self.starHighlight($('.data-stars-field div', self.createForm)[0], bundle.stars);
@@ -1012,6 +1040,34 @@ var jToxBundle = {
           }
           self.progressTabs();
         });
+        self.loadUsers();
+      }
+    });
+  },
+
+  loadUsers: function () {
+    var self = this;
+    var bundle = self.bundle;
+    // request and process users with write access
+    jT.call(self, self.settings.baseUrl + "/myaccount/users?mode=W&bundle_uri=" + encodeURIComponent(bundle.URI), function (users) {
+      if (!!users) {
+        var select = $('#users-write');
+        select.data('tokenize').clear();
+        for (var i = 0, l = users.length; i < l; ++i) {
+          var u = users[i];
+          select.data('tokenize').tokenAdd(u.id, u.name, true);
+        }
+      }
+    });
+    // request and process users with read only access
+    jT.call(self, self.settings.baseUrl + "/myaccount/users?mode=R&bundle_uri=" + encodeURIComponent(bundle.URI), function (users) {
+      if (!!users) {
+        var select = $('#users-read');
+        select.data('tokenize').clear();
+        for (var i = 0, l = users.length; i < l; ++i) {
+          var u = users[i];
+          select.data('tokenize').tokenAdd(u.id, u.name, true);
+        }
       }
     });
   },

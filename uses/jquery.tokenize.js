@@ -467,7 +467,7 @@
                 .insertBefore(this.searchToken);
 
             if(!first){
-                this.options.onAddToken(value, text);
+                this.options.onAddToken.apply(this, [value, text]);
             }
 
             this.resetSearchInput();
@@ -489,7 +489,7 @@
 
             $('li.Token[data-value="' + value + '"]', this.tokensContainer).remove();
 
-            this.options.onRemoveToken(value);
+            this.options.onRemoveToken.apply(this, [value]);
             this.resizeSearchInput();
             this.dropdownHide();
 
