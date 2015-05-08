@@ -1079,11 +1079,16 @@ window.jT.ui = {
         if (!!loValue) {
           out += fnFormat(prefix, data.loQualifier || '=', loValue);
         }
-        else if (!!data.upValue) {
+        else if (!!upValue) {
           out += fnFormat(prefix, data.upQualifier || '=', upValue);
         }
         else {
-          out += type == 'display' ? '-' : '';
+          if (!!prefix) {
+            out += prefix;
+          }
+          else {
+            out += type == 'display' ? '-' : '';
+          }
         }
       }
 
