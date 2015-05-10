@@ -275,7 +275,8 @@ var jToxBundle = {
               for (var i = 0, l = f.annotation.length; i < l; i++){
                 var a = f.annotation[i];
                 if ( a.type == 'conditions' && ccLib.getJsonValue(config, 'conditions.' + a.p.toLowerCase() + '.inMatrix') == true ) {
-                  conditions.push(a.p + ' = ' + a.o);
+                  var t = ccLib.getJsonValue(config, 'conditions.' + a.p.toLowerCase() + '.sTitle') || a.p;
+                  conditions.push(t + ' = ' + a.o);
                 }
                 else if (a.type == 'parameters') {
                   parameters.push(a.o);
