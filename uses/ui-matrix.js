@@ -414,7 +414,8 @@ var jToxBundle = {
           return html;
         }
         if (!!bInfo.tag) {
-          html += '<button class="jt-toggle active" disabled="true"' + (!bInfo.remarks ? '' : 'title="' + bInfo.remarks + '"') + '>' + (bInfo.tag == 'source' ? 'S' : 'T') + '</button><br />';
+          var tag = bInfo.tag.match(/\b\w/gi).join('').toUpperCase();
+          html += '<button class="jt-toggle active" disabled="true"' + (!bInfo.remarks ? '' : 'title="' + bInfo.remarks + '"') + '>' + tag + '</button><br />';
         }
         if (!!bInfo.remarks && bInfo.remarks != '') {
           html += jT.ui.putInfo(null, bInfo.remarks);
@@ -900,7 +901,8 @@ var jToxBundle = {
             return html;
           }
           if (!!bInfo.tag) {
-            html += '<button class="jt-toggle active" disabled="true"' + (!bInfo.remarks ? '' : 'title="' + bInfo.remarks + '"') + '>' + (bInfo.tag == 'source' ? 'S' : 'T') + '</button><br />';
+            var tag = bInfo.tag.match(/\b\w/gi).join('').toUpperCase();
+            html += '<button class="jt-toggle active" disabled="true"' + (!bInfo.remarks ? '' : 'title="' + bInfo.remarks + '"') + '>' + tag + '</button><br />';
           }
 
           return html;
@@ -916,7 +918,7 @@ var jToxBundle = {
           var bundleInfo = data.bundles[self.bundleUri] || {};
           var noteEl = $('textarea.remark', row);
           if (!!bundleInfo.tag) {
-            $('button.jt-toggle.' + bundleInfo.tag.toLowerCase(), row).addClass('active');
+            $('button.jt-toggle.' + bundleInfo.tag.toLowerCase().replace(' ', '-'), row).addClass('active');
             noteEl.val(bundleInfo.remarks);
           }
           noteEl.prop('readonly', true);
@@ -997,7 +999,7 @@ var jToxBundle = {
         });
 
         if (!!bundleInfo.tag) {
-          $('button.jt-toggle.' + bundleInfo.tag.toLowerCase(), row).addClass('active');
+          $('button.jt-toggle.' + bundleInfo.tag.toLowerCase().replace(' ', '-'), row).addClass('active');
           noteEl.val(bundleInfo.remarks);
         }
         else {
@@ -1172,7 +1174,7 @@ var jToxBundle = {
 
 // Now some handlers - they should be outside, because they are called within windows' context.
 function onSelectStructure(e) {
-  jToxBundle.selectStructure($(this).data('data'), $(this).hasClass('target') ? 'target' : 'source', this);
+  jToxBundle.selectStructure($(this).data('data'), $(this).data('tag'), this);
 }
 
 function onBrowserFilled(dataset) {
