@@ -414,7 +414,7 @@ var jToxBundle = {
           return html;
         }
         if (!!bInfo.tag) {
-          var tag = bInfo.tag.match(/\b\w/gi).join('').toUpperCase();
+          var tag = (bInfo.tag == 'cm') ? 'CM' : bInfo.tag.substr(0,1).toUpperCase();
           html += '<button class="jt-toggle active" disabled="true"' + (!bInfo.remarks ? '' : 'title="' + bInfo.remarks + '"') + '>' + tag + '</button><br />';
         }
         if (!!bInfo.remarks && bInfo.remarks != '') {
@@ -901,7 +901,7 @@ var jToxBundle = {
             return html;
           }
           if (!!bInfo.tag) {
-            var tag = bInfo.tag.match(/\b\w/gi).join('').toUpperCase();
+            var tag = (bInfo.tag == 'cm') ? 'CM' : bInfo.tag.substr(0,1).toUpperCase();
             html += '<button class="jt-toggle active" disabled="true"' + (!bInfo.remarks ? '' : 'title="' + bInfo.remarks + '"') + '>' + tag + '</button><br />';
           }
 
@@ -918,7 +918,7 @@ var jToxBundle = {
           var bundleInfo = data.bundles[self.bundleUri] || {};
           var noteEl = $('textarea.remark', row);
           if (!!bundleInfo.tag) {
-            $('button.jt-toggle.' + bundleInfo.tag.toLowerCase().replace(' ', '-'), row).addClass('active');
+            $('button.jt-toggle.' + bundleInfo.tag.toLowerCase(), row).addClass('active');
             noteEl.val(bundleInfo.remarks);
           }
           noteEl.prop('readonly', true);
@@ -999,7 +999,7 @@ var jToxBundle = {
         });
 
         if (!!bundleInfo.tag) {
-          $('button.jt-toggle.' + bundleInfo.tag.toLowerCase().replace(' ', '-'), row).addClass('active');
+          $('button.jt-toggle.' + bundleInfo.tag.toLowerCase(), row).addClass('active');
           noteEl.val(bundleInfo.remarks);
         }
         else {
@@ -1106,11 +1106,10 @@ var jToxBundle = {
       $(el).removeClass('loading');
       if (!!result) {
         $(el).toggleClass('active');
-        if (activate)
-        {
+        if (activate) {
           self.bundleSummary.compound++;
-          what = (what == "target" ? "source" : "target");
-          $('button.' + what, el.parentNode).removeClass('active');
+          $('button', el.parentNode).removeClass('active');
+          $(el).addClass('active');
         }
         else
           self.bundleSummary.compound--;
