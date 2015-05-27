@@ -23,6 +23,11 @@ strong {
   resize: none;
 }
 
+#jtox-bundle button.jt-toggle {
+  width: auto;
+  min-width: 24px;
+}
+
 #jtox-identifiers form div.actions {
 	margin-top: 15px;
 	font-size: 80%;
