@@ -288,10 +288,12 @@ var jToxBundle = {
               if(conditions.length > 0){
                 postValParts.push('<span>' + conditions.join(', ') + '</span>');
               }
-              if(f.creator !== undefined && f.creator != null && f.creator != '' && f.creator != 'null' && f.creator != 'no data'){
-                postValParts.push('<span class="shortened" title="'+f.creator+'">'+f.creator + '</span>');
+              if(ccLib.getJsonValue(config, 'protocol.guideline.inMatrix') == true){
+                if(f.creator !== undefined && f.creator != null && f.creator != '' && f.creator != 'null' && f.creator != 'no data'){
+                  postValParts.push('<span class="shortened" title="'+f.creator+'">'+f.creator + '</span>');
+                }
               }
-              postVal = '(' + postValParts.join(', ') + ')';
+              postVal = (postValParts.length > 0) ? '(' + postValParts.join(', ') + ')' : '';
 
               if (!f.isMultiValue || !$.isArray(theData)){
                 theData = [theData];
