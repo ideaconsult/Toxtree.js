@@ -25,6 +25,7 @@ var jToxCompound = (function () {
     "metricFeature": "http://www.opentox.org/api/1.1#Similarity",   // This is the default metric feature, if no other is specified
     "onTab": null,            // invoked after each group's tab is created - function (element, tab, name, isMain);
     "onLoaded": null,         // invoked when a set of compounds is loaded.
+    "onComplete": null,       // invoked when the component is all ready.
     "onPrepared": null,       // invoked when the initial call for determining the tabs/columns is ready
     "onDetails": null,        // invoked when a details pane is openned
     "preDetails": null,       // invoked prior of details pane creation to see if it is going to happen at all
@@ -864,13 +865,16 @@ var jToxCompound = (function () {
           if (!self.settings.noInterface) {
             // ok - go and update the table, filtering the entries, if needed
             self.updateTables();
-            if (self.settings.showControls)
+            if (self.settings.showControls) {
               // finally - go and update controls if they are visible
               self.updateControls(qStart, dataset.dataEntry.length);
+            }
           }
         }
-        else
+        else {
           ccLib.fireCallback(self.settings.onLoaded, self, dataset);
+        }
+        ccLib.fireCallback(self.settings.onComplete, self);
       };
 
       // we may be passed dataset, if the initial, setup query was 404: Not Found - to avoid second such query...
