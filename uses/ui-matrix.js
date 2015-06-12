@@ -689,8 +689,8 @@ var jToxBundle = {
     if (!self.queryKit) {
       self.queryKit = jT.kit($('#jtox-query')[0]);
       self.queryKit.setWidget("bundle", self.rootElement);
-      // provid onRow function so the buttons can be se properly...
       self.queryKit.kit().settings.fixedWidth = '200px';
+      // provid onRow function so the buttons can be se properly...
       self.queryKit.kit().settings.onRow = function (row, data, index) {
         if (!data.bundles)
           return;
@@ -730,6 +730,114 @@ var jToxBundle = {
     }
     else {
       self.queryKit.query();
+    }
+
+  },
+
+  onReport: function(id, panel){
+
+    var self = this;
+
+    ccLib.fillTree(panel, self.bundle);
+
+    if (!self.reportQueryKit) {
+      self.reportQueryKit = jT.kit($('#jtox-report-query')[0]);
+      self.reportQueryKit.setWidget("bundle", self.rootElement);
+      self.reportQueryKit.kit().settings.fixedWidth = '200px';
+      // provid onRow function so the buttons can be se properly...
+      self.reportQueryKit.kit().settings.onRow = function (row, data, index) {
+        if (!data.bundles)
+          return;
+
+        var bundleInfo = data.bundles[self.bundleUri] || {};
+        if (!!bundleInfo.tag) {
+          $('button.jt-toggle.' + bundleInfo.tag.toLowerCase(), row).addClass('active');
+        }
+        if (!!bundleInfo.remarks) {
+          $('textarea.remark', row).val(bundleInfo.remarks).prop('readonly', true);
+        }
+      };
+
+    }
+    self.reportQueryKit.kit().queryDataset(self.bundleUri + '/compound');
+
+    if (!self.reportSubstancesQueryKit) {
+
+      self.reportSubstancesQueryKit = self.prepareSubstanceKit($('#jtox-report-substance-query')[0]);
+
+      self.reportSubstancesQueryKit.kit().settings.onRow = function (row, data, index) {
+        if (!data.bundles){
+          return;
+        }
+        var bundleInfo = data.bundles[self.bundleUri] || {};
+        $('textarea.remark', row).val(bundleInfo.remarks).prop('readonly', true);
+        if (!!bundleInfo.tag) {
+          $('button.jt-toggle.' + bundleInfo.tag.toLowerCase(), row).addClass('active');
+        }
+      };
+
+    }
+
+    self.reportSubstancesQueryKit.kit().queryDataset(self.bundleUri + '/compound');
+
+
+    if (!self.reportMatrixKit) {
+
+      self.reportMatrixKit = self.prepareMatrixKit($('#jtox-report-matrix .jtox-toolkit')[0]);
+
+      self.reportMatrixKit.settings.showTabs = false;
+      self.reportMatrixKit.settings.showControls = false;
+      self.reportMatrixKit.settings.fixedWidth = "100%";
+
+      self.reportMatrixKit.settings.onComplete = function () {
+        var self = this,
+            table = $('<table class="dataTable"><thead></thead><tbody></tbody></table>'),
+            head = table.find('thead'),
+            body = table.find('tbody');
+
+        var ntr = $('<tr><th>Substance name</th></tr>');
+        var ttr = $('<tr><th>Tag</th></tr>');
+        var ctr = $('<tr><th>CAS No.</th></tr>');
+        $(self.fixTable).find('> tbody > tr').each(function(){
+          var cth = $('<th></th>').html( $(this).find('td')[2].innerHTML );
+          ctr.append(cth);
+          var nth = $('<th></th>').html( $(this).find('td')[3].innerHTML );
+          ntr.append(nth);
+          var tth = $('<th></th>').append( $($(this).find('td')[6]).find('button.active').clone() );
+          ttr.append(tth);
+        });
+        head.append(ttr).append(ntr).append(ctr);
+
+        $(self.varTable).find('thead th').each(function(index){
+          if (this.innerHTML == '') return;
+          var $this = $(this);
+          var tr = $('<tr></tr>').append('<th>' + $this.html() + '</th>');
+          $(self.varTable).find('tbody > tr').each(function(){
+            tr.append( '<td>' + $(this).find('td:nth-child(' + (index+1) + ')').html() + '</td>' );
+          });
+          body.append(tr);
+        });
+
+        $('#jtox-report-final > div').append(table);
+
+        $(self.varTable).remove();
+        self.equalizeTables();
+
+      };
+
+      self.reportMatrixKit.settings.onRow = function (row, data, index) {
+        var self = this;
+        // equalize multi-rows, if there are any
+        setTimeout(function () {
+          ccLib.equalizeHeights.apply(window, jT.$('td.jtox-multi table tbody', row).toArray());
+        }, 50);
+      };
+
+    }
+
+    var queryUri = self.bundleUri + '/matrix/final';
+    if (!!queryUri) {
+      self.reportMatrixKit.query(queryUri);
     }
 
   },
@@ -1088,6 +1196,7 @@ var jToxBundle = {
     $(this.rootElement).tabs(this.bundleSummary.substance > 0  && this.bundleSummary.property > 0 ? 'enable' : 'disable', 3);
     if (this.bundleSummary.matrix > 0 || this.bundleSummary['matrix/final'] > 0) {
       $('#xfinal').button('enable');
+      $(this.rootElement).tabs('enable', 4);
     }
     else {
       $('#xfinal').button('disable');
@@ -1272,6 +1381,16 @@ function onDetailedRow(row, data, event) {
     new jToxStudy(root, $.extend({}, this.settings, {substanceUri: data.URI}));
   } } ) );
 }
+
+function onReportSubstancesLoaded(dataset) {
+  // Use setTimeout so that this is called after the UI is generated.
+  setTimeout(function(){
+    $('#jtox-report-substance-query .jtox-details-open').each(function(){
+      this.click();
+    });
+  }, 16);
+}
+
 
 $(document).ready(function(){
   $('#logger').on('click', function () { $(this).toggleClass('hidden'); });
