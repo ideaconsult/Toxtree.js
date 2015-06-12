@@ -245,189 +245,6 @@ var jToxBundle = {
   onMatrix: function (panId, panel) {
     var self = this;
     if (!$(panel).hasClass('initialized')) {
-      jTConfig.matrix.groups = function (miniset, kit) {
-        var groups = { "Identifiers" : self.settings.matrixIdentifiers.concat(self.settings.matrixMultiRows) },
-            groupids = [],
-            endpoints = {};
-
-        var fRender = function (feat, theId) {
-          return function (data, type, full) {
-            if (type != 'display')
-              return '-';
-
-            var html = '';
-            for (var fId in self.matrixKit.dataset.feature) {
-              var f = self.matrixKit.dataset.feature[fId];
-              if (f.sameAs != feat.sameAs || full.values[fId] == null)
-                continue;
-
-              var catId = self.parseFeatureId(fId).category,
-                  config = jT.$.extend(true, {}, kit.settings.configuration.columns["_"], kit.settings.configuration.columns[catId]);
-
-              var theData = full.values[fId];
-              var preVal = (ccLib.getJsonValue(config, 'effects.endpoint.bVisible') !== false) ? "<strong>"+f.title+"</strong>" : null;
-
-              var icon = f.isModelPredictionFeature?"ui-icon-calculator":"ui-icon-tag";
-              var studyType = "<span class='ui-icon "+icon+"' title='" + f.source.type + "'></span>";
-              //preVal = [preVal, f.source.type].filter(function(value){return value!==null}).join(' : ');
-
-              var postVal = '', postValParts = [], parameters = [], conditions = [];
-              for (var i = 0, l = f.annotation.length; i < l; i++){
-                var a = f.annotation[i];
-                if ( a.type == 'conditions' && ccLib.getJsonValue(config, 'conditions.' + a.p.toLowerCase() + '.inMatrix') == true ) {
-                  var t = ccLib.getJsonValue(config, 'conditions.' + a.p.toLowerCase() + '.sTitle') || a.p;
-                  conditions.push(t + ' = ' + a.o);
-                }
-                else if (a.type == 'parameters') {
-                  parameters.push(a.o);
-                }
-              }
-              if(parameters.length > 0){
-                postValParts.push('<span>' + parameters.join(', ') + '</span>');
-              }
-              if(conditions.length > 0){
-                postValParts.push('<span>' + conditions.join(', ') + '</span>');
-              }
-              if(ccLib.getJsonValue(config, 'protocol.guideline.inMatrix') == true){
-                if(f.creator !== undefined && f.creator != null && f.creator != '' && f.creator != 'null' && f.creator != 'no data'){
-                  postValParts.push('<span class="shortened" title="'+f.creator+'">'+f.creator + '</span>');
-                }
-              }
-              postVal = (postValParts.length > 0) ? '(' + postValParts.join(', ') + ')' : '';
-
-              if (!f.isMultiValue || !$.isArray(theData)){
-                theData = [theData];
-              }
-
-              // now - ready to produce HTML
-              for (var i = 0, vl = theData.length; i < vl; ++i) {
-                var d = theData[i];
-                if (d.deleted && !self.edit.matrixEditable)
-                  continue;
-                html += '<div>';
-                if (self.edit.matrixEditable) {
-                  if (d.deleted){
-                    html += '<span class="ui-icon ui-icon-info delete-popup"></span>&nbsp;';
-                  }
-                  else {
-                    html += '<span class="ui-icon ui-icon-circle-minus delete-popup"></span>&nbsp;';
-                  }
-                }
-                html += '<a class="info-popup' + ((d.deleted) ? ' deleted' : '') + '" data-index="' + i + '" data-feature="' + fId + '" href="#">' + jT.ui.renderObjValue(d, f.units, 'display', preVal) + '</a>'
-                     + studyType
-                     + ' ' + postVal;
-                html += jT.ui.putInfo(full.compound.URI + '/study?property_uri=' + encodeURIComponent(fId));
-                html += '</div>';
-              }
-            }
-
-            if (self.edit.matrixEditable)
-              html += '<span class="ui-icon ui-icon-circle-plus edit-popup" data-feature="' + theId + '"></span>';
-            return  html;
-          };
-        };
-
-        for (var fId in miniset.feature) {
-          var feat = miniset.feature[fId];
-          if (feat.sameAs == null || feat.sameAs.indexOf("echaEndpoints.owl#") < 0)
-            continue;
-
-          var catId = self.parseFeatureId(fId).topcategory;
-          var grp = groups[catId];
-          if (grp == null)
-            groups[catId] = grp = [];
-
-          if (endpoints[feat.sameAs] == null) {
-            endpoints[feat.sameAs] = true;
-            if (!feat.title)
-              feat.title = feat.sameAs.substr(feat.sameAs.indexOf('#') + 1);
-            feat.render = fRender(feat, fId);
-            feat.column = { sClass: "breakable", sWidth: "80px" };
-            grp.push(fId);
-          }
-        }
-
-        /*
-         * Sort columns alphabetically, in this case - by the category number.
-         */
-        for(var grp in groups) {
-          if(grp != 'Identifiers'){
-            var group = groups[grp];
-            group.sort(function(a,b){
-              if (miniset.feature[a].title == miniset.feature[b].title) {
-                return 0;
-              }
-              return (miniset.feature[a].title < miniset.feature[b].title) ? -1 : 1;
-            });
-          }
-        }
-
-        /*
-         * Sort groups by the columns titles / category number.
-         * Since we are trying to sort an Object keys, which is
-         * itself nonsense in JavaScript, this may fail at any time.
-         */
-        groupids = Object.keys(groups);
-
-        groupids.sort(function(a, b){
-          if (a == 'Identifiers') return -1;
-          if (b == 'Identifiers') return 1;
-          a = groups[a][0], b = groups[b][0];
-          if (miniset.feature[a].title == miniset.feature[b].title) {
-            return 0;
-          }
-          return (miniset.feature[a].title < miniset.feature[b].title) ? -1 : 1;
-        })
-
-        var newgroups = {};
-
-        groupids.forEach(function(i, v){
-          newgroups[i] = groups[i];
-        });
-
-        groups = newgroups;
-
-        return groups;
-      }
-
-      $(panel).addClass('initialized');
-
-      var conf = $.extend(true, {}, jTConfig.matrix, config_study);
-
-      conf.baseFeatures['#IdRow'] = { used: true, basic: true, data: "number", column: { "sClass": "center"}, render: function (data, type, full) {
-        if (type != 'display')
-          return data || 0;
-        var html = "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;<br/>";
-        html += '<button type="button" class="ui-button ui-button-icon-only jtox-up"><span class="ui-icon ui-icon-triangle-1-n">up</span></button><br />' +
-                '<button type="button" class="ui-button ui-button-icon-only jtox-down"><span class="ui-icon ui-icon-triangle-1-s">down</span></button><br />'
-        return html;
-      } };
-
-      conf.baseFeatures['#Tag'] = { title: 'Tag', used: false, basic: true, visibility: "main", primary: true, column: { "sClass": "center"}, render: function (data, type, full) {
-
-        if (type != 'display')
-          return data || 0;
-
-        var html = "";
-        var bInfo = full.component.bundles[self.bundleUri];
-        if (!bInfo) {
-          return html;
-        }
-        if (!!bInfo.tag) {
-          var tag = (bInfo.tag == 'cm') ? 'CM' : bInfo.tag.substr(0,1).toUpperCase();
-          html += '<button class="jt-toggle active" disabled="true"' + (!bInfo.remarks ? '' : 'title="' + bInfo.remarks + '"') + '>' + tag + '</button><br />';
-        }
-        if (!!bInfo.remarks && bInfo.remarks != '') {
-          html += jT.ui.putInfo(null, bInfo.remarks);
-        }
-
-        return html;
-      } };
-
-      conf.baseFeatures['http://www.opentox.org/api/1.1#CASRN'].primary = true;
-
-
-      var featuresInitialized = false;
 
       var saveButton = $('.save-button', panel)[0];
       saveButton.disabled = true;
@@ -701,88 +518,39 @@ var jToxBundle = {
 
       $('select.type-list', editDiv)[0].appendChild(df);
 
-      self.matrixKit = new jToxCompound($('.jtox-toolkit', panel)[0], {
-        crossDomain: true,
-        rememberChecks: true,
-        tabsFolded: true,
-        showDiagrams: true,
-        showUnits: false,
-        hasDetails: false,
-        fixedWidth: "650px",
-        configuration: conf,
-        featureUri: self.bundleUri + '/property',
-        onPrepared: function (miniset, kit) {
-          if (featuresInitialized)
-            return;
-          // this is when we have the features combined, so we can make the multi stuff
-          var getRender = function (fId, oldData, oldRender) {
-            return function (data, type, full) {
-              return typeof data != 'object' ? '-' : jT.ui.renderMulti(data, type, full, function (_data, _type, _full){
-                var dt = ccLib.getJsonValue(_data, (fId.indexOf('#Diagram') > 0 ? 'component.' : '') + oldData);
-                return (typeof oldRender == 'function' ? oldRender(dt, _type, fId.indexOf('#Diagram') > 0 ? _data.component : _data) : dt);
-              });
-            };
-          };
+      self.matrixKit = self.prepareMatrixKit($('.jtox-toolkit', panel)[0]);
 
-          // and now - process the multi-row columns
-          for (var i = 0, mrl = self.settings.matrixMultiRows.length;i < mrl; ++i) {
-            var fId = self.settings.matrixMultiRows[i];
-            var mr = miniset.feature[fId];
-            mr.render = getRender(fId, mr.data, mr.render);
-            mr.data = 'composition';
-            var col = mr.column;
-            if (col == null)
-              mr.column = col = { sClass: "jtox-multi" };
-            else if (col.sClass == null)
-              col.sClass = "jtox-multi";
-            else
-              col.sClass += " jtox-multi";
-          }
+      self.matrixKit.settings.onRow = function (row, data, index) {
+        // equalize multi-rows, if there are any
+        jT.$('td.jtox-multi .jtox-diagram span.ui-icon', row).on('click', function () {
+          setTimeout(function () {
+            ccLib.equalizeHeights.apply(window, jT.$('td.jtox-multi table tbody', row).toArray());
+          }, 50);
+        });
 
-          featuresInitialized = true;
-        },
+        $('.info-popup, .edit-popup, .delete-popup', row).on('click', function (e) {
+          if (!$(this).hasClass('delete-popup') || $(this).data('index') == null)
+            onEditClick.call(this, data);
+        });
 
-        onLoaded: function (dataset) {
-          jToxCompound.processFeatures(dataset.feature, this.feature);
+        var self = this;
+        $('button.jtox-up', row).on('click', function(){
+          var i = $(self.fixTable).find('> tbody > tr').index(row);
+          var varRow = $(self.varTable).find('> tbody > tr')[i];
+          $(row).insertBefore( $(row.previousElementSibling) );
+          $(varRow).insertBefore( $(varRow.previousElementSibling) );
+        });
+        $('button.jtox-down', row).on('click', function(){
+          var i = $(self.fixTable).find('> tbody > tr').index(row);
+          var varRow = $(self.varTable).find('> tbody > tr')[i];
+          $(row).insertAfter( $(row.nextElementSibling) );
+          $(varRow).insertAfter( $(varRow.nextElementSibling) );
+        });
 
-          // we need to process
-          for (var i = 0, dl = dataset.dataEntry.length; i < dl; ++i) {
-            var data = dataset.dataEntry[i];
-            if (data.composition != null)
-              for (var j = 0;j < data.composition.length; ++j)
-                jToxCompound.processEntry(data.composition[j].component, dataset.feature);
-          }
-        },
+      };
 
-        onRow: function (row, data, index) {
-          // equalize multi-rows, if there are any
-          jT.$('td.jtox-multi .jtox-diagram span.ui-icon', row).on('click', function () {
-            setTimeout(function () {
-              ccLib.equalizeHeights.apply(window, jT.$('td.jtox-multi table tbody', row).toArray());
-            }, 50);
-          });
+      $(panel).addClass('initialized');
 
-          $('.info-popup, .edit-popup, .delete-popup', row).on('click', function (e) {
-            if (!$(this).hasClass('delete-popup') || $(this).data('index') == null)
-              onEditClick.call(this, data);
-          });
-
-          var self = this;
-          $('button.jtox-up', row).on('click', function(){
-            var i = $(self.fixTable).find('> tbody > tr').index(row);
-            var varRow = $(self.varTable).find('> tbody > tr')[i];
-            $(row).insertBefore( $(row.previousElementSibling) );
-            $(varRow).insertBefore( $(varRow.previousElementSibling) );
-          });
-          $('button.jtox-down', row).on('click', function(){
-            var i = $(self.fixTable).find('> tbody > tr').index(row);
-            var varRow = $(self.varTable).find('> tbody > tr')[i];
-            $(row).insertAfter( $(row.nextElementSibling) );
-            $(varRow).insertAfter( $(varRow.nextElementSibling) );
-          });
-
-        }
-      });
     }
 
 
@@ -1015,6 +783,249 @@ var jToxBundle = {
     else {
       self.queryKit.query();
     }
+
+  },
+
+  prepareMatrixKit: function(rootEl){
+    var self = this;
+
+    jTConfig.matrix.groups = function(miniset, kit) {
+      var groups = { "Identifiers" : self.settings.matrixIdentifiers.concat(self.settings.matrixMultiRows) },
+          groupids = [],
+          endpoints = {};
+
+      var fRender = function (feat, theId) {
+        return function (data, type, full) {
+          if (type != 'display')
+            return '-';
+
+          var html = '';
+          for (var fId in kit.dataset.feature) {
+            var f = kit.dataset.feature[fId];
+            if (f.sameAs != feat.sameAs || full.values[fId] == null)
+              continue;
+
+            var catId = self.parseFeatureId(fId).category,
+                config = jT.$.extend(true, {}, kit.settings.configuration.columns["_"], kit.settings.configuration.columns[catId]);
+
+            var theData = full.values[fId];
+            var preVal = (ccLib.getJsonValue(config, 'effects.endpoint.bVisible') !== false) ? "<strong>"+f.title+"</strong>" : null;
+
+            var icon = f.isModelPredictionFeature?"ui-icon-calculator":"ui-icon-tag";
+            var studyType = "<span class='ui-icon "+icon+"' title='" + f.source.type + "'></span>";
+            //preVal = [preVal, f.source.type].filter(function(value){return value!==null}).join(' : ');
+
+            var postVal = '', postValParts = [], parameters = [], conditions = [];
+            for (var i = 0, l = f.annotation.length; i < l; i++){
+              var a = f.annotation[i];
+              if ( a.type == 'conditions' && ccLib.getJsonValue(config, 'conditions.' + a.p.toLowerCase() + '.inMatrix') == true ) {
+                var t = ccLib.getJsonValue(config, 'conditions.' + a.p.toLowerCase() + '.sTitle') || a.p;
+                conditions.push(t + ' = ' + a.o);
+              }
+              else if (a.type == 'parameters') {
+                parameters.push(a.o);
+              }
+            }
+            if(parameters.length > 0){
+              postValParts.push('<span>' + parameters.join(', ') + '</span>');
+            }
+            if(conditions.length > 0){
+              postValParts.push('<span>' + conditions.join(', ') + '</span>');
+            }
+            if(ccLib.getJsonValue(config, 'protocol.guideline.inMatrix') == true){
+              if(f.creator !== undefined && f.creator != null && f.creator != '' && f.creator != 'null' && f.creator != 'no data'){
+                postValParts.push('<span class="shortened" title="'+f.creator+'">'+f.creator + '</span>');
+              }
+            }
+            postVal = (postValParts.length > 0) ? '(' + postValParts.join(', ') + ')' : '';
+
+            if (!f.isMultiValue || !$.isArray(theData)){
+              theData = [theData];
+            }
+
+            // now - ready to produce HTML
+            for (var i = 0, vl = theData.length; i < vl; ++i) {
+              var d = theData[i];
+              if (d.deleted && !self.edit.matrixEditable)
+                continue;
+              html += '<div>';
+              if (self.edit.matrixEditable) {
+                if (d.deleted){
+                  html += '<span class="ui-icon ui-icon-info delete-popup"></span>&nbsp;';
+                }
+                else {
+                  html += '<span class="ui-icon ui-icon-circle-minus delete-popup"></span>&nbsp;';
+                }
+              }
+              html += '<a class="info-popup' + ((d.deleted) ? ' deleted' : '') + '" data-index="' + i + '" data-feature="' + fId + '" href="#">' + jT.ui.renderObjValue(d, f.units, 'display', preVal) + '</a>'
+                   + studyType
+                   + ' ' + postVal;
+              html += jT.ui.putInfo(full.compound.URI + '/study?property_uri=' + encodeURIComponent(fId));
+              html += '</div>';
+            }
+          }
+
+          if (self.edit.matrixEditable)
+            html += '<span class="ui-icon ui-icon-circle-plus edit-popup" data-feature="' + theId + '"></span>';
+          return  html;
+        };
+      };
+
+      for (var fId in miniset.feature) {
+        var feat = miniset.feature[fId];
+        if (feat.sameAs == null || feat.sameAs.indexOf("echaEndpoints.owl#") < 0)
+          continue;
+
+        var catId = self.parseFeatureId(fId).topcategory;
+        var grp = groups[catId];
+        if (grp == null)
+          groups[catId] = grp = [];
+
+        if (endpoints[feat.sameAs] == null) {
+          endpoints[feat.sameAs] = true;
+          if (!feat.title)
+            feat.title = feat.sameAs.substr(feat.sameAs.indexOf('#') + 1);
+          feat.render = fRender(feat, fId);
+          feat.column = { sClass: "breakable", sWidth: "80px" };
+          grp.push(fId);
+        }
+      }
+
+      /*
+       * Sort columns alphabetically, in this case - by the category number.
+       */
+      for(var grp in groups) {
+        if(grp != 'Identifiers'){
+          var group = groups[grp];
+          group.sort(function(a,b){
+            if (miniset.feature[a].title == miniset.feature[b].title) {
+              return 0;
+            }
+            return (miniset.feature[a].title < miniset.feature[b].title) ? -1 : 1;
+          });
+        }
+      }
+
+      /*
+       * Sort groups by the columns titles / category number.
+       * Since we are trying to sort an Object keys, which is
+       * itself nonsense in JavaScript, this may fail at any time.
+       */
+      groupids = Object.keys(groups);
+
+      groupids.sort(function(a, b){
+        if (a == 'Identifiers') return -1;
+        if (b == 'Identifiers') return 1;
+        a = groups[a][0], b = groups[b][0];
+        if (miniset.feature[a].title == miniset.feature[b].title) {
+          return 0;
+        }
+        return (miniset.feature[a].title < miniset.feature[b].title) ? -1 : 1;
+      })
+
+      var newgroups = {};
+
+      groupids.forEach(function(i, v){
+        newgroups[i] = groups[i];
+      });
+
+      groups = newgroups;
+
+      return groups;
+    };
+
+    var conf = $.extend(true, {}, jTConfig.matrix, config_study);
+
+    conf.baseFeatures['#IdRow'] = { used: true, basic: true, data: "number", column: { "sClass": "center"}, render: function (data, type, full) {
+      if (type != 'display')
+        return data || 0;
+      var html = "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;<br/>";
+      html += '<button type="button" class="ui-button ui-button-icon-only jtox-up"><span class="ui-icon ui-icon-triangle-1-n">up</span></button><br />' +
+              '<button type="button" class="ui-button ui-button-icon-only jtox-down"><span class="ui-icon ui-icon-triangle-1-s">down</span></button><br />'
+      return html;
+    } };
+
+    conf.baseFeatures['#Tag'] = { title: 'Tag', used: false, basic: true, visibility: "main", primary: true, column: { "sClass": "center"}, render: function (data, type, full) {
+
+      if (type != 'display')
+        return data || 0;
+
+      var html = "";
+      var bInfo = full.component.bundles[self.bundleUri];
+      if (!bInfo) {
+        return html;
+      }
+      if (!!bInfo.tag) {
+        var tag = (bInfo.tag == 'cm') ? 'CM' : bInfo.tag.substr(0,1).toUpperCase();
+        html += '<button class="jt-toggle active" disabled="true"' + (!bInfo.remarks ? '' : 'title="' + bInfo.remarks + '"') + '>' + tag + '</button><br />';
+      }
+      if (!!bInfo.remarks && bInfo.remarks != '') {
+        html += jT.ui.putInfo(null, bInfo.remarks);
+      }
+
+      return html;
+    } };
+
+    conf.baseFeatures['http://www.opentox.org/api/1.1#CASRN'].primary = true;
+
+    var featuresInitialized = false;
+
+    matrixKit = new jToxCompound(rootEl, {
+      crossDomain: true,
+      rememberChecks: true,
+      tabsFolded: true,
+      showDiagrams: true,
+      showUnits: false,
+      hasDetails: false,
+      fixedWidth: "650px",
+      configuration: conf,
+      featureUri: self.bundleUri + '/property',
+      onPrepared: function (miniset, kit) {
+        if (featuresInitialized)
+          return;
+        // this is when we have the features combined, so we can make the multi stuff
+        var getRender = function (fId, oldData, oldRender) {
+          return function (data, type, full) {
+            return typeof data != 'object' ? '-' : jT.ui.renderMulti(data, type, full, function (_data, _type, _full){
+              var dt = ccLib.getJsonValue(_data, (fId.indexOf('#Diagram') > 0 ? 'component.' : '') + oldData);
+              return (typeof oldRender == 'function' ? oldRender(dt, _type, fId.indexOf('#Diagram') > 0 ? _data.component : _data) : dt);
+            });
+          };
+        };
+
+        // and now - process the multi-row columns
+        for (var i = 0, mrl = self.settings.matrixMultiRows.length;i < mrl; ++i) {
+          var fId = self.settings.matrixMultiRows[i];
+          var mr = miniset.feature[fId];
+          mr.render = getRender(fId, mr.data, mr.render);
+          mr.data = 'composition';
+          var col = mr.column;
+          if (col == null)
+            mr.column = col = { sClass: "jtox-multi" };
+          else if (col.sClass == null)
+            col.sClass = "jtox-multi";
+          else
+            col.sClass += " jtox-multi";
+        }
+
+        featuresInitialized = true;
+      },
+
+      onLoaded: function (dataset) {
+        jToxCompound.processFeatures(dataset.feature, this.feature);
+
+        // we need to process
+        for (var i = 0, dl = dataset.dataEntry.length; i < dl; ++i) {
+          var data = dataset.dataEntry[i];
+          if (data.composition != null)
+            for (var j = 0;j < data.composition.length; ++j)
+              jToxCompound.processEntry(data.composition[j].component, dataset.feature);
+        }
+      }
+
+    });
+
+    return matrixKit;
 
   },
 
