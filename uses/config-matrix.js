@@ -11,7 +11,11 @@ jTConfig.matrix = {
       }
 		},
     "http://www.opentox.org/api/1.1#ChemicalName" : {
-      primary: false
+      primary: false,
+      render : function(data, type, full) {
+        // Allow longer names that are list, separated by "|", to break
+        return data.replace(/\|/g, ' | ');
+      }
     },
     "http://www.opentox.org/api/1.1#CASRN" : {
       primary: false
@@ -133,6 +137,7 @@ jTConfig.matrix = {
       }
       return arr;
     }
+
   },
 	"columns": {
   	"substance": {
