@@ -638,58 +638,7 @@ var jToxBundle = {
     if (id == "endsubstance") {
 
       if (!self.substancesQueryKit) {
-        self.substancesQueryKit = jT.kit($('#jtox-substance-query')[0]);
-        self.substancesQueryKit.setWidget("bundle", self.rootElement);
-        self.substancesQueryKit.kit().settings.fixedWidth = '100%';
-        self.substancesQueryKit.kit().settings.bUri = self.bundleUri;
-
-        self.substancesQueryKit.kit().settings.configuration.baseFeatures['http://www.opentox.org/api/1.1#ChemicalName'].primary = true;
-        self.substancesQueryKit.kit().settings.configuration.baseFeatures['http://www.opentox.org/api/1.1#CASRN'].primary = true;
-        self.substancesQueryKit.kit().settings.configuration.baseFeatures['http://www.opentox.org/api/1.1#EINECS'].primary = true;
-        self.substancesQueryKit.kit().settings.configuration.baseFeatures['http://www.opentox.org/api/1.1#Reasoning'].primary = true;
-
-        // Modify the #IdRow not to show tag buttons and add #Tag column that show the selected tag.
-        self.substancesQueryKit.kit().settings.configuration.baseFeatures['#IdRow'] = { used: true, basic: true, data: "number", column: { "sClass": "center"}, render: function (data, type, full) {
-          if (type != 'display')
-            return data || 0;
-          var html = "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;<br/>";
-          html += '<span class="jtox-details-open ui-icon ui-icon-folder-collapsed" title="Press to open/close detailed info for this compound"></span>';
-          return html;
-        } };
-
-        self.substancesQueryKit.kit().settings.configuration.baseFeatures['#Tag'] = { title: 'Tag', used: false, basic: true, visibility: "main", primary: true, column: { "sClass": "center"}, render: function (data, type, full) {
-
-          if (type != 'display')
-            return data || 0;
-
-          var html = "";
-          var bInfo = full.bundles[self.bundleUri];
-          if (!bInfo) {
-            return html;
-          }
-          if (!!bInfo.tag) {
-            var tag = (bInfo.tag == 'cm') ? 'CM' : bInfo.tag.substr(0,1).toUpperCase();
-            html += '<button class="jt-toggle active" disabled="true"' + (!bInfo.remarks ? '' : 'title="' + bInfo.remarks + '"') + '>' + tag + '</button><br />';
-          }
-
-          return html;
-        } };
-
-        self.substancesQueryKit.kit().settings.configuration.groups.Identifiers.push('#Tag');
-
-        // provid onRow function so the buttons can be set properly...
-        self.substancesQueryKit.kit().settings.onRow = function (row, data, index) {
-          if (!data.bundles){
-            return;
-          }
-          var bundleInfo = data.bundles[self.bundleUri] || {};
-          var noteEl = $('textarea.remark', row);
-          if (!!bundleInfo.tag) {
-            $('button.jt-toggle.' + bundleInfo.tag.toLowerCase(), row).addClass('active');
-            noteEl.val(bundleInfo.remarks);
-          }
-          noteEl.prop('readonly', true);
-        };
+        self.substancesQueryKit = self.prepareSubstanceKit($('#jtox-substance-query')[0]);
 
         /* Setup expand/collaps all buttons */
         $('#structures-expand-all').on('click', function(){
@@ -782,6 +731,52 @@ var jToxBundle = {
     else {
       self.queryKit.query();
     }
+
+  },
+
+  prepareSubstanceKit: function(rootEl){
+
+    var kit = jT.kit(rootEl);
+
+    kit.setWidget("bundle", self.rootElement);
+    kit.kit().settings.fixedWidth = '100%';
+    kit.kit().settings.bUri = self.bundleUri;
+
+    kit.kit().settings.configuration.baseFeatures['http://www.opentox.org/api/1.1#ChemicalName'].primary = true;
+    kit.kit().settings.configuration.baseFeatures['http://www.opentox.org/api/1.1#CASRN'].primary = true;
+    kit.kit().settings.configuration.baseFeatures['http://www.opentox.org/api/1.1#EINECS'].primary = true;
+    kit.kit().settings.configuration.baseFeatures['http://www.opentox.org/api/1.1#Reasoning'].primary = true;
+
+    // Modify the #IdRow not to show tag buttons and add #Tag column that show the selected tag.
+    kit.kit().settings.configuration.baseFeatures['#IdRow'] = { used: true, basic: true, data: "number", column: { "sClass": "center"}, render: function (data, type, full) {
+      if (type != 'display')
+        return data || 0;
+      var html = "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;<br/>";
+      html += '<span class="jtox-details-open ui-icon ui-icon-folder-collapsed" title="Press to open/close detailed info for this compound"></span>';
+      return html;
+    } };
+
+    kit.kit().settings.configuration.baseFeatures['#Tag'] = { title: 'Tag', used: false, basic: true, visibility: "main", primary: true, column: { "sClass": "center"}, render: function (data, type, full) {
+
+      if (type != 'display')
+        return data || 0;
+
+      var html = "";
+      var bInfo = full.bundles[self.bundleUri];
+      if (!bInfo) {
+        return html;
+      }
+      if (!!bInfo.tag) {
+        var tag = (bInfo.tag == 'cm') ? 'CM' : bInfo.tag.substr(0,1).toUpperCase();
+        html += '<button class="jt-toggle active" disabled="true"' + (!bInfo.remarks ? '' : 'title="' + bInfo.remarks + '"') + '>' + tag + '</button><br />';
+      }
+
+      return html;
+    } };
+
+    kit.kit().settings.configuration.groups.Identifiers.push('#Tag');
+
+    return kit;
 
   },
 
