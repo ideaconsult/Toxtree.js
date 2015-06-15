@@ -342,6 +342,7 @@ dt {
 }
 
 dd {
+  min-height: 1.4em;
   margin-left: 26%;
   overflow: hidden;
 }
