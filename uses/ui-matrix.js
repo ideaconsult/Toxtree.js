@@ -818,7 +818,7 @@ var jToxBundle = {
           body.append(tr);
         });
 
-        $('#jtox-report-final > div').append(table);
+        $('#jtox-report-final > div').html('').append(table);
 
         $(self.varTable).remove();
         self.equalizeTables();
