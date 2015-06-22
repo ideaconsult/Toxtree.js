@@ -411,3 +411,14 @@ function formatDate(timestamp) {
       year = d.getFullYear();
   return ((day<10)?'0':'') + day + '.' + ((month<10)?'0':'') + month + '.' + d.getFullYear();
 }
+
+// Wrap string in a[href] tag if it is valid URL
+function formatLink(str) {
+  // https://gist.github.com/searls/1033143
+  var p = /^(?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’])$/i;
+  if(str.search(p) != -1){
+    str = '<a href="' + str + '" target="_blank">' + str + '</a>';
+  }
+  return str;
+}
+
