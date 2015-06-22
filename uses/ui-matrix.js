@@ -580,6 +580,7 @@ var jToxBundle = {
             self.bundleSummary['matrix/final']++;
             self.edit.matrixEditable = false;
             self.matrixKit.query(self.bundleUri + '/matrix/final');
+            self.progressTabs();
           }
         });
       });
