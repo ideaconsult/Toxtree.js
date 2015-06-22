@@ -847,6 +847,7 @@ var jToxBundle = {
   },
 
   prepareSubstanceKit: function(rootEl){
+    var self = this;
 
     var kit = jT.kit(rootEl);
 
