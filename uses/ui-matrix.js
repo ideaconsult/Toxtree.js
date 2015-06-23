@@ -1313,7 +1313,7 @@ function preDetailedRow(index, cell) {
 
   var self = this;
   var data = this.dataset.dataEntry[index];
-  var uri = this.settings.baseUrl + '/substance?type=related&compound_uri=' + encodeURIComponent(data.compound.URI) + '&filterbybundle=' + encodeURIComponent(this.settings.bUri) + '&bundle_uri=' + encodeURIComponent(this.settings.bUri);
+  var uri = this.settings.baseUrl + '/substance?type=related&addDummySubstance=true&compound_uri=' + encodeURIComponent(data.compound.URI) + '&filterbybundle=' + encodeURIComponent(this.settings.bUri) + '&bundle_uri=' + encodeURIComponent(this.settings.bUri);
 
   var $row = $(cell.parentNode),
       $idcell = $row.find('td:first-child'),
