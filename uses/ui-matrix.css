@@ -39,6 +39,19 @@ strong {
 	border: 0px;
 }
 
+#jtox-identifiers form input[type="radio"],
+#jtox-identifiers form input[type="checkbox"] {
+  display: inline-block;
+  width: auto;
+  vertical-align: top;
+}
+
+#jtox-identifiers label {
+  display: inline-block;
+  font-weight: normal;
+  font-size: inherit;
+}
+
 #jtox-identifiers table th {
   font-weight: normal;
   cursor: default;

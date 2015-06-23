@@ -60,16 +60,14 @@
 
             <tr><th class="right top size-third">Purpose:</th><td><textarea class="validate nomargin data-field" data-field="description" name="description"></textarea></td></tr>
             <tr><th class="right size-third">Version:</th><td class="data-field" data-field="version">?.?</td></tr>
-            <tr><th class="right size-third">Status:</th><td class="data-field" data-field="status"></td></tr>
             <tr><th class="right size-third">Version start date:</th><td class="data-field" data-field="created" data-format="formatDate"></td></tr>
             <tr><th class="right size-third">Version last modified on:</th><td class="data-field" data-field="updated" data-format="formatDate"></td></tr>
             <tr>
-              <th class="right size-third">Published:</th>
+              <th class="right size-third">Status:</th>
               <td>
-                <select name="status" class="data-field" data-field="status">
-                  <option value="draft">No</option>
-                  <option value="published">Yes</option>
-                </select>
+                  <input type="radio" name="status" value="draft" id="status-draft"><label for="status-draft">Draft</label>
+                  <input type="radio" name="status" value="published" id="status-published"><label for="status-published">Published</label>
+                  <input type="radio" name="status" value="archived" id="status-archived"><label for="status-archived">Archived</label>
               </td>
             </tr>
             <tr><th class="right size-third">License:</th><td><input class="data-field first-time validate" data-field="rights.URI" name="license"/></td></tr>

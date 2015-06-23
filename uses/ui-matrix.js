@@ -1146,6 +1146,9 @@ var jToxBundle = {
         self.bundle = bundle;
 
         ccLib.fillTree(self.createForm, bundle);
+
+        $('#status-' + bundle.status).prop('checked', true);
+
         self.starHighlight($('.data-stars-field div', self.createForm)[0], bundle.stars);
         self.createForm.stars.value = bundle.stars;
 
