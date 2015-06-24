@@ -101,7 +101,16 @@ jTConfig.matrix = {
           '<button class="jt-toggle jtox-handler cm" data-tag="cm" data-data="' + data + '" data-handler="onSelectStructure" title="Select the structure as Category Member">CM</button>' +
           '<span class="jtox-details-open ui-icon ui-icon-folder-collapsed" title="Press to open/close detailed info for this compound"></span>';
       }
-		}
+		},
+    "http://www.opentox.org/api/1.1#Similarity" : {
+      "title": "Similarity",
+      "data" : "compound.metric",
+      "accumulate": true,
+      "column": { bVisible: false },
+      "render" : function(data, type, full) {
+        return data;
+      }
+    }
   },
   "groups": {
     "Identifiers" : [
@@ -110,7 +119,8 @@ jTConfig.matrix = {
       "http://www.opentox.org/api/1.1#CASRN",
       "http://www.opentox.org/api/1.1#EINECS",
       "http://www.opentox.org/api/1.1#ChemicalName",
-      "http://www.opentox.org/api/1.1#Reasoning",
+      "http://www.opentox.org/api/1.1#Similarity",
+      "http://www.opentox.org/api/1.1#Reasoning"
       // The rest of them
       //"http://www.opentox.org/api/1.1#SMILES",
       //"http://www.opentox.org/api/1.1#InChIKey",
@@ -151,5 +161,23 @@ jTConfig.matrix = {
         }
       },
     }
-	}
-};
+	},
+  "handlers": {
+    "query": function (e, query) {
+
+      var kit = jT.parentKit(jToxQuery, this),
+          searchKit = kit.widget('search');
+      var form = $(searchKit).find('form')[0];
+      var searchType = form.searchtype.value;
+      if (searchType == 'similarity') {
+        kit.mainKit.settings.configuration.baseFeatures["http://www.opentox.org/api/1.1#Similarity"].column.bVisible = true;
+      }
+      else {
+        kit.mainKit.settings.configuration.baseFeatures["http://www.opentox.org/api/1.1#Similarity"].column.bVisible = false;
+      }
+
+      kit.query();
+
+    }
+  }
+}
