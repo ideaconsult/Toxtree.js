@@ -926,8 +926,8 @@ var jToxBundle = {
             var postVal = '', postValParts = [], parameters = [], conditions = [];
             for (var i = 0, l = f.annotation.length; i < l; i++){
               var a = f.annotation[i];
-              if ( a.type == 'conditions' && ccLib.getJsonValue(config, 'conditions.' + a.p.toLowerCase() + '.inMatrix') == true ) {
-                var t = ccLib.getJsonValue(config, 'conditions.' + a.p.toLowerCase() + '.sTitle') || a.p;
+              if ( a.type == 'conditions' && ccLib.getJsonValue(config, 'conditions["' + a.p.toLowerCase() + '"].inMatrix') == true ) {
+                var t = ccLib.getJsonValue(config, 'conditions["' + a.p.toLowerCase() + '"].sTitle') || a.p;
                 conditions.push(t + ' = ' + a.o);
               }
               else if (a.type == 'parameters') {
