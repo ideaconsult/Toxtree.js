@@ -743,7 +743,132 @@ var jToxBundle = {
 
     var self = this;
 
-    ccLib.fillTree(panel, self.bundle);
+    if (!$(panel).hasClass('initialized')) {
+
+      ccLib.fillTree(panel, self.bundle);
+
+      $('#generate-doc').on('click', function(){
+        var loadFile = function(url, callback){
+          JSZipUtils.getBinaryContent(url, callback);
+        }
+        loadFile("assessment-report.docx", function(err, content){
+          if (err) { throw err };
+          var doc = new Docxgen(content);
+
+          var data = $.extend(true, {}, self.bundle);
+          data.created = formatDate(self.bundle.created);
+          data.updated = formatDate(self.bundle.updated);
+          data.structures = [];
+
+          var structuresFixRows = $('#jtox-report-query .jtox-ds-fixed tbody tr');
+          var structuresVarRows = $('#jtox-report-query .jtox-ds-variable tbody tr');
+          structuresFixRows.each(function(index){
+            var structure = {}, fr = $(this), vr = $(structuresVarRows[index]);
+            structure.tag = fr.find('td:first-child button.active').text();
+            var cells = vr.find('td:not(.jtox-hidden)');
+            structure.casrn = $(cells[0]).text();
+            structure.ecnum = $(cells[1]).text();
+            structure.names = $(cells[2]).text();
+            structure.rationale = $(cells[3]).find('textarea').val();
+            structure.substances = [];
+            data.structures.push(structure);
+          });
+
+          var substanceContainers = $('#jtox-report-substance-query .jtox-substance');
+          substanceContainers.each(function(index){
+            var structure = data.structures[index],
+                substanceRows = $(this).find('tbody tr');
+            substanceRows.each(function(i){
+              var cells = $(this).find('td'),
+                  substance = {};
+              substance.i = i + 1;
+              substance.name = $(cells[1]).text();
+              substance.uuid = $(cells[2]).text();
+              substance.type = $(cells[3]).text();
+              substance.pubname = $(cells[4]).text();
+              substance.refuuid = $(cells[5]).text();
+              substance.owner = $(cells[6]).text();
+              substance.info = $(cells[7]).text();
+              substance.contained = $(cells[8]).text();
+              structure.substances.push(substance);
+            });
+          });
+
+          data.matrix = [];
+          var matrixRows = $('#jtox-report-matrix .jtox-ds-fixed .dataTable > tbody > tr');
+          matrixRows.each(function(){
+            var rowData = {};
+            var cells = $(this).find('> td:not(.jtox-hidden)');
+            rowData.cas = $(cells[1]).text();
+            rowData.substancename = $(cells[2]).text();
+            rowData.i5uuid = $(cells[3]).text();
+            rowData.datasource = $(cells[4]).text();
+            rowData.tag = $(cells[5]).text();
+            rowData.constituentname = $(cells[7]).text();
+            rowData.content = $(cells[8]).text();
+            rowData.containedas = $(cells[9]).text();
+            data.matrix.push(rowData);
+          });
+
+          var structuresCount = data.matrix.length;
+          var groups = Math.ceil(structuresCount/3);
+
+          data.dataMatrix = [];
+          var structureRows = $('#jtox-report-final thead tr');
+          var dataRows = $('#jtox-report-final tbody tr');
+          var tagCells = $(structureRows[0]).find('th');
+          var nameCells = $(structureRows[1]).find('th');
+          var casCells = $(structureRows[2]).find('th');
+          for (var i = 0; i < groups; i++) {
+            var dataGroup = {
+              tag1: '',
+              tag2: '',
+              tag3: '',
+              name1: '',
+              name2: '',
+              name3: '',
+              cas1: '',
+              cas2: '',
+              cas3: '',
+              data: []
+            };
+            for (var c = 1, cl = Math.min(3, tagCells.length - 3*i); c <= cl; c++) {
+              dataGroup['tag' + c] = $(tagCells[3*i + c]).text();
+            }
+            for (var c = 1, cl = Math.min(3, nameCells.length - 3*i); c <= cl; c++) {
+              dataGroup['name' + c] = $(nameCells[3*i + c]).text();
+            }
+            for (var c = 1, cl = Math.min(3, casCells.length - 3*i); c <= cl; c++) {
+              dataGroup['cas' + c] = $(casCells[3*i + c]).text();
+            }
+            dataRows.each(function(){
+              var cells = $(this).find('th, td');
+              var row = { title: '', value1: '', value2: '', value3: ''};
+              row.title = $(cells[0]).text();
+              for (var c = 1, cl = Math.min(3, nameCells.length - 3*i); c <= cl; c++) {
+                var parts = [];
+                $(cells[3*i + c].childNodes).each(function(){
+                  parts.push( $(this).text() );
+                })
+                row['value' + c] = parts.join('\n\r');
+              }
+              dataGroup.data.push(row);
+            });
+            data.dataMatrix.push(dataGroup);
+          }
+
+          //console.log(data);
+
+          doc.setData( data ); //set the templateVariables
+          doc.render(); //apply them (replace all occurences of {first_name} by Hipp, ...)
+          var output = doc.getZip().generate({type:"blob"}); //Output the document using Data-URI
+          saveAs(output, "report.docx");
+        });
+      });
+
+      $(panel).addClass('initialized');
+
+    }
 
     if (!self.reportQueryKit) {
       self.reportQueryKit = jT.kit($('#jtox-report-query')[0]);
