@@ -414,8 +414,9 @@ function formatDate(timestamp) {
 
 // Wrap string in a[href] tag if it is valid URL
 function formatLink(str) {
-  var p = /((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/i;
-  if(str.match(p)){
+  // https://gist.github.com/searls/1033143
+  var p = /^(?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’])$/i;
+  if(str.search(p) != -1){
     str = '<a href="' + str + '" target="_blank">' + str + '</a>';
   }
   return str;
@@ -723,7 +724,6 @@ window.jT = window.jToxKit = {
 			dataType: params.dataType || (settings.plainText ? "text": (settings.jsonp ? 'jsonp' : 'json')),
 			headers: self.$.extend({ Accept: accType }, params.headers),
 			crossDomain: settings.crossDomain || settings.jsonp,
-      //xhrFields: settings.crossDomain ? {withCredentials: true} : null,
 			timeout: parseInt(settings.timeout),
 			type: params.method,
 			data: params.data,
@@ -4907,7 +4907,7 @@ jT.templates['all-compound']  =
 "	      <input type=\"text\" class=\"filterbox\" placeholder=\"Filter...\" />" +
 "	    </div>" +
 "	    <div class=\"jtox-ds-tables\">" +
-"	      <div class=\"jt-processing\">	        " +
+"	      <div class=\"jt-processing\">" +
 "          <span class=\"message\">Loading compounds...</span>" +
 "	      </div>" +
 "	      <div class=\"jtox-ds-fixed\">" +

@@ -300,7 +300,6 @@ window.jT = window.jToxKit = {
 			dataType: params.dataType || (settings.plainText ? "text": (settings.jsonp ? 'jsonp' : 'json')),
 			headers: self.$.extend({ Accept: accType }, params.headers),
 			crossDomain: settings.crossDomain || settings.jsonp,
-      //xhrFields: settings.crossDomain ? {withCredentials: true} : null,
 			timeout: parseInt(settings.timeout),
 			type: params.method,
 			data: params.data,
