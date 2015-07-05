@@ -846,9 +846,11 @@ var jToxBundle = {
               row.title = $(cells[0]).text();
               for (var c = 1, cl = Math.min(3, nameCells.length - 3*i); c <= cl; c++) {
                 var parts = [];
-                $(cells[3*i + c].childNodes).each(function(){
-                  parts.push( $(this).text() );
-                })
+                if (cells[3*i + c] !== undefined) {
+                  $(cells[3*i + c].childNodes).each(function(){
+                    parts.push( $(this).text() );
+                  });
+                }
                 row['value' + c] = parts.join('\n\r');
               }
               dataGroup.data.push(row);
