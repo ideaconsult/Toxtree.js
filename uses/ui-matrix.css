@@ -333,6 +333,14 @@ tr:last-child .jtox-down {
   display: inline-block;
 }
 
+#jtox-report .jt-toggle {
+  display: none;
+}
+
+#jtox-report .jt-toggle.active {
+  display: inline-block;
+}
+
 
 section {
   clear: both;
