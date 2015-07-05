@@ -1172,9 +1172,23 @@ var jToxBundle = {
     conf.baseFeatures['#IdRow'] = { used: true, basic: true, data: "number", column: { "sClass": "center"}, render: function (data, type, full) {
       if (type != 'display')
         return data || 0;
+      var bInfo = full.bundles[self.bundleUri];
+      var tag = 'target'; // the default
+      if (!!bInfo && !!bInfo.tag) {
+        tag = bInfo.tag;
+      }
       var html = "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;<br/>";
-      html += '<button type="button" class="ui-button ui-button-icon-only jtox-up"><span class="ui-icon ui-icon-triangle-1-n">up</span></button><br />' +
-              '<button type="button" class="ui-button ui-button-icon-only jtox-down"><span class="ui-icon ui-icon-triangle-1-s">down</span></button><br />'
+      if (self.edit.matrixEditable) {
+        html += '<button class="jt-toggle jtox-handler target' + ( (tag == 'target') ? ' active' : '') + '" data-tag="target" data-uri="' + full.compound.URI + '" data-handler="onTagSubstance" title="Select the substance as Target">T</button>' +
+            '<button class="jt-toggle jtox-handler source' + ( (tag == 'source') ? ' active' : '') + '" data-tag="source" data-uri="' + full.compound.URI + '" data-handler="onTagSubstance" title="Select the substance as Source">S</button>' +
+            '<button class="jt-toggle jtox-handler cm' + ( (tag == 'cm') ? ' active' : '') + '" data-tag="cm" data-uri="' + full.compound.URI + '" data-handler="onTagSubstance" title="Select the substance as Category Member">CM</button>';
+      }
+      else {
+        tag = (tag == 'cm') ? 'CM' : tag.substr(0,1).toUpperCase();
+        html += '<button class="jt-toggle active" disabled="true">' + tag + '</button>';
+      }
+      html += '<div><button type="button" class="ui-button ui-button-icon-only jtox-up"><span class="ui-icon ui-icon-triangle-1-n">up</span></button><br />' +
+              '<button type="button" class="ui-button ui-button-icon-only jtox-down"><span class="ui-icon ui-icon-triangle-1-s">down</span></button><br /></div>'
       return html;
     } };
 
@@ -1392,6 +1406,23 @@ var jToxBundle = {
     });
   },
 
+  tagSubstance: function (uri, el) {
+    var self = this;
+    var activate = !$(el).hasClass('active');
+    if (activate) {
+      $(el).addClass('loading');
+      jT.service(self, self.bundleUri + '/substance', { method: 'PUT', data: { substance_uri: uri, command: 'add', tag : $(el).data('tag')} }, function (result) {
+        $(el.parentNode).find('button.jt-toggle').removeClass('active');
+        $(el).removeClass('loading').addClass('active');
+        if (!result)
+          el.checked = !el.checked; // i.e. revert
+        else {
+          console.log("Substance [" + uri + "] tagged " + $(el).data('tag'));
+        }
+      });
+    }
+  },
+
   selectEndpoint: function (topcategory, endpoint, el) {
     var self = this;
     $(el).addClass('loading');
@@ -1429,6 +1460,10 @@ function onBrowserFilled(dataset) {
 
 function onSelectSubstance(e) {
   jToxBundle.selectSubstance(this.value, this);
+}
+
+function onTagSubstance(e) {
+  jToxBundle.tagSubstance($(this).data('uri'), this);
 }
 
 function onSelectEndpoint(e) {
