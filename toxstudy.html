@@ -40,7 +40,8 @@
       			"text": { "sTitle": "Text Value", "iOrder": -1 }
       		},
       		"protocol": {
-      		  "citation": { "bVisible": false }
+      		  "citation": { "bVisible": false },
+            "reliability": {"mRender": function (data, type, full) { return data.r_value.replace(/\s*\([^)]*\)/gi, ''); }}
       		}
       	},
       	"PC_PARTITION_SECTION": {
