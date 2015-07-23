@@ -403,7 +403,7 @@ window.jT.ui = {
             // Allow bVisible to be set on the whole category
             if (!ccLib.isNull(catCol.bVisible)) {
               catCol[name] = catCol[name] || {};
-              catCol[name].bVisible = (ccLib.isNull(catCol[name].bVisible) || catCol[name].bVisible) && !!catCol.bVisible;
+              catCol[name].bVisible = !!catCol[name].bVisible || !!catCol.bVisible;
             }
   	        catCol = catCol[name];
           }
