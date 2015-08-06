@@ -300,6 +300,9 @@ tr:last-child .jtox-down {
 }
 
 
+.jtox-report #jtox-bundle {
+  overflow: auto;
+}
 
 #jtox-report {
   counter-reset: section;

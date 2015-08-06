@@ -64,6 +64,9 @@ var jToxBundle = {
     if (typeof self.settings.studyTypeList == 'string')
       self.settings.studyTypeList = window[self.settings.studyTypeList];
 
+    // Initialize all nested kits before doing anything else
+    $('.jtox-toolkit', self.rootElement).each(function(i) { if (!$(this).data('manualInit')) jT.initKit(this); });
+
     // the (sub)action in the panel
     var loadAction = function () {
       if (!this.checked)
@@ -157,6 +160,7 @@ var jToxBundle = {
 
   onIdentifiers: function (id, panel) {
     var self = this;
+    if (!panel) return;
     if (!$(panel).hasClass('initialized')) {
       $(panel).addClass('initialized');
       var checkForm = function () {
@@ -165,6 +169,7 @@ var jToxBundle = {
       };
 
       self.createForm = $('form', panel)[0];
+
       // TODO: assign this on form submit, not on button click.
       //       Forms can be submitted in a number of other ways.
       self.createForm.assStart.onclick = function (e) {
@@ -238,6 +243,7 @@ var jToxBundle = {
       });
 
       ccLib.prepareForm(self.createForm);
+
     }
   },
 
@@ -1285,19 +1291,24 @@ var jToxBundle = {
         self.bundleUri = bundle.URI;
         self.bundle = bundle;
 
-        ccLib.fillTree(self.createForm, bundle);
+        if (!!self.createForm) {
 
-        $('#status-' + bundle.status).prop('checked', true);
+          ccLib.fillTree(self.createForm, bundle);
 
-        self.starHighlight($('.data-stars-field div', self.createForm)[0], bundle.stars);
-        self.createForm.stars.value = bundle.stars;
+          $('#status-' + bundle.status).prop('checked', true);
 
-        // now take care for enabling proper buttons on the Indetifiers page
-        self.createForm.assFinalize.style.display = '';
-        self.createForm.assNewVersion.style.display = '';
-        self.createForm.assStart.style.display = 'none';
+          self.starHighlight($('.data-stars-field div', self.createForm)[0], bundle.stars);
+          self.createForm.stars.value = bundle.stars;
+
+          // now take care for enabling proper buttons on the Identifiers page
+          self.createForm.assFinalize.style.display = '';
+          self.createForm.assNewVersion.style.display = '';
+          self.createForm.assStart.style.display = 'none';
+
+        }
 
         $(self.rootElement).tabs('enable', 1);
+
         // now request and process the bundle summary
         jT.call(self, bundle.URI + "/summary", function (summary) {
           if (!!summary) {
@@ -1308,7 +1319,16 @@ var jToxBundle = {
           }
           self.progressTabs();
         });
+
         self.loadUsers();
+
+        var reportLink = $('#open-report')[0];
+        if (!!reportLink) {
+          reportLink.href = reportLink.href + '?baseUrl=' + encodeURIComponent(self.settings.baseUrl) + '&bundleUri=' + encodeURIComponent(self.bundleUri);
+        }
+
+        ccLib.fireCallback(self.settings.onLoaded, self);
+
       }
     });
   },
@@ -1320,6 +1340,7 @@ var jToxBundle = {
     jT.call(self, self.settings.baseUrl + "/myaccount/users?mode=W&bundle_uri=" + encodeURIComponent(bundle.URI), function (users) {
       if (!!users) {
         var select = $('#users-write');
+        if (select.length == 0) return;
         select.data('tokenize').clear();
         for (var i = 0, l = users.length; i < l; ++i) {
           var u = users[i];
@@ -1331,6 +1352,7 @@ var jToxBundle = {
     jT.call(self, self.settings.baseUrl + "/myaccount/users?mode=R&bundle_uri=" + encodeURIComponent(bundle.URI), function (users) {
       if (!!users) {
         var select = $('#users-read');
+        if (select.length == 0) return;
         select.data('tokenize').clear();
         for (var i = 0, l = users.length; i < l; ++i) {
           var u = users[i];
