@@ -19,6 +19,7 @@
 
 	<link rel="stylesheet" href="../www/jtoxkit.css"/>
 	<link rel="stylesheet" href="../www/ketcher.css"/>
+  <link rel="stylesheet" href="jquery.tokenize.css"/>
 	<link rel="stylesheet" href="ui-matrix.css"/>
 
   <script src="oecdcategories.js"></script>
@@ -33,10 +34,16 @@
   <script src="../tests/jBox.js"></script>
 
   <script src="../www/jtoxkit.js"></script>
-  <script src="../www/ketcher.js"></script>
+  <!-- <script src="../www/ketcher.js"></script> -->
+  <script src="jquery.tokenize.js"></script>
   <script src="ui-matrix.js"></script>
   <script src="config-matrix.js"></script>
   <script src="config-study.js"></script>
+
+  <script src="docxgen.min.js"></script>
+  <script src="FileSaver.min.js"></script>
+  <script src="jszip-utils.js"></script>
+
 </head>
 <body>
   <div id="logger" class="jtox-toolkit jtox-widget hidden" data-kit="log" data-resend="false" data-right-side="true"></div>
@@ -53,54 +60,47 @@
 	  	<form>
 	      <table class="dataTable">
 	        <thead>
-	          <tr><th class="right size-third">Assessment</th><th class="data-field" data-field="id"></th></tr>
-	          <tr><td class="right size-third">Title:</td><td><input class="data-field first-time validate" data-field="title" name="title"/></td></tr>
-	          <tr><td class="right size-third">Source:</td><td><input class="data-field first-time validate" data-field="seeAlso" name="source"/></td></tr>
-	          <tr><td class="right size-third">Source URL:</td><td><input class="data-field first-time validate" data-field="source" name="url"/></td></tr>
-	          <tr><td class="right size-third">License:</td><td><input class="data-field first-time validate" data-field="rights.URI" name="license"/></td></tr>
-	          <tr><td class="right size-third">Rights holder:</td><td><input class="data-field first-time validate" data-field="rightsHolder" name="rightsHolder"/></td></tr>
-	          <tr><td class="right size-third">Maintainer:</td><td><input class="data-field first-time validate" data-field="maintainer" name="maintainer"/></td></tr>
+	          <tr><th class="right size-third">Title:</th><td><input class="data-field first-time validate" data-field="title" name="title"/></td></tr>
+            <tr><th class="right size-third">Maintainer:</th><td><input class="data-field first-time validate" data-field="maintainer" name="maintainer"/></td></tr>
 
-	          <tr><td class="right top size-third">Purpose:</td><td><textarea class="validate nomargin data-field" data-field="description" name="description"></textarea></td></tr>
-	          <tr><td class="right size-third">Version:</td><td class="data-field" data-field="version">?.?</td></tr>
-	          <tr><td class="right size-third">Status:</td><td class="data-field" data-field="status"></td></tr>
-	          <tr><td class="right size-third">Date started:</td><td class="data-field" data-field="created" data-format="formatDate"></td></tr>
-	          <tr><td class="right size-third">Date finished:</td><td class="data-field" data-field="finished"></td></tr>
-	          <tr>
-	          	<td class="right size-third">Flags:</td>
-	          	<td>
-		          	<div class="jq-buttonset">
-		          		<input type="hidden" name="flags"/>
-								  <input type="checkbox" id="confidential" class="accumulate" data-accumulate="flags" value="confidential"><label for="confidential">Confidential</label></input>
-								  <input type="checkbox" id="internal" class="accumulate" data-accumulate="flags" value="internal"><label for="internal">Internal</label></input>
-								</div>
-							</td>
-						</tr>
-	          <tr>
-	          	<td class="right size-third">Published:</td>
-	          	<td>
-		          	<div class="jq-buttonset">
-								  <input type="radio" id="pub-yes" name="published" value="true"><label for="pub-yes">Yes</label></input>
-								  <input type="radio" id="pub-no" name="published" value="false" checked="checked"><label for="pub-no">No</label></input>
-								</div>
-							</td>
-						</tr>
-	          <tr>
-	          	<td class="right size-third">Use allowed:</td>
-	          	<td>
-		          	<div class="jq-buttonset">
-								  <input type="radio" id="use-yes" value="true" name="useAllowed"><label for="use-yes">Yes</label></input>
-								  <input type="radio" id="use-no" value="false" name="useAllowed" checked="checked"><label for="use-no">No</label></input>
-								</div>
-							</td>
-						</tr>
-	          <tr><td class="right size-third">Rating:</td><td class="data-stars-field"><input type="hidden" name="stars" value="0"/></td></tr>
+            <tr><th class="right top size-third">Purpose:</th><td><textarea class="validate nomargin data-field" data-field="description" name="description"></textarea></td></tr>
+            <tr><th class="right size-third">Version:</th><td class="data-field" data-field="version">?.?</td></tr>
+            <tr><th class="right size-third">Version start date:</th><td class="data-field" data-field="created" data-format="formatDate"></td></tr>
+            <tr><th class="right size-third">Version last modified on:</th><td class="data-field" data-field="updated" data-format="formatDate"></td></tr>
+            <tr>
+              <th class="right size-third">Status:</th>
+              <td>
+                  <input type="radio" name="status" value="draft" id="status-draft"><label for="status-draft">Draft</label>
+                  <input type="radio" name="status" value="published" id="status-published"><label for="status-published">Published</label>
+                  <input type="radio" name="status" value="archived" id="status-archived"><label for="status-archived">Archived</label>
+              </td>
+            </tr>
+            <tr><th class="right size-third">License:</th><td><input class="data-field first-time validate" data-field="rights.URI" name="license"/></td></tr>
+            <tr><th class="right size-third">Rights holder:</th><td><input class="data-field first-time validate" data-field="rightsHolder" name="rightsHolder"/></td></tr>
+	          <tr><th class="right size-third">See also:</th><td><input class="data-field first-time validate" data-field="seeAlso" name="seeAlso"/></td></tr>
+	          <tr><th class="right size-third">Source URL:</th><td><input class="data-field first-time validate" data-field="source" name="source"/></td></tr>
+            <tr><th class="right size-third">Assessment:</th><td class="data-field" data-field="number"></td></tr>
+	          <tr><th class="right size-third">Rating:</th><td class="data-stars-field"><input type="hidden" name="stars" value="0"/></td></tr>
+            <tr>
+              <th class="right size-third top">Users with write access:</th>
+              <td class="jtox-user-rights">
+                <select name="users-write" id="users-write" multiple class="jtox-users-select">
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <th class="right size-third top">Users with read access:</th>
+              <td class="jtox-user-rights">
+                <select name="users-read" id="users-read" multiple class="jtox-users-select">
+                </select>
+              </td>
+            </tr>
 	        </thead>
 	      </table>
 	      <div class="actions">
 		      <button name="assStart" type="button">Start</button>
 		      <button name="assFinalize" type="button">Finalize</button>
-		      <button name="assDuplicate" type="button">Duplicate</button>
+		      <button name="assNewVersion" type="button">Generate new version</button>
 	      </div>
 	  	</form>
 	  </div>
@@ -109,14 +109,14 @@
 			  <input type="radio" id="structcollect" name="structaction" checked="checked"><label for="structcollect">Collect structures</label></input>
 			  <input type="radio" id="structlist" name="structaction"><label for="structlist">List collected</label></input>
 			</div>
-      <div id="jtox-query" class="jtox-toolkit" data-kit="query" data-cross-domain="true" data-configuration="jTConfigurator" data-initial-query="false">
+      <div id="jtox-query" class="jtox-toolkit" data-kit="query" data-configuration="jTConfigurator" data-initial-query="false">
         <div class="jtox-foldable folded">
           <div class="title"><p class="data-field" data-field="title">Search</p></div>
           <div class="content">
             <div id="searchbar" class="jtox-toolkit jtox-widget" data-kit="search" data-hide-options="url,context"></div>
           </div>
         </div>
-        <div id="browser" class="jtox-toolkit" data-kit="compound" data-show-tabs="false" data-details-height="500px" data-hide-empty="true" data-on-details="onDetailedRow" data-show-diagrams="true" data-on-loaded="onBrowserFilled"></div>
+        <div id="browser" class="jtox-toolkit" data-kit="compound" data-show-tabs="false" data-hide-empty="true" data-on-details="onDetailedRow" data-details-height="500px" data-show-diagrams="true" data-on-loaded="onBrowserFilled"></div>
       </div>
     </div>
     <div id="jtox-endpoints">
@@ -126,7 +126,22 @@
 			</div>
 			<div class="size-full">
   			<div class="jtox-slidable">
-          <div class="jtox-inline tab-substance"></div><div class="jtox-inline tab-points"><div class="check-all"><input type="checkbox" name="endpointAll"/>Show all<span>&nbsp;</span></div></div>
+
+          <div class="jtox-inline tab-substance">
+            <div class="float-right">
+              <button type="button" id="structures-expand-all">Expand all</button><button type="button" id="structures-collapse-all">Collapse all</button>
+            </div>
+            <div id="jtox-substance-query" class="jtox-toolkit" data-kit="query" data-configuration="jTConfigurator" data-initial-query="false">
+              <div id="substance-browser" class="jtox-toolkit" data-kit="compound" data-show-tabs="false" data-hide-empty="true" data-pre-details="preDetailedRow" data-show-diagrams="true"></div>
+            </div>
+          </div>
+
+          <div class="jtox-inline tab-points">
+            <div class="check-all">
+              <label for="endpointAll"><input type="checkbox" name="endpointAll" id="endpointAll"/> Show all endpoints</label>
+            </div>
+          </div>
+
   			</div>
   		</div>
 		</div>
@@ -138,9 +153,79 @@
 			</div>
 			<button class="save-button jt-disabled">Saved</button>
 			<button class="create-button">Create working copy</button>
+			<button class="create-final-button">Create final matrix</button>
 			<div class="jtox-toolkit" data-kit="compound" data-manual-init="true"></div>
     </div>
-    <div id="jtox-report" class="jtox-report"></div>
+    <div id="jtox-report" class="jtox-report" data-action="onReport">
+
+      <button type="button" id="generate-doc">Download</button>
+
+      <div id="jtox-report-cover">
+        <h1>Ambit Assessment Report</h1>
+        <h2 class="data-field" data-field="title">Category For Glymes</h2>
+        <dl>
+          <dt>Author:</dt><dd class="data-field" data-field="maintainer"></dd>
+          <dt>Company:</dt><dd class="data-field" data-field="rightsHolder"></dd>
+          <dt>Date:</dt><dd class="data-field" data-field="created" data-format="formatDate"></dd>
+          <dt>Assessment code:</dt><dd class="data-field" data-field="number"></dd>
+          <dt>Purpose:</dt><dd class="data-field" data-field="description"></dd>
+        </dl>
+      </div>
+
+      <section id="jtox-report-identifiers">
+        <h2>Assessment Identifiers</h2>
+
+        <table class="dataTable">
+          <thead>
+            <tr><th class="right size-third">Assessment title:</th><td class="data-field" data-field="title"></td></tr>
+            <tr><th class="right size-third">Owner:</th><td class="data-field" data-field="maintainer"></td></tr>
+
+            <tr><th class="right top size-third">Purpose:</th><td class="data-field" data-field="description"></td></tr>
+            <tr><th class="right size-third">Version:</th><td class="data-field" data-field="version">?.?</td></tr>
+            <tr><th class="right size-third">Status:</th><td class="data-field" data-field="status"></td></tr>
+            <tr><th class="right size-third">Version start date:</th><td class="data-field" data-field="created" data-format="formatDate"></td></tr>
+            <tr><th class="right size-third">Version last modified on:</th><td class="data-field" data-field="updated" data-format="formatDate"></td></tr>
+            <tr><th class="right size-third">Published:</th><td class="data-field" data-field="status"></td></tr>
+            <tr><th class="right size-third">Assessment code:</th><td class="data-field" data-field="seeAlso"></td></tr>
+            <tr><th class="right size-third">Assessment DocLink:</th><td class="data-field" data-field="source" data-format="formatLink"></td></tr>
+            <tr><th class="right size-third">Assessment ID:</th><td class="data-field" data-field="number"></td></tr>
+          </thead>
+        </table>
+
+        <p>The original assessment in Ambit can be found via “Assessment ID”.</p>
+
+      </section>
+
+      <section id="jtox-report-structlist">
+        <h2>List of structures for assessment</h2>
+        <p>In the assessment, similar structures were selected from exact structure, substructure and/or similarity searches, or were added manually. The rationale for the selection is given in the table.</p>
+        <div id="jtox-report-query" class="jtox-toolkit" data-kit="query" data-configuration="jTConfigurator" data-initial-query="false">
+          <div id="browser" class="jtox-toolkit" data-kit="compound" data-show-tabs="false" data-hide-empty="true" data-on-details="onDetailedRow" data-details-height="500px" data-show-diagrams="true" data-on-loaded="onBrowserFilled"></div>
+        </div>
+      </section>
+
+      <section id="jtox-report-substances">
+        <h2>List of substances related to the structures</h2>
+        <p>In the following, for each structure listed in chapter 2, substances were selected and the rationale is given.</p>
+        <div id="jtox-report-substance-query" class="jtox-toolkit" data-kit="query" data-configuration="jTConfigurator" data-initial-query="false">
+          <div id="report-substance-browser" class="jtox-toolkit" data-kit="compound" data-show-tabs="false" data-hide-empty="true" data-pre-details="preDetailedRow" data-show-diagrams="true" data-on-loaded="onReportSubstancesLoaded"></div>
+        </div>
+      </section>
+
+      <section id="jtox-report-matrix">
+        <h2>Substance composition matrix</h2>
+        <p>In the following, for each substance, the associated structure(s) and the composition are given.</p>
+        <div class="jtox-toolkit" data-kit="compound" data-manual-init="true"></div>
+      </section>
+
+      <section id="jtox-report-final">
+        <h2>Assessment data matrix</h2>
+        <p>In the following, for each substance, the associated endpoint data are given, either experimental data, waiving or read-across.</p>
+        <p>For detailed data or rationale for waiving and read-across, click hyperlinks in the table. These data or rationales can also be found in the annex of the report.</p>
+        <div class="jtox-toolkit" data-manual-init="true"></div>
+      </section>
+
+    </div>
   </div>
   <div class="jtox-template">
     <div id="info-box">
@@ -150,7 +235,7 @@
             <th rowspan="2">Endpoint</th>
             <th rowspan="2">Value</th>
             <th class="conditions center">Conditions</th>
-            <th rowspan="2">Guidance</th>
+            <th rowspan="2">Guideline</th>
           </tr>
           <tr class="conditions">
           </tr>
@@ -172,15 +257,15 @@
     </div>
     <div id="edit-box">
 	    <div class="jtox-medium-box box-field" data-name="type">
-  	    <div class="jtox-details font-heavy">Study type</div>
+  	    <div class="jtox-details font-heavy jtox-required">Study type</div>
   	    <select class="data-field type-list" data-field="type"><option value="-1"> - Select type - </option></select>
 	    </div>
 	    <div class="jtox-medium-box box-field" data-name="reference">
-  	    <div class="jtox-details font-heavy">Reference</div>
+  	    <div class="jtox-details font-heavy jtox-required">Reference</div>
   	    <input type="text" class="data-field" data-field="reference" placeholder="Reference_"/>
 	    </div>
 	    <div class="jtox-medium-box box-field size-full" data-name="justification">
-  	    <div class="jtox-details font-heavy">Justification</div>
+  	    <div class="jtox-details font-heavy jtox-required">Justification</div>
   	    <textarea class="data-field" data-field="justification" placeholder="Justification_"></textarea>
 	    </div>
 	    <div class="jtox-medium-box box-field size-full" data-name="remarks">

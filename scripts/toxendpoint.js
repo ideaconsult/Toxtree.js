@@ -6,7 +6,7 @@
 
 var jToxEndpoint = (function () {
   var defaultSettings = { // all settings, specific for the kit, with their defaults. These got merged with general (jToxKit) ones.
-    selectionHandler: null,   // selection handler to be attached on checkbox, for jToxQuery integration    
+    selectionHandler: null,   // selection handler to be attached on checkbox, for jToxQuery integration
     noInterface: false,       // run in interface-less mode, with data retrieval and callback calling only
     heightStyle: "content",   // the accordition heightStyle
     hideFilter: false,        // if you don't want to have filter box - just hide it
@@ -28,7 +28,7 @@ var jToxEndpoint = (function () {
       "sInfo": "Showing _TOTAL_ endpoint(s) (_START_ to _END_)"
     },
     /* endpointUri */
-    configuration: { 
+    configuration: {
       columns : {
         endpoint: {
           'Id': { sTitle: "Id", mData: "uri", bSortable: false, sWidth: "30px", mRender: function (data, type, full) { return ''; } },
@@ -39,24 +39,24 @@ var jToxEndpoint = (function () {
       }
     }
   };
-  
+
   var cls = function (root, settings) {
     var self = this;
     self.rootElement = root;
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even when manually initialized
 
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
-        
+
     if (!self.settings.noInterface) {
       self.rootElement.appendChild(jT.getTemplate('#jtox-endpoint'));
       self.init(settings);
     }
-        
+
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
     if (self.settings.endpointUri != undefined || self.settings.loadOnInit)
       self.loadEndpoints(self.settings.endpointUri)
   };
-  
+
   // now the editors...
   cls.linkEditors = function (kit, root, settings) { // category, top, onchange, conditions
     // get the configuration so we can setup the fields and their titles according to it
@@ -78,10 +78,10 @@ var jToxEndpoint = (function () {
       // prepare the options
       if (!options)
         options = {};
-      
-      // finally - configure the autocomplete options, themselves to initialize the component itself
+
+      // finally - configure the autocomplete options themselves to initialize the component itself
       if (!options.source) options.source = function( request, response ) {
-        jT.call(kit, service, { method: "GET", data: { 
+        jT.call(kit, service, { method: "GET", data: {
           'category': settings.category,
           'top': settings.top,
           'max': kit.settings.maxHits || defaultSettings.maxHits,
@@ -96,22 +96,22 @@ var jToxEndpoint = (function () {
           }));
         });
       };
-      
+
       // and the change functon
       if (!options.change) options.change = function (e, ui) {
         settings.onchange.call(this, e, field, !ui.item ? ccLib.trim(this.value) : ui.item.value);
       };
-      
+
       // and the final parameter
       if (!options.minLength) options.minLength = 0;
-      
+
       return jT.$('input', box[0]).autocomplete(options);
     };
-        
+
     var putValueComplete = function (root, configEntry) {
       var field = root.data('field');
       var extractLast = function( val ) { return !!val ? val.split( /[,\(\)\s]*/ ).pop() : val; };
-      var parseValue = function ( text ) { 
+      var parseValue = function ( text ) {
         var obj = {};
         var parsers = [
           {
@@ -121,7 +121,7 @@ var jToxEndpoint = (function () {
             adjust: function (obj, parse) {
               if (!obj.upValue) delete obj.upQualifier;
               else              obj.upQualifier = parse[4] == ']' ? '<=' : '<';
-              
+
               if (!obj.loValue) delete obj.loQualifier;
               else              obj.loQualifier = parse[1] == '[' ? '>=' : '>';
             }
@@ -148,7 +148,7 @@ var jToxEndpoint = (function () {
             fields: ['', 'loValue', 'loQualifier', 'unit'],
           }
         ];
-        
+
         for (var pi = 0;pi < parsers.length; ++pi) {
           var parse = text.match(parsers[pi].regex);
           if (!parse)
@@ -164,15 +164,15 @@ var jToxEndpoint = (function () {
           if (!!obj.unit) obj.unit = obj.unit.trim();
           break;
         }
-        
+
         if (pi >= parsers.length)
           obj.textValue = ccLib.trim(text);
-          
+
         return obj;
       };
-      
+
       var allTags = [].concat(kit.settings.loTags || defaultSettings.loTags, kit.settings.hiTags || defaultSettings.hiTags, kit.settings.units || defaultSettings.units);
-      
+
       var autoEl = putAutocomplete(root, null, configEntry, {
         change: function (e, ui) {
           settings.onchange.call(this, e, field, parseValue(this.value));
@@ -187,23 +187,23 @@ var jToxEndpoint = (function () {
         select: function( event, ui ) {
           var theVal = this.value,
               last = extractLast(theVal);
-          
+
           this.value = theVal.substr(0, theVal.length - last.length) + ui.item.value + ' ';
           return false;
         }
       });
 
-      // it might be a hidden one - so, take care for this      
+      // it might be a hidden one - so, take care for this
       if (!!autoEl) autoEl.bind('keydown', function (event) {
         if ( event.keyCode === jT.$.ui.keyCode.TAB && !!autoEl.menu.active )
           event.preventDefault();
       });
     };
-    
+
     // deal with endpoint name itself
     putAutocomplete(jT.$('div.box-endpoint', root), '/query/experiment_endpoints', ccLib.getJsonValue(config, 'effects.endpoint'));
     putAutocomplete(jT.$('div.box-interpretation', root), '/query/interpretation_result', ccLib.getJsonValue(config, 'interpretation.result'));
-    
+
     jT.$('.box-conditions', root).hide(); // to optimize process with adding children
     if (!!settings.conditions) {
       // now put some conditions...
@@ -221,12 +221,12 @@ var jToxEndpoint = (function () {
       if (any)
         jT.$('.box-conditions', root).show();
     }
-      
+
     // now comes the value editing mechanism
     var confRange = ccLib.getJsonValue(config, 'effects.result') || {};
     var confText = ccLib.getJsonValue(config, 'effects.text') || {};
     putValueComplete(jT.$('.box-value', root), confRange.bVisible === false ? confText : confRange);
-    
+
     // now initialize other fields, marked with box-field
     jT.$('.box-field', root).each(function () {
       var name = jT.$(this).data('name');
@@ -235,35 +235,35 @@ var jToxEndpoint = (function () {
       });
     });
   };
-  
+
   cls.prototype = {
     init: function (settings) {
       var self = this;
-      
+
       // we can redefine onDetails only if there is not one passed and we're asked to show editors at ll
       if (!!self.settings.showEditors && !self.settings.onDetails) {
         self.edittedValues = {};
         self.settings.onDetails = function (root, data, element) {
           self.edittedValues[data.endpoint] = {};
-          cls.linkEditors(self, root.appendChild(jT.getTemplate('#jtox-endeditor')), { 
-            category: data.endpoint, 
-            top: data.subcategory, 
-            conditions: self.settings.showConditions, 
+          cls.linkEditors(self, root.appendChild(jT.getTemplate('#jtox-endeditor')), {
+            category: data.endpoint,
+            top: data.subcategory,
+            conditions: self.settings.showConditions,
             onchange: function (e, field, value) { ccLib.setJsonValue(self.edittedValues[data.endpoint], field, value); }
           });
         };
       }
-      
+
       // deal if the selection is chosen
       if (!!self.settings.selectionHandler || !!self.settings.onDetails)
         jT.ui.putActions(self, self.settings.configuration.columns.endpoint.Id);
-      
+
       self.settings.configuration.columns.endpoint.Id.sTitle = '';
-      
+
       // again , so that changed defaults can be taken into account.
       self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
       var cols = jT.ui.processColumns(self, 'endpoint');
-      
+
       // make the accordition now...
     	jT.$('.jtox-categories', self.rootElement).accordion( {
     		heightStyle: self.settings.heightStyle
@@ -273,8 +273,8 @@ var jToxEndpoint = (function () {
       // and now - initialize all the tables...
       jT.$('table', self.rootElement).each(function () {
         var name = this.className;
-        self.tables[name] = jT.ui.putTable(self, this, "endpoint", { 
-          "aoColumns": cols, 
+        self.tables[name] = jT.ui.putTable(self, this, "endpoint", {
+          "aoColumns": cols,
           "fnInfoCallback": self.updateStats(name),
           "aaSortingFixed": [[1, 'asc']],
           "onRow": function (nRow, aData, iDataIndex) {
@@ -282,7 +282,7 @@ var jToxEndpoint = (function () {
           }
         });
       });
-      
+
       if (!!self.settings.hideFilter)
         jT.$('.filter-box', self.rootElement).remove();
       else {
@@ -290,34 +290,34 @@ var jToxEndpoint = (function () {
         var fFilter = function (ev) {
           if (!!filterTimeout)
             clearTimeout(filterTimeout);
-      
+
           var field = ev.currentTarget;
-          
+
           filterTimeout = setTimeout(function() {
             jT.$('table', self.rootElement).each(function () {
               jT.$(this).dataTable().fnFilter(field.value);
             });
           }, 300);
         };
-        
+
         jT.$('.filter-box input', self.rootElement).on('keydown', fFilter);
       }
-      
+
       if (!self.settings.showMultiselect || !self.settings.selectionHandler)
         jT.$('h3 a', self.rootElement).remove();
       else
         jT.ui.installMultiSelect(self.rootElement, null, function (el) { return el.parentNode.parentNode.nextElementSibling; });
     },
-    
+
     getValues: function (needle) {
       var self = this;
-      
+
       var filter = null;
       if (!needle)
         filter = function (end) { return true; };
       else if (typeof needle != 'function')
         filter = function (end) { return end.indexOf(needle) >= 0; };
-      else 
+      else
         filter = needle;
 
       for (var endpoint in self.edittedValues) {
@@ -326,7 +326,7 @@ var jToxEndpoint = (function () {
       }
       return null;
     },
-    
+
     updateStats: function (name) {
       var self = this;
       return function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
@@ -342,12 +342,12 @@ var jToxEndpoint = (function () {
         }
         else
           html = '';
-        
-        jT.$('div.jtox-details span', head).html(html); 
+
+        jT.$('div.jtox-details span', head).html(html);
         return sPre;
       }
     },
-    
+
     fillEntries: function (facet) {
       var self = this;
       // first we need to group them and extract some summaries
@@ -360,7 +360,7 @@ var jToxEndpoint = (function () {
 
         cat.push(entry);
       }
-      
+
       // now, as we're ready - go and fill everything
       jT.$('h3', self.rootElement).each(function () {
         var name = jT.$(this).data('cat');
@@ -372,7 +372,7 @@ var jToxEndpoint = (function () {
           table.fnAddData(cat);
       });
     },
-    
+
     loadEndpoints: function (uri) {
       var self = this;
       if (uri == null)
@@ -396,20 +396,20 @@ var jToxEndpoint = (function () {
         }
       });
     },
-    
+
     query: function (uri) {
       this.loadEndpoints(uri);
     },
-    
+
     modifyUri: function (uri) {
       jT.$('input[type="checkbox"]', this.rootElement).each(function () {
         if (this.checked)
           uri = ccLib.addParameter(uri, 'feature_uris[]=' + encodeURIComponent(this.value + '/feature'));
       })
-      
+
       return uri;
     }
   };
-  
+
   return cls;
 })();

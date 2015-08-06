@@ -26,12 +26,12 @@
   <script src="scripts/ccLib.js"></script>
   <script src="scripts/jtoxkit.js"></script>
   <script src="scripts/toxcompound.js"></script>
-  
+
   <script language="javascript">
     $(document).ready(function(){
-      window['ds'] = new jToxCompound($(".jtox-toolkit")[0], {crossDomain: true, rememberChecks: true, hideEmpty: true} );
+      window['ds'] = new jToxCompound($(".jtox-toolkit")[0], {rememberChecks: true, hideEmpty: true} );
 //       ds.queryDataset("http://apps.ideaconsult.net:8080/data/dataset/18?feature_uris[]=http://apps.ideaconsult.net:8080/toxbank/model/6/predicted");
-//       ds.queryDataset("http://apps.ideaconsult.net:8080/data/dataset/1", "http://apps.ideaconsult.net:8080/data/dataset/1/feature"); 
+//       ds.queryDataset("http://apps.ideaconsult.net:8080/data/dataset/1", "http://apps.ideaconsult.net:8080/data/dataset/1/feature");
       ds.queryDataset("https://apps.ideaconsult.net/data/bundle/1/dataset");
     });
   </script>
@@ -54,7 +54,7 @@
 	      <input type="text" class="filterbox" placeholder="Filter..." />
 	    </div>
 	    <div class="jtox-ds-tables">
-	      <div class="jt-processing">	        
+	      <div class="jt-processing">
           <span class="message">Loading compounds...</span>
 	      </div>
 	      <div class="jtox-ds-fixed">

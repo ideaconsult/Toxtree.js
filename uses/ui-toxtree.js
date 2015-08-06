@@ -5,7 +5,7 @@ var tt = {
   algoMap: {}, // { <id> : { index: <>, results: <>, dom: <>, model: <>}
   compoundIdx: 0,
   coreFeatures: [
-    "http://www.opentox.org/api/1.1#CASRN", 
+    "http://www.opentox.org/api/1.1#CASRN",
     "http://www.opentox.org/api/1.1#EINECS",
     "http://www.opentox.org/api/1.1#IUCLID5_UUID",
     "http://www.opentox.org/api/1.1#ChemicalName",
@@ -38,7 +38,7 @@ var config_toxtree = {
 	"groups" : {
 	  "Identifiers": [
       "http://www.opentox.org/api/1.1#Diagram",
-      "http://www.opentox.org/api/1.1#CASRN", 
+      "http://www.opentox.org/api/1.1#CASRN",
       "http://www.opentox.org/api/1.1#EINECS",
       "http://www.opentox.org/api/1.1#IUCLID5_UUID"
 	  ],
@@ -51,7 +51,7 @@ function makeModel(el, algoId, callback) {
     el = $('button.jt-toggle.model', tt.algoMap[algoId].dom)[0];
   else
     algoId = $(el).parents('.tt-algorithm').data('algoId');
-  
+
   var uri = tt.modelKit.algorithm[tt.algoMap[algoId].index].uri;
   $(el).addClass('loading');
 
@@ -70,7 +70,7 @@ function runPredict (el, algoId, index) {
     el = $('button.jt-toggle.predict', tt.algoMap[algoId].dom)[0];
   else if (algoId == null) {
     algoId = $(el).data('algoId');
-    if (algoId == null) 
+    if (algoId == null)
       algoId = $(el).parents('.tt-algorithm').data('algoId');
   }
 
@@ -83,9 +83,9 @@ function runPredict (el, algoId, index) {
     if (index == null)
       index = tt.compoundIdx;
     if (index >= 0 && index < tt.browserKit.dataset.dataEntry.length)
-      datasetUri = tt.browserKit.dataset.dataEntry[index].compound.URI;  
+      datasetUri = tt.browserKit.dataset.dataEntry[index].compound.URI;
   }
-  
+
   if (tt.browserKit.dataset == null || datasetUri == null)
     return;
 
@@ -98,25 +98,26 @@ function runPredict (el, algoId, index) {
       $(el).removeClass('loading');
     })
   };
-  
+
   $(el).addClass('loading');
   if (tt.algoMap[algoId].model == null) {
-    makeModel(null, algoId, function (result) { 
+    makeModel(null, algoId, function (result) {
       if (!!result)
         runIt(result);
       else
         $(el).removeClass('loading');
     });
   }
-  else
+  else {
     runIt(tt.algoMap[algoId].model);
+  }
 }
 
 function runSelected() {
   $('#tt-models-panel button.jt-toggle.auto.active').each(function () {
     var tEl = $(this).parents('.tt-algorithm');
     runPredict(null, tEl.data('algoId'));
-  });  
+  });
 }
 
 function formatAlgoName(val) {
@@ -127,7 +128,7 @@ function buildCategories(features, values) {
 	var cats = [];
 	var regex = /\^\^(\S+)Category/i;
 	var multi = false;
-	
+
 	for (var fId in values) {
 	  if (features[fId].title.indexOf('#explanation') > -1 || features[fId].source.type.toLowerCase() != 'model')
 	    continue;
@@ -153,7 +154,7 @@ function buildCategories(features, values) {
         active: true
       });
 	};
-	
+
 	if (multi) {
 	  var old = cats;
 	  cats = [];
@@ -163,7 +164,7 @@ function buildCategories(features, values) {
     	  cats.push(o);
   	  }
 	  });
-  	
+
 	}
 
 	return cats;
@@ -201,26 +202,26 @@ function onAlgoLoaded(result) {
         dom: this,
         results: {},
       };
-      
+
       $(this).data('algoId', data.id);
       config_toxtree.groups.ToxTree.push(data.uri);
       config_toxtree.baseFeatures[data.uri] = {
-    	  title: formatAlgoName(data.name), 
+    	  title: formatAlgoName(data.name),
     	  search: false,
     	  data: "index",
     	  column: { sClass: data.id },
     	  render: (function (aId) { return function(data, type, full) {
-    	    return (type != 'display') ? data : 
+    	    return (type != 'display') ? data :
     	      '<button class="jt-toggle jtox-handler predict" data-algo-id="' + aId + '" data-index="' + data + '" data-handler="runPredict" title="Run prediction with the algorithm on current compound">▶︎</button>';
           };
         })(data.id)
       };
       idx++;
     });
-    
+
     jT.ui.installHandlers(tt.modelKit);
   }
-  
+
   onSelectedUpdate(null);
   // now it's time to create the browser table
   jT.initKit($('#tt-table')[0]);
@@ -260,7 +261,7 @@ function clearSlate(all) {
   $('#tt-models-panel .tt-algorithm button.predict').removeClass('active');
   $('#tt-models-panel .tt-algorithm .tt-explanation').empty();
   $('#tt-models-panel .tt-algorithm .tt-classification').empty();
-  
+
   if (all) {
     for (var aId in tt.algoMap)
   	  tt.algoMap[aId].results = {};
@@ -285,16 +286,16 @@ function showCompound() {
 
   var counter = $('#tt-browser-panel .counter-field')[0];
   counter.innerHTML = jT.ui.updateCounter(
-    counter.innerHTML, 
-    tt.compoundIdx + kit.pageStart + (kit.dataset.dataEntry[tt.compoundIdx] ? 1 : 0), 
+    counter.innerHTML,
+    tt.compoundIdx + kit.pageStart + (kit.dataset.dataEntry[tt.compoundIdx] ? 1 : 0),
     kit.entriesCount != null ? kit.entriesCount : kit.pageStart + kit.pageSize + '+'
   );
-  
-  if (tt.compoundIdx == 0 && kit.pageStart == 0) // we need to disable prev 
+
+  if (tt.compoundIdx == 0 && kit.pageStart == 0) // we need to disable prev
     $('#tt-browser-panel .prev-field').addClass('paginate_disabled_previous').removeClass('paginate_enabled_previous');
   else
     $('#tt-browser-panel .prev-field').removeClass('paginate_disabled_previous').addClass('paginate_enabled_previous');
-    
+
   if (kit.entriesCount != null && tt.compoundIdx + kit.pageStart >= kit.entriesCount - 1)
     $('#tt-browser-panel .next-field').addClass('paginate_disabled_next').removeClass('paginate_enabled_next');
   else
@@ -308,7 +309,7 @@ function showCompound() {
 function showPrediction(algoId) {
   var map = tt.algoMap[algoId];
   var mapRes = map.results[tt.compoundIdx];
-  
+
   // check if we have results for this guy at all...
   if (mapRes == null || mapRes.data == null)
     return;
@@ -318,21 +319,22 @@ function showPrediction(algoId) {
   if (mapRes.explanation != null)
     $('.tt-explanation', aEl).html(mapRes.explanation.replace(/(Yes|No)/g, '<span class="answer $1">$1</span>'));
   $('.tt-classification', aEl).empty();
-  
-  
+
+
   fillClassification($('.tt-classification', aEl)[0], mapRes.categories);
   $(aEl).removeClass('folded');
 }
 
 function parsePrediction(result, algoId, index) {
   var map = tt.algoMap[algoId];
-  
+
   var cells = $('#tt-table table td.' + algoId);
   for (var i = 0, rl = result.dataEntry.length; i < rl; ++i) {
     var idx = i + (index || 0);
     var mapRes = map.results[idx];
-    if (mapRes == null)
+    if (mapRes == null){
       map.results[idx] = mapRes = {};
+    }
     mapRes.explanation = '';
     mapRes.data = jToxCompound.extractFeatures(result.dataEntry[i], result.feature, function (feature, fId) {
       if (feature.title.indexOf("#explanation") > -1) {
@@ -346,10 +348,11 @@ function parsePrediction(result, algoId, index) {
     });
 
     mapRes.categories = buildCategories(result.feature, result.dataEntry[i].values);
-    
-    if (mapRes.categories.length == 0 && index == null)
-        runPredict ($('button', cells[idx]), algoId);
-    else { 
+
+    if (mapRes.categories.length == 0 && index == null){
+      runPredict ($('button', cells[idx]), algoId);
+    }
+    else {
       $('.tt-class', cells[idx]).remove();
       $(cells[idx]).addClass('calculated');
       if (mapRes.categories.length > 0) {
@@ -362,7 +365,7 @@ function parsePrediction(result, algoId, index) {
         cells[idx].innerHTML = '-';
     }
   }
-  
+
   tt.browserKit.equalizeTables();
 }
 
@@ -395,7 +398,7 @@ function switchView(mode) {
     else
       $(this).removeClass("pressed");
   });
-  
+
   var scroller = $('#tt-bigpane')[0];
   $(scroller).animate({ scrollTop: (mode == 'single') ? 0 : $('#tt-table')[0].offsetTop }, 300, 'easeOutQuad');
 }
@@ -403,7 +406,7 @@ function switchView(mode) {
 function onTableDetails(idx) {
   loadCompound(idx);
   switchView('single');
-  return false;  
+  return false;
 }
 
 $(document).ready(function(){
@@ -415,7 +418,7 @@ $(document).ready(function(){
       $('#tt-models-panel button.jt-toggle.auto').addClass('active');
     else
       $('#tt-models-panel button.jt-toggle.auto.active').removeClass('active');
-    
+
     onSelectedUpdate.call(this);
   });
   $('#tt-models-panel a.expand-collapse').on('click', function () {
@@ -448,21 +451,21 @@ $(document).ready(function(){
         $('table .' + aId, tt.browserKit.rootElement).hide();
       }
     });
-    
+
     tt.browserKit.equalizeTables();
   });
-  
+
   tt.modelKit = jToxModel.kits[0];
   tt.featuresList = $('#tt-features .list')[0];
-  
+
   $('#tt-browser-panel .prev-field').on('click', function () { if ($(this).hasClass('paginate_enabled_previous')) loadCompound(tt.compoundIdx - 1); });
   $('#tt-browser-panel .next-field').on('click', function () { if ($(this).hasClass('paginate_enabled_next')) loadCompound(tt.compoundIdx + 1); });
   $('#tt-diagram .title').on('click', function () { updateSize('#tt-browser-panel'); });
   $('#sidebar .side-title>div').on('click', switchView);
   switchView('single');
-  
+
   $('#logger').on('click', function () { $(this).toggleClass('hidden'); });
-  
+
   $(window).on('resize', function () { updateSize(); });
   updateSize();
 });

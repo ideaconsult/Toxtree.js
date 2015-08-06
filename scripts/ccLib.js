@@ -5,7 +5,7 @@ var ccLib = {
       base = [];
     else if (!jQuery.isArray(base))
       base = [base];
-    
+
     // now proceed with extending
     if (arr !== undefined && arr !== null){
       for (var i = 0, al = arr.length; i < al; ++i){
@@ -16,7 +16,7 @@ var ccLib = {
     }
     return base;
   },
-  
+
   extendNew: function (base) {
     var deep = false;
     var arr = null;
@@ -27,13 +27,13 @@ var ccLib = {
     }
     else
       arr = arguments;
-    
+
     for (var i = 1, al = arr.length;i < al; ++i) {
       var obj = arr[i];
       if (typeof obj != 'object')
         continue;
       for (var key in obj) {
-        if (!base.hasOwnProperty(key)) 
+        if (!base.hasOwnProperty(key))
           base[key] = (typeof obj[key] == 'object') ? window.jQuery.extend({}, obj[key]) : obj[key];
         else if (deep && typeof base[key] == 'object' && typeof obj[key] == 'object')
           this.extendNew(true, base[key], obj[key]);
@@ -41,18 +41,18 @@ var ccLib = {
     }
     return base;
   },
-  
+
   joinDeep: function (data, field, jn) {
     var arr = [];
     for (var i = 0, dl = data.length;i < dl; ++i)
       arr.push(this.getJsonValue(data[i], field));
     return arr.join(jn);
   },
-  
+
   fireCallback: function (callback, self) {
     if (!jQuery.isArray(callback))
       callback = [callback];
-      
+
     var ret = true;
     for (var i = 0, cl = callback.length; i < cl; ++i) {
       var callone = callback[i];
@@ -62,23 +62,23 @@ var ccLib = {
     }
     return ret;
   },
-  
+
   /* Function setObjValue(obj, value)Set a given to the given element (obj) in the most appropriate way - be it property - the necessary one, or innetHTML
   */
   setObjValue: function (obj, value){
   	if ((value === undefined || value === null) && jQuery(obj).data('default') !== undefined)
   		value = jQuery(obj).data('default');
-  
+
     if (obj.nodeName == "INPUT" && obj.type == 'checkbox')
       obj.checked = !!value;
-    else if (obj.nodeName == "INPUT" || obj.nodeName == "SELECT")
+    else if (obj.nodeName == "INPUT" || obj.nodeName == "SELECT" || obj.nodeName == "TEXTAREA")
       obj.value = value;
     else if (obj.nodeName == "IMG")
       obj.src = value;
     else if (obj.nodeName == "BUTTON")
   		jQuery(obj).data('value', value);
     else
-      obj.innerHTML = value;      
+      obj.innerHTML = value;
   },
 
   getObjValue: function (obj){
@@ -97,7 +97,7 @@ var ccLib = {
   isNull: function(obj) {
     return obj === undefined || obj == null;
   },
-  
+
   isEmpty: function(obj) {
     var empty = true;
     if (obj !== undefined || obj != null) {
@@ -107,7 +107,7 @@ var ccLib = {
             empty = false;
             break;
           }
-        } 
+        }
       }
       else if (typeof obj == 'string')
         empty = obj.trim().length == 0;
@@ -118,7 +118,7 @@ var ccLib = {
     }
     return empty;
   },
-  
+
   enumObject: function(obj, fn, idx, level) {
     if (level == null)
       level = 0;
@@ -131,7 +131,7 @@ var ccLib = {
       for (var i in obj)
         this.enumObject(obj[i], fn, i, level + 1);
   },
-  
+
   setJsonValue: function (json, field, val) {
     if (field != null){
       try {
@@ -144,22 +144,22 @@ var ccLib = {
 
         json[arr[i]] = val;
       }
-    }  
+    }
   },
-  
+
   getJsonValue: function (json, field){
     var value = json[field];
     if (value === undefined && field != null) {
       try {
         eval("value = json." + field);
-      } 
+      }
       catch(e){
         ;
       }
     }
     return value;
   },
-  
+
   // given a root DOM element and an JSON object it fills all (sub)element of the tree
   // which has class 'data-field' and their name corresponds to a property in json object.
   // If prefix is given AND json has id property - the root's id set to to prefix + json.id
@@ -169,7 +169,7 @@ var ccLib = {
       return;
   	if (!filter)
   		filter = 'data-field';
-  	
+
   	var processFn = function(el, json){
   	  var value = self.getJsonValue(json, jQuery(el).data('field'));
       if (value !== undefined) {
@@ -183,21 +183,21 @@ var ccLib = {
           self.setObjValue(el, value);
       }
   	}
-	
+
   	if (jQuery(root).hasClass(filter))
   		processFn(root, json);
-  
+
     jQuery('.' + filter, root).each(function (i) { processFn(jQuery(this)[0], json); } );
-  
+
     if (prefix && json.id !== undefined) {
       root.id = prefix + json.id;
     }
   },
-  
+
   populateData: function (root, template, data, enumFn) {
     if (data == null || typeof data != 'object')
       return;
-      
+
     var temp = $(template)[0];
     var oldDisp = root.style.display;
     root.style.display = 'none';
@@ -206,21 +206,21 @@ var ccLib = {
       el.removeAttribute('id');
       if (this.fireCallback(enumFn, el, data[i]) === false)
         continue;
-    
+
       root.appendChild(el);
       this.fillTree(el, data[i]);
     }
-    
+
     root.style.display = oldDisp;
   },
-  
+
   // Prepare a form so that non-empty fields are checked before submit and accumuater fields
   // are accumulated. Call it after you've set submit behavior, etc.
   prepareForm: function (form) {
   	var self = this;
 	  var $ = window.jQuery;
 
-		// first - attach the accumulators handler.	  
+		// first - attach the accumulators handler.
 	  $('.accumulate', form).on('change', function (e) {
 		  var target = $(this).data('accumulate');
 		  if (!!target) {
@@ -234,7 +234,7 @@ var ccLib = {
 			return false;
 	  });
   },
-  
+
   packData: function (data) {
     var out = {};
     for (var i in data) {
@@ -243,14 +243,14 @@ var ccLib = {
       var o = data[i];
       out[o.name] = o.value;
     }
-      
+
     return out;
   },
-  
+
   serializeForm: function (form) {
     return this.packData(window.jQuery(form).serializeArray());
   },
-	 
+
   flexSize: function (root) {
     var $ = jQuery;
     $('.cc-flex', root).each(function () {
@@ -267,7 +267,7 @@ var ccLib = {
       el.style[horiz ? 'width' : 'height'] = (this.offsetParent[horiz ? 'clientWidth' : 'clientHeight'] - sum) + 'px';
     });
   },
-	 
+
 	 // Check if the form is not-empty according to non-empty fields
   validateForm: function (form, callback) {
   	var self = this;
@@ -276,7 +276,7 @@ var ccLib = {
 		  if (!self.fireCallback(callback, this))
 		  	ok = false;
 	  });
-	  
+
 	  return ok;
   },
   /*
@@ -287,7 +287,7 @@ var ccLib = {
       obj.removeChild(obj.lastChild);
     }
   },
-    
+
 	/* formats a string, replacing {number | property} in it with the corresponding value in the arguments
   */
   formatString: function(format, pars) {
@@ -295,7 +295,7 @@ var ccLib = {
       format = format.replace('{' + i + '}', pars[i]);
     return format;
   },
-  
+
   trim: function(obj) {
     if (obj === undefined || obj == null)
       return '';
@@ -304,36 +304,36 @@ var ccLib = {
     else
       return obj;
   },
-  
+
   copyToClipboard: function(text, prompt) {
     if (!prompt) {
       prompt = "Press Ctrl-C (Command-C) to copy and then Enter.";
     }
     window.prompt(prompt, text);
   },
-  
+
   equalizeHeights: function() {
     var tabs = [];
     for (var i = 0;i < arguments.length; ++i) {
       tabs[i] = arguments[i].firstElementChild;
-    }    
-    
+    }
+
     for (;;) {
       var height = 0;
       for (i = 0;i < tabs.length ; ++i) {
         if (tabs[i] == null)
           continue;
-          
+
         if (!jQuery(tabs[i]).hasClass('lock-height') && tabs[i].style.height != '')
           tabs[i].style.height = "auto";
 
         if (tabs[i].offsetHeight > height)
           height = tabs[i].offsetHeight;
       }
-      
+
       if (height == 0)
         break;
-        
+
       for (i = 0;i < tabs.length ; ++i) {
         if (tabs[i] != null) {
           jQuery(tabs[i]).height(height);
@@ -342,7 +342,7 @@ var ccLib = {
       }
     }
   },
-  
+
   positionTo: function (el, parent) {
     var ps = { left: -parent.offsetLeft, top: -parent.offsetTop };
     parent = parent.offsetParent;
@@ -352,11 +352,11 @@ var ccLib = {
     }
     return ps;
   },
-  
+
   addParameter: function (url, param) {
     return url + (("&?".indexOf(url.charAt(url.length - 1)) == -1) ?  (url.indexOf('?') > 0 ? "&" : "?") : '') + param;
   },
-  
+
   removeParameter: function (url, param) {
     return url.replace(new RegExp('(.*\?.*)(' + param + '=[^\&\s$]*\&?)(.*)'), '$1$3');
   },
@@ -411,3 +411,14 @@ function formatDate(timestamp) {
       year = d.getFullYear();
   return ((day<10)?'0':'') + day + '.' + ((month<10)?'0':'') + month + '.' + d.getFullYear();
 }
+
+// Wrap string in a[href] tag if it is valid URL
+function formatLink(str) {
+  // https://gist.github.com/searls/1033143
+  var p = /^(?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’])$/i;
+  if(str.search(p) != -1){
+    str = '<a href="' + str + '" target="_blank">' + str + '</a>';
+  }
+  return str;
+}
+

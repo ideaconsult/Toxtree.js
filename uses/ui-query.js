@@ -8,13 +8,14 @@ function onSideLoaded(result) {
 	var set = (result.model || result.dataset);
 	$(tEl).data('total', set.length);
 	tEl.innerHTML = jT.ui.updateCounter(tEl.innerHTML, 0, set.length);
+  this.table.fnSort([ [2,'desc'] ]);
 }
 
 function onSelectedUpdate(e) {
   var par = $(this).parents('.jtox-foldable')[0];
 	var tEl = $('.title', par)[0];
 	var v = $('input[type="checkbox"]:checked', par).length;
-	
+
 	tEl.innerHTML = jT.ui.updateCounter(tEl.innerHTML, v, $(tEl).data('total'));
 }
 
@@ -33,7 +34,7 @@ function onDetailedRow(row, data, element) {
   $(el).addClass('paddingless');
   var div = document.createElement('div');
   el.appendChild(div);
-  new jToxSubstance(div, $.extend(true, {}, this.settings, {crossDomain: true, selectionHandler: null, substanceUri: uri, showControls: true, onDetails: function (root, data, element) {
+  new jToxSubstance(div, $.extend(true, {}, this.settings, {selectionHandler: null, substanceUri: uri, showControls: true, onDetails: function (root, data, element) {
     new jToxStudy(root, $.extend({}, this.settings, {substanceUri: data.URI}));
   } } ) );
 }
@@ -52,9 +53,9 @@ function runPredict(el) {
 function createGroups(miniset, kit) {
   var groups = {
     "Identifiers" : [
-      "http://www.opentox.org/api/1.1#Diagram", 
+      "http://www.opentox.org/api/1.1#Diagram",
       "#DetailedInfoRow",
-      "http://www.opentox.org/api/1.1#CASRN", 
+      "http://www.opentox.org/api/1.1#CASRN",
       "http://www.opentox.org/api/1.1#EINECS",
       "http://www.opentox.org/api/1.1#IUCLID5_UUID",
       // Names
@@ -68,7 +69,7 @@ function createGroups(miniset, kit) {
     ]
 	};
 	for (var fId in miniset.feature) {
-	  var feat = miniset.feature[fId]; 
+	  var feat = miniset.feature[fId];
   	var src = feat.source;
   	if (!src || !src.type || src.type.toLowerCase() != 'model')
   	  continue;

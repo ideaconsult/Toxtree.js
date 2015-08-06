@@ -34,7 +34,7 @@
 <body>
   <div class="jtox-toolkit" data-kit="query" data-initial-query="yes">
     <div class="jtox-toolkit jtox-widget" data-kit="search" data-hide-options="context"></div>
-	  <div class="jtox-toolkit" data-kit="compound" data-cross-domain="true" data-show-tabs="false"></div>
+	  <div class="jtox-toolkit" data-kit="compound" data-show-tabs="false"></div>
   </div>
 	<div class="jtox-template">
 <!--[[ jT.templates['widget-search'] -->
@@ -53,10 +53,11 @@
     		<div class="float-right search-pane">
   			  <div class="dynamic auto-hide searchauto hidden jtox-inline">
   			    <div>
-    			    <input type="checkbox" name="regexp" title="fadsfas"/><span>Enable fragment search<sup class="helper"><a target="_blank" href="http://en.wikipedia.org/wiki/Regular_expression"><span class="ui-icon ui-icon-info"></span></a></sup></span>
+    			    <input type="checkbox" name="regexp" id="toxquery-regexp" /><label for="toxquery-regexp">Enable fragment search<sup class="helper"><a target="_blank" href="http://en.wikipedia.org/wiki/Regular_expression"><span class="ui-icon ui-icon-info"></span></a></sup></label>
   			    </div>
   			  </div>
   			  <div class="dynamic auto-hide searchsimilarity hidden jtox-inline">
+            <input type="checkbox" name="similaritybysubstance" value="true" id="similaritybysubstance" /><label for="similaritybysubstance">Only hits with substance data</label>
       			<select name='threshold' title ='Tanimoto similarity threshold'>
     					<option value='0.9' selected="selected">0.9</option>
   			   		<option value='0.8' >0.8</option>
@@ -67,9 +68,10 @@
   			   		<option value='0.3' >0.3</option>
   			   		<option value='0.2' >0.2</option>
   			   		<option value='0.1' >0.1</option>
-      			</select>	
+      			</select>
   			  </div>
   			  <div class="dynamic auto-hide searchsmarts hidden jtox-inline">
+            <input type="checkbox" name="smartsbysubstance" value="true" id="smartsbysubstance" /><label for="smartsbysubstance">Only hits with substance data</label>
   			    <select name="smarts" title ="Predefined functional groups"></select>
   			  </div>
   			  <div class="jtox-inline">
