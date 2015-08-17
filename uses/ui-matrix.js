@@ -932,7 +932,7 @@ var jToxBundle = {
 
             var imageModule = new ImageModule({centered:false});
             imageModule.getSizeFromData=function(imgData) {
-              return imgData.size;
+              return [imgData.size[0] / 2, imgData.size[1] / 2];
             }
             imageModule.getImageFromData=function(imgData) {
               console.log(imgData.data);
