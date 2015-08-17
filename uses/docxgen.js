@@ -60,6 +60,9 @@ DocUtils.clone = function(obj) {
   if (obj instanceof Date) {
     return new Date(obj.getTime());
   }
+  if (obj instanceof ArrayBuffer) {
+    return obj.slice(0);
+  }
   if (obj instanceof RegExp) {
     flags = '';
     if (obj.global != null) {
