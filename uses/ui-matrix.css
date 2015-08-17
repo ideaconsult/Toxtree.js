@@ -305,7 +305,7 @@ tr:last-child .jtox-down {
 }
 
 #jtox-report {
-  counter-reset: section;
+  counter-reset: section annexes;
 }
 
 #jtox-report tbody th {
@@ -352,6 +352,11 @@ section {
 section h2:before {
   counter-increment: section;
   content: counter(section) ". ";
+}
+
+section.annex h2:before {
+  counter-increment: annexes;
+  content: "Annex " counter(annexes) " ";
 }
 
 dl {
