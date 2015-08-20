@@ -106,9 +106,7 @@ $(document).ready(function(){
   var toggleBar = function () {
     $('#sidebar').toggleClass('hidden');
   };
-  $('#sidebar span.ui-icon').on('click', toggleBar);
-  $('#sidebar div.side-title').on('click', toggleBar);
-  $('#sidebar').on('mouseover', function () { $(this).removeClass('hidden'); }).on('mouseout', function () { $(this).addClass('hidden');});
+  $('#sidebar-handle').on('click', toggleBar);
   jT.ui.installMultiSelect($('#sidebar')[0], onSelectedUpdate);
   $('#logger').on('click', function (e) { $(this).toggleClass('hidden'); });
 });
