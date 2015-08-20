@@ -822,12 +822,19 @@ window.jT.ui = {
 	    var catCol = kit.settings.configuration.columns[cat];
 	    if (!ccLib.isNull(catCol)) {
 	      if (!!group) {
-	        catCol = catCol[group];
-  	      if (!ccLib.isNull(catCol))
+          catCol = catCol[group];
+  	      if (!ccLib.isNull(catCol)){
+            // Allow bVisible to be set on the whole category
+            if (!ccLib.isNull(catCol.bVisible)) {
+              catCol[name] = catCol[name] || {};
+              catCol[name].bVisible = !!catCol[name].bVisible || !!catCol.bVisible;
+            }
   	        catCol = catCol[name];
+          }
         }
-        else
+        else {
 	        catCol = catCol[name];
+        }
 	    }
 
 	    if (ccLib.isNull(catCol))
