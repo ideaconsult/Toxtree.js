@@ -158,7 +158,19 @@
     </div>
     <div id="jtox-report" class="jtox-report">
 
-      <a href="ui-matrix-report.html" id="open-report">View and download the assessment report</a>
+      <p>
+        <a href="{ROOT}/ui/assessment_report?bundle_uri={ROOT}/bundle/{id}" id="open-report">Create assessment report</a>
+      </p>
+      <p>
+        <a href="{ROOT}/bundle/{id}/substance?media=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">Create Excel file with all used experimental data</a>
+      </p>
+      <p>
+        <a href="{ROOT}/bundle/{id}/dataset?media=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">Create Excel file with the initial matrix</a>
+      </p>
+      <p>
+        <a href="{ROOT}/bundle/{id}/matrix?media=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">Create Excel file with the working matrix</a>
+      </p>
+
 
     </div>
   </div>
