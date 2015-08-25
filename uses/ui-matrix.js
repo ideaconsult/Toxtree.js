@@ -168,8 +168,6 @@ var jToxBundle = {
       // TODO: assign this on form submit, not on button click.
       //       Forms can be submitted in a number of other ways.
       self.createForm.assStart.onclick = function (e) {
-        e.preventDefault();
-        e.stopPropagation();
         if (ccLib.validateForm(self.createForm, checkForm)) {
           jT.service(self, '/bundle', { method: 'POST', data: ccLib.serializeForm(self.createForm)}, function (bundleUri, jhr) {
             if (!!bundleUri)
@@ -179,13 +177,50 @@ var jToxBundle = {
               console.log("Error on creating bundle [" + jhr.status + ": " + jhr.statusText);
           });
         }
+        e.preventDefault();
+        e.stopPropagation();
+      };
+
+      self.createForm.assFinalize.onclick = function (e) {
+
+        if (!self.bundleUri)
+          return;
+
+        var $this = $(this),
+            data = {};
+        data['status'] = 'published';
+        $this.addClass('loading');
+        jT.service(self, self.bundleUri, { method: 'PUT', data: data } , function (result) {
+          $this.removeClass('loading');
+          if (!result) { // i.e. on error - request the old data
+            self.load(self.bundleUri);
+          }
+          else {
+            $('.data-field[data-field="status"]').html(formatStatus('published'));
+          }
+        });
+
+        e.preventDefault();
+        e.stopPropagation();
+
       };
 
       self.createForm.assNewVersion.onclick = function (e) {
-        e.preventDefault();
-        e.stopPropagation();
+
         if (!self.bundleUri)
           return;
+
+        var $this = $(this),
+            data = {};
+        data['status'] = 'archived';
+        $this.addClass('loading');
+        jT.service(self, self.bundleUri, { method: 'PUT', data: data } , function (result) {
+          $this.removeClass('loading');
+          if (!result) { // i.e. on error - request the old data
+            self.load(self.bundleUri);
+          }
+        });
+
         jT.service(self, self.bundleUri + '/version', { method: 'POST' }, function (bundleUri, jhr) {
           if (!!bundleUri)
             self.load(bundleUri);
@@ -193,6 +228,10 @@ var jToxBundle = {
             // TODO: report an error
             console.log("Error on creating bundle [" + jhr.status + ": " + jhr.statusText);
         });
+
+        e.preventDefault();
+        e.stopPropagation();
+
       };
 
       self.createForm.assFinalize.style.display = 'none';
@@ -1564,3 +1603,12 @@ function onReportSubstancesLoaded(dataset) {
 $(document).ready(function(){
   $('#logger').on('click', function () { $(this).toggleClass('hidden'); });
 });
+
+function formatStatus(status) {
+  var statuses = {
+    'draft': 'Draft Version',
+    'published': 'Final Assessment',
+    'archived': 'Archived Version'
+  }
+  return statuses[status];
+}

@@ -69,11 +69,7 @@
             <tr><th class="right size-third">Version last modified on:</th><td class="data-field" data-field="updated" data-format="formatDate"></td></tr>
             <tr>
               <th class="right size-third">Status:</th>
-              <td>
-                  <input type="radio" name="status" value="draft" id="status-draft"><label for="status-draft">Draft</label>
-                  <input type="radio" name="status" value="published" id="status-published"><label for="status-published">Published</label>
-                  <input type="radio" name="status" value="archived" id="status-archived"><label for="status-archived">Archived</label>
-              </td>
+              <td class="data-field" data-field="status" data-format="formatStatus"></td>
             </tr>
             <tr><th class="right size-third">License:</th><td><input class="data-field first-time validate" data-field="rights.URI" name="license"/></td></tr>
             <tr><th class="right size-third">Rights holder:</th><td><input class="data-field first-time validate" data-field="rightsHolder" name="rightsHolder"/></td></tr>
@@ -99,7 +95,7 @@
 	      </table>
 	      <div class="actions">
 		      <button name="assStart" type="button">Start</button>
-		      <button name="assFinalize" type="button">Finalize</button>
+		      <button name="assFinalize" type="button">Finalize Assessment</button>
 		      <button name="assNewVersion" type="button">Generate new version</button>
 	      </div>
 	  	</form>
