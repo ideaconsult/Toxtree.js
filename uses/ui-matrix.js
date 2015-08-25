@@ -803,7 +803,7 @@ var jToxBundle = {
             var structuresFixRows = $('#jtox-report-query .jtox-ds-fixed tbody tr');
             var structuresVarRows = $('#jtox-report-query .jtox-ds-variable tbody tr');
             structuresFixRows.each(function(index){
-              var structure = {}, fr = $(this), vr = $(structuresVarRows[index]);
+              var structure = {"index": index + 1}, fr = $(this), vr = $(structuresVarRows[index]);
               structure.tag = fr.find('td:first-child button.active').text();
 
               var image = fr.find('img.jtox-smalldiagram')[0];
@@ -925,7 +925,7 @@ var jToxBundle = {
 
           console.log(data);
 
-          loadFile("assessment-report.docx", function(err, content){
+          loadFile("assessment-report-v2.docx", function(err, content){
             if (err) { throw err };
 
             var doc = new Docxgen();
@@ -1055,6 +1055,19 @@ var jToxBundle = {
     if (!!queryUri) {
       self.reportMatrixKit.query(queryUri);
     }
+/*
+    if (!self.reportStudyKit) {
+      self.reportStudyKit = new jToxEndpoint($('report-experimental-data')[0], {
+        onRow: function (row, data, index) {
+          if (!data.bundles)
+            return;
+          var bundleInfo = data.bundles[self.bundleUri];
+        }
+      });
+    }
+
+    self.reportStudyKit.
+*/
 
   },
 
@@ -1400,11 +1413,6 @@ var jToxBundle = {
         });
 
         self.loadUsers();
-
-        var reportLink = $('#open-report')[0];
-        if (!!reportLink) {
-          reportLink.href = reportLink.href + '?baseUrl=' + encodeURIComponent(self.settings.baseUrl) + '&bundleUri=' + encodeURIComponent(self.bundleUri);
-        }
 
         ccLib.fireCallback(self.settings.onLoaded, self);
 
