@@ -165,7 +165,11 @@ var jToxBundle = {
           return this.checkValidity();
         }
         else {
-          return this.value.length > 0;
+          var valid = (this.value.length > 0);
+          if(!valid){
+            this.placeholder = 'You need to fill this box';
+          }
+          return valid;
         }
       };
 
