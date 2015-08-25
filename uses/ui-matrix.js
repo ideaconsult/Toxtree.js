@@ -159,15 +159,20 @@ var jToxBundle = {
     var self = this;
     if (!$(panel).hasClass('initialized')) {
       $(panel).addClass('initialized');
+
       var checkForm = function () {
-        this.placeholder = "You need to fill this box";
-        return this.value.length > 0;
+        if( 'checkValidity' in this ){
+          return this.checkValidity();
+        }
+        else {
+          return this.value.length > 0;
+        }
       };
 
       self.createForm = $('form', panel)[0];
       // TODO: assign this on form submit, not on button click.
       //       Forms can be submitted in a number of other ways.
-      self.createForm.assStart.onclick = function (e) {
+      self.createForm.onsubmit = function (e) {
         if (ccLib.validateForm(self.createForm, checkForm)) {
           jT.service(self, '/bundle', { method: 'POST', data: ccLib.serializeForm(self.createForm)}, function (bundleUri, jhr) {
             if (!!bundleUri)
