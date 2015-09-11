@@ -60,36 +60,32 @@
 	  	<form>
 	      <table class="dataTable">
 	        <thead>
-	          <tr><th class="right size-third">Title:</th><td><input class="data-field first-time validate" data-field="title" name="title"/></td></tr>
-            <tr><th class="right size-third">Maintainer:</th><td><input class="data-field first-time validate" data-field="maintainer" name="maintainer"/></td></tr>
+	          <tr><th class="right size-third"><label for="title">Title:*</label></th><td><input class="data-field first-time validate" data-field="title" name="title" id="title" required /></td></tr>
+            <tr><th class="right size-third"><label for="maintainer">Maintainer:*</label></th><td><input class="data-field first-time validate" data-field="maintainer" name="maintainer" id="maintainer" required /></td></tr>
 
-            <tr><th class="right top size-third">Purpose:</th><td><textarea class="validate nomargin data-field" data-field="description" name="description"></textarea></td></tr>
+            <tr><th class="right top size-third"><label for="description">Purpose:*</label></th><td><textarea class="validate nomargin data-field" data-field="description" name="description" id="description" required ></textarea></td></tr>
             <tr><th class="right size-third">Version:</th><td class="data-field" data-field="version">?.?</td></tr>
             <tr><th class="right size-third">Version start date:</th><td class="data-field" data-field="created" data-format="formatDate"></td></tr>
             <tr><th class="right size-third">Version last modified on:</th><td class="data-field" data-field="updated" data-format="formatDate"></td></tr>
             <tr>
               <th class="right size-third">Status:</th>
-              <td>
-                  <input type="radio" name="status" value="draft" id="status-draft"><label for="status-draft">Draft</label>
-                  <input type="radio" name="status" value="published" id="status-published"><label for="status-published">Published</label>
-                  <input type="radio" name="status" value="archived" id="status-archived"><label for="status-archived">Archived</label>
-              </td>
+              <td class="data-field" data-field="status" data-format="formatStatus"></td>
             </tr>
-            <tr><th class="right size-third">License:</th><td><input class="data-field first-time validate" data-field="rights.URI" name="license"/></td></tr>
-            <tr><th class="right size-third">Rights holder:</th><td><input class="data-field first-time validate" data-field="rightsHolder" name="rightsHolder"/></td></tr>
-	          <tr><th class="right size-third">See also:</th><td><input class="data-field first-time validate" data-field="seeAlso" name="seeAlso"/></td></tr>
-	          <tr><th class="right size-third">Source URL:</th><td><input class="data-field first-time validate" data-field="source" name="source"/></td></tr>
+            <tr><th class="right size-third"><label for="license">License:*</label></th><td><input class="data-field first-time validate" data-field="rights.URI" name="license" id="license" required /></td></tr>
+            <tr><th class="right size-third"><label for="rightsHolder">Rights holder:*</label></th><td><input class="data-field first-time validate" data-field="rightsHolder" name="rightsHolder" id="rightsHolder" required /></td></tr>
+	          <tr><th class="right size-third"><label for="seeAlso">See also:*</label></th><td><input class="data-field first-time validate" data-field="seeAlso" name="seeAlso" id="seeAlso" required /></td></tr>
+	          <tr><th class="right size-third"><label for="source">Source URL:*</label></th><td><input class="data-field first-time validate" data-field="source" name="source" id="source" required /></td></tr>
             <tr><th class="right size-third">Assessment:</th><td class="data-field" data-field="number"></td></tr>
 	          <tr><th class="right size-third">Rating:</th><td class="data-stars-field"><input type="hidden" name="stars" value="0"/></td></tr>
             <tr>
-              <th class="right size-third top">Users with write access:</th>
+              <th class="right size-third top"><label for="users-write">Users with write access:</label></th>
               <td class="jtox-user-rights">
                 <select name="users-write" id="users-write" multiple class="jtox-users-select">
                 </select>
               </td>
             </tr>
             <tr>
-              <th class="right size-third top">Users with read access:</th>
+              <th class="right size-third top"><label for="users-read">Users with read access:</label></th>
               <td class="jtox-user-rights">
                 <select name="users-read" id="users-read" multiple class="jtox-users-select">
                 </select>
@@ -98,8 +94,8 @@
 	        </thead>
 	      </table>
 	      <div class="actions">
-		      <button name="assStart" type="button">Start</button>
-		      <button name="assFinalize" type="button">Finalize</button>
+		      <button name="assStart" type="submit">Start</button>
+		      <button name="assFinalize" type="button">Finalize Assessment</button>
 		      <button name="assNewVersion" type="button">Generate new version</button>
 	      </div>
 	  	</form>
