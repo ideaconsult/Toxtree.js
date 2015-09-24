@@ -1411,6 +1411,11 @@ var jToxBundle = {
 
         self.loadUsers();
 
+        $('#open-report').prop('href', self.settings.baseUrl + '/ui/assessment_report?bundle_uri=' + encodeURIComponent(self.bundleUri));
+        $('#export-substance').prop('href', self.bundleUri + '/substance?media=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $('#export-initial-matrix').prop('href', self.bundleUri + '/dataset?media=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $('#export-working-matrix').prop('href', self.bundleUri + '/matrix?media=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
         ccLib.fireCallback(self.settings.onLoaded, self);
 
       }
