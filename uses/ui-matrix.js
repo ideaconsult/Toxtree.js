@@ -923,9 +923,7 @@ var jToxBundle = {
 
         getData().then(function(data){
 
-          console.log(data);
-
-          loadFile("assessment-report-v2.docx", function(err, content){
+          loadFile("assessment-report.docx", function(err, content){
             if (err) { throw err };
 
             var doc = new Docxgen();
@@ -935,7 +933,6 @@ var jToxBundle = {
               return [imgData.size[0] / 2, imgData.size[1] / 2];
             }
             imageModule.getImageFromData=function(imgData) {
-              console.log(imgData.data);
               return imgData.data.slice(0);
             }
             doc.attachModule(imageModule);
