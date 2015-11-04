@@ -97,7 +97,8 @@ var jToxCompound = (function () {
         {type: "text/x-arff", icon: "images/arff.png"},
         {type: "text/x-arff-3col", icon: "images/arff-3.png"},
         {type: "application/rdf+xml", icon: "images/rdf64.png"},
-        {type: "application/json", icon: "images/json64.png"}
+        {type: "application/json", icon: "images/json64.png"},
+        {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", icon: "images/xlsx.png"}
       ],
 
       // These are instance-wide pre-definitions of default baseFeatures as described below.
