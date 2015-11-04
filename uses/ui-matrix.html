@@ -49,11 +49,11 @@
 var customize = {
     "lri": {
         "title": {
-            "l_title": "Assessment title:",
-            "l_maintainer": "Owner:",
-            "l_number": "Assessment ID:",
-            "l_seeAlso": "Assessment code:",
-            "l_source": "Assessment Doclink(s):"
+            "l_title": "Assessment title",
+            "l_maintainer": "Owner",
+            "l_number": "Assessment ID",
+            "l_seeAlso": "Assessment code",
+            "l_source": "Assessment Doclink(s)"
         },
         "hide": "lri_hide"
     }
@@ -88,32 +88,32 @@ $(document)
 	  	<form>
 	      <table class="dataTable">
 	        <thead>
-	          <tr><th class="right size-third"><label for="title" id="l_title">Title:</label>*</th><td><input class="data-field first-time validate" data-field="title" name="title" id="title" required /></td></tr>
-            <tr><th class="right size-third"><label for="maintainer" id="l_maintainer">Maintainer:</label>*</th><td><input class="data-field first-time validate" data-field="maintainer" name="maintainer" id="maintainer" required /></td></tr>
+	          <tr><th class="right size-third"><label for="title" id="l_title">Title</label>*<a href='#' class='chelp a_name'>?</a>:</th><td><input class="data-field first-time validate" data-field="title" name="title" id="title" required /></td></tr>
+            <tr><th class="right size-third"><label for="maintainer" id="l_maintainer">Maintainer</label>*<a href='#' class='chelp a_maintainer'>?</a>:</th><td><input class="data-field first-time validate" data-field="maintainer" name="maintainer" id="maintainer" required /></td></tr>
 
-            <tr><th class="right top size-third"><label for="description">Purpose:</label>*</th><td><textarea class="validate nomargin data-field" data-field="description" name="description" id="description" required ></textarea></td></tr>
-            <tr><th class="right size-third">Version:</th><td class="data-field" data-field="version">?.?</td></tr>
-            <tr><th class="right size-third">Version start date:</th><td class="data-field" data-field="created" data-format="formatDate"></td></tr>
-            <tr><th class="right size-third">Version last modified on:</th><td class="data-field" data-field="updated" data-format="formatDate"></td></tr>
+            <tr><th class="right top size-third"><label for="description">Purpose</label>*<a href='#' class='chelp a_description'>?</a>:</th><td><textarea class="validate nomargin data-field" data-field="description" name="description" id="description" required ></textarea></td></tr>
+            <tr><th class="right size-third">Version <a href='#' class='chelp a_version'>?</a>:</th><td class="data-field" data-field="version">?.?</td></tr>
+            <tr><th class="right size-third">Version start date <a href='#' class='chelp a_version_date'>?</a>:</th><td class="data-field" data-field="created" data-format="formatDate"></td></tr>
+            <tr><th class="right size-third">Version last modified on <a href='#' class='chelp a_version_date'>?</a>:</th><td class="data-field" data-field="updated" data-format="formatDate"></td></tr>
             <tr>
-              <th class="right size-third">Status:</th>
+              <th class="right size-third">Status<a href='#' class='chelp a_published'>?</a>:</th>
               <td class="data-field" data-field="status" data-format="formatStatus"></td>
             </tr>
-            <tr class="lri_hide"><th class="right size-third"><label for="license">License:</label>*</th><td><input class="data-field first-time validate" data-field="rights.URI" name="license" id="license" required /></td></tr>
-            <tr class="lri_hide"><th class="right size-third"><label for="rightsHolder">Rights holder:</label>*</th><td><input class="data-field first-time validate" data-field="rightsHolder" name="rightsHolder" id="rightsHolder" required /></td></tr>
-	          <tr ><th class="right size-third"><label for="seeAlso" id="l_seeAlso">See also:</label>*</th><td><input class="data-field first-time validate" data-field="seeAlso" name="seeAlso" id="seeAlso" required /></td></tr>
-	          <tr ><th class="right size-third"><label for="source" id="l_source">Source URL:</label>*</th><td><input class="data-field first-time validate" data-field="source" name="source" id="source" required /></td></tr>
-            <tr><th class="right size-third"><label for="number" id="l_number">Identifier:</label></th><td class="data-field" data-field="number"></td></tr>
-	          <tr class="lri_hide"><th class="right size-third">Rating:</th><td class="data-stars-field"><input type="hidden" name="stars" value="0"/></td></tr>
-            <tr>
-              <th class="right size-third top"><label for="users-write">Users with write access:</label></th>
+            <tr class="lri_hide"><th class="right size-third"><label for="license">License</label>*:</th><td><input class="data-field first-time validate" data-field="rights.URI" name="license" id="license" required /></td></tr>
+            <tr class="lri_hide"><th class="right size-third"><label for="rightsHolder">Rights holder</label>*<a href='#' class='chelp a_rightsholder'>?</a>:</th><td><input class="data-field first-time validate" data-field="rightsHolder" name="rightsHolder" id="rightsHolder" required /></td></tr>
+	          <tr ><th class="right size-third"><label for="seeAlso" id="l_seeAlso">See also</label>*<a href='#' class='chelp a_code'>?</a>:</th><td><input class="data-field first-time validate" data-field="seeAlso" name="seeAlso" id="seeAlso" required /></td></tr>
+	          <tr ><th class="right size-third"><label for="source" id="l_source">Source URL</label>*<a href='#' class='chelp a_doclink'>?</a>:</th><td><input class="data-field first-time validate" data-field="source" name="source" id="source" required /></td></tr>
+            <tr><th class="right size-third"><label for="number" id="l_number">Identifier</label><a href='#' class='chelp assessment'>?</a>:</th><td class="data-field" data-field="number"></td></tr>
+	          <tr class="lri_hide"><th class="right size-third">Rating <a href='#' class='chelp a_rating'>?</a>:</th><td class="data-stars-field"><input type="hidden" name="stars" value="0"/></td></tr>
+            <tr class="aadb">
+              <th class="right size-third top"><label for="users-write">Users with write access</label><a href='#' class='chelp bundle_rw'>?</a>:</th>
               <td class="jtox-user-rights">
                 <select name="users-write" id="users-write" multiple class="jtox-users-select">
                 </select>
               </td>
             </tr>
-            <tr>
-              <th class="right size-third top"><label for="users-read">Users with read access:</label></th>
+            <tr class="aadb">
+              <th class="right size-third top"><label for="users-read">Users with read access</label><a href='#' class='chelp bundle_rw'>?</a>:</th>
               <td class="jtox-user-rights">
                 <select name="users-read" id="users-read" multiple class="jtox-users-select">
                 </select>
