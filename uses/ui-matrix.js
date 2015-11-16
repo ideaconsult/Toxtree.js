@@ -64,9 +64,6 @@ var jToxBundle = {
     if (typeof self.settings.studyTypeList == 'string')
       self.settings.studyTypeList = window[self.settings.studyTypeList];
 
-    // Initialize all nested kits before doing anything else
-    $('.jtox-toolkit', self.rootElement).each(function(i) { if (!$(this).data('manualInit')) jT.initKit(this); });
-
     // the (sub)action in the panel
     var loadAction = function () {
       if (!this.checked)
