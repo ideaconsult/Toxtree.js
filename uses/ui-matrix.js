@@ -464,10 +464,12 @@ var jToxBundle = {
           boxOptions.cancelButton = "Cancel";
           var endSetValue = function (e, field, value) {
             var f = valueMap[field];
-            if (!f)
+            if (!f) {
               featureJson.effects[0].conditions[field] = value;
-            else
-            ccLib.setJsonValue(featureJson, f, value);
+            }
+            else {
+              ccLib.setJsonValue(featureJson, f, value);
+            }
           };
 
           boxOptions.onOpen = function () {
@@ -1081,14 +1083,202 @@ var jToxBundle = {
         $(self.varTable).remove();
         self.equalizeTables();
 
+        // Generate appendixes 2 and 3
+
+        var substanceSection = $('#jtox-report-substance'),
+            featureSection = $('#jtox-report-feature'),
+            infoDiv = $('#info-box'),
+            addedData = [],
+            deletedData = [];
+
+        for ( var i = 0, sl = self.dataset.dataEntry.length; i < sl; i++ ) {
+          var substance = self.dataset.dataEntry[i];
+          for ( var theId in substance.values ) {
+            if( $.isArray(substance.values[theId]) ){
+              var feature = self.dataset.feature[theId];
+              for ( var j = 0, vl = substance.values[theId].length; j < vl; j++ ) {
+                var value = substance.values[theId][j];
+                if (feature.isModelPredictionFeature || value.deleted ) {
+
+                  for ( var fId in self.feature ) {
+                    var f = self.feature[fId];
+                    if ( f.sameAs == feature.sameAs ) {
+                      var featureId = f.URI;
+                    }
+                  }
+
+                  if ( feature.isModelPredictionFeature ) {
+                    // Append data to Appendix 2
+                    if( !addedData[i] ) {
+                      addedData[i] = {};
+                    }
+                    if( !addedData[i][featureId] ){
+                      addedData[i][featureId] = [];
+                    }
+                    addedData[i][featureId].push( {
+                      feature: feature,
+                      value: value
+                    } );
+                  }
+                  if ( value.deleted ) {
+                    // Append data to Appendix 3
+                    if( !deletedData[i] ) {
+                      deletedData[i] = {};
+                    }
+                    if( !deletedData[i][featureId] ){
+                      deletedData[i][featureId] = [];
+                    }
+                    deletedData[i][featureId].push( {
+                      feature: feature,
+                      value: value
+                    } );
+                  }
+
+                }
+              }
+            }
+          }
+
+          for( var i = 0, al = addedData.length; i < al; i++ ){
+            var newSection = substanceSection.clone().removeAttr('id');
+            var substance = self.dataset.dataEntry[i];
+            ccLib.fillTree(newSection[0], {name: substance.compound.name || substance.compound.tradename});
+            for(fId in addedData[i]){
+              var set = addedData[i][fId];
+
+              var newFeature = featureSection.clone().removeAttr('id');
+              ccLib.fillTree(newFeature[0], {title: self.dataset.feature[fId].title});
+
+              for ( var j = 0, sl = set.length; j < sl; j++ ) {
+
+                var newInfo = infoDiv.clone().removeAttr('id');
+                var feature = set[j].feature;
+                var value = set[j].value;
+
+                $('.dynamic-condition', newInfo).remove();
+                var dynHead = $('tr.conditions', newInfo)[0];
+                var postCell = $('td.postconditions', newInfo)[0];
+
+                for (var k = 0, cl = feature.annotation.length; k < cl; ++k) {
+                  var ano = feature.annotation[k];
+                  // first add the column
+                  var el = document.createElement('th');
+                  el.className = 'dynamic-condition';
+                  el.innerHTML = ano.p;
+                  dynHead.appendChild(el);
+                  // now add the value
+                  el = document.createElement('td');
+                  el.className = 'dynamic-condition';
+                  el.innerHTML = ano.o;
+                  postCell.parentNode.insertBefore(el, postCell);
+                }
+
+                // make sure there is at least one cell.
+                if (cl < 1) {
+                  el = document.createElement('td');
+                  el.className = 'dynamic-condition';
+                  el.innerHTML = '-';
+                  postCell.parentNode.insertBefore(el, postCell);
+                }
+
+                $('th.conditions', newInfo).attr('colspan', cl);
+
+                ccLib.fillTree(newInfo, {
+                  endpoint: feature.title,
+                  guidance: '',
+                  value: jT.ui.renderObjValue(value, feature.units, 'display'),
+                  remarks: feature.creator,
+                  studyType: feature.source.type
+                });
+
+                newFeature.append( newInfo );
+
+              }
+
+              newSection.append( newFeature );
+
+            }
+
+            $('#jtox-report-gap-filling').append( newSection );
+
+          }
+
+          for( var i = 0, al = deletedData.length; i < al; i++ ){
+            var newSection = substanceSection.clone().removeAttr('id');
+            var substance = self.dataset.dataEntry[i];
+            ccLib.fillTree(newSection[0], {name: substance.compound.name || substance.compound.tradename});
+            for(fId in deletedData[i]){
+
+              var set = deletedData[i][fId];
+              var newFeature = featureSection.clone().removeAttr('id');
+              ccLib.fillTree(newFeature[0], {title: self.dataset.feature[fId].title});
+
+              for ( var j = 0, sl = set.length; j < sl; j++ ) {
+
+                var newInfo = infoDiv.clone().removeAttr('id');
+                var feature = set[j].feature;
+                var value = set[j].value;
+
+                $('.dynamic-condition', newInfo).remove();
+                var dynHead = $('tr.conditions', newInfo)[0];
+                var postCell = $('td.postconditions', newInfo)[0];
+
+                for (var k = 0, cl = feature.annotation.length; k < cl; ++k) {
+                  var ano = feature.annotation[k];
+                  // first add the column
+                  var el = document.createElement('th');
+                  el.className = 'dynamic-condition';
+                  el.innerHTML = ano.p;
+                  dynHead.appendChild(el);
+                  // now add the value
+                  el = document.createElement('td');
+                  el.className = 'dynamic-condition';
+                  el.innerHTML = ano.o;
+                  postCell.parentNode.insertBefore(el, postCell);
+                }
+
+                // make sure there is at least one cell.
+                if (cl < 1) {
+                  el = document.createElement('td');
+                  el.className = 'dynamic-condition';
+                  el.innerHTML = '-';
+                  postCell.parentNode.insertBefore(el, postCell);
+                }
+
+                $('th.conditions', newInfo).attr('colspan', cl);
+
+                ccLib.fillTree(newInfo, {
+                  endpoint: feature.title,
+                  guidance: feature.creator,
+                  value: jT.ui.renderObjValue(value, feature.units, 'display'),
+                  remarks: value.remarks
+                });
+
+                newInfo.find('h5').remove();
+
+                newFeature.append( newInfo );
+
+              }
+
+              newSection.append( newFeature );
+
+            }
+
+            $('#jtox-report-deleting-data').append( newSection );
+
+          }
+
+        }
+
       };
 
       self.reportMatrixKit.settings.onRow = function (row, data, index) {
-        var self = this;
+
         // equalize multi-rows, if there are any
         setTimeout(function () {
           ccLib.equalizeHeights.apply(window, jT.$('td.jtox-multi table tbody', row).toArray());
         }, 50);
+
       };
 
     }
@@ -1097,19 +1287,6 @@ var jToxBundle = {
     if (!!queryUri) {
       self.reportMatrixKit.query(queryUri);
     }
-/*
-    if (!self.reportStudyKit) {
-      self.reportStudyKit = new jToxEndpoint($('report-experimental-data')[0], {
-        onRow: function (row, data, index) {
-          if (!data.bundles)
-            return;
-          var bundleInfo = data.bundles[self.bundleUri];
-        }
-      });
-    }
-
-    self.reportStudyKit.
-*/
 
   },
 
@@ -1405,9 +1582,11 @@ var jToxBundle = {
         // we need to process
         for (var i = 0, dl = dataset.dataEntry.length; i < dl; ++i) {
           var data = dataset.dataEntry[i];
-          if (data.composition != null)
-            for (var j = 0;j < data.composition.length; ++j)
+          if (data.composition != null) {
+            for (var j = 0;j < data.composition.length; ++j) {
               jToxCompound.processEntry(data.composition[j].component, dataset.feature);
+            }
+          }
         }
       }
 
@@ -1559,7 +1738,7 @@ var jToxBundle = {
         else
           self.bundleSummary.substance--;
         self.progressTabs();
-        console.log("Substance [" + uri + "] selected");
+        //console.log("Substance [" + uri + "] selected");
       }
     });
   },
@@ -1575,7 +1754,7 @@ var jToxBundle = {
         if (!result)
           el.checked = !el.checked; // i.e. revert
         else {
-          console.log("Substance [" + uri + "] tagged " + $(el).data('tag'));
+          //console.log("Substance [" + uri + "] tagged " + $(el).data('tag'));
         }
       });
     }
@@ -1601,7 +1780,7 @@ var jToxBundle = {
         else
           self.bundleSummary.property--;
         self.progressTabs();
-        console.log("Endpoint [" + endpoint + "] selected");
+        //console.log("Endpoint [" + endpoint + "] selected");
       }
     });
   }
