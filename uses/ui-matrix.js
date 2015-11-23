@@ -1139,134 +1139,136 @@ var jToxBundle = {
             }
           }
 
-          for( var i = 0, al = addedData.length; i < al; i++ ){
-            var newSection = substanceSection.clone().removeAttr('id');
-            var substance = self.dataset.dataEntry[i];
-            ccLib.fillTree(newSection[0], {name: substance.compound.name || substance.compound.tradename});
-            for(fId in addedData[i]){
-              var set = addedData[i][fId];
+        }
 
-              var newFeature = featureSection.clone().removeAttr('id');
-              ccLib.fillTree(newFeature[0], {title: self.dataset.feature[fId].title});
+        for( var i = 0, al = addedData.length; i < al; i++ ){
+          if( !addedData[i] ) continue;
+          var newSection = substanceSection.clone().removeAttr('id');
+          var substance = self.dataset.dataEntry[i];
+          ccLib.fillTree(newSection[0], {name: substance.compound.name || substance.compound.tradename});
+          for(fId in addedData[i]){
+            var set = addedData[i][fId];
 
-              for ( var j = 0, sl = set.length; j < sl; j++ ) {
+            var newFeature = featureSection.clone().removeAttr('id');
+            ccLib.fillTree(newFeature[0], {title: self.dataset.feature[fId].title});
 
-                var newInfo = infoDiv.clone().removeAttr('id');
-                var feature = set[j].feature;
-                var value = set[j].value;
+            for ( var j = 0, sl = set.length; j < sl; j++ ) {
 
-                $('.dynamic-condition', newInfo).remove();
-                var dynHead = $('tr.conditions', newInfo)[0];
-                var postCell = $('td.postconditions', newInfo)[0];
+              var newInfo = infoDiv.clone().removeAttr('id');
+              var feature = set[j].feature;
+              var value = set[j].value;
 
-                for (var k = 0, cl = feature.annotation.length; k < cl; ++k) {
-                  var ano = feature.annotation[k];
-                  // first add the column
-                  var el = document.createElement('th');
-                  el.className = 'dynamic-condition';
-                  el.innerHTML = ano.p;
-                  dynHead.appendChild(el);
-                  // now add the value
-                  el = document.createElement('td');
-                  el.className = 'dynamic-condition';
-                  el.innerHTML = ano.o;
-                  postCell.parentNode.insertBefore(el, postCell);
-                }
+              $('.dynamic-condition', newInfo).remove();
+              var dynHead = $('tr.conditions', newInfo)[0];
+              var postCell = $('td.postconditions', newInfo)[0];
 
-                // make sure there is at least one cell.
-                if (cl < 1) {
-                  el = document.createElement('td');
-                  el.className = 'dynamic-condition';
-                  el.innerHTML = '-';
-                  postCell.parentNode.insertBefore(el, postCell);
-                }
-
-                $('th.conditions', newInfo).attr('colspan', cl);
-
-                ccLib.fillTree(newInfo, {
-                  endpoint: feature.title,
-                  guidance: '',
-                  value: jT.ui.renderObjValue(value, feature.units, 'display'),
-                  remarks: feature.creator,
-                  studyType: feature.source.type
-                });
-
-                newFeature.append( newInfo );
-
+              for (var k = 0, cl = feature.annotation.length; k < cl; ++k) {
+                var ano = feature.annotation[k];
+                // first add the column
+                var el = document.createElement('th');
+                el.className = 'dynamic-condition';
+                el.innerHTML = ano.p;
+                dynHead.appendChild(el);
+                // now add the value
+                el = document.createElement('td');
+                el.className = 'dynamic-condition';
+                el.innerHTML = ano.o;
+                postCell.parentNode.insertBefore(el, postCell);
               }
 
-              newSection.append( newFeature );
+              // make sure there is at least one cell.
+              if (cl < 1) {
+                el = document.createElement('td');
+                el.className = 'dynamic-condition';
+                el.innerHTML = '-';
+                postCell.parentNode.insertBefore(el, postCell);
+              }
+
+              $('th.conditions', newInfo).attr('colspan', cl);
+
+              ccLib.fillTree(newInfo, {
+                endpoint: feature.title,
+                guidance: '',
+                value: jT.ui.renderObjValue(value, feature.units, 'display'),
+                remarks: feature.creator,
+                studyType: feature.source.type
+              });
+
+              newFeature.append( newInfo );
 
             }
 
-            $('#jtox-report-gap-filling').append( newSection );
+            newSection.append( newFeature );
 
           }
 
-          for( var i = 0, al = deletedData.length; i < al; i++ ){
-            var newSection = substanceSection.clone().removeAttr('id');
-            var substance = self.dataset.dataEntry[i];
-            ccLib.fillTree(newSection[0], {name: substance.compound.name || substance.compound.tradename});
-            for(fId in deletedData[i]){
+          $('#jtox-report-gap-filling').append( newSection );
 
-              var set = deletedData[i][fId];
-              var newFeature = featureSection.clone().removeAttr('id');
-              ccLib.fillTree(newFeature[0], {title: self.dataset.feature[fId].title});
+        }
 
-              for ( var j = 0, sl = set.length; j < sl; j++ ) {
+        for( var i = 0, al = deletedData.length; i < al; i++ ){
+          if( !deletedData[i] ) continue;
+          var newSection = substanceSection.clone().removeAttr('id');
+          var substance = self.dataset.dataEntry[i];
+          ccLib.fillTree(newSection[0], {name: substance.compound.name || substance.compound.tradename});
+          for(fId in deletedData[i]){
 
-                var newInfo = infoDiv.clone().removeAttr('id');
-                var feature = set[j].feature;
-                var value = set[j].value;
+            var set = deletedData[i][fId];
+            var newFeature = featureSection.clone().removeAttr('id');
+            ccLib.fillTree(newFeature[0], {title: self.dataset.feature[fId].title});
 
-                $('.dynamic-condition', newInfo).remove();
-                var dynHead = $('tr.conditions', newInfo)[0];
-                var postCell = $('td.postconditions', newInfo)[0];
+            for ( var j = 0, sl = set.length; j < sl; j++ ) {
 
-                for (var k = 0, cl = feature.annotation.length; k < cl; ++k) {
-                  var ano = feature.annotation[k];
-                  // first add the column
-                  var el = document.createElement('th');
-                  el.className = 'dynamic-condition';
-                  el.innerHTML = ano.p;
-                  dynHead.appendChild(el);
-                  // now add the value
-                  el = document.createElement('td');
-                  el.className = 'dynamic-condition';
-                  el.innerHTML = ano.o;
-                  postCell.parentNode.insertBefore(el, postCell);
-                }
+              var newInfo = infoDiv.clone().removeAttr('id');
+              var feature = set[j].feature;
+              var value = set[j].value;
 
-                // make sure there is at least one cell.
-                if (cl < 1) {
-                  el = document.createElement('td');
-                  el.className = 'dynamic-condition';
-                  el.innerHTML = '-';
-                  postCell.parentNode.insertBefore(el, postCell);
-                }
+              $('.dynamic-condition', newInfo).remove();
+              var dynHead = $('tr.conditions', newInfo)[0];
+              var postCell = $('td.postconditions', newInfo)[0];
 
-                $('th.conditions', newInfo).attr('colspan', cl);
-
-                ccLib.fillTree(newInfo, {
-                  endpoint: feature.title,
-                  guidance: feature.creator,
-                  value: jT.ui.renderObjValue(value, feature.units, 'display'),
-                  remarks: value.remarks
-                });
-
-                newInfo.find('h5').remove();
-
-                newFeature.append( newInfo );
-
+              for (var k = 0, cl = feature.annotation.length; k < cl; ++k) {
+                var ano = feature.annotation[k];
+                // first add the column
+                var el = document.createElement('th');
+                el.className = 'dynamic-condition';
+                el.innerHTML = ano.p;
+                dynHead.appendChild(el);
+                // now add the value
+                el = document.createElement('td');
+                el.className = 'dynamic-condition';
+                el.innerHTML = ano.o;
+                postCell.parentNode.insertBefore(el, postCell);
               }
 
-              newSection.append( newFeature );
+              // make sure there is at least one cell.
+              if (cl < 1) {
+                el = document.createElement('td');
+                el.className = 'dynamic-condition';
+                el.innerHTML = '-';
+                postCell.parentNode.insertBefore(el, postCell);
+              }
+
+              $('th.conditions', newInfo).attr('colspan', cl);
+
+              ccLib.fillTree(newInfo, {
+                endpoint: feature.title,
+                guidance: feature.creator,
+                value: jT.ui.renderObjValue(value, feature.units, 'display'),
+                remarks: value.remarks
+              });
+
+              newInfo.find('h5').remove();
+
+              newFeature.append( newInfo );
 
             }
 
-            $('#jtox-report-deleting-data').append( newSection );
+            newSection.append( newFeature );
 
           }
+
+          $('#jtox-report-deleting-data').append( newSection );
 
         }
 
