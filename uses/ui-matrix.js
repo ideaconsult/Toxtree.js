@@ -1145,7 +1145,7 @@ var jToxBundle = {
           if( !addedData[i] ) continue;
           var newSection = substanceSection.clone().removeAttr('id');
           var substance = self.dataset.dataEntry[i];
-          ccLib.fillTree(newSection[0], {name: substance.compound.name || substance.compound.tradename});
+          ccLib.fillTree(newSection[0], {name: (substance.compound.name || substance.compound.tradename), number: substance.number});
           for(fId in addedData[i]){
             var set = addedData[i][fId];
 
@@ -1210,7 +1210,7 @@ var jToxBundle = {
           if( !deletedData[i] ) continue;
           var newSection = substanceSection.clone().removeAttr('id');
           var substance = self.dataset.dataEntry[i];
-          ccLib.fillTree(newSection[0], {name: substance.compound.name || substance.compound.tradename});
+          ccLib.fillTree(newSection[0], {name: (substance.compound.name || substance.compound.tradename), number: substance.number});
           for(fId in deletedData[i]){
 
             var set = deletedData[i][fId];
