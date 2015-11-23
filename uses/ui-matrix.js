@@ -958,6 +958,74 @@ var jToxBundle = {
               data.dataMatrix.push(dataGroup);
             }
 
+            data.adstructures = [];
+            var adstructureEls = $('#jtox-report-gap-filling section');
+            adstructureEls.each(function(){
+
+              var structure = {name: $('h3', this).text(), features: []}
+
+              $(this).children('div').each(function(){
+                var feature = {name: $('h4', this).html(), data: []};
+                $('div.popup-box', this).each(function(){
+                  var entry = {
+                    endpoint: $('td.the-endpoint', this).text(),
+                    value: $('td.the-value', this).text(),
+                    guidance: $('td.postconditions', this).text(),
+                    rationaleTitle: $('h5', this).text(),
+                    rationale: $('p.justification', this).text(),
+                    conditions: []
+                  };
+                  var dch = $('th.dynamic-condition', this);
+                  var dcd = $('td.dynamic-condition', this);
+                  dch.each(function(i){
+                    entry.conditions.push({
+                      condition: this.innerHTML,
+                      value: dcd[i].innerHTML
+                    });
+                  });
+                  feature.data.push(entry);
+                });
+                structure.features.push(feature);
+              });
+
+              data.adstructures.push(structure);
+
+            });
+
+            data.ddstructures = [];
+            var ddstructureEls = $('#jtox-report-deleting-data section');
+            ddstructureEls.each(function(){
+
+              var structure = {name: $('h3', this).text(), features: []}
+
+              $(this).children('div').each(function(){
+                var feature = {name: $('h4', this).html(), data: []};
+                $('div.popup-box', this).each(function(){
+                  var entry = {
+                    endpoint: $('td.the-endpoint', this).text(),
+                    value: $('td.the-value', this).text(),
+                    guidance: $('td.postconditions', this).text(),
+                    rationale: $('p.justification', this).text(),
+                    conditions: []
+                  };
+                  var dch = $('th.dynamic-condition', this);
+                  var dcd = $('td.dynamic-condition', this);
+                  dch.each(function(i){
+                    entry.conditions.push({
+                      condition: this.innerHTML,
+                      value: dcd[i].innerHTML
+                    });
+                  });
+                  feature.data.push(entry);
+                });
+                structure.features.push(feature);
+              });
+
+              data.ddstructures.push(structure);
+
+            });
+
+
             // We use Promose.all to wait for the images to load
             // and then resolve with data
             return Promise.all(imagePromises).then(function(){
