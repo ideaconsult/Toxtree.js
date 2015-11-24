@@ -376,6 +376,15 @@ dd {
   overflow: hidden;
 }
 
+#jtox-report h5 {
+  margin-top: 1em;
+  font-weight: bold;
+}
+
+.annex table {
+  margin-bottom: 1em;
+}
+
 @media print {
 
   * {
