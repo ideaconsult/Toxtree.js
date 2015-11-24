@@ -79,7 +79,7 @@ window.jT = window.jToxKit = {
         obj.parentKit = parent;
       }
       else
-        console.log("jToxError: trying to initialize unexistend jTox kit: " + kit);
+        console.log("jToxError: trying to initialize unexistent jTox kit: " + kit);
 
       return obj;
     };
