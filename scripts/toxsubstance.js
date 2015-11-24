@@ -28,7 +28,9 @@ var jToxSubstance = (function () {
           'Id': { sTitle: 'Id', mData: 'URI', sDefaultContent: "-", sWidth: "60px", mRender: function (data, type, full) {
             return (type != 'display') ? full.index : '&nbsp;-&nbsp;' + full.index + '&nbsp;-&nbsp;';
           } },
-          'Substance Name': { sTitle: "Substance Name", mData: "name", sDefaultContent: "-" },
+          'Substance Name': { sTitle: "Substance Name", mData: "name",  mRender: function (data, type, full) {
+            return (type != 'display') ? data : jT.ui.linkedData('<a target="_blank" href="' + full.URI + '/study">' + data + '</a>', "Click to view study details", data)
+          } },          
           'Substance UUID': { sTitle: "Substance UUID", mData: "i5uuid", mRender: function (data, type, full) {
             if (ccLib.isNull(data) || data == 'null') return '';
             return (type != 'display') ? data : jT.ui.shortenedData('<a target="_blank" href="' + full.URI + '/study">' + data + '</a>', "Press to copy the UUID in the clipboard", data)
