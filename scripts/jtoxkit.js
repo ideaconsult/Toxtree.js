@@ -349,21 +349,21 @@ window.jT.ui = {
     return res;
   },
 	linkedData: function (content, message, data) {
-	    var res = '';
+    var res = '';
 
-	    if (ccLib.isNull(data))
-	      data = content;
-	    if (data.toString().length <= 5) {
-	      res += content;
-	    }
-	    else {
-	      
-	      if (message != null)
-	        res +=  res += '<div title="' + message + '">' + content + '</div>';
-
-	      else res += '<div >' + content + '</div>';
-	    }
-	    return res;
+    if (ccLib.isNull(data)) {
+      data = content;
+    }
+    if (data.toString().length <= 5) {
+      res += content;
+    }
+    else {
+      if (message != null) {
+        res +=  res += '<div title="' + message + '">' + content + '</div>';
+      }
+      else res += '<div >' + content + '</div>';
+    }
+    return res;
 	},
   changeTabsIds: function (root, suffix) {
     jT.$('ul li a', root).each(function() {
