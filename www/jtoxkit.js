@@ -503,7 +503,7 @@ window.jT = window.jToxKit = {
         obj.parentKit = parent;
       }
       else
-        console.log("jToxError: trying to initialize unexistend jTox kit: " + kit);
+        console.log("jToxError: trying to initialize unexistent jTox kit: " + kit);
 
       return obj;
     };
@@ -772,7 +772,23 @@ window.jT.ui = {
     }
     return res;
   },
+	linkedData: function (content, message, data) {
+    var res = '';
 
+    if (ccLib.isNull(data)) {
+      data = content;
+    }
+    if (data.toString().length <= 5) {
+      res += content;
+    }
+    else {
+      if (message != null) {
+        res +=  res += '<div title="' + message + '">' + content + '</div>';
+      }
+      else res += '<div >' + content + '</div>';
+    }
+    return res;
+	},
   changeTabsIds: function (root, suffix) {
     jT.$('ul li a', root).each(function() {
       var id = jT.$(this).attr('href').substr(1);
@@ -1778,7 +1794,8 @@ var jToxCompound = (function () {
         {type: "text/x-arff", icon: "images/arff.png"},
         {type: "text/x-arff-3col", icon: "images/arff-3.png"},
         {type: "application/rdf+xml", icon: "images/rdf64.png"},
-        {type: "application/json", icon: "images/json64.png"}
+        {type: "application/json", icon: "images/json64.png"},
+        {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", icon: "images/xlsx.png"}
       ],
 
       // These are instance-wide pre-definitions of default baseFeatures as described below.
@@ -3184,7 +3201,10 @@ var jToxSubstance = (function () {
           'Id': { sTitle: 'Id', mData: 'URI', sDefaultContent: "-", sWidth: "60px", mRender: function (data, type, full) {
             return (type != 'display') ? full.index : '&nbsp;-&nbsp;' + full.index + '&nbsp;-&nbsp;';
           } },
-          'Substance Name': { sTitle: "Substance Name", mData: "name", sDefaultContent: "-" },
+          'Substance Name': { sTitle: "Substance Name", mData: "name",  mRender: function (data, type, full) {
+            if (ccLib.isNull(data) || data == 'null') data = '-';
+            return (type != 'display') ? data : jT.ui.linkedData('<a target="_blank" href="' + full.URI + '/study">' + data + '</a>', "Click to view study details", data)
+          } },
           'Substance UUID': { sTitle: "Substance UUID", mData: "i5uuid", mRender: function (data, type, full) {
             if (ccLib.isNull(data) || data == 'null') return '';
             return (type != 'display') ? data : jT.ui.shortenedData('<a target="_blank" href="' + full.URI + '/study">' + data + '</a>', "Press to copy the UUID in the clipboard", data)
