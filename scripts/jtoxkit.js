@@ -364,7 +364,7 @@ window.jT.ui = {
       else res += '<div >' + content + '</div>';
     }
     return res;
-<	},
+	},
   changeTabsIds: function (root, suffix) {
     jT.$('ul li a', root).each(function() {
       var id = jT.$(this).attr('href').substr(1);
