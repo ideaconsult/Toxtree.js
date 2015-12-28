@@ -287,6 +287,12 @@ var jToxBundle = {
         }
       });
 
+      var link = $('#source-link')[0], $source = $('#source');
+      link.href = $source[0].value;
+      $source.on('change', function(){
+        link.href = this.value;
+      });
+
       ccLib.prepareForm(self.createForm);
 
     }
@@ -1056,11 +1062,13 @@ var jToxBundle = {
 
             doc.setData( data ); //set the templateVariables
             doc.render(); //apply them (replace all occurences of {first_name} by Hipp, ...)
-            var output = doc.getZip().generate({type:"blob"}); //Output the document using Data-URI
+            var output = doc.getZip().generate({type:"blob", compression: 'DEFLATE'}); //Output the document using Data-URI
             saveAs(output, "report.docx");
           });
 
-        }, function(error){console.log('Error', error);});
+        }, function(error){
+          console.log('Error', error);
+        });
 
       });
 
