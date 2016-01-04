@@ -131,7 +131,7 @@ var jToxModel = (function () {
       if (!self.settings.noInterface)
         jT.$(self.table).dataTable().fnClearTable();
       jT.call(self, uri, function (result, jhr) {
-        if (!result && jhr.status == 404)
+        if (!result && jhr.status != 200)
           result = { model: [] }; // empty one
 
         if (!!result) {
@@ -155,7 +155,7 @@ var jToxModel = (function () {
       if (!self.settings.noInterface)
         jT.$(self.table).dataTable().fnClearTable();
       jT.call(self, uri, function (result, jhr) {
-        if (!result && jhr.status == 404)
+        if (!result && jhr.status != 200)
           result = { algorithm: [] }; // empty one
         if (!!result) {
           self.algorithm = result.algorithm;
