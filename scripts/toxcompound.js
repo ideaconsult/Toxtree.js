@@ -903,7 +903,7 @@ var jToxCompound = (function () {
       // now make the actual call...
       jT.call(self, queryUri, function (result, jhr) {
         if (!result && jhr.status != 200) {
-          result = { feature: {}, dataEntry: [] }; // an empty set, to make it show the table...
+          self.$procDiv.hide();
           self.$errDiv.show().find('.message').html( 'Server error: ' + jhr.statusText );
         }
 
