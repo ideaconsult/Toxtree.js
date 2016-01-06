@@ -94,7 +94,7 @@ JSZipUtils.getBinaryContent = function(path, callback) {
                     }
                     callback(err, file);
                 } else {
-                    callback(new Error("Ajax error for " + path + " : " + this.status), null);
+                    callback(new Error("Ajax error for " + path + " : " + this.status + " " + this.statusText), null);
                 }
             }
         };
