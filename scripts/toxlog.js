@@ -15,7 +15,7 @@ var jToxLog = (function () {
     hasDetails: true,       // whether to have the ability to open each line, to show it's details
     noInterface: false,     // whether to have interface, or not - it can be used just as relay station
     onEvent: null,          // a callback, when new event has arrived: function (logEvent). See README.md for more details
-    
+
     // line formatting function - function (service, state, params, jhr) -> { header: "", details: "" }
     formatEvent: function (service, state, params, jhr) {
       if (params != null)
@@ -30,9 +30,9 @@ var jToxLog = (function () {
         };
       else
         return null;
-    }       
+    }
   };
-  
+
   var cls = function (root, settings) {
     var self = this;
     self.rootElement = root;
@@ -41,29 +41,29 @@ var jToxLog = (function () {
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
     if (!self.settings.noInterface) {
       self.rootElement.appendChild(jT.getTemplate('#jtox-logger'));
-      
+
       if (typeof self.settings.lineHeight == "number")
         self.settings.lineHeight = self.settings.lineHeight.toString() + 'px';
       if (typeof self.settings.keepMessages != "number")
         self.settings.keepMessages = parseInt(self.settings.keepMessages);
-        
+
       // now the actual UI manipulation functions...
       var listRoot = $('.list-root', self.rootElement)[0];
       var statusEl = $('.status', self.rootElement)[0];
-  
+
       if (!!self.settings.rightSide) {
         statusEl.style.right = '0px';
         jT.$(self.rootElement).addClass('right-side');
       }
       else
         statusEl.style.left = '0px';
-    
+
       var setIcon = function (root, status) {
         if (status == "error")
           jT.$(root).addClass('ui-state-error');
         else
           jT.$(root).removeClass('ui-state-error');
-  
+
         if (status == "error")
           jT.$('.icon', root).addClass('ui-icon ui-icon-alert').removeClass('loading ui-icon-check');
         else if (status == "success")
@@ -74,12 +74,12 @@ var jToxLog = (function () {
             jT.$('.icon', root).addClass('loading');
         }
       };
-      
+
       var setStatus = function (status) {
         $(".icon", statusEl).removeClass("jt-faded");
         setIcon (statusEl, status);
         if (status == "error" || status == "success") {
-          setTimeout(function () { 
+          setTimeout(function () {
             jT.$('.icon', statusEl).addClass('jt-faded');
             var hasConnect = false;
             jT.$('.logline', listRoot).each(function () {
@@ -93,7 +93,7 @@ var jToxLog = (function () {
         ccLib.fireCallback(self.settings.onStatus, self, status, self.theStatus);
         self.theStatus = status;
       };
-      
+
       var addLine = function (data) {
         var el = jT.getTemplate("#jtox-logline");
         el.style.height = '0px';
@@ -112,25 +112,25 @@ var jToxLog = (function () {
             }
             else
               el.style.height = self.settings.lineHeight;
-              
+
             // to make sure other clickable handler won't take control.
             e.stopPropagation();
           });
         }
-        
+
         while (listRoot.childNodes.length > self.settings.keepMessages)
           listRoot.removeChild(listRoot.lastElementChild);
-  
+
         return el;
       };
-      
+
       setStatus('');
-      
+
       // this is the queue of events - indexes by the passed service
       self.events = {};
     } // noInterface if
-    
-    // now the handlers - needed no matter if we have interface or not    
+
+    // now the handlers - needed no matter if we have interface or not
     self.handlers = {
       onConnect: function (service, params, id) {
         var info = ccLib.fireCallback(self.settings.formatEvent, this, service, "connecting", params, null);
@@ -178,34 +178,34 @@ var jToxLog = (function () {
           ccLib.fillTree(line, info);
           jT.$(line).data('status', "error");
 
-          console.log("Error [" + id + ": " + service);
+          console.log("Error [" + id + "]: " + service);
         }
         if (!!self.settings.resend && this._handlers != null)
           ccLib.fireCallback(this._handlers.onError, this, service, status, jhr, id);
       }
     };
-    
+
     if (!!self.settings.autoInstall)
       self.install();
   };
-  
+
   // Install the handers for given kit
   cls.prototype.install = function (kit) {
     var self = this;
     if (kit == null)
       kit = jT;
-    
+
     // save the oldies
     kit._handlers = {
       onConnect: kit.settings.onConnect,
       onSuccess: kit.settings.onSuccess,
       onError: kit.settings.onError
     };
-    
+
     kit.settings = jT.$.extend(kit.settings, self.handlers);
     return kit;
   };
-  
+
   // Deinstall the handlers for given kit, reverting old ones
   cls.prototype.revert = function (kit) {
     var self = this;
@@ -215,10 +215,10 @@ var jToxLog = (function () {
     kit.settings = jT.$.extend(kit.settings, kit._handlers);
     return kit;
   };
-  
-  cls.prototype.modifyUri = function (uri) { 
+
+  cls.prototype.modifyUri = function (uri) {
     return uri;
   };
-  
+
   return cls;
 })();

@@ -143,7 +143,7 @@ var jToxSubstance = (function () {
       var qStart = Math.floor(from / size);
       var qUri = ccLib.addParameter(self.substanceUri, "page=" + qStart + "&pagesize=" + size);
       jT.call(self, qUri, function (result, jhr) {
-        if (!result && jhr.status == 404)
+        if (!result && jhr.status != 200)
           result = { substabce: [] }; // empty one
         if (!!result) {
           self.pageSize = size;

@@ -20,7 +20,7 @@ var jToxDataset = (function () {
       "sInfo": "Showing _TOTAL_ dataset(s) (_START_ to _END_)"
     },
     /* datasetUri */
-    configuration: { 
+    configuration: {
       columns : {
         dataset: {
           'Id': { iOrder: 0, sTitle: "Id", mData: "URI", sWidth: "50px", mRender: function (data, type, full) {
@@ -38,60 +38,60 @@ var jToxDataset = (function () {
       }
     }
   };
-  
+
   var cls = function (root, settings) {
     var self = this;
     self.rootElement = root;
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even when manually initialized
 
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
-        
+
     if (!self.settings.noInterface) {
       self.rootElement.appendChild(jT.getTemplate('#jtox-dataset'));
       self.init(settings);
     }
-        
+
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
     if (self.settings.datasetUri != undefined || self.settings.loadOnInit)
       self.listDatasets(self.settings.datasetUri)
   };
-  
+
   cls.prototype = {
     init: function (settings) {
       var self = this;
-      
+
       // arrange certain things on the columns first - like dealing with short/long stars
       self.settings.configuration.columns.dataset.Stars.mRender = function (data, type, full) {
         return type != 'display' ? data : jT.ui.putStars(self, data, "Dataset quality stars rating (worst) 1-10 (best)");
       };
-      
+
       if (self.settings.shortStars)
         self.settings.configuration.columns.dataset.Stars.sWidth = "40px";
-      
+
       // deal if the selection is chosen
       if (!!self.settings.selectionHandler || !!self.settings.onDetails) {
         jT.ui.putActions(self, self.settings.configuration.columns.dataset.Id);
         self.settings.configuration.columns.dataset.Id.sWidth = "60px";
       }
-      
+
       // again , so that changed defaults can be taken into account.
       self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
-      
+
       // READYY! Go and prepare THE table.
       self.table = jT.ui.putTable(self, jT.$('table', self.rootElement)[0], 'dataset');
     },
-    
+
     listDatasets: function (uri) {
       var self = this;
       if (uri == null)
         uri = self.settings.baseUrl + '/dataset';
       else if (!self.settings.baseUrl)
         self.settings.baseUrl = jT.grabBaseUrl(uri);
-      
+
       if (!self.settings.noInterface)
         jT.$(self.table).dataTable().fnClearTable();
       jT.call(self, uri, function (result, jhr) {
-        if (!result && jhr.status == 404)
+        if (!result && jhr.status != 200)
           result = { dataset: [] }; // empty one...
         if (!!result) {
           self.dataset = result.dataset;
@@ -105,20 +105,20 @@ var jToxDataset = (function () {
         }
       });
     },
-    
+
     query: function (uri) {
       this.listDatasets(uri);
     },
-    
+
     modifyUri: function (uri) {
       jT.$('input[type="checkbox"]', this.rootElement).each(function () {
         if (this.checked)
           uri = ccLib.addParameter(uri, 'feature_uris[]=' + encodeURIComponent(this.value + '/feature'));
       })
-      
+
       return uri;
     }
   };
-    
+
   return cls;
 })();
