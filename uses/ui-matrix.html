@@ -39,46 +39,43 @@
   <script src="ui-matrix.js"></script>
   <script src="config-matrix.js"></script>
   <script src="config-study.js"></script>
-  <!--
-  <script src="docxgen.min.js"></script>
-  <script src="FileSaver.min.js"></script>
-  <script src="jszip-utils.js"></script>
-  -->
-<script type='text/javascript'>
 
-var customize = {
-    "lri": {
-        "title": {
-            "l_title": "Assessment title",
-            "l_maintainer": "Owner",
-            "l_number": "Assessment ID",
-            "l_seeAlso": "Assessment code",
-            "l_source": "Assessment Doclink(s)"
-        },
-        "hide": "lri_hide"
-    }
-};
+  <script type='text/javascript'>
 
-$(document)
-		.ready(
-				function() {
-						var profile = "lri";
-						
-						if (customize[profile]!=undefined) {
-							$.each(customize[profile]["title"],function(key,value) {
-									try {$("#"+key).html(value);} catch (err) {};
-								});
-							try {$("." + customize[profile]["hide"]).hide();	} catch (err) {};
-						}	
-				});
-</script>  
+    var customize = {
+        "lri": {
+            "title": {
+                "l_title": "Assessment title",
+                "l_maintainer": "Owner",
+                "l_number": "Assessment ID",
+                "l_seeAlso": "Assessment code",
+                "l_source": "Assessment Doclink(s)"
+            },
+            "hide": "lri_hide"
+        }
+    };
+
+    $(document)
+  		.ready(
+  				function() {
+  						var profile = "lri";
+
+  						if (customize[profile]!=undefined) {
+  							$.each(customize[profile]["title"],function(key,value) {
+  									try {$("#"+key).html(value);} catch (err) {};
+  								});
+  							try {$("." + customize[profile]["hide"]).hide();	} catch (err) {};
+  						}
+  				});
+  </script>
+
 </head>
 <body>
 	<div class="container" style="margin:0;padding:0;">
   <div id="logger" class="jtox-toolkit jtox-widget hidden" data-kit="log" data-resend="false" data-right-side="true"></div>
 
 	<div class="sixteen columns remove-bottom" style="padding:0;" >
-		
+
   <div id="jtox-bundle" class="jtox-toolkit" data-kit="bundle"  >
     <ul>
       <li><a href="#jtox-identifiers">Assessment identifier</a></li>
@@ -102,10 +99,16 @@ $(document)
               <th class="right size-third">Status<a href='#' class='chelp a_published'>?</a>:</th>
               <td class="data-field" data-field="status" data-format="formatStatus"></td>
             </tr>
-            <tr class="lri_hide"><th class="right size-third"><label for="license">License</label>*:</th><td><input class="data-field first-time validate" data-field="rights.URI" name="license" id="license" required /></td></tr>
-            <tr class="lri_hide"><th class="right size-third"><label for="rightsHolder">Rights holder</label>*<a href='#' class='chelp a_rightsholder'>?</a>:</th><td><input class="data-field first-time validate" data-field="rightsHolder" name="rightsHolder" id="rightsHolder" required /></td></tr>
+            <tr class="lri_hide"><th class="right size-third"><label for="license">License</label>*:</th><td><input class="data-field first-time validate" data-field="rights.URI" name="license" id="license" /></td></tr>
+            <tr class="lri_hide"><th class="right size-third"><label for="rightsHolder">Rights holder</label>*<a href='#' class='chelp a_rightsholder'>?</a>:</th><td><input class="data-field first-time validate" data-field="rightsHolder" name="rightsHolder" id="rightsHolder" /></td></tr>
 	          <tr ><th class="right size-third"><label for="seeAlso" id="l_seeAlso">See also</label>*<a href='#' class='chelp a_code'>?</a>:</th><td><input class="data-field first-time validate" data-field="seeAlso" name="seeAlso" id="seeAlso" required /></td></tr>
-	          <tr ><th class="right size-third"><label for="source" id="l_source">Source URL</label>*<a href='#' class='chelp a_doclink'>?</a>:</th><td><input class="data-field first-time validate" data-field="source" name="source" id="source" required /></td></tr>
+	          <tr >
+              <th class="right size-third"><label for="source" id="l_source">Source URL</label>*<a href='#' class='chelp a_doclink'>?</a>:</th>
+              <td>
+                <input class="data-field first-time validate" data-field="source" name="source" id="source" required />
+                <a href="" id="source-link" target="_blank" class="ui-icon ui-icon-extlink">open link</a>
+              </td>
+            </tr>
             <tr><th class="right size-third"><label for="number" id="l_number">Identifier</label><a href='#' class='chelp assessment'>?</a>:</th><td class="data-field" data-field="number"></td></tr>
 	          <tr class="lri_hide"><th class="right size-third">Rating <a href='#' class='chelp a_rating'>?</a>:</th><td class="data-stars-field"><input type="hidden" name="stars" value="0"/></td></tr>
             <tr class="aadb">
