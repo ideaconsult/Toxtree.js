@@ -97,7 +97,8 @@ var jToxCompound = (function () {
         {type: "text/x-arff", icon: "images/arff.png"},
         {type: "text/x-arff-3col", icon: "images/arff-3.png"},
         {type: "application/rdf+xml", icon: "images/rdf64.png"},
-        {type: "application/json", icon: "images/json64.png"}
+        {type: "application/json", icon: "images/json64.png"},
+        {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", icon: "images/xlsx.png"}
       ],
 
       // These are instance-wide pre-definitions of default baseFeatures as described below.
@@ -221,6 +222,10 @@ var jToxCompound = (function () {
           sizeChange: function() { self.queryEntries(self.pageStart, parseInt(jT.$(this).val())); },
           filter: function () { self.updateTables() }
         });
+
+        self.$procDiv = jT.$('.jt-processing', self.rootElement);
+        self.$errDiv = jT.$('.jt-error', self.rootElement);
+
       }
     },
 
@@ -897,8 +902,9 @@ var jToxCompound = (function () {
 
       // now make the actual call...
       jT.call(self, queryUri, function (result, jhr) {
-        if (!result && jhr.status == 404) {
-          dataset = { feature: {}, dataEntry: [] }; // an empty set, to make it show the table...
+        if (!result && jhr.status != 200) {
+          self.$procDiv.hide();
+          self.$errDiv.show().find('.message').html( 'Server error: ' + jhr.statusText );
         }
 
         // remove the loading pane in anyways..
@@ -950,8 +956,9 @@ var jToxCompound = (function () {
             self.prepareTables(); // prepare the tables - we need features to build them - we have them!
             self.equalizeTables(); // to make them nicer, while waiting...
           }
-          else
+          else {
           	ccLib.fireCallback(self.settings.onPrepared, self, miniset, self);
+          }
 
           // finally make the callback for
           callback(dataset);
@@ -975,12 +982,13 @@ var jToxCompound = (function () {
       // remember the _original_ datasetUri and make a call with one size length to retrieve all features...
       self.datasetUri = (datasetUri.indexOf('http') !=0 ? self.settings.baseUrl : '') + datasetUri;
 
-      var procDiv = jT.$('.jt-processing', self.rootElement).show()[0];
+      self.$procDiv.show();
+      self.$errDiv.hide();
       if (!!self.settings.oLanguage.sLoadingRecords)
         jT.$('.message', procDiv).html(self.settings.oLanguage.sLoadingRecords);
 
       self.queryFeatures(featureUri, function (dataset) {
-        jT.$(procDiv).hide();
+        self.$procDiv.hide();
         self.queryEntries(self.pageStart, self.pageSize, dataset);
       });
     },

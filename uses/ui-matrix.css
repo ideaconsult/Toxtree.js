@@ -52,6 +52,16 @@ strong {
   font-size: inherit;
 }
 
+#jtox-identifiers #source {
+  width: 90%;
+  width: calc(100% - 3em);
+}
+
+#source-link {
+  display: inline-block;
+}
+
+
 #jtox-identifiers table th {
   font-weight: normal;
   cursor: default;
@@ -300,9 +310,12 @@ tr:last-child .jtox-down {
 }
 
 
+.jtox-report #jtox-bundle {
+  overflow: auto;
+}
 
 #jtox-report {
-  counter-reset: section;
+  counter-reset: section annexes;
 }
 
 #jtox-report tbody th {
@@ -351,6 +364,11 @@ section h2:before {
   content: counter(section) ". ";
 }
 
+section.annex h2:before {
+  counter-increment: annexes;
+  content: "Annex " counter(annexes) " ";
+}
+
 dl {
   margin: 0;
   padding: 0;
@@ -366,6 +384,15 @@ dd {
   min-height: 1.4em;
   margin-left: 26%;
   overflow: hidden;
+}
+
+#jtox-report h5 {
+  margin-top: 1em;
+  font-weight: bold;
+}
+
+.annex table {
+  margin-bottom: 1em;
 }
 
 @media print {

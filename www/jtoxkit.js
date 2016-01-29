@@ -396,7 +396,19 @@ var ccLib = {
       relative: (a.href.match(/tps?:\/\/[^\/]+(.+)/) || [,''])[1],
       segments: a.pathname.replace(/^\//,'').split('/')
     };
+  },
+
+  escapeHTML: function(str){
+    var map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    };
+    return str.replace(/[&<>"']/g, function(m) { return map[m]; });
   }
+
 };
 
 function ccNonEmptyFilter(v) {
@@ -503,7 +515,7 @@ window.jT = window.jToxKit = {
         obj.parentKit = parent;
       }
       else
-        console.log("jToxError: trying to initialize unexistend jTox kit: " + kit);
+        console.log("jToxError: trying to initialize unexistent jTox kit: " + kit);
 
       return obj;
     };
@@ -772,7 +784,23 @@ window.jT.ui = {
     }
     return res;
   },
+	linkedData: function (content, message, data) {
+    var res = '';
 
+    if (ccLib.isNull(data)) {
+      data = content;
+    }
+    if (data.toString().length <= 5) {
+      res += content;
+    }
+    else {
+      if (message != null) {
+        res +=  res += '<div title="' + message + '">' + content + '</div>';
+      }
+      else res += '<div >' + content + '</div>';
+    }
+    return res;
+	},
   changeTabsIds: function (root, suffix) {
     jT.$('ul li a', root).each(function() {
       var id = jT.$(this).attr('href').substr(1);
@@ -822,12 +850,19 @@ window.jT.ui = {
 	    var catCol = kit.settings.configuration.columns[cat];
 	    if (!ccLib.isNull(catCol)) {
 	      if (!!group) {
-	        catCol = catCol[group];
-  	      if (!ccLib.isNull(catCol))
+          catCol = catCol[group];
+  	      if (!ccLib.isNull(catCol)){
+            // Allow bVisible to be set on the whole category
+            if (!ccLib.isNull(catCol.bVisible)) {
+              catCol[name] = catCol[name] || {};
+              catCol[name].bVisible = !!catCol[name].bVisible || !!catCol.bVisible;
+            }
   	        catCol = catCol[name];
+          }
         }
-        else
+        else {
 	        catCol = catCol[name];
+        }
 	    }
 
 	    if (ccLib.isNull(catCol))
@@ -1771,7 +1806,8 @@ var jToxCompound = (function () {
         {type: "text/x-arff", icon: "images/arff.png"},
         {type: "text/x-arff-3col", icon: "images/arff-3.png"},
         {type: "application/rdf+xml", icon: "images/rdf64.png"},
-        {type: "application/json", icon: "images/json64.png"}
+        {type: "application/json", icon: "images/json64.png"},
+        {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", icon: "images/xlsx.png"}
       ],
 
       // These are instance-wide pre-definitions of default baseFeatures as described below.
@@ -1895,6 +1931,10 @@ var jToxCompound = (function () {
           sizeChange: function() { self.queryEntries(self.pageStart, parseInt(jT.$(this).val())); },
           filter: function () { self.updateTables() }
         });
+
+        self.$procDiv = jT.$('.jt-processing', self.rootElement);
+        self.$errDiv = jT.$('.jt-error', self.rootElement);
+
       }
     },
 
@@ -2571,8 +2611,9 @@ var jToxCompound = (function () {
 
       // now make the actual call...
       jT.call(self, queryUri, function (result, jhr) {
-        if (!result && jhr.status == 404) {
-          dataset = { feature: {}, dataEntry: [] }; // an empty set, to make it show the table...
+        if (!result && jhr.status != 200) {
+          self.$procDiv.hide();
+          self.$errDiv.show().find('.message').html( 'Server error: ' + jhr.statusText );
         }
 
         // remove the loading pane in anyways..
@@ -2624,8 +2665,9 @@ var jToxCompound = (function () {
             self.prepareTables(); // prepare the tables - we need features to build them - we have them!
             self.equalizeTables(); // to make them nicer, while waiting...
           }
-          else
+          else {
           	ccLib.fireCallback(self.settings.onPrepared, self, miniset, self);
+          }
 
           // finally make the callback for
           callback(dataset);
@@ -2649,12 +2691,13 @@ var jToxCompound = (function () {
       // remember the _original_ datasetUri and make a call with one size length to retrieve all features...
       self.datasetUri = (datasetUri.indexOf('http') !=0 ? self.settings.baseUrl : '') + datasetUri;
 
-      var procDiv = jT.$('.jt-processing', self.rootElement).show()[0];
+      self.$procDiv.show();
+      self.$errDiv.hide();
       if (!!self.settings.oLanguage.sLoadingRecords)
         jT.$('.message', procDiv).html(self.settings.oLanguage.sLoadingRecords);
 
       self.queryFeatures(featureUri, function (dataset) {
-        jT.$(procDiv).hide();
+        self.$procDiv.hide();
         self.queryEntries(self.pageStart, self.pageSize, dataset);
       });
     },
@@ -2803,7 +2846,7 @@ var jToxDataset = (function () {
       "sInfo": "Showing _TOTAL_ dataset(s) (_START_ to _END_)"
     },
     /* datasetUri */
-    configuration: { 
+    configuration: {
       columns : {
         dataset: {
           'Id': { iOrder: 0, sTitle: "Id", mData: "URI", sWidth: "50px", mRender: function (data, type, full) {
@@ -2821,60 +2864,60 @@ var jToxDataset = (function () {
       }
     }
   };
-  
+
   var cls = function (root, settings) {
     var self = this;
     self.rootElement = root;
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even when manually initialized
 
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
-        
+
     if (!self.settings.noInterface) {
       self.rootElement.appendChild(jT.getTemplate('#jtox-dataset'));
       self.init(settings);
     }
-        
+
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
     if (self.settings.datasetUri != undefined || self.settings.loadOnInit)
       self.listDatasets(self.settings.datasetUri)
   };
-  
+
   cls.prototype = {
     init: function (settings) {
       var self = this;
-      
+
       // arrange certain things on the columns first - like dealing with short/long stars
       self.settings.configuration.columns.dataset.Stars.mRender = function (data, type, full) {
         return type != 'display' ? data : jT.ui.putStars(self, data, "Dataset quality stars rating (worst) 1-10 (best)");
       };
-      
+
       if (self.settings.shortStars)
         self.settings.configuration.columns.dataset.Stars.sWidth = "40px";
-      
+
       // deal if the selection is chosen
       if (!!self.settings.selectionHandler || !!self.settings.onDetails) {
         jT.ui.putActions(self, self.settings.configuration.columns.dataset.Id);
         self.settings.configuration.columns.dataset.Id.sWidth = "60px";
       }
-      
+
       // again , so that changed defaults can be taken into account.
       self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
-      
+
       // READYY! Go and prepare THE table.
       self.table = jT.ui.putTable(self, jT.$('table', self.rootElement)[0], 'dataset');
     },
-    
+
     listDatasets: function (uri) {
       var self = this;
       if (uri == null)
         uri = self.settings.baseUrl + '/dataset';
       else if (!self.settings.baseUrl)
         self.settings.baseUrl = jT.grabBaseUrl(uri);
-      
+
       if (!self.settings.noInterface)
         jT.$(self.table).dataTable().fnClearTable();
       jT.call(self, uri, function (result, jhr) {
-        if (!result && jhr.status == 404)
+        if (!result && jhr.status != 200)
           result = { dataset: [] }; // empty one...
         if (!!result) {
           self.dataset = result.dataset;
@@ -2888,21 +2931,21 @@ var jToxDataset = (function () {
         }
       });
     },
-    
+
     query: function (uri) {
       this.listDatasets(uri);
     },
-    
+
     modifyUri: function (uri) {
       jT.$('input[type="checkbox"]', this.rootElement).each(function () {
         if (this.checked)
           uri = ccLib.addParameter(uri, 'feature_uris[]=' + encodeURIComponent(this.value + '/feature'));
       })
-      
+
       return uri;
     }
   };
-    
+
   return cls;
 })();
 /* toxmodel.js - A kit for querying/manipulating all available models (algorithms)
@@ -3038,7 +3081,7 @@ var jToxModel = (function () {
       if (!self.settings.noInterface)
         jT.$(self.table).dataTable().fnClearTable();
       jT.call(self, uri, function (result, jhr) {
-        if (!result && jhr.status == 404)
+        if (!result && jhr.status != 200)
           result = { model: [] }; // empty one
 
         if (!!result) {
@@ -3062,7 +3105,7 @@ var jToxModel = (function () {
       if (!self.settings.noInterface)
         jT.$(self.table).dataTable().fnClearTable();
       jT.call(self, uri, function (result, jhr) {
-        if (!result && jhr.status == 404)
+        if (!result && jhr.status != 200)
           result = { algorithm: [] }; // empty one
         if (!!result) {
           self.algorithm = result.algorithm;
@@ -3167,23 +3210,28 @@ var jToxSubstance = (function () {
       "sEmptyTable": "No substances available.",
       "sInfo": "Showing _TOTAL_ substance(s) (_START_ to _END_)"
     },
-  
+
     pageStart: 0,
     pageSize: 10,
     /* substanceUri */
-    configuration: { 
+    configuration: {
       columns : {
         substance: {
-          'Id': { sTitle: 'Id', mData: 'URI', sDefaultContent: "-", sWidth: "60px", mRender: function (data, type, full) { 
+          'Id': { sTitle: 'Id', mData: 'URI', sDefaultContent: "-", sWidth: "60px", mRender: function (data, type, full) {
             return (type != 'display') ? full.index : '&nbsp;-&nbsp;' + full.index + '&nbsp;-&nbsp;';
           } },
-          'Substance Name': { sTitle: "Substance Name", mData: "name", sDefaultContent: "-" },
+          'Substance Name': { sTitle: "Substance Name", mData: "name",  mRender: function (data, type, full) {
+            if (ccLib.isNull(data) || data == 'null') data = '-';
+            return (type != 'display') ? data : jT.ui.linkedData('<a target="_blank" href="' + full.URI + '/study">' + data + '</a>', "Click to view study details", data)
+          } },
           'Substance UUID': { sTitle: "Substance UUID", mData: "i5uuid", mRender: function (data, type, full) {
+            if (ccLib.isNull(data) || data == 'null') return '';
             return (type != 'display') ? data : jT.ui.shortenedData('<a target="_blank" href="' + full.URI + '/study">' + data + '</a>', "Press to copy the UUID in the clipboard", data)
           } },
           'Substance Type': { sTitle: "Substance Type", mData: "substanceType", sWidth: "15%", sDefaultContent: '-' },
           'Public name': { sTitle: "Public name", mData: "publicname", sDefaultContent: '-'},
           'Reference substance UUID': { sTitle: "Reference substance UUID", mData: "referenceSubstance", mRender: function (data, type, full) {
+            if (ccLib.isNull(data.i5uuid) || data.i5uuid == 'null') return '';
             return (type != 'display') ? data.i5uuid : jT.ui.shortenedData('<a target="_blank" href="' + data.uri + '">' + data.i5uuid + '</a>', "Press to copy the UUID in the clipboard", data.i5uuid);
           } },
           'Owner': { sTitle: "Owner", mData: "ownerName", sDefaultContent: '-'},
@@ -3192,24 +3240,24 @@ var jToxSubstance = (function () {
       }
     }
   };
-  
+
   var cls = function (root, settings) {
     var self = this;
     self.rootElement = root;
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even when manually initialized
-    
+
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
 
     self.pageStart = self.settings.pageStart;
     self.pageSize = self.settings.pageSize;
-    
+
     if (!self.settings.noInterface) {
       if (self.settings.embedComposition && self.settings.onDetails == null) {
         self.settings.onDetails = function (root, data, element) {
           new jToxComposition(root, jT.$.extend(
-            {}, 
-            self.settings, 
-            (typeof self.settings.embedComposition == 'object' ? self.settings.embedComposition : jT.blankSettings), 
+            {},
+            self.settings,
+            (typeof self.settings.embedComposition == 'object' ? self.settings.embedComposition : jT.blankSettings),
             { compositionUri : data.URI + '/composition' }
           ));
         };
@@ -3217,18 +3265,18 @@ var jToxSubstance = (function () {
 
       self.rootElement.appendChild(jT.getTemplate('#jtox-substance'));
       self.init(settings);
-    }    
-        
+    }
+
     // finally, if provided - make the query
     if (!!self.settings.substanceUri)
       self.querySubstance(self.settings.substanceUri)
   };
-  
+
   // format the external identifiers column
   cls.formatExtIdentifiers = function (data, type, full) {
     if (type != 'display')
       return ccLib.joinDeep(data, 'id', ', ');
-    
+
     var html = '';
     for (var i = 0;i < data.length;++i) {
       if (i > 0)
@@ -3237,29 +3285,29 @@ var jToxSubstance = (function () {
     }
     return html;
   };
-  
+
   cls.prototype = {
     init: function (settings) {
       var self = this;
-      
+
       // deal if the selection is chosen
       var colId = self.settings.configuration.columns.substance['Id'];
       jT.ui.putActions(self, colId);
       colId.sTitle = '';
-      
+
       self.settings.configuration.columns.substance['Owner'].mRender = function (data, type, full) {
         return (type != 'display') ? data : '<a target="_blank" href="' + self.settings.baseUrl + '/substanceowner/' + full.ownerUUID + '/substance">' + data + '</a>';
       };
-      
+
       var opts = {  "sDom": "rti" };
       if (self.settings.showControls) {
-        jT.ui.bindControls(self, { 
+        jT.ui.bindControls(self, {
           nextPage: function () { self.nextPage(); },
           prevPage: function () { self.prevPage(); },
           sizeChange: function() { self.queryEntries(self.pageStart, parseInt(jT.$(this).val())); },
           filter: function () { jT.$(self.table).dataTable().fnFilter(jT.$(this).val()); }
         });
-        
+
         opts['fnInfoCallback'] = function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
           var needle = jT.$('.filterbox', self.rootElement).val();
           jT.$('.filtered-text', self.rootElement).html(!needle ? ' ' : ' (filtered to <span class="high">' + iTotal + '</span>) ');
@@ -3268,36 +3316,36 @@ var jToxSubstance = (function () {
       }
       else
         jT.$('.jtox-controls', self.rootElement).remove();
-      
+
       // again , so that changed defaults can be taken into account.
       self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
-      
+
       // READYY! Go and prepare THE table.
       self.table = jT.ui.putTable(self, jT.$('table', self.rootElement)[0], 'substance', opts);
     },
-    
+
     queryEntries: function(from, size) {
       var self = this;
       if (from < 0)
         from = 0;
-        
+
       if (!size || size < 0)
         size = self.pageSize;
-        
+
       var qStart = Math.floor(from / size);
       var qUri = ccLib.addParameter(self.substanceUri, "page=" + qStart + "&pagesize=" + size);
       jT.call(self, qUri, function (result, jhr) {
-        if (!result && jhr.status == 404)
+        if (!result && jhr.status != 200)
           result = { substabce: [] }; // empty one
         if (!!result) {
           self.pageSize = size;
           self.pageStart = from;
-        
+
           for (var i = 0, rl = result.substance.length; i < rl; ++i)
             result.substance[i].index = i + from + 1;
 
           self.substance = result.substance;
-          
+
           if (result.substance.length < self.pageSize) // we've reached the end!!
             self.entriesCount = from + result.substance.length;
 
@@ -3306,7 +3354,7 @@ var jToxSubstance = (function () {
           if (!self.settings.noInterface) {
             jT.$(self.table).dataTable().fnClearTable();
             jT.$(self.table).dataTable().fnAddData(result.substance);
-            
+
             self.updateControls(from, result.substance.length);
           }
         }
@@ -3314,25 +3362,25 @@ var jToxSubstance = (function () {
           ccLib.fireCallback(self.settings.onLoaded, self, result);
       });
     },
-    
+
     querySubstance: function (uri) {
       var self = this;
       self.substanceUri = jT.grabPaging(self, uri);
       if (ccLib.isNull(self.settings.baseUrl))
         self.settings.baseUrl = jT.grabBaseUrl(uri);
       self.queryEntries(self.pageStart);
-    },   
-    
+    },
+
     query: function (uri) {
       this.querySubstance(uri);
     }
   };
-  
+
   // some "inheritance" :-)
   cls.prototype.nextPage = jToxCompound.prototype.nextPage;
   cls.prototype.prevPage = jToxCompound.prototype.prevPage;
   cls.prototype.updateControls = jToxCompound.prototype.updateControls;
-  
+
   return cls;
 })();
 /* toxcomposition.js - A kit for visualizing substance composition(s)
@@ -3674,8 +3722,9 @@ var jToxStudy = (function () {
           for (var i = 0;i < len; ++i) {
             var col = jT.$.extend({}, defaultColumns[i + start]);
             col = jT.ui.modifyColDef(self, col, category, group);
-            if (col != null)
+            if (col != null) {
               colDefs.push(col);
+            }
           }
         };
 
@@ -3730,7 +3779,7 @@ var jToxStudy = (function () {
         });
 
         // finally put the protocol entries
-        putDefaults(4, 4, "protocol");
+        putDefaults(4, 5, "protocol");
 
         // but before given it up - make a small sorting..
         jT.ui.sortColDefs(colDefs);
@@ -4215,7 +4264,7 @@ var jToxLog = (function () {
     hasDetails: true,       // whether to have the ability to open each line, to show it's details
     noInterface: false,     // whether to have interface, or not - it can be used just as relay station
     onEvent: null,          // a callback, when new event has arrived: function (logEvent). See README.md for more details
-    
+
     // line formatting function - function (service, state, params, jhr) -> { header: "", details: "" }
     formatEvent: function (service, state, params, jhr) {
       if (params != null)
@@ -4230,9 +4279,9 @@ var jToxLog = (function () {
         };
       else
         return null;
-    }       
+    }
   };
-  
+
   var cls = function (root, settings) {
     var self = this;
     self.rootElement = root;
@@ -4241,29 +4290,29 @@ var jToxLog = (function () {
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
     if (!self.settings.noInterface) {
       self.rootElement.appendChild(jT.getTemplate('#jtox-logger'));
-      
+
       if (typeof self.settings.lineHeight == "number")
         self.settings.lineHeight = self.settings.lineHeight.toString() + 'px';
       if (typeof self.settings.keepMessages != "number")
         self.settings.keepMessages = parseInt(self.settings.keepMessages);
-        
+
       // now the actual UI manipulation functions...
       var listRoot = $('.list-root', self.rootElement)[0];
       var statusEl = $('.status', self.rootElement)[0];
-  
+
       if (!!self.settings.rightSide) {
         statusEl.style.right = '0px';
         jT.$(self.rootElement).addClass('right-side');
       }
       else
         statusEl.style.left = '0px';
-    
+
       var setIcon = function (root, status) {
         if (status == "error")
           jT.$(root).addClass('ui-state-error');
         else
           jT.$(root).removeClass('ui-state-error');
-  
+
         if (status == "error")
           jT.$('.icon', root).addClass('ui-icon ui-icon-alert').removeClass('loading ui-icon-check');
         else if (status == "success")
@@ -4274,12 +4323,12 @@ var jToxLog = (function () {
             jT.$('.icon', root).addClass('loading');
         }
       };
-      
+
       var setStatus = function (status) {
         $(".icon", statusEl).removeClass("jt-faded");
         setIcon (statusEl, status);
         if (status == "error" || status == "success") {
-          setTimeout(function () { 
+          setTimeout(function () {
             jT.$('.icon', statusEl).addClass('jt-faded');
             var hasConnect = false;
             jT.$('.logline', listRoot).each(function () {
@@ -4293,7 +4342,7 @@ var jToxLog = (function () {
         ccLib.fireCallback(self.settings.onStatus, self, status, self.theStatus);
         self.theStatus = status;
       };
-      
+
       var addLine = function (data) {
         var el = jT.getTemplate("#jtox-logline");
         el.style.height = '0px';
@@ -4312,25 +4361,25 @@ var jToxLog = (function () {
             }
             else
               el.style.height = self.settings.lineHeight;
-              
+
             // to make sure other clickable handler won't take control.
             e.stopPropagation();
           });
         }
-        
+
         while (listRoot.childNodes.length > self.settings.keepMessages)
           listRoot.removeChild(listRoot.lastElementChild);
-  
+
         return el;
       };
-      
+
       setStatus('');
-      
+
       // this is the queue of events - indexes by the passed service
       self.events = {};
     } // noInterface if
-    
-    // now the handlers - needed no matter if we have interface or not    
+
+    // now the handlers - needed no matter if we have interface or not
     self.handlers = {
       onConnect: function (service, params, id) {
         var info = ccLib.fireCallback(self.settings.formatEvent, this, service, "connecting", params, null);
@@ -4378,34 +4427,34 @@ var jToxLog = (function () {
           ccLib.fillTree(line, info);
           jT.$(line).data('status', "error");
 
-          console.log("Error [" + id + ": " + service);
+          console.log("Error [" + id + "]: " + service);
         }
         if (!!self.settings.resend && this._handlers != null)
           ccLib.fireCallback(this._handlers.onError, this, service, status, jhr, id);
       }
     };
-    
+
     if (!!self.settings.autoInstall)
       self.install();
   };
-  
+
   // Install the handers for given kit
   cls.prototype.install = function (kit) {
     var self = this;
     if (kit == null)
       kit = jT;
-    
+
     // save the oldies
     kit._handlers = {
       onConnect: kit.settings.onConnect,
       onSuccess: kit.settings.onSuccess,
       onError: kit.settings.onError
     };
-    
+
     kit.settings = jT.$.extend(kit.settings, self.handlers);
     return kit;
   };
-  
+
   // Deinstall the handlers for given kit, reverting old ones
   cls.prototype.revert = function (kit) {
     var self = this;
@@ -4415,11 +4464,11 @@ var jToxLog = (function () {
     kit.settings = jT.$.extend(kit.settings, kit._handlers);
     return kit;
   };
-  
-  cls.prototype.modifyUri = function (uri) { 
+
+  cls.prototype.modifyUri = function (uri) {
     return uri;
   };
-  
+
   return cls;
 })();
 /* toxendpoint.js - An endpoint listing and selection toolkit
@@ -4806,7 +4855,7 @@ var jToxEndpoint = (function () {
 
       // make the call...
       jT.call(self, uri, function (result, jhr) {
-        if (!result && jhr.status == 404)
+        if (!result && jhr.status != 200)
           result = { facet: [] }; // empty one
         if (!!result) {
           self.summary = result.facet;
@@ -4911,6 +4960,9 @@ jT.templates['all-compound']  =
 "	      <div class=\"jt-processing\">" +
 "          <span class=\"message\">Loading compounds...</span>" +
 "	      </div>" +
+"        <div class=\"jt-error\">" +
+"          <span class=\"message\"></span>" +
+"        </div>" +
 "	      <div class=\"jtox-ds-fixed\">" +
 "	        <table></table>" +
 "	      </div><div class=\"jtox-ds-variable\">" +

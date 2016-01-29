@@ -382,7 +382,7 @@ var jToxEndpoint = (function () {
 
       // make the call...
       jT.call(self, uri, function (result, jhr) {
-        if (!result && jhr.status == 404)
+        if (!result && jhr.status != 200)
           result = { facet: [] }; // empty one
         if (!!result) {
           self.summary = result.facet;

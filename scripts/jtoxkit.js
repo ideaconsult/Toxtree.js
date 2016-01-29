@@ -79,7 +79,7 @@ window.jT = window.jToxKit = {
         obj.parentKit = parent;
       }
       else
-        console.log("jToxError: trying to initialize unexistend jTox kit: " + kit);
+        console.log("jToxError: trying to initialize unexistent jTox kit: " + kit);
 
       return obj;
     };
@@ -348,7 +348,23 @@ window.jT.ui = {
     }
     return res;
   },
+	linkedData: function (content, message, data) {
+    var res = '';
 
+    if (ccLib.isNull(data)) {
+      data = content;
+    }
+    if (data.toString().length <= 5) {
+      res += content;
+    }
+    else {
+      if (message != null) {
+        res +=  res += '<div title="' + message + '">' + content + '</div>';
+      }
+      else res += '<div >' + content + '</div>';
+    }
+    return res;
+	},
   changeTabsIds: function (root, suffix) {
     jT.$('ul li a', root).each(function() {
       var id = jT.$(this).attr('href').substr(1);
@@ -398,12 +414,19 @@ window.jT.ui = {
 	    var catCol = kit.settings.configuration.columns[cat];
 	    if (!ccLib.isNull(catCol)) {
 	      if (!!group) {
-	        catCol = catCol[group];
-  	      if (!ccLib.isNull(catCol))
+          catCol = catCol[group];
+  	      if (!ccLib.isNull(catCol)){
+            // Allow bVisible to be set on the whole category
+            if (!ccLib.isNull(catCol.bVisible)) {
+              catCol[name] = catCol[name] || {};
+              catCol[name].bVisible = !!catCol[name].bVisible || !!catCol.bVisible;
+            }
   	        catCol = catCol[name];
+          }
         }
-        else
+        else {
 	        catCol = catCol[name];
+        }
 	    }
 
 	    if (ccLib.isNull(catCol))
