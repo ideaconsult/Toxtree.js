@@ -1,4 +1,6 @@
-[submodule "ketcher"]
-	path = ketcher
+[submodule "libs/d3js"]
+	path = libs/d3js
+	url = https://github.com/thejonan/d3.git
+[submodule "libs/ketcher"]
+	path = libs/ketcher
 	url = https://github.com/thejonan/ketcher.git
-	branch = master
