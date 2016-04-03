@@ -1,3 +1,9 @@
+/* jtoxkit.js - The main jToxKit service routines
+ *
+ * Copyright 2012-2014, IDEAconsult Ltd. http://www.ideaconsult.net/
+ * Created by Ivan Georgiev
+**/
+
 window.jT = window.jToxKit = {
 	templateRoot: null,
 
@@ -85,7 +91,7 @@ window.jT = window.jToxKit = {
     };
 
 	  // first, get the configuration, if such is passed
-	  if (!ccLib.isNull(dataParams.configFile)) {
+	  if (dataParams.configFile != null) {
 	    // we'll use a trick here so the baseUrl parameters set so far to take account... thus passing 'fake' kit instance
 	    // as the first parameter of jT.call();
   	  self.call({ settings: dataParams}, dataParams.configFile, function(config){
@@ -134,7 +140,7 @@ window.jT = window.jToxKit = {
   	}
 
   	// now scan all insertion divs
-  	self.$('.jtox-toolkit', root).each(function(i) { if (!self.$(this).data('manualInit')) self. initKit(this); });
+  	self.$('.jtox-toolkit', root).each(function(i) { if (!self.$(this).data('manualInit')) self.initKit(this); });
 	},
 
 	kit: function (element) {
@@ -187,7 +193,7 @@ window.jT = window.jToxKit = {
 
 	insertTool: function (name, root) {
 	  var html = this.tools[name];
-	  if (!ccLib.isNull(html)) {
+	  if (html != null) {
   	  root.innerHTML = html;
   	  this.init(root); // since we're pasting as HTML - we need to make re-traverse and initiazaltion of possible jTox kits.
     }
@@ -222,14 +228,19 @@ window.jT = window.jToxKit = {
       url = url.slice(0, -1);
   	return url;
 	},
+	
 	/* Deduce the baseUrl from a given Url - either if it is full url, of fallback to jToxKit's if it is local
 	Passed is the first "non-base" component of the path...
 	*/
-	grabBaseUrl: function(url){
-    if (!ccLib.isNull(url) && url.indexOf('http') == 0)
-      return this.formBaseUrl(ccLib.parseURL(url));
-    else
-      return this.settings.baseUrl;
+	grabBaseUrl: function(url, key) {
+    if (url != null) {
+      if (!!key) 
+        return url.slice(0, url.indexOf("/" + key));
+      else if (url.indexOf('http') == 0)
+        return this.formBaseUrl(ccLib.parseURL(url));
+    }
+    
+    return this.settings.baseUrl;
 	},
 
   /* Grab the paging information from the given URL and place it into the settings of passed
@@ -336,7 +347,7 @@ window.jT.ui = {
   shortenedData: function (content, message, data) {
     var res = '';
 
-    if (ccLib.isNull(data))
+    if (data == null)
       data = content;
     if (data.toString().length <= 5) {
       res += content;
@@ -351,7 +362,7 @@ window.jT.ui = {
 	linkedData: function (content, message, data) {
     var res = '';
 
-    if (ccLib.isNull(data)) {
+    if (data == null) {
       data = content;
     }
     if (data.toString().length <= 5) {
@@ -412,12 +423,12 @@ window.jT.ui = {
 	  // helper function for retrieving col definition, if exists. Returns empty object, if no.
 	  var getColDef = function (cat) {
 	    var catCol = kit.settings.configuration.columns[cat];
-	    if (!ccLib.isNull(catCol)) {
+	    if (catCol != null) {
 	      if (!!group) {
           catCol = catCol[group];
-  	      if (!ccLib.isNull(catCol)){
+  	      if (catCol != null){
             // Allow bVisible to be set on the whole category
-            if (!ccLib.isNull(catCol.bVisible)) {
+            if (catCol.bVisible != null) {
               catCol[name] = catCol[name] || {};
               catCol[name].bVisible = !!catCol[name].bVisible || !!catCol.bVisible;
             }
@@ -429,14 +440,14 @@ window.jT.ui = {
         }
 	    }
 
-	    if (ccLib.isNull(catCol))
+	    if (catCol == null)
 	      catCol = {};
 	    return catCol;
 	  };
 	  // now form the default column, if existing and the category-specific one...
 	  // extract column redefinitions and merge them all.
 	  col = jT.$.extend(col, (!!group ? getColDef('_') : {}), getColDef(category));
-	  return ccLib.isNull(col.bVisible) || col.bVisible ? col : null;
+	  return col.bVisible == null || col.bVisible ? col : null;
   },
 
   sortColDefs: function (colDefs) {

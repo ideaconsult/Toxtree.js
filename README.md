@@ -354,7 +354,7 @@ In the full configuration, shown below example of using last two can be seen for
         "Calculated": function (name, features) {
           var arr = [];
           for (var f in features) {
-            if (!ccLib.isNull(features[f].source) && !ccLib.isNull(features[f].source.type) && !features[f].source.type.toLowerCase() == "algorithm")
+            if (features[f].source != null && features[f].source.type != null && !features[f].source.type.toLowerCase() == "algorithm")
               arr.push(f);
           }
           return arr;

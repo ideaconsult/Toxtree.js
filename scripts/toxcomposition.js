@@ -57,112 +57,110 @@ var jToxComposition = (function () {
 		return ccLib.extendArray(old, value != null ? value.trim().toLowerCase().split("|") : [value]).filter(ccNonEmptyFilter);
   };
   
-  cls.prototype = {
-    prepareTable: function (json, tab) {
-      var self = this;
+  cls.prototype.prepareTable = function (json, tab) {
+    var self = this;
+    
+    // deal if the selection is chosen
+    var colId = self.settings.configuration.columns.composition.Name;
+    if (!!self.settings.selectionHandler) {
+      jT.ui.putActions(self, colId);
+      colId.sWidth = "60px";
+    }
       
-      // deal if the selection is chosen
-      var colId = self.settings.configuration.columns.composition.Name;
-      if (!!self.settings.selectionHandler) {
-        jT.ui.putActions(self, colId);
-        colId.sWidth = "60px";
+    // we need that processing to remove the title of "Also contained in..." column...
+    var cols = jT.ui.processColumns(self, 'composition');
+    for (var i = 0, cl = cols.length; i < cl; ++i)
+      if (cols[i].sTitle == 'Also') {
+        cols[i].sTitle = '';
+        // we need to do this here, because 'self' is not defined up there...
+        cols[i].mRender = function(val, type, full) { return !val ? '' : '<a href="' + (self.settings.baseUrl || self.baseUrl) + '/substance?type=related&compound_uri=' + encodeURIComponent(val) + '" target="_blank">Also contained in...</a>'; };
+        break;
       }
-        
-      // we need that processing to remove the title of "Also contained in..." column...
-      var cols = jT.ui.processColumns(self, 'composition');
-      for (var i = 0, cl = cols.length; i < cl; ++i)
-        if (cols[i].sTitle == 'Also') {
-          cols[i].sTitle = '';
-          // we need to do this here, because 'self' is not defined up there...
-          cols[i].mRender = function(val, type, full) { return !val ? '' : '<a href="' + (self.settings.baseUrl || self.baseUrl) + '/substance?type=related&compound_uri=' + encodeURIComponent(val) + '" target="_blank">Also contained in...</a>'; };
-          break;
-        }
-        
-      // if we have showDiagram set to true we need to show it up
-      if (self.settings.showDiagrams) {
-        var diagFeature = jToxCompound.baseFeatures['http://www.opentox.org/api/1.1#Diagram'];
-        cols.push(jT.$.extend({}, diagFeature.column, { 
-          sTitle: 'Structure', 
-          mData: "component", 
-          mRender: function (val, type, full) { return diagFeature.render(val.compound.URI, type, val); } 
-        }));
-      }
-      // READYY! Go and prepare THE table.
-      self.table = jT.ui.putTable(self, jT.$('table.composition-table', tab)[0], 'composition', {
-        "aoColumns": cols
-      });
       
-      jT.$(self.table).dataTable().fnAddData(json);
-      // now make a few fixing for multi-column title
-      var colSpan = jT.$('th.colspan-2', self.table);
-      jT.$(colSpan).attr('colspan', 2);
-      jT.$(jT.$(colSpan).next()).remove();
-      return self.table;
-    },
+    // if we have showDiagram set to true we need to show it up
+    if (self.settings.showDiagrams) {
+      var diagFeature = jToxCompound.baseFeatures['http://www.opentox.org/api/1.1#Diagram'];
+      cols.push(jT.$.extend({}, diagFeature.column, { 
+        sTitle: 'Structure', 
+        mData: "component", 
+        mRender: function (val, type, full) { return diagFeature.render(val.compound.URI, type, val); } 
+      }));
+    }
+    // READYY! Go and prepare THE table.
+    self.table = jT.ui.putTable(self, jT.$('table.composition-table', tab)[0], 'composition', {
+      "aoColumns": cols
+    });
     
-    queryComposition: function (uri) {
-      var self = this;
-      self.compositionUri = uri;
-      self.baseUrl = jT.grabBaseUrl(uri);
-      jT.call(self, uri, function (json) {
-        if (!!json && !!json.composition) {
-          // clear the old tabs, if any.
-          var substances = {};
+    jT.$(self.table).dataTable().fnAddData(json);
+    // now make a few fixing for multi-column title
+    var colSpan = jT.$('th.colspan-2', self.table);
+    jT.$(colSpan).attr('colspan', 2);
+    jT.$(jT.$(colSpan).next()).remove();
+    return self.table;
+  };
     
-          jToxCompound.processFeatures(json.feature);
-          // proprocess the data...
-          for (var i = 0, cmpl = json.composition.length; i < cmpl; ++i) {
-            var cmp = json.composition[i];
+  cls.prototype.queryComposition = function (uri) {
+    var self = this;
+    self.compositionUri = uri;
+    self.baseUrl = jT.grabBaseUrl(uri, "substance");
+    jT.call(self, uri, function (json) {
+      if (!!json && !!json.composition) {
+        // clear the old tabs, if any.
+        var substances = {};
+  
+        jToxCompound.processFeatures(json.feature);
+        // proprocess the data...
+        for (var i = 0, cmpl = json.composition.length; i < cmpl; ++i) {
+          var cmp = json.composition[i];
+          
+          // TODO: Start using show banner!
+          jToxCompound.processEntry(cmp.component, json.feature, fnDatasetValue);
+  
+          // now prepare the subs        
+          var theSubs = substances[cmp.compositionUUID];
+          if (theSubs === undefined)
+            substances[cmp.compositionUUID] = theSubs = { name: "", purity: "", maxvalue: 0, uuid: cmp.compositionUUID, composition: [] };
+          
+          theSubs.composition.push(cmp);
+          if (cmp.compositionName != '' && cmp.compositionName != null)
+            theSubs.name = cmp.compositionName;
             
-            // TODO: Start using show banner!
-            jToxCompound.processEntry(cmp.component, json.feature, fnDatasetValue);
-    
-            // now prepare the subs        
-            var theSubs = substances[cmp.compositionUUID];
-            if (theSubs === undefined)
-              substances[cmp.compositionUUID] = theSubs = { name: "", purity: "", maxvalue: 0, uuid: cmp.compositionUUID, composition: [] };
-            
-            theSubs.composition.push(cmp);
-            if (cmp.compositionName != '' && cmp.compositionName != null)
-              theSubs.name = cmp.compositionName;
-              
-            var val = cmp.proportion.typical;
-            if (cmp.relation == 'HAS_CONSTITUENT' && theSubs.name == '') {
-              theSubs.name = cmp.component.compound['name'] + ' (' + jToxComposition.formatConcentration(val.precision, val.value, val.unit) + ')';
-            }
-            
-            if (cmp.relation == 'HAS_CONSTITUENT' && theSubs.maxvalue < val.value) {
-              theSubs.maxvalue = val.value;
-              val = cmp.proportion.real;
-              theSubs.purity = jToxComposition.formatConcentration(null, val.lowerValue + '-' + val.upperValue, val.unit);
-            }
+          var val = cmp.proportion.typical;
+          if (cmp.relation == 'HAS_CONSTITUENT' && theSubs.name == '') {
+            theSubs.name = cmp.component.compound['name'] + ' (' + jToxComposition.formatConcentration(val.precision, val.value, val.unit) + ')';
           }
           
-          ccLib.fireCallback(self.settings.onLoaded, self, json.composition);
-          // now make the actual filling
-          if (!self.settings.noInterface) {
-            for (var i in substances) {
-              var panel = jT.getTemplate('#jtox-composition');
-              self.rootElement.appendChild(panel);
-              
-              if (self.settings.showBanner)
-                ccLib.fillTree(jT.$('.composition-info', panel)[0], substances[i]);
-              else // we need to remove it
-                jT.$('.composition-info', panel).remove();
-              // we need to prepare tables, abyways.
-              self.prepareTable(substances[i].composition, panel);
-            }
+          if (cmp.relation == 'HAS_CONSTITUENT' && theSubs.maxvalue < val.value) {
+            theSubs.maxvalue = val.value;
+            val = cmp.proportion.real;
+            theSubs.purity = jToxComposition.formatConcentration(null, val.lowerValue + '-' + val.upperValue, val.unit);
           }
         }
-        else
-          ccLib.fireCallback(self.settings.onLoaded, self, json.composition);
-      });
-    },   
+        
+        ccLib.fireCallback(self.settings.onLoaded, self, json.composition);
+        // now make the actual filling
+        if (!self.settings.noInterface) {
+          for (var i in substances) {
+            var panel = jT.getTemplate('#jtox-composition');
+            self.rootElement.appendChild(panel);
+            
+            if (self.settings.showBanner)
+              ccLib.fillTree(jT.$('.composition-info', panel)[0], substances[i]);
+            else // we need to remove it
+              jT.$('.composition-info', panel).remove();
+            // we need to prepare tables, abyways.
+            self.prepareTable(substances[i].composition, panel);
+          }
+        }
+      }
+      else
+        ccLib.fireCallback(self.settings.onLoaded, self, json.composition);
+    });
+  };
     
-    query: function (uri) {
-      jT.$(self.rootElement).empty();
-      this.queryComposition(uri);
-    }
+  cls.prototype.query = function (uri) {
+    jT.$(self.rootElement).empty();
+    this.queryComposition(uri);
   };
   
   return cls;

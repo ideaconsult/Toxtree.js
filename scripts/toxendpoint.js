@@ -236,179 +236,177 @@ var jToxEndpoint = (function () {
     });
   };
 
-  cls.prototype = {
-    init: function (settings) {
-      var self = this;
+  cls.prototype.init = function (settings) {
+    var self = this;
 
-      // we can redefine onDetails only if there is not one passed and we're asked to show editors at ll
-      if (!!self.settings.showEditors && !self.settings.onDetails) {
-        self.edittedValues = {};
-        self.settings.onDetails = function (root, data, element) {
-          self.edittedValues[data.endpoint] = {};
-          cls.linkEditors(self, root.appendChild(jT.getTemplate('#jtox-endeditor')), {
-            category: data.endpoint,
-            top: data.subcategory,
-            conditions: self.settings.showConditions,
-            onchange: function (e, field, value) { ccLib.setJsonValue(self.edittedValues[data.endpoint], field, value); }
-          });
-        };
-      }
-
-      // deal if the selection is chosen
-      if (!!self.settings.selectionHandler || !!self.settings.onDetails)
-        jT.ui.putActions(self, self.settings.configuration.columns.endpoint.Id);
-
-      self.settings.configuration.columns.endpoint.Id.sTitle = '';
-
-      // again , so that changed defaults can be taken into account.
-      self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
-      var cols = jT.ui.processColumns(self, 'endpoint');
-
-      // make the accordition now...
-    	jT.$('.jtox-categories', self.rootElement).accordion( {
-    		heightStyle: self.settings.heightStyle
-    	});
-
-      self.tables = { };
-      // and now - initialize all the tables...
-      jT.$('table', self.rootElement).each(function () {
-        var name = this.className;
-        self.tables[name] = jT.ui.putTable(self, this, "endpoint", {
-          "aoColumns": cols,
-          "fnInfoCallback": self.updateStats(name),
-          "aaSortingFixed": [[1, 'asc']],
-          "onRow": function (nRow, aData, iDataIndex) {
-            jT.$(nRow).addClass(aData.endpoint);
-          }
+    // we can redefine onDetails only if there is not one passed and we're asked to show editors at ll
+    if (!!self.settings.showEditors && !self.settings.onDetails) {
+      self.edittedValues = {};
+      self.settings.onDetails = function (root, data, element) {
+        self.edittedValues[data.endpoint] = {};
+        cls.linkEditors(self, root.appendChild(jT.getTemplate('#jtox-endeditor')), {
+          category: data.endpoint,
+          top: data.subcategory,
+          conditions: self.settings.showConditions,
+          onchange: function (e, field, value) { ccLib.setJsonValue(self.edittedValues[data.endpoint], field, value); }
         });
-      });
-
-      if (!!self.settings.hideFilter)
-        jT.$('.filter-box', self.rootElement).remove();
-      else {
-        var filterTimeout = null;
-        var fFilter = function (ev) {
-          if (!!filterTimeout)
-            clearTimeout(filterTimeout);
-
-          var field = ev.currentTarget;
-
-          filterTimeout = setTimeout(function() {
-            jT.$('table', self.rootElement).each(function () {
-              jT.$(this).dataTable().fnFilter(field.value);
-            });
-          }, 300);
-        };
-
-        jT.$('.filter-box input', self.rootElement).on('keydown', fFilter);
-      }
-
-      if (!self.settings.showMultiselect || !self.settings.selectionHandler)
-        jT.$('h3 a', self.rootElement).remove();
-      else
-        jT.ui.installMultiSelect(self.rootElement, null, function (el) { return el.parentNode.parentNode.nextElementSibling; });
-    },
-
-    getValues: function (needle) {
-      var self = this;
-
-      var filter = null;
-      if (!needle)
-        filter = function (end) { return true; };
-      else if (typeof needle != 'function')
-        filter = function (end) { return end.indexOf(needle) >= 0; };
-      else
-        filter = needle;
-
-      for (var endpoint in self.edittedValues) {
-        if (filter(endpoint))
-          return self.edittedValues[endpoint];
-      }
-      return null;
-    },
-
-    updateStats: function (name) {
-      var self = this;
-      return function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
-        var head = jT.$('h3.' + name, self.rootElement)[0];
-        // now make the summary...
-        var html = '';
-        if (iTotal > 0) {
-          var count = 0;
-          var data = this.fnGetData();
-          for (var i = iStart; i <= iEnd && i < iMax; ++i)
-            count += data[i].count;
-          html = "[" + count + "]";
-        }
-        else
-          html = '';
-
-        jT.$('div.jtox-details span', head).html(html);
-        return sPre;
-      }
-    },
-
-    fillEntries: function (facet) {
-      var self = this;
-      // first we need to group them and extract some summaries
-      var ends = { };
-      for (var i = 0, fl = facet.length; i < fl; ++i) {
-        var entry = facet[i];
-        var cat = ends[entry.subcategory];
-        if (cat == null)
-          ends[entry.subcategory] = cat = [];
-
-        cat.push(entry);
-      }
-
-      // now, as we're ready - go and fill everything
-      jT.$('h3', self.rootElement).each(function () {
-        var name = jT.$(this).data('cat');
-        var table = self.tables[name];
-        table.fnClearTable();
-
-        var cat = ends[name.replace("_", " ")];
-        if (cat != null)
-          table.fnAddData(cat);
-      });
-    },
-
-    loadEndpoints: function (uri) {
-      var self = this;
-      if (uri == null)
-        uri = self.settings.baseUrl + '/query/study';
-      else if (!self.settings.baseUrl)
-        self.settings.baseUrl = jT.grabBaseUrl(uri);
-
-      // make the call...
-      jT.call(self, uri, function (result, jhr) {
-        if (!result && jhr.status != 200)
-          result = { facet: [] }; // empty one
-        if (!!result) {
-          self.summary = result.facet;
-          ccLib.fireCallback(self.settings.onLoaded, self, result);
-          if (!self.settings.noInterface)
-            self.fillEntries(result.facet);
-        }
-        else {
-          self.facet = null;
-          ccLib.fireCallback(self.settings.onLoaded, self, result);
-        }
-      });
-    },
-
-    query: function (uri) {
-      this.loadEndpoints(uri);
-    },
-
-    modifyUri: function (uri) {
-      jT.$('input[type="checkbox"]', this.rootElement).each(function () {
-        if (this.checked)
-          uri = ccLib.addParameter(uri, 'feature_uris[]=' + encodeURIComponent(this.value + '/feature'));
-      })
-
-      return uri;
+      };
     }
+
+    // deal if the selection is chosen
+    if (!!self.settings.selectionHandler || !!self.settings.onDetails)
+      jT.ui.putActions(self, self.settings.configuration.columns.endpoint.Id);
+
+    self.settings.configuration.columns.endpoint.Id.sTitle = '';
+
+    // again , so that changed defaults can be taken into account.
+    self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
+    var cols = jT.ui.processColumns(self, 'endpoint');
+
+    // make the accordition now...
+  	jT.$('.jtox-categories', self.rootElement).accordion( {
+  		heightStyle: self.settings.heightStyle
+  	});
+
+    self.tables = { };
+    // and now - initialize all the tables...
+    jT.$('table', self.rootElement).each(function () {
+      var name = this.className;
+      self.tables[name] = jT.ui.putTable(self, this, "endpoint", {
+        "aoColumns": cols,
+        "fnInfoCallback": self.updateStats(name),
+        "aaSortingFixed": [[1, 'asc']],
+        "onRow": function (nRow, aData, iDataIndex) {
+          jT.$(nRow).addClass(aData.endpoint);
+        }
+      });
+    });
+
+    if (!!self.settings.hideFilter)
+      jT.$('.filter-box', self.rootElement).remove();
+    else {
+      var filterTimeout = null;
+      var fFilter = function (ev) {
+        if (!!filterTimeout)
+          clearTimeout(filterTimeout);
+
+        var field = ev.currentTarget;
+
+        filterTimeout = setTimeout(function() {
+          jT.$('table', self.rootElement).each(function () {
+            jT.$(this).dataTable().fnFilter(field.value);
+          });
+        }, 300);
+      };
+
+      jT.$('.filter-box input', self.rootElement).on('keydown', fFilter);
+    }
+
+    if (!self.settings.showMultiselect || !self.settings.selectionHandler)
+      jT.$('h3 a', self.rootElement).remove();
+    else
+      jT.ui.installMultiSelect(self.rootElement, null, function (el) { return el.parentNode.parentNode.nextElementSibling; });
+  };
+
+  cls.prototype.getValues = function (needle) {
+    var self = this;
+
+    var filter = null;
+    if (!needle)
+      filter = function (end) { return true; };
+    else if (typeof needle != 'function')
+      filter = function (end) { return end.indexOf(needle) >= 0; };
+    else
+      filter = needle;
+
+    for (var endpoint in self.edittedValues) {
+      if (filter(endpoint))
+        return self.edittedValues[endpoint];
+    }
+    return null;
+  };
+
+  cls.prototype.updateStats = function (name) {
+    var self = this;
+    return function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
+      var head = jT.$('h3.' + name, self.rootElement)[0];
+      // now make the summary...
+      var html = '';
+      if (iTotal > 0) {
+        var count = 0;
+        var data = this.fnGetData();
+        for (var i = iStart; i <= iEnd && i < iMax; ++i)
+          count += data[i].count;
+        html = "[" + count + "]";
+      }
+      else
+        html = '';
+
+      jT.$('div.jtox-details span', head).html(html);
+      return sPre;
+    }
+  };
+
+  cls.prototype.fillEntries = function (facet) {
+    var self = this;
+    // first we need to group them and extract some summaries
+    var ends = { };
+    for (var i = 0, fl = facet.length; i < fl; ++i) {
+      var entry = facet[i];
+      var cat = ends[entry.subcategory];
+      if (cat == null)
+        ends[entry.subcategory] = cat = [];
+
+      cat.push(entry);
+    }
+
+    // now, as we're ready - go and fill everything
+    jT.$('h3', self.rootElement).each(function () {
+      var name = jT.$(this).data('cat');
+      var table = self.tables[name];
+      table.fnClearTable();
+
+      var cat = ends[name.replace("_", " ")];
+      if (cat != null)
+        table.fnAddData(cat);
+    });
+  };
+
+  cls.prototype.loadEndpoints = function (uri) {
+    var self = this;
+    if (uri == null)
+      uri = self.settings.baseUrl + '/query/study';
+    else if (!self.settings.baseUrl)
+      self.settings.baseUrl = jT.grabBaseUrl(uri, "query");
+
+    // make the call...
+    jT.call(self, uri, function (result, jhr) {
+      if (!result && jhr.status != 200)
+        result = { facet: [] }; // empty one
+      if (!!result) {
+        self.summary = result.facet;
+        ccLib.fireCallback(self.settings.onLoaded, self, result);
+        if (!self.settings.noInterface)
+          self.fillEntries(result.facet);
+      }
+      else {
+        self.facet = null;
+        ccLib.fireCallback(self.settings.onLoaded, self, result);
+      }
+    });
+  };
+
+  cls.prototype.query = function (uri) {
+    this.loadEndpoints(uri);
+  };
+
+  cls.prototype.modifyUri = function (uri) {
+    jT.$('input[type="checkbox"]', this.rootElement).each(function () {
+      if (this.checked)
+        uri = ccLib.addParameter(uri, 'feature_uris[]=' + encodeURIComponent(this.value + '/feature'));
+    })
+
+    return uri;
   };
 
   return cls;

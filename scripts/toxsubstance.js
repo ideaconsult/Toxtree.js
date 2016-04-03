@@ -29,17 +29,17 @@ var jToxSubstance = (function () {
             return (type != 'display') ? full.index : '&nbsp;-&nbsp;' + full.index + '&nbsp;-&nbsp;';
           } },
           'Substance Name': { sTitle: "Substance Name", mData: "name",  mRender: function (data, type, full) {
-            if (ccLib.isNull(data) || data == 'null') data = '-';
+            if (data == null || data == 'null') data = '-';
             return (type != 'display') ? data : jT.ui.linkedData('<a target="_blank" href="' + full.URI + '/study">' + data + '</a>', "Click to view study details", data)
           } },
           'Substance UUID': { sTitle: "Substance UUID", mData: "i5uuid", mRender: function (data, type, full) {
-            if (ccLib.isNull(data) || data == 'null') return '';
+            if (data == null || data == 'null') return '';
             return (type != 'display') ? data : jT.ui.shortenedData('<a target="_blank" href="' + full.URI + '/study">' + data + '</a>', "Press to copy the UUID in the clipboard", data)
           } },
           'Substance Type': { sTitle: "Substance Type", mData: "substanceType", sWidth: "15%", sDefaultContent: '-' },
           'Public name': { sTitle: "Public name", mData: "publicname", sDefaultContent: '-'},
           'Reference substance UUID': { sTitle: "Reference substance UUID", mData: "referenceSubstance", mRender: function (data, type, full) {
-            if (ccLib.isNull(data.i5uuid) || data.i5uuid == 'null') return '';
+            if (data.i5uuid == null || data.i5uuid == 'null') return '';
             return (type != 'display') ? data.i5uuid : jT.ui.shortenedData('<a target="_blank" href="' + data.uri + '">' + data.i5uuid + '</a>', "Press to copy the UUID in the clipboard", data.i5uuid);
           } },
           'Owner': { sTitle: "Owner", mData: "ownerName", sDefaultContent: '-'},
@@ -94,94 +94,92 @@ var jToxSubstance = (function () {
     return html;
   };
 
-  cls.prototype = {
-    init: function (settings) {
-      var self = this;
+  cls.prototype.init = function (settings) {
+    var self = this;
 
-      // deal if the selection is chosen
-      var colId = self.settings.configuration.columns.substance['Id'];
-      jT.ui.putActions(self, colId);
-      colId.sTitle = '';
+    // deal if the selection is chosen
+    var colId = self.settings.configuration.columns.substance['Id'];
+    jT.ui.putActions(self, colId);
+    colId.sTitle = '';
 
-      self.settings.configuration.columns.substance['Owner'].mRender = function (data, type, full) {
-        return (type != 'display') ? data : '<a target="_blank" href="' + self.settings.baseUrl + '/substanceowner/' + full.ownerUUID + '/substance">' + data + '</a>';
+    self.settings.configuration.columns.substance['Owner'].mRender = function (data, type, full) {
+      return (type != 'display') ? data : '<a target="_blank" href="' + self.settings.baseUrl + '/substanceowner/' + full.ownerUUID + '/substance">' + data + '</a>';
+    };
+
+    var opts = {  "sDom": "rti" };
+    if (self.settings.showControls) {
+      jT.ui.bindControls(self, {
+        nextPage: function () { self.nextPage(); },
+        prevPage: function () { self.prevPage(); },
+        sizeChange: function() { self.queryEntries(self.pageStart, parseInt(jT.$(this).val())); },
+        filter: function () { jT.$(self.table).dataTable().fnFilter(jT.$(this).val()); }
+      });
+
+      opts['fnInfoCallback'] = function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
+        var needle = jT.$('.filterbox', self.rootElement).val();
+        jT.$('.filtered-text', self.rootElement).html(!needle ? ' ' : ' (filtered to <span class="high">' + iTotal + '</span>) ');
+        return '';
       };
+    }
+    else
+      jT.$('.jtox-controls', self.rootElement).remove();
 
-      var opts = {  "sDom": "rti" };
-      if (self.settings.showControls) {
-        jT.ui.bindControls(self, {
-          nextPage: function () { self.nextPage(); },
-          prevPage: function () { self.prevPage(); },
-          sizeChange: function() { self.queryEntries(self.pageStart, parseInt(jT.$(this).val())); },
-          filter: function () { jT.$(self.table).dataTable().fnFilter(jT.$(this).val()); }
-        });
+    // again , so that changed defaults can be taken into account.
+    self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
 
-        opts['fnInfoCallback'] = function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
-          var needle = jT.$('.filterbox', self.rootElement).val();
-          jT.$('.filtered-text', self.rootElement).html(!needle ? ' ' : ' (filtered to <span class="high">' + iTotal + '</span>) ');
-          return '';
-        };
+    // READYY! Go and prepare THE table.
+    self.table = jT.ui.putTable(self, jT.$('table', self.rootElement)[0], 'substance', opts);
+  };
+
+  cls.prototype.queryEntries = function(from, size) {
+    var self = this;
+    if (from < 0)
+      from = 0;
+
+    if (!size || size < 0)
+      size = self.pageSize;
+
+    var qStart = Math.floor(from / size);
+    var qUri = ccLib.addParameter(self.substanceUri, "page=" + qStart + "&pagesize=" + size);
+    jT.call(self, qUri, function (result, jhr) {
+      if (!result && jhr.status != 200)
+        result = { substabce: [] }; // empty one
+      if (!!result) {
+        self.pageSize = size;
+        self.pageStart = from;
+
+        for (var i = 0, rl = result.substance.length; i < rl; ++i)
+          result.substance[i].index = i + from + 1;
+
+        self.substance = result.substance;
+
+        if (result.substance.length < self.pageSize) // we've reached the end!!
+          self.entriesCount = from + result.substance.length;
+
+        // time to call the supplied function, if any.
+        ccLib.fireCallback(self.settings.onLoaded, self, result);
+        if (!self.settings.noInterface) {
+          jT.$(self.table).dataTable().fnClearTable();
+          jT.$(self.table).dataTable().fnAddData(result.substance);
+
+          self.updateControls(from, result.substance.length);
+        }
       }
       else
-        jT.$('.jtox-controls', self.rootElement).remove();
+        ccLib.fireCallback(self.settings.onLoaded, self, result);
+    });
+  };
 
-      // again , so that changed defaults can be taken into account.
-      self.settings.configuration = jT.$.extend(true, self.settings.configuration, settings.configuration);
+  cls.prototype.querySubstance = function (uri) {
+    var self = this;
+    self.substanceUri = jT.grabPaging(self, uri);
+    if (self.settings.baseUrl == null)
+      self.settings.baseUrl = jT.grabBaseUrl(uri, "substance");
+    self.queryEntries(self.pageStart);
+  };
 
-      // READYY! Go and prepare THE table.
-      self.table = jT.ui.putTable(self, jT.$('table', self.rootElement)[0], 'substance', opts);
-    },
-
-    queryEntries: function(from, size) {
-      var self = this;
-      if (from < 0)
-        from = 0;
-
-      if (!size || size < 0)
-        size = self.pageSize;
-
-      var qStart = Math.floor(from / size);
-      var qUri = ccLib.addParameter(self.substanceUri, "page=" + qStart + "&pagesize=" + size);
-      jT.call(self, qUri, function (result, jhr) {
-        if (!result && jhr.status != 200)
-          result = { substabce: [] }; // empty one
-        if (!!result) {
-          self.pageSize = size;
-          self.pageStart = from;
-
-          for (var i = 0, rl = result.substance.length; i < rl; ++i)
-            result.substance[i].index = i + from + 1;
-
-          self.substance = result.substance;
-
-          if (result.substance.length < self.pageSize) // we've reached the end!!
-            self.entriesCount = from + result.substance.length;
-
-          // time to call the supplied function, if any.
-          ccLib.fireCallback(self.settings.onLoaded, self, result);
-          if (!self.settings.noInterface) {
-            jT.$(self.table).dataTable().fnClearTable();
-            jT.$(self.table).dataTable().fnAddData(result.substance);
-
-            self.updateControls(from, result.substance.length);
-          }
-        }
-        else
-          ccLib.fireCallback(self.settings.onLoaded, self, result);
-      });
-    },
-
-    querySubstance: function (uri) {
-      var self = this;
-      self.substanceUri = jT.grabPaging(self, uri);
-      if (ccLib.isNull(self.settings.baseUrl))
-        self.settings.baseUrl = jT.grabBaseUrl(uri);
-      self.queryEntries(self.pageStart);
-    },
-
-    query: function (uri) {
-      this.querySubstance(uri);
-    }
+  cls.prototype.query = function (uri) {
+    this.querySubstance(uri);
   };
 
   // some "inheritance" :-)

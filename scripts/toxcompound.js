@@ -31,10 +31,10 @@ var jToxCompound = (function () {
     "preDetails": null,       // invoked prior of details pane creation to see if it is going to happen at all
     "oLanguage": {},          // some default language settings, which apply to first (static) table only
     "fnAccumulate": function(fId, oldVal, newVal, features) {
-      if (ccLib.isNull(newVal))
+      if (newVal == null)
         return oldVal;
       newVal = newVal.toString();
-      if (ccLib.isNull(oldVal) || newVal.toLowerCase().indexOf(oldVal.toLowerCase()) >= 0)
+      if (oldVal == null || newVal.toLowerCase().indexOf(oldVal.toLowerCase()) >= 0)
         return newVal;
       if (oldVal.toLowerCase().indexOf(newVal.toLowerCase()) >= 0)
         return oldVal;
@@ -62,12 +62,12 @@ var jToxCompound = (function () {
 
         "Calculated": function (name, miniset) {
           var arr = [];
-          if (miniset.dataEntry.length > 0 && !ccLib.isNull(miniset.dataEntry[0].compound.metric))
+          if (miniset.dataEntry.length > 0 && miniset.dataEntry[0].compound.metric != null)
             arr.push(this.settings.metricFeature);
 
           for (var f in miniset.feature) {
             var feat = miniset.feature[f];
-            if (ccLib.isNull(feat.source) || ccLib.isNull(feat.source.type) || !!feat.basic)
+            if (feat.source == null || feat.source.type == null || !!feat.basic)
               continue;
             else if (feat.source.type.toLowerCase() == "algorithm" || feat.source.type.toLowerCase() == "model") {
               arr.push(f);
@@ -198,807 +198,806 @@ var jToxCompound = (function () {
   };
 
   // now follow the prototypes of the instance functions.
-  cls.prototype = {
-    init: function () {
-      var self = this;
+cls.prototype.init = function () {
+    var self = this;
 
-      self.feature = null; // features, as downloaded from server, after being processed.
-      self.dataset = null; // the last-downloaded dataset.
-      self.groups = null; // computed groups, i.e. 'groupName' -> array of feature list, prepared.
-      self.fixTable = self.varTable = null; // the two tables - to be initialized in prepareTables.
-      self.entriesCount = null;
-      self.suspendEqualization = false;
-      self.orderList = [];
-      self.usedFeatures = [];
-      self.pageStart = self.settings.pageStart;
-      self.pageSize = self.settings.pageSize;
+    self.feature = null; // features, as downloaded from server, after being processed.
+    self.dataset = null; // the last-downloaded dataset.
+    self.groups = null; // computed groups, i.e. 'groupName' -> array of feature list, prepared.
+    self.fixTable = self.varTable = null; // the two tables - to be initialized in prepareTables.
+    self.entriesCount = null;
+    self.suspendEqualization = false;
+    self.orderList = [];
+    self.usedFeatures = [];
+    self.pageStart = self.settings.pageStart;
+    self.pageSize = self.settings.pageSize;
 
-      if (!self.settings.noInterface) {
-        self.rootElement.appendChild(jT.getTemplate('#jtox-compound'));
+    if (!self.settings.noInterface) {
+      self.rootElement.appendChild(jT.getTemplate('#jtox-compound'));
 
-        jT.ui.bindControls(self, {
-          nextPage: function () { self.nextPage(); },
-          prevPage: function () { self.prevPage(); },
-          sizeChange: function() { self.queryEntries(self.pageStart, parseInt(jT.$(this).val())); },
-          filter: function () { self.updateTables() }
-        });
+      jT.ui.bindControls(self, {
+        nextPage: function () { self.nextPage(); },
+        prevPage: function () { self.prevPage(); },
+        sizeChange: function() { self.queryEntries(self.pageStart, parseInt(jT.$(this).val())); },
+        filter: function () { self.updateTables() }
+      });
 
-        self.$procDiv = jT.$('.jt-processing', self.rootElement);
-        self.$errDiv = jT.$('.jt-error', self.rootElement);
+      self.$procDiv = jT.$('.jt-processing', self.rootElement);
+      self.$errDiv = jT.$('.jt-error', self.rootElement);
 
+    }
+  };
+
+  cls.prototype.clearDataset = function () {
+    if (this.usedFeatures !== undefined) {
+      if (!this.settings.noInterface)
+        jT.$(this.rootElement).empty();
+      for (var i = 0, fl = this.usedFeatures.length; i < fl; ++i) {
+        var fid = this.usedFeatures[i];
+        this.feature[fid].used = false;
       }
-    },
+    }
+  };
 
-    clearDataset: function () {
-      if (this.usedFeatures !== undefined) {
-        if (!this.settings.noInterface)
-          jT.$(this.rootElement).empty();
-        for (var i = 0, fl = this.usedFeatures.length; i < fl; ++i) {
-          var fid = this.usedFeatures[i];
-          this.feature[fid].used = false;
-        }
-      }
-    },
+  /* make a tab-based widget with features and grouped on tabs. It relies on filled and processed 'self.feature' as well
+  as created 'self.groups'.
+  */
+  cls.prototype.prepareTabs = function (root, isMain, groupFn) {
+    var self = this;
 
-    /* make a tab-based widget with features and grouped on tabs. It relies on filled and processed 'self.feature' as well
-    as created 'self.groups'.
-    */
-    prepareTabs: function (root, isMain, groupFn) {
-      var self = this;
+    var all = document.createElement('div');
+    all.style.display = "none"; // we suppress the re-layouting engine this way, we'll show it at the end.
+    root.appendChild(all);
+    ulEl = document.createElement('ul');
+    all.appendChild(ulEl);
 
-      var all = document.createElement('div');
-      all.style.display = "none"; // we suppress the re-layouting engine this way, we'll show it at the end.
-      root.appendChild(all);
-      ulEl = document.createElement('ul');
-      all.appendChild(ulEl);
+    var createATab = function(grId, name) {
+      var liEl = document.createElement('li');
+      ulEl.appendChild(liEl);
+      var aEl = document.createElement('a');
+      aEl.href = "#" + grId;
+      aEl.innerHTML = name;
+      liEl.appendChild(aEl);
+      return liEl;
+    };
 
-      var createATab = function(grId, name) {
-        var liEl = document.createElement('li');
-        ulEl.appendChild(liEl);
-        var aEl = document.createElement('a');
-        aEl.href = "#" + grId;
-        aEl.innerHTML = name;
-        liEl.appendChild(aEl);
-        return liEl;
-      };
+    var emptyList = [];
+    var idx = 0;
+    for (var gr in self.groups) {
+      var grId = "jtox-ds-" + gr.replace(/\s/g, "_") + "-" + self.instanceNo + (isMain ? '' : '-details');
+      var grName = gr.replace(/_/g, " ");
+      var tabLi = createATab(grId, grName);
+      if (isMain)
+        tabLi.title = "Select which columns to be displayed";
 
-      var emptyList = [];
-      var idx = 0;
-      for (var gr in self.groups) {
-        var grId = "jtox-ds-" + gr.replace(/\s/g, "_") + "-" + self.instanceNo + (isMain ? '' : '-details');
-        var grName = gr.replace(/_/g, " ");
-        var tabLi = createATab(grId, grName);
-        if (isMain)
-          tabLi.title = "Select which columns to be displayed";
-
-        // now prepare the content...
-        var divEl = document.createElement('div');
-        divEl.id = grId;
-        all.appendChild(divEl);
-        // add the group check multi-change
-        if (self.settings.groupSelection && isMain) {
-          var sel = jT.getTemplate("#jtox-ds-selection");
-          divEl.appendChild(sel);
-          jT.$('.multi-select', sel).on('click', function (e) {
-            var par = jT.$(this).closest('.ui-tabs-panel')[0];
-            var doSel = jT.$(this).hasClass('select');
-            $('input', par).each(function () {
-              this.checked = doSel;
-              jT.$(this).trigger('change');
-            });
+      // now prepare the content...
+      var divEl = document.createElement('div');
+      divEl.id = grId;
+      all.appendChild(divEl);
+      // add the group check multi-change
+      if (self.settings.groupSelection && isMain) {
+        var sel = jT.getTemplate("#jtox-ds-selection");
+        divEl.appendChild(sel);
+        jT.$('.multi-select', sel).on('click', function (e) {
+          var par = jT.$(this).closest('.ui-tabs-panel')[0];
+          var doSel = jT.$(this).hasClass('select');
+          $('input', par).each(function () {
+            this.checked = doSel;
+            jT.$(this).trigger('change');
           });
-        }
-
-        if (groupFn(divEl, gr)) {
-          if (self.settings.hideEmpty) {
-            jT.$(divEl).remove();
-            jT.$(tabLi).remove();
-            --idx;
-          }
-          else
-            emptyList.push(idx);
-        }
-        ++idx;
-
-        ccLib.fireCallback(self.settings.onTab, self, divEl, tabLi, grName, isMain);
-      }
-
-      if (isMain && self.settings.showExport) {
-        var tabId = "jtox-ds-export-" + self.instanceNo;
-        var liEl = createATab(tabId, "Export");
-        jT.$(liEl).addClass('jtox-ds-export');
-        var divEl = jT.getTemplate('#jtox-ds-export')
-        divEl.id = tabId;
-        all.appendChild(divEl);
-        divEl = jT.$('.jtox-exportlist', divEl)[0];
-
-        for (var i = 0, elen = self.settings.configuration.exports.length; i < elen; ++i) {
-          var expo = self.settings.configuration.exports[i];
-          var el = jT.getTemplate('#jtox-ds-download');
-          divEl.appendChild(el);
-
-          jT.$('a', el)[0].href = ccLib.addParameter(self.datasetUri, "media=" + encodeURIComponent(expo.type));
-          var img = el.getElementsByTagName('img')[0];
-          img.alt = img.title = expo.type;
-          img.src = (jT.settings.baseUrl || self.settings.baseUrl) + '/' + expo.icon;
-        }
-
-        ccLib.fireCallback(self.settings.onTab, self, divEl, liEl, "Export", isMain);
-      }
-
-      // now show the whole stuff and mark the disabled tabs
-      all.style.display = "block";
-      return jT.$(all).tabs({
-        collapsible: isMain,
-        active: (self.settings.tabsFolded && isMain) ? false : 0,
-        disabled: emptyList,
-        heightStyle: isMain ? "content" : (self.settings.detailsHeight == 'auto' ? 'auto' : 'fill')
-      });
-    },
-
-    equalizeTables: function () {
-      var self = this;
-      if (!self.suspendEqualization && self.fixTable != null && self.varTable != null) {
-        ccLib.equalizeHeights(self.fixTable.tHead, self.varTable.tHead);
-        ccLib.equalizeHeights(self.fixTable.tBodies[0], self.varTable.tBodies[0]);
-
-        // now we need to equalize openned details boxes, if any.
-        var tabRoot = jT.$('.jtox-ds-tables', self.rootElement)[0];
-        var varWidth = jT.$('.jtox-ds-variable', tabRoot).width();
-
-        jT.$('.jtox-details-box', self.rootElement).each(function (i) {
-          var cell = jT.$(this).data('rootCell');
-          if (!!cell) {
-            this.style.display = 'none';
-            var ps = ccLib.positionTo(cell, tabRoot);
-            this.style.top = ps.top + 'px';
-            this.style.left = ps.left + 'px';
-            var cellW = jT.$(cell).parents('.dataTables_wrapper').width() - cell.offsetLeft;
-            this.style.width = (cellW + varWidth) + 'px';
-            this.style.display = 'block';
-
-            var rowH = jT.$(cell).parents('tr').height();
-            var cellH = cell.offsetHeight;
-            var meH = jT.$(this).height();
-
-            if (cellH < rowH)
-              jT.$(cell).height(cellH = rowH);
-            if (cellH < meH)
-              jT.$(cell).height(cellH = meH);
-
-            if (meH < cellH) {
-              jT.$(this).height(cellH);
-              jT.$('.ui-tabs').tabs('refresh');
-            }
-          }
         });
       }
-    },
 
-    featureValue: function (fId, entry, type) {
-      var self = this;
-      var feature = self.feature[fId];
-      var val = (feature.data !== undefined) ? (ccLib.getJsonValue(entry, jT.$.isArray(feature.data) ? feature.data[0] : feature.data)) : entry.values[fId];
-      return (typeof feature.render == 'function') ?
-        feature.render(val, !!type ? type : 'filter', entry) :
-        jT.ui.renderObjValue(val, feature.units, type);
-    },
-
-    featureUri: function (fId) {
-      return this.feature[fId].URI || fId;
-    },
-
-    featureData: function (entry, set, scope) {
-      if (scope == null)
-        scope = 'details';
-      var self = this;
-      var data = [];
-      ccLib.enumObject(set, function (fId, idx, level) {
-        var feat = jT.$.extend({}, self.feature[fId]);
-        var vis = feat.visibility;
-        if (!!vis && vis != scope)
-          return;
-        var title = feat.title;
-        feat.value = self.featureValue(fId, entry, scope);
-        if (!!title && (!self.settings.hideEmptyDetails || !!feat.value)) {
-          if (!feat.value)
-            feat.value = '-';
-          data.push(feat);
+      if (groupFn(divEl, gr)) {
+        if (self.settings.hideEmpty) {
+          jT.$(divEl).remove();
+          jT.$(tabLi).remove();
+          --idx;
         }
-      });
-
-      return data;
-    },
-
-    prepareColumn: function (fId, feature) {
-      var self = this;
-      if (feature.visibility == 'details')
-        return null;
-
-      // now we now we should show this one.
-      var col = {
-        "sTitle": !feature.title ? '' : jT.ui.valueWithUnits(feature.title.replace(/_/g, ' '), (!self.settings.showUnits ? null : feature.units)),
-        "sDefaultContent": "-",
-      };
-
-      if (typeof feature.column == 'function')
-        col = feature.column.call(self, col, fId);
-      else if (!ccLib.isNull(feature.column))
-        col = jT.$.extend(col, feature.column);
-
-      col["mData"] = (feature.data != null) ? feature.data : 'values';
-
-      if (feature.render != null)
-        col["mRender"] = feature.data != null ? feature.render : function (data, type, full) { return feature.render(full.values[fId], type, full); };
-      else if (!!feature.shorten)
-        col["mRender"] = function(data, type, full) {
-          if (!feature.data) data = data[fId];
-          return (type != "display") ? '' + data : jT.ui.shortenedData(data, "Press to copy the value in the clipboard");
-        };
-      else if (feature.data == null) // in other cases we want the default presenting of the plain value
-        col["mRender"] = (function(featureId, units) { return function(data, type, full) {
-          var val = full.values[featureId] || '-';
-          if (typeof val != 'object')
-            return val;
-          if (!jT.$.isArray(val))
-            val = [val];
-          var html = '';
-          for (var i = 0;i < val.length; ++i) {
-            html += (type == 'display') ? '<div>' : '';
-            html += jT.ui.renderObjValue(val[i], units, type);
-            html += (type == 'display') ? '</div>' : ',';
-          }
-          return html;
-        }; })(fId, feature.unit);
-
-      // other convenient cases
-      if (!!feature.shorten)
-        col["sWidth"] = "75px";
-
-      return col;
-    },
-
-    getVarRow: function (idx) {
-	  	if (idx.tagName != null)
-	  		idx = jT.ui.rowIndex(idx);
-
-      return document.getElementById('jtox-var-' + this.instanceNo + '-' + idx);
-    },
-
-    prepareTables: function() {
-      var self = this;
-      var varCols = [];
-      var fixCols = [];
-
-      // first, some preparation of the first, IdRow column
-      var idFeature = self.settings.configuration.baseFeatures['#IdRow'];
-      if (!idFeature.render) {
-        idFeature.render = self.settings.hasDetails ?
-          function (data, type, full) {
-            return (type != "display") ?
-              '' + data :
-              "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;<br/>" +
-              '<span class="jtox-details-open ui-icon ui-icon-folder-collapsed" title="Press to open/close detailed info for this compound"></span>';
-          } : // no details case
-          function (data, type, full) {
-            return (type != "display") ?
-              '' + data :
-              "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;";
-          };
-      }
-
-      fixCols.push(
-        self.prepareColumn('#IdRow', idFeature),
-        { "sClass": "jtox-hidden", "mData": "index", "sDefaultContent": "-", "bSortable": true, "mRender": function(data, type, full) { return ccLib.isNull(self.orderList) ? 0 : self.orderList[data]; } } // column used for ordering
-      );
-
-      varCols.push({ "sClass": "jtox-hidden jtox-ds-details paddingless", "mData": "index", "mRender": function(data, type, full) { return ''; }  });
-
-      // prepare the function for column switching...
-      var fnShowColumn = function() {
-        var dt = $(this).data();
-        var cells = jT.$(dt.sel + ' table tr .' + dt.column, self.rootElement);
-        if (this.checked) {
-          jT.$(cells).show();
-          jT.$("table tr .blank-col", self.rootElement).addClass('jtox-hidden');
-        }
-        else {
-          jT.$(cells).hide();
-          if (jT.$(dt.sel + " table tr *:visible", self.rootElement).length == 0)
-            jT.$("table tr .blank-col", self.rootElement).removeClass('jtox-hidden');
-        }
-        if (self.settings.rememberChecks)
-          self.featureStates[dt.id] = this.checked;
-        self.equalizeTables();
-      };
-
-      var fnExpandCell = function (cell, expand) {
-        var cnt = 0;
-        for (var c = cell;c; c = c.nextElementSibling, ++cnt)
-          jT.$(c).toggleClass('jtox-hidden');
-
-        if (expand)
-          cell.setAttribute('colspan', '' + cnt);
         else
-          cell.removeAttribute('colspan');
+          emptyList.push(idx);
+      }
+      ++idx;
+
+      ccLib.fireCallback(self.settings.onTab, self, divEl, tabLi, grName, isMain);
+    }
+
+    if (isMain && self.settings.showExport) {
+      var tabId = "jtox-ds-export-" + self.instanceNo;
+      var liEl = createATab(tabId, "Export");
+      jT.$(liEl).addClass('jtox-ds-export');
+      var divEl = jT.getTemplate('#jtox-ds-export')
+      divEl.id = tabId;
+      all.appendChild(divEl);
+      divEl = jT.$('.jtox-exportlist', divEl)[0];
+
+      for (var i = 0, elen = self.settings.configuration.exports.length; i < elen; ++i) {
+        var expo = self.settings.configuration.exports[i];
+        var el = jT.getTemplate('#jtox-ds-download');
+        divEl.appendChild(el);
+
+        jT.$('a', el)[0].href = ccLib.addParameter(self.datasetUri, "media=" + encodeURIComponent(expo.type));
+        var img = el.getElementsByTagName('img')[0];
+        img.alt = img.title = expo.type;
+        img.src = (jT.settings.baseUrl || self.settings.baseUrl) + '/' + expo.icon;
+      }
+
+      ccLib.fireCallback(self.settings.onTab, self, divEl, liEl, "Export", isMain);
+    }
+
+    // now show the whole stuff and mark the disabled tabs
+    all.style.display = "block";
+    return jT.$(all).tabs({
+      collapsible: isMain,
+      active: (self.settings.tabsFolded && isMain) ? false : 0,
+      disabled: emptyList,
+      heightStyle: isMain ? "content" : (self.settings.detailsHeight == 'auto' ? 'auto' : 'fill')
+    });
+  };
+
+  cls.prototype.equalizeTables = function () {
+    var self = this;
+    if (!self.suspendEqualization && self.fixTable != null && self.varTable != null) {
+      ccLib.equalizeHeights(self.fixTable.tHead, self.varTable.tHead);
+      ccLib.equalizeHeights(self.fixTable.tBodies[0], self.varTable.tBodies[0]);
+
+      // now we need to equalize openned details boxes, if any.
+      var tabRoot = jT.$('.jtox-ds-tables', self.rootElement)[0];
+      var varWidth = jT.$('.jtox-ds-variable', tabRoot).width();
+
+      jT.$('.jtox-details-box', self.rootElement).each(function (i) {
+        var cell = jT.$(this).data('rootCell');
+        if (!!cell) {
+          this.style.display = 'none';
+          var ps = ccLib.positionTo(cell, tabRoot);
+          this.style.top = ps.top + 'px';
+          this.style.left = ps.left + 'px';
+          var cellW = jT.$(cell).parents('.dataTables_wrapper').width() - cell.offsetLeft;
+          this.style.width = (cellW + varWidth) + 'px';
+          this.style.display = 'block';
+
+          var rowH = jT.$(cell).parents('tr').height();
+          var cellH = cell.offsetHeight;
+          var meH = jT.$(this).height();
+
+          if (cellH < rowH)
+            jT.$(cell).height(cellH = rowH);
+          if (cellH < meH)
+            jT.$(cell).height(cellH = meH);
+
+          if (meH < cellH) {
+            jT.$(this).height(cellH);
+            jT.$('.ui-tabs').tabs('refresh');
+          }
+        }
+      });
+    }
+  };
+
+  cls.prototype.featureValue = function (fId, entry, type) {
+    var self = this;
+    var feature = self.feature[fId];
+    var val = (feature.data !== undefined) ? (ccLib.getJsonValue(entry, jT.$.isArray(feature.data) ? feature.data[0] : feature.data)) : entry.values[fId];
+    return (typeof feature.render == 'function') ?
+      feature.render(val, !!type ? type : 'filter', entry) :
+      jT.ui.renderObjValue(val, feature.units, type);
+  };
+
+  cls.prototype.featureUri = function (fId) {
+    return this.feature[fId].URI || fId;
+  };
+
+  cls.prototype.featureData = function (entry, set, scope) {
+    if (scope == null)
+      scope = 'details';
+    var self = this;
+    var data = [];
+    ccLib.enumObject(set, function (fId, idx, level) {
+      var feat = jT.$.extend({}, self.feature[fId]);
+      var vis = feat.visibility;
+      if (!!vis && vis != scope)
+        return;
+      var title = feat.title;
+      feat.value = self.featureValue(fId, entry, scope);
+      if (!!title && (!self.settings.hideEmptyDetails || !!feat.value)) {
+        if (!feat.value)
+          feat.value = '-';
+        data.push(feat);
+      }
+    });
+
+    return data;
+  };
+
+  cls.prototype.prepareColumn = function (fId, feature) {
+    var self = this;
+    if (feature.visibility == 'details')
+      return null;
+
+    // now we now we should show this one.
+    var col = {
+      "sTitle": !feature.title ? '' : jT.ui.valueWithUnits(feature.title.replace(/_/g, ' '), (!self.settings.showUnits ? null : feature.units)),
+      "sDefaultContent": "-",
+    };
+
+    if (typeof feature.column == 'function')
+      col = feature.column.call(self, col, fId);
+    else if (feature.column != null)
+      col = jT.$.extend(col, feature.column);
+
+    col["mData"] = (feature.data != null) ? feature.data : 'values';
+
+    if (feature.render != null)
+      col["mRender"] = feature.data != null ? feature.render : function (data, type, full) { return feature.render(full.values[fId], type, full); };
+    else if (!!feature.shorten)
+      col["mRender"] = function(data, type, full) {
+        if (!feature.data) data = data[fId];
+        return (type != "display") ? '' + data : jT.ui.shortenedData(data, "Press to copy the value in the clipboard");
       };
-
-      var fnShowDetails = (self.settings.hasDetails ? function(row, event) {
-        var cell = jT.$(".jtox-ds-details", row)[0];
-        var idx = jT.$(row).data('jtox-index');
-
-        if (self.settings.preDetails != null && !ccLib.fireCallback(self.settings.preDetails, self, idx, cell) || !cell)
-          return; // the !cell  means you've forgotten to add #DetailedInfoRow feature somewhere.
-        jT.$(row).toggleClass('jtox-detailed-row');
-        var toShow = jT.$(row).hasClass('jtox-detailed-row');
-
-        // now go and expand both fixed and variable table details' cells.
-        fnExpandCell(cell, toShow);
-        var varCell = self.getVarRow(idx).firstElementChild;
-        fnExpandCell(varCell, toShow);
-
-        jT.$('.jtox-details-open', row).toggleClass('ui-icon-folder-open ui-icon-folder-collapsed');
-
-        if (toShow) {
-          // i.e. we need to show it - put the full sized diagram in the fixed part and the tabs in the variable one...
-          var entry = self.dataset.dataEntry[idx];
-
-          var detDiv = document.createElement('div');
-          detDiv.className = 'jtox-details-box jtox-details';
-
-          var tabRoot = jT.$('.jtox-ds-tables', self.rootElement)[0];
-          var width = jT.$(cell).width() + jT.$('.jtox-ds-variable', tabRoot).width();
-          jT.$(detDiv).width(width);
-
-          if (ccLib.isNull(self.settings.detailsHeight) || self.settings.detailsHeight == 'fill')
-            jT.$(detDiv).height(jT.$(cell).height() * 2);
-          else if (parseInt(self.settings.detailsHeight) > 0)
-            jT.$(detDiv).height(self.settings.detailsHeight)
-
-          tabRoot.appendChild(detDiv);
-
-          self.prepareTabs(detDiv, false, function (parent, gr) {
-            var data = self.featureData(entry, self.groups[gr]);
-
-            if (data.length > 0 || !self.settings.hideEmpty) {
-              jT.$(parent).addClass('jtox-details-table');
-              var tabTable = document.createElement('table');
-              parent.appendChild(tabTable);
-              jT.$(tabTable).dataTable({
-                "bPaginate": false,
-                "bProcessing": true,
-                "bLengthChange": false,
-        				"bAutoWidth": true,
-                "sDom" : "rt<f>",
-                "aoColumns": jT.ui.processColumns(self, 'compound'),
-                "bSort": true,
-              });
-              jT.$(tabTable).dataTable().fnAddData(data);
-              jT.$(tabTable).dataTable().fnAdjustColumnSizing();
-            }
-
-            return data.length == 0;
-          });
-
-          jT.$(cell).height(detDiv.offsetHeight);
-          ccLib.fireCallback(self.settings.onDetails, self, detDiv, entry, cell);
-          jT.$(cell).data('detailsDiv', detDiv);
-          jT.$(detDiv).data('rootCell', cell);
+    else if (feature.data == null) // in other cases we want the default presenting of the plain value
+      col["mRender"] = (function(featureId, units) { return function(data, type, full) {
+        var val = full.values[featureId] || '-';
+        if (typeof val != 'object')
+          return val;
+        if (!jT.$.isArray(val))
+          val = [val];
+        var html = '';
+        for (var i = 0;i < val.length; ++i) {
+          html += (type == 'display') ? '<div>' : '';
+          html += jT.ui.renderObjValue(val[i], units, type);
+          html += (type == 'display') ? '</div>' : ',';
         }
-        else {
-          // i.e. we need to hide
-          jT.$(cell).data('detailsDiv').remove();
-          jT.$(cell).data('detailsDiv', null);
-          cell.style.height = '';
-        }
+        return html;
+      }; })(fId, feature.unit);
 
-        self.equalizeTables();
-      } : null); // fnShowDetails definition end
+    // other convenient cases
+    if (!!feature.shorten)
+      col["sWidth"] = "75px";
 
-      // now proceed to enter all other columns
-      for (var gr in self.groups) {
-        ccLib.enumObject(self.groups[gr], function (fId, idx, level) {
-          if (idx == "name")
-            return;
+    return col;
+  };
 
-          var feature = self.feature[fId];
-          var col = self.prepareColumn(fId, feature);
-          if (!col)
-            return;
+  cls.prototype.getVarRow = function (idx) {
+  	if (idx.tagName != null)
+  		idx = jT.ui.rowIndex(idx);
 
-          // finally - assign column switching to the checkbox of main tab.
-          var colList = !!feature.primary ? fixCols : varCols;
-          var colId = 'col-' + colList.length;
-          col.sClass = (!!col.sClass ? col.sClass + ' ' : '') + colId;
+    return document.getElementById('jtox-var-' + this.instanceNo + '-' + idx);
+  };
 
-          jT.$('.jtox-ds-features input.jtox-checkbox[value="' + fId + '"]', self.rootElement).data({ sel: !!feature.primary ? '.jtox-ds-fixed' : '.jtox-ds-variable', column: colId, id: fId}).on('change', fnShowColumn)
+  cls.prototype.prepareTables = function() {
+    var self = this;
+    var varCols = [];
+    var fixCols = [];
 
-          // and push it into the proper list.
-          colList.push(col);
-        });
+    // first, some preparation of the first, IdRow column
+    var idFeature = self.settings.configuration.baseFeatures['#IdRow'];
+    if (!idFeature.render) {
+      idFeature.render = self.settings.hasDetails ?
+        function (data, type, full) {
+          return (type != "display") ?
+            '' + data :
+            "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;<br/>" +
+            '<span class="jtox-details-open ui-icon ui-icon-folder-collapsed" title="Press to open/close detailed info for this compound"></span>';
+        } : // no details case
+        function (data, type, full) {
+          return (type != "display") ?
+            '' + data :
+            "&nbsp;-&nbsp;" + data + "&nbsp;-&nbsp;";
+        };
+    }
+
+    fixCols.push(
+      self.prepareColumn('#IdRow', idFeature),
+      { "sClass": "jtox-hidden", "mData": "index", "sDefaultContent": "-", "bSortable": true, "mRender": function(data, type, full) { return self.orderList == null ? 0 : self.orderList[data]; } } // column used for ordering
+    );
+
+    varCols.push({ "sClass": "jtox-hidden jtox-ds-details paddingless", "mData": "index", "mRender": function(data, type, full) { return ''; }  });
+
+    // prepare the function for column switching...
+    var fnShowColumn = function() {
+      var dt = $(this).data();
+      var cells = jT.$(dt.sel + ' table tr .' + dt.column, self.rootElement);
+      if (this.checked) {
+        jT.$(cells).show();
+        jT.$("table tr .blank-col", self.rootElement).addClass('jtox-hidden');
       }
+      else {
+        jT.$(cells).hide();
+        if (jT.$(dt.sel + " table tr *:visible", self.rootElement).length == 0)
+          jT.$("table tr .blank-col", self.rootElement).removeClass('jtox-hidden');
+      }
+      if (self.settings.rememberChecks)
+        self.featureStates[dt.id] = this.checked;
+      self.equalizeTables();
+    };
 
-      // now - sort columns and create the tables...
-      if (self.settings.fixedWidth != null)
-      	jT.$(".jtox-ds-fixed", self.rootElement).width(self.settings.fixedWidth);
+    var fnExpandCell = function (cell, expand) {
+      var cnt = 0;
+      for (var c = cell;c; c = c.nextElementSibling, ++cnt)
+        jT.$(c).toggleClass('jtox-hidden');
 
-      jT.ui.sortColDefs(fixCols);
-      self.fixTable = (jT.$(".jtox-ds-fixed table", self.rootElement).dataTable({
-        "bPaginate": false,
-        "bLengthChange": false,
-				"bAutoWidth": true,
-        "sDom" : "rt",
-        "aoColumns": fixCols,
-        "bSort": false,
-        "fnCreatedRow": function( nRow, aData) {
-          // attach the click handling
-          var iDataIndex = aData.index;
-          if (self.settings.hasDetails)
-            jT.$('.jtox-details-open', nRow).on('click', function(e) { fnShowDetails(nRow, e); });
-          jT.$(nRow).data('jtox-index', iDataIndex);
+      if (expand)
+        cell.setAttribute('colspan', '' + cnt);
+      else
+        cell.removeAttribute('colspan');
+    };
 
-          ccLib.fireCallback(self.settings.onRow, self, nRow, aData, iDataIndex);
-          jT.ui.installHandlers(self, nRow);
-          jT.$('.jtox-diagram span.ui-icon', nRow).on('click', function () {
-            setTimeout(function () {
-              jT.$(self.fixTable).dataTable().fnAdjustColumnSizing();
-              self.equalizeTables();
-            }, 50);
-          });
-        },
-        "oLanguage" : { "sEmptyTable": '<span class="jt-feeding">' + (self.settings.oLanguage.sProcess || 'Feeding data...') + '</span>' }
-      }))[0];
+    var fnShowDetails = (self.settings.hasDetails ? function(row, event) {
+      var cell = jT.$(".jtox-ds-details", row)[0];
+      var idx = jT.$(row).data('jtox-index');
 
-      // we need to put a fake column to stay, when there is no other column here, or when everything is hidden..
-      varCols.push({ "sClass": "center blank-col" + (varCols.length > 1 ? " jtox-hidden" : ""), "mData": "index", "mRender": function(data, type, full) { return type != 'display' ? data : '...'; }  });
+      if (self.settings.preDetails != null && !ccLib.fireCallback(self.settings.preDetails, self, idx, cell) || !cell)
+        return; // the !cell  means you've forgotten to add #DetailedInfoRow feature somewhere.
+      jT.$(row).toggleClass('jtox-detailed-row');
+      var toShow = jT.$(row).hasClass('jtox-detailed-row');
 
-      jT.ui.sortColDefs(varCols);
-      self.varTable = (jT.$(".jtox-ds-variable table", self.rootElement).dataTable({
-        "bPaginate": false,
-        "bProcessing": true,
-        "bLengthChange": false,
-				"bAutoWidth": false,
-        "sDom" : "rt",
-        "bSort": true,
-        "aoColumns": varCols,
-        "bScrollCollapse": true,
-        "fnCreatedRow": function( nRow, aData ) {
-          var iDataIndex = aData.index;
-          nRow.id = 'jtox-var-' + self.instanceNo + '-' + iDataIndex;
+      // now go and expand both fixed and variable table details' cells.
+      fnExpandCell(cell, toShow);
+      var varCell = self.getVarRow(idx).firstElementChild;
+      fnExpandCell(varCell, toShow);
 
-	        // equalize multi-rows, if there are any
-	        ccLib.equalizeHeights.apply(window, jT.$('td.jtox-multi table tbody', nRow).toArray());
+      jT.$('.jtox-details-open', row).toggleClass('ui-icon-folder-open ui-icon-folder-collapsed');
 
-          jT.$(nRow).addClass('jtox-row');
-          jT.$(nRow).data('jtox-index', iDataIndex);
-          ccLib.fireCallback(self.settings.onRow, self, nRow, aData, iDataIndex);
-          jT.ui.installHandlers(self, nRow);
-        },
-        "fnDrawCallback": function(oSettings) {
-          // this is for synchro-sorting the two tables
-          var sorted = jT.$('.jtox-row', this);
-          for (var i = 0, rlen = sorted.length;i < rlen; ++i) {
-            var idx = jT.$(sorted[i]).data('jtox-index');
-            self.orderList[idx] = i;
+      if (toShow) {
+        // i.e. we need to show it - put the full sized diagram in the fixed part and the tabs in the variable one...
+        var entry = self.dataset.dataEntry[idx];
+
+        var detDiv = document.createElement('div');
+        detDiv.className = 'jtox-details-box jtox-details';
+
+        var tabRoot = jT.$('.jtox-ds-tables', self.rootElement)[0];
+        var width = jT.$(cell).width() + jT.$('.jtox-ds-variable', tabRoot).width();
+        jT.$(detDiv).width(width);
+
+        if (self.settings.detailsHeight == null || self.settings.detailsHeight == 'fill')
+          jT.$(detDiv).height(jT.$(cell).height() * 2);
+        else if (parseInt(self.settings.detailsHeight) > 0)
+          jT.$(detDiv).height(self.settings.detailsHeight)
+
+        tabRoot.appendChild(detDiv);
+
+        self.prepareTabs(detDiv, false, function (parent, gr) {
+          var data = self.featureData(entry, self.groups[gr]);
+
+          if (data.length > 0 || !self.settings.hideEmpty) {
+            jT.$(parent).addClass('jtox-details-table');
+            var tabTable = document.createElement('table');
+            parent.appendChild(tabTable);
+            jT.$(tabTable).dataTable({
+              "bPaginate": false,
+              "bProcessing": true,
+              "bLengthChange": false,
+      				"bAutoWidth": true,
+              "sDom" : "rt<f>",
+              "aoColumns": jT.ui.processColumns(self, 'compound'),
+              "bSort": true,
+            });
+            jT.$(tabTable).dataTable().fnAddData(data);
+            jT.$(tabTable).dataTable().fnAdjustColumnSizing();
           }
 
-          if (rlen > 0)
-            jT.$(self.fixTable).dataTable().fnSort([[1, "asc"]]);
-        },
-        "oLanguage" : { "sEmptyTable": "-"}
-      }))[0];
-    },
-
-    updateTables: function() {
-      var self = this;
-      if (self.settings.hasDetails)
-        $('div.jtox-details-box', self.rootElement).remove();
-
-      self.filterEntries(jT.$('.jtox-controls input', self.rootElement).val());
-    },
-
-    /* Prepare the groups and the features.
-    */
-    prepareGroups: function (miniset) {
-      var self = this;
-
-      var grps = self.settings.configuration.groups;
-      if (typeof grps == 'function')
-        grps = grps(miniset, self);
-
-      self.groups = {};
-      for (var i in grps){
-        var grp = grps[i];
-        if (ccLib.isNull(grp))
-          continue;
-
-        var grpArr = (typeof grp == "function" || typeof grp == "string") ? ccLib.fireCallback(grp, self, i, miniset) : grp;
-        self.groups[i] = [];
-        ccLib.enumObject(grpArr, function(fid, idx) {
-          var isUsed = false;
-          cls.enumSameAs(fid, self.feature, function (feature) {
-            isUsed |= feature.used;
-          });
-          if (idx != "name" && !isUsed) {
-            self.groups[i].push(fid);
-            // these we need to be able to return back to original state.
-            self.usedFeatures.push(fid);
-            self.feature[fid].used = true;
-          }
+          return data.length == 0;
         });
-      }
-    },
 
-    /* Enumerate all recofnized features, caling fnMatch(featureId, groupId) for each of it.
-    Return true from the function to stop enumeration, which in turn will return true if it was stopped.
-    */
-    enumerateFeatures: function(fnMatch) {
-      var self = this;
-      var stopped = false;
-      for (var gr in self.groups) {
-        for (var i = 0, glen = self.groups[gr].length;i < glen; ++i) {
-          if (stopped = fnMatch(self.groups[gr][i], gr))
-            break;
+        jT.$(cell).height(detDiv.offsetHeight);
+        ccLib.fireCallback(self.settings.onDetails, self, detDiv, entry, cell);
+        jT.$(cell).data('detailsDiv', detDiv);
+        jT.$(detDiv).data('rootCell', cell);
+      }
+      else {
+        // i.e. we need to hide
+        jT.$(cell).data('detailsDiv').remove();
+        jT.$(cell).data('detailsDiv', null);
+        cell.style.height = '';
+      }
+
+      self.equalizeTables();
+    } : null); // fnShowDetails definition end
+
+    // now proceed to enter all other columns
+    for (var gr in self.groups) {
+      ccLib.enumObject(self.groups[gr], function (fId, idx, level) {
+        if (idx == "name")
+          return;
+
+        var feature = self.feature[fId];
+        var col = self.prepareColumn(fId, feature);
+        if (!col)
+          return;
+
+        // finally - assign column switching to the checkbox of main tab.
+        var colList = !!feature.primary ? fixCols : varCols;
+        var colId = 'col-' + colList.length;
+        col.sClass = (!!col.sClass ? col.sClass + ' ' : '') + colId;
+
+        jT.$('.jtox-ds-features input.jtox-checkbox[value="' + fId + '"]', self.rootElement).data({ sel: !!feature.primary ? '.jtox-ds-fixed' : '.jtox-ds-variable', column: colId, id: fId}).on('change', fnShowColumn)
+
+        // and push it into the proper list.
+        colList.push(col);
+      });
+    }
+
+    // now - sort columns and create the tables...
+    if (self.settings.fixedWidth != null)
+    	jT.$(".jtox-ds-fixed", self.rootElement).width(self.settings.fixedWidth);
+
+    jT.ui.sortColDefs(fixCols);
+    self.fixTable = (jT.$(".jtox-ds-fixed table", self.rootElement).dataTable({
+      "bPaginate": false,
+      "bLengthChange": false,
+			"bAutoWidth": true,
+      "sDom" : "rt",
+      "aoColumns": fixCols,
+      "bSort": false,
+      "fnCreatedRow": function( nRow, aData) {
+        // attach the click handling
+        var iDataIndex = aData.index;
+        if (self.settings.hasDetails)
+          jT.$('.jtox-details-open', nRow).on('click', function(e) { fnShowDetails(nRow, e); });
+        jT.$(nRow).data('jtox-index', iDataIndex);
+
+        ccLib.fireCallback(self.settings.onRow, self, nRow, aData, iDataIndex);
+        jT.ui.installHandlers(self, nRow);
+        jT.$('.jtox-diagram span.ui-icon', nRow).on('click', function () {
+          setTimeout(function () {
+            jT.$(self.fixTable).dataTable().fnAdjustColumnSizing();
+            self.equalizeTables();
+          }, 50);
+        });
+      },
+      "oLanguage" : { "sEmptyTable": '<span class="jt-feeding">' + (self.settings.oLanguage.sProcess || 'Feeding data...') + '</span>' }
+    }))[0];
+
+    // we need to put a fake column to stay, when there is no other column here, or when everything is hidden..
+    varCols.push({ "sClass": "center blank-col" + (varCols.length > 1 ? " jtox-hidden" : ""), "mData": "index", "mRender": function(data, type, full) { return type != 'display' ? data : '...'; }  });
+
+    jT.ui.sortColDefs(varCols);
+    self.varTable = (jT.$(".jtox-ds-variable table", self.rootElement).dataTable({
+      "bPaginate": false,
+      "bProcessing": true,
+      "bLengthChange": false,
+			"bAutoWidth": false,
+      "sDom" : "rt",
+      "bSort": true,
+      "aoColumns": varCols,
+      "bScrollCollapse": true,
+      "fnCreatedRow": function( nRow, aData ) {
+        var iDataIndex = aData.index;
+        nRow.id = 'jtox-var-' + self.instanceNo + '-' + iDataIndex;
+
+        // equalize multi-rows, if there are any
+        ccLib.equalizeHeights.apply(window, jT.$('td.jtox-multi table tbody', nRow).toArray());
+
+        jT.$(nRow).addClass('jtox-row');
+        jT.$(nRow).data('jtox-index', iDataIndex);
+        ccLib.fireCallback(self.settings.onRow, self, nRow, aData, iDataIndex);
+        jT.ui.installHandlers(self, nRow);
+      },
+      "fnDrawCallback": function(oSettings) {
+        // this is for synchro-sorting the two tables
+        var sorted = jT.$('.jtox-row', this);
+        for (var i = 0, rlen = sorted.length;i < rlen; ++i) {
+          var idx = jT.$(sorted[i]).data('jtox-index');
+          self.orderList[idx] = i;
         }
 
-        if (stopped)
+        if (rlen > 0)
+          jT.$(self.fixTable).dataTable().fnSort([[1, "asc"]]);
+      },
+      "oLanguage" : { "sEmptyTable": "-"}
+    }))[0];
+  };
+
+  cls.prototype.updateTables = function() {
+    var self = this;
+    if (self.settings.hasDetails)
+      $('div.jtox-details-box', self.rootElement).remove();
+
+    self.filterEntries(jT.$('.jtox-controls input', self.rootElement).val());
+  };
+
+  /* Prepare the groups and the features.
+  */
+  cls.prototype.prepareGroups = function (miniset) {
+    var self = this;
+
+    var grps = self.settings.configuration.groups;
+    if (typeof grps == 'function')
+      grps = grps(miniset, self);
+
+    self.groups = {};
+    for (var i in grps){
+      var grp = grps[i];
+      if (grp == null)
+        continue;
+
+      var grpArr = (typeof grp == "function" || typeof grp == "string") ? ccLib.fireCallback(grp, self, i, miniset) : grp;
+      self.groups[i] = [];
+      ccLib.enumObject(grpArr, function(fid, idx) {
+        var isUsed = false;
+        cls.enumSameAs(fid, self.feature, function (feature) {
+          isUsed |= feature.used;
+        });
+        if (idx != "name" && !isUsed) {
+          self.groups[i].push(fid);
+          // these we need to be able to return back to original state.
+          self.usedFeatures.push(fid);
+          self.feature[fid].used = true;
+        }
+      });
+    }
+  };
+
+  /* Enumerate all recofnized features, caling fnMatch(featureId, groupId) for each of it.
+  Return true from the function to stop enumeration, which in turn will return true if it was stopped.
+  */
+  cls.prototype.enumerateFeatures = function(fnMatch) {
+    var self = this;
+    var stopped = false;
+    for (var gr in self.groups) {
+      for (var i = 0, glen = self.groups[gr].length;i < glen; ++i) {
+        if (stopped = fnMatch(self.groups[gr][i], gr))
           break;
       }
 
-      return stopped;
-    },
+      if (stopped)
+        break;
+    }
 
-    filterEntries: function(needle) {
-      var self = this;
+    return stopped;
+  };
 
-      if (ccLib.isNull(needle))
-        needle = '';
-      else
-        needle = needle.toLowerCase();
+  cls.prototype.filterEntries = function(needle) {
+    var self = this;
 
-      var dataFeed = [];
-      if (needle != '') {
-        for (var i = 0, slen = self.dataset.dataEntry.length;i < slen; ++i){
-          var entry = self.dataset.dataEntry[i];
+    if (needle == null)
+      needle = '';
+    else
+      needle = needle.toLowerCase();
 
-          var match = self.enumerateFeatures(function(fId, gr){
-            var feat = self.feature[fId];
-            if (feat.search !== undefined && !feat.search)
-              return false;
-            var val = self.featureValue(fId, entry, 'sort');
-            return !ccLib.isNull(val) && val.toString().toLowerCase().indexOf(needle) >= 0;
-          });
+    var dataFeed = [];
+    if (needle != '') {
+      for (var i = 0, slen = self.dataset.dataEntry.length;i < slen; ++i){
+        var entry = self.dataset.dataEntry[i];
+
+        var match = self.enumerateFeatures(function(fId, gr){
+          var feat = self.feature[fId];
+          if (feat.search !== undefined && !feat.search)
+            return false;
+          var val = self.featureValue(fId, entry, 'sort');
+          return val != null && val.toString().toLowerCase().indexOf(needle) >= 0;
+        });
 
 
-          if (match)
-            dataFeed.push(entry);
+        if (match)
+          dataFeed.push(entry);
+      }
+    }
+    else {
+      dataFeed = self.dataset.dataEntry;
+    }
+
+    jT.$(self.fixTable).dataTable().fnClearTable();
+    jT.$(self.varTable).dataTable().fnClearTable();
+    jT.$(self.fixTable).dataTable().fnAddData(dataFeed);
+    jT.$(self.varTable).dataTable().fnAddData(dataFeed);
+    jT.$('.jt-feeding', self.rootElement).html(self.settings.oLanguage.sZeroRecords || 'No records matching the filter.');
+
+    ccLib.fillTree(jT.$('.jtox-controls', self.rootElement)[0], {
+      "filtered-text": !needle ? " " : ' (filtered to <span class="high">' + dataFeed.length + '</span>) '
+    });
+
+    if (self.settings.showTabs){
+      self.suspendEqualization = true;
+      jT.$('.jtox-ds-features .jtox-checkbox', self.rootElement).trigger('change');
+      self.suspendEqualization = false;
+    }
+
+    // finally
+    self.equalizeTables();
+  };
+
+  // These two are shortcuts for calling the queryEntries routine
+  cls.prototype.nextPage = function() {
+    var self = this;
+    if (self.entriesCount == null || self.pageStart + self.pageSize < self.entriesCount)
+      self.queryEntries(self.pageStart + self.pageSize);
+  };
+
+  cls.prototype.prevPage = function() {
+    var self = this;
+    if (self.pageStart > 0)
+      self.queryEntries(self.pageStart - self.pageSize);
+  };
+
+  cls.prototype.updateControls = function (qStart, qSize) {
+    var self = this;
+    var pane = jT.$('.jtox-controls', self.rootElement)[0];
+    ccLib.fillTree(pane, {
+      "pagestart": qSize > 0 ? qStart + 1 : 0,
+      "pageend": qStart + qSize
+    });
+
+    var nextBut = jT.$('.next-field', pane);
+    if (self.entriesCount == null || qStart + qSize < self.entriesCount)
+      jT.$(nextBut).addClass('paginate_enabled_next').removeClass('paginate_disabled_next');
+    else
+      jT.$(nextBut).addClass('paginate_disabled_next').removeClass('paginate_enabled_next');
+
+    var prevBut = jT.$('.prev-field', pane);
+    if (qStart > 0)
+      jT.$(prevBut).addClass('paginate_enabled_previous').removeClass('paginate_disabled_previous');
+    else
+      jT.$(prevBut).addClass('paginate_disabled_previous').removeClass('paginate_enabled_previous');
+  };
+
+  cls.prototype.queryUri = function (scope) {
+    var self = this;
+    if (self.datasetUri == null)
+      return null;
+    if (scope == null)
+      scope = { from: self.pageStart, size: self.pageSize };
+    if (scope.from < 0)
+      scope.from = 0;
+    if (scope.size == null)
+      scope.size = self.pageSize;
+
+    return ccLib.addParameter(self.datasetUri, "page=" + Math.floor(scope.from / scope.size) + "&pagesize=" + scope.size);
+  };
+
+  // make the actual query for the (next) portion of data.
+  cls.prototype.queryEntries = function(from, size, dataset) {
+    var self = this;
+    var scope = { 'from': from, 'size': size };
+    var qUri = self.queryUri(scope);
+    jT.$('.jtox-controls select', self.rootElement).val(scope.size);
+    self.dataset = null;
+
+    // the function for filling
+    var fillFn = function(dataset) {
+      if (!!dataset){
+        // first, arrange the page markers
+        self.pageSize = scope.size;
+        var qStart = self.pageStart = Math.floor(scope.from / scope.size) * scope.size;
+        if (dataset.dataEntry.length < self.pageSize) // we've reached the end!!
+          self.entriesCount = qStart + dataset.dataEntry.length;
+
+        // then process the dataset
+        self.dataset = cls.processDataset(dataset, $.extend(true, {}, dataset.feature, self.feature), self.settings.fnAccumulate, self.pageStart);
+        // time to call the supplied function, if any.
+        ccLib.fireCallback(self.settings.onLoaded, self, dataset);
+        if (!self.settings.noInterface) {
+          // ok - go and update the table, filtering the entries, if needed
+          self.updateTables();
+          if (self.settings.showControls) {
+            // finally - go and update controls if they are visible
+            self.updateControls(qStart, dataset.dataEntry.length);
+          }
         }
       }
       else {
-        dataFeed = self.dataset.dataEntry;
+        ccLib.fireCallback(self.settings.onLoaded, self, dataset);
+      }
+      ccLib.fireCallback(self.settings.onComplete, self);
+    };
+
+    // we may be passed dataset, if the initial, setup query was 404: Not Found - to avoid second such query...
+    if (dataset != null)
+      fillFn(dataset)
+    else
+      jT.call(self, qUri, fillFn);
+  };
+
+  /* Retrieve features for provided dataserUri, using settings.featureUri, if provided, or making automatice page=0&pagesize=1 query
+    */
+  cls.prototype.queryFeatures = function (featureUri, callback) {
+    var self = this;
+    var dataset = null;
+
+    // first, build the proper
+    var queryUri = featureUri || self.settings.featureUri || self.settings.feature_uri;
+    if (!queryUri) // rollback this is the automatic way, which makes a false query in the beginning
+      queryUri = ccLib.addParameter(self.datasetUri, "page=0&pagesize=1");
+
+    // now make the actual call...
+    jT.call(self, queryUri, function (result, jhr) {
+      if (!result && jhr.status != 200) {
+        self.$procDiv.hide();
+        self.$errDiv.show().find('.message').html( 'Server error: ' + jhr.statusText );
       }
 
-      jT.$(self.fixTable).dataTable().fnClearTable();
-      jT.$(self.varTable).dataTable().fnClearTable();
-      jT.$(self.fixTable).dataTable().fnAddData(dataFeed);
-      jT.$(self.varTable).dataTable().fnAddData(dataFeed);
-      jT.$('.jt-feeding', self.rootElement).html(self.settings.oLanguage.sZeroRecords || 'No records matching the filter.');
+      // remove the loading pane in anyways..
+      if (!!result) {
+        self.feature = result.feature;
 
-      ccLib.fillTree(jT.$('.jtox-controls', self.rootElement)[0], {
-        "filtered-text": !needle ? " " : ' (filtered to <span class="high">' + dataFeed.length + '</span>) '
-      });
+        cls.processFeatures(self.feature, self.settings.configuration.baseFeatures);
+        var miniset = { dataEntry: [], feature: self.feature };
+        if (!self.settings.noInterface) {
+          self.prepareGroups(miniset);
+          if (self.settings.showTabs) {
+            // tabs feature building
+            var nodeFn = function (id, name, parent) {
+              var fEl = jT.getTemplate('#jtox-ds-feature');
+              parent.appendChild(fEl);
+              ccLib.fillTree(fEl, {title: name.replace(/_/g, ' '), uri: self.featureUri(id)});
 
-      if (self.settings.showTabs){
-        self.suspendEqualization = true;
-        jT.$('.jtox-ds-features .jtox-checkbox', self.rootElement).trigger('change');
-        self.suspendEqualization = false;
-      }
+              var checkEl = jT.$('input[type="checkbox"]', fEl)[0];
+              if (!checkEl)
+                return;
+              checkEl.value = id;
+              if (self.settings.rememberChecks)
+                checkEl.checked = (self.featureStates[id] === undefined || self.featureStates[id]);
 
-      // finally
-      self.equalizeTables();
-    },
+              return fEl;
+            };
 
-    // These two are shortcuts for calling the queryEntries routine
-    nextPage: function() {
-      var self = this;
-      if (self.entriesCount == null || self.pageStart + self.pageSize < self.entriesCount)
-        self.queryEntries(self.pageStart + self.pageSize);
-    },
+            self.prepareTabs(jT.$('.jtox-ds-features', self.rootElement)[0], true, function (divEl, gr) {
+              var empty = true;
+              ccLib.enumObject(self.groups[gr], function (fId, idx, level) {
+                var vis = (self.feature[fId] || {})['visibility'];
+                if (!!vis && vis != 'main')
+                  return;
+                empty = false;
+                if (idx == "name")
+                  var fEl = nodeFn(null, fId, divEl);
+                else if (level == 1) {
+                  var title = self.feature[fId].title;
+                  if (title != null)
+                    nodeFn(fId, title, divEl);
+                }
+              });
 
-    prevPage: function() {
-      var self = this;
-      if (self.pageStart > 0)
-        self.queryEntries(self.pageStart - self.pageSize);
-    },
-
-    updateControls: function (qStart, qSize) {
-      var self = this;
-      var pane = jT.$('.jtox-controls', self.rootElement)[0];
-      ccLib.fillTree(pane, {
-        "pagestart": qSize > 0 ? qStart + 1 : 0,
-        "pageend": qStart + qSize
-      });
-
-      var nextBut = jT.$('.next-field', pane);
-      if (self.entriesCount == null || qStart + qSize < self.entriesCount)
-        jT.$(nextBut).addClass('paginate_enabled_next').removeClass('paginate_disabled_next');
-      else
-        jT.$(nextBut).addClass('paginate_disabled_next').removeClass('paginate_enabled_next');
-
-      var prevBut = jT.$('.prev-field', pane);
-      if (qStart > 0)
-        jT.$(prevBut).addClass('paginate_enabled_previous').removeClass('paginate_disabled_previous');
-      else
-        jT.$(prevBut).addClass('paginate_disabled_previous').removeClass('paginate_enabled_previous');
-    },
-
-    queryUri: function (scope) {
-      var self = this;
-      if (self.datasetUri == null)
-        return null;
-      if (scope == null)
-        scope = { from: self.pageStart, size: self.pageSize };
-      if (scope.from < 0)
-        scope.from = 0;
-      if (scope.size == null)
-        scope.size = self.pageSize;
-
-      return ccLib.addParameter(self.datasetUri, "page=" + Math.floor(scope.from / scope.size) + "&pagesize=" + scope.size);
-    },
-
-    // make the actual query for the (next) portion of data.
-    queryEntries: function(from, size, dataset) {
-      var self = this;
-      var scope = { 'from': from, 'size': size };
-      var qUri = self.queryUri(scope);
-      jT.$('.jtox-controls select', self.rootElement).val(scope.size);
-      self.dataset = null;
-
-      // the function for filling
-      var fillFn = function(dataset) {
-        if (!!dataset){
-          // first, arrange the page markers
-          self.pageSize = scope.size;
-          var qStart = self.pageStart = Math.floor(scope.from / scope.size) * scope.size;
-          if (dataset.dataEntry.length < self.pageSize) // we've reached the end!!
-            self.entriesCount = qStart + dataset.dataEntry.length;
-
-          // then process the dataset
-          self.dataset = cls.processDataset(dataset, $.extend(true, {}, dataset.feature, self.feature), self.settings.fnAccumulate, self.pageStart);
-          // time to call the supplied function, if any.
-          ccLib.fireCallback(self.settings.onLoaded, self, dataset);
-          if (!self.settings.noInterface) {
-            // ok - go and update the table, filtering the entries, if needed
-            self.updateTables();
-            if (self.settings.showControls) {
-              // finally - go and update controls if they are visible
-              self.updateControls(qStart, dataset.dataEntry.length);
-            }
+              return empty;
+            });
           }
+
+        	ccLib.fireCallback(self.settings.onPrepared, self, miniset, self);
+          self.prepareTables(); // prepare the tables - we need features to build them - we have them!
+          self.equalizeTables(); // to make them nicer, while waiting...
         }
         else {
-          ccLib.fireCallback(self.settings.onLoaded, self, dataset);
-        }
-        ccLib.fireCallback(self.settings.onComplete, self);
-      };
-
-      // we may be passed dataset, if the initial, setup query was 404: Not Found - to avoid second such query...
-      if (dataset != null)
-        fillFn(dataset)
-      else
-        jT.call(self, qUri, fillFn);
-    },
-
-    /* Retrieve features for provided dataserUri, using settings.featureUri, if provided, or making automatice page=0&pagesize=1 query
-      */
-    queryFeatures: function (featureUri, callback) {
-      var self = this;
-      var dataset = null;
-
-      // first, build the proper
-      var queryUri = featureUri || self.settings.featureUri || self.settings.feature_uri;
-      if (!queryUri) // rollback this is the automatic way, which makes a false query in the beginning
-        queryUri = ccLib.addParameter(self.datasetUri, "page=0&pagesize=1");
-
-      // now make the actual call...
-      jT.call(self, queryUri, function (result, jhr) {
-        if (!result && jhr.status != 200) {
-          self.$procDiv.hide();
-          self.$errDiv.show().find('.message').html( 'Server error: ' + jhr.statusText );
+        	ccLib.fireCallback(self.settings.onPrepared, self, miniset, self);
         }
 
-        // remove the loading pane in anyways..
-        if (!!result) {
-          self.feature = result.feature;
+        // finally make the callback for
+        callback(dataset);
+      }
+    });
+  };
 
-          cls.processFeatures(self.feature, self.settings.configuration.baseFeatures);
-          var miniset = { dataEntry: [], feature: self.feature };
-          if (!self.settings.noInterface) {
-            self.prepareGroups(miniset);
-            if (self.settings.showTabs) {
-              // tabs feature building
-              var nodeFn = function (id, name, parent) {
-                var fEl = jT.getTemplate('#jtox-ds-feature');
-                parent.appendChild(fEl);
-                ccLib.fillTree(fEl, {title: name.replace(/_/g, ' '), uri: self.featureUri(id)});
+  /* Makes a query to the server for particular dataset, asking for feature list first, so that the table(s) can be
+  prepared.
+  */
+  cls.prototype.queryDataset = function (datasetUri, featureUri) {
+    var self = this;
+    // if some oldies exist...
+    this.clearDataset();
+    this.init();
 
-                var checkEl = jT.$('input[type="checkbox"]', fEl)[0];
-                if (!checkEl)
-                  return;
-                checkEl.value = id;
-                if (self.settings.rememberChecks)
-                  checkEl.checked = (self.featureStates[id] === undefined || self.featureStates[id]);
+    datasetUri = jT.grabPaging(self, datasetUri);
 
-                return fEl;
-              };
+    self.settings.baseUrl = self.settings.baseUrl || jT.grabBaseUrl(datasetUri);
 
-              self.prepareTabs(jT.$('.jtox-ds-features', self.rootElement)[0], true, function (divEl, gr) {
-                var empty = true;
-                ccLib.enumObject(self.groups[gr], function (fId, idx, level) {
-                  var vis = (self.feature[fId] || {})['visibility'];
-                  if (!!vis && vis != 'main')
-                    return;
-                  empty = false;
-                  if (idx == "name")
-                    var fEl = nodeFn(null, fId, divEl);
-                  else if (level == 1) {
-                    var title = self.feature[fId].title;
-                    if (!ccLib.isNull(title))
-                      nodeFn(fId, title, divEl);
-                  }
-                });
+    // remember the _original_ datasetUri and make a call with one size length to retrieve all features...
+    self.datasetUri = (datasetUri.indexOf('http') !=0 ? self.settings.baseUrl : '') + datasetUri;
 
-                return empty;
-              });
-            }
+    self.$procDiv.show();
+    self.$errDiv.hide();
+    if (!!self.settings.oLanguage.sLoadingRecords)
+      jT.$('.message', procDiv).html(self.settings.oLanguage.sLoadingRecords);
 
-          	ccLib.fireCallback(self.settings.onPrepared, self, miniset, self);
-            self.prepareTables(); // prepare the tables - we need features to build them - we have them!
-            self.equalizeTables(); // to make them nicer, while waiting...
-          }
-          else {
-          	ccLib.fireCallback(self.settings.onPrepared, self, miniset, self);
-          }
+    self.queryFeatures(featureUri, function (dataset) {
+      self.$procDiv.hide();
+      self.queryEntries(self.pageStart, self.pageSize, dataset);
+    });
+  };
 
-          // finally make the callback for
-          callback(dataset);
-        }
-      });
-    },
-
-    /* Makes a query to the server for particular dataset, asking for feature list first, so that the table(s) can be
-    prepared.
-    */
-    queryDataset: function (datasetUri, featureUri) {
-      var self = this;
-      // if some oldies exist...
-      this.clearDataset();
-      this.init();
-
-      datasetUri = jT.grabPaging(self, datasetUri);
-
-      self.settings.baseUrl = self.settings.baseUrl || jT.grabBaseUrl(datasetUri);
-
-      // remember the _original_ datasetUri and make a call with one size length to retrieve all features...
-      self.datasetUri = (datasetUri.indexOf('http') !=0 ? self.settings.baseUrl : '') + datasetUri;
-
-      self.$procDiv.show();
-      self.$errDiv.hide();
-      if (!!self.settings.oLanguage.sLoadingRecords)
-        jT.$('.message', procDiv).html(self.settings.oLanguage.sLoadingRecords);
-
-      self.queryFeatures(featureUri, function (dataset) {
-        self.$procDiv.hide();
-        self.queryEntries(self.pageStart, self.pageSize, dataset);
-      });
-    },
-
-    /* This is a needed shortcut that jToxQuery routine will call
-    */
-    query: function (uri) {
-      this.queryDataset(uri);
-    }
-  }; // end of prototype
+  /* This is a needed shortcut that jToxQuery routine will call
+  */
+  cls.prototype.query = function (uri) {
+    this.queryDataset(uri);
+  }; 
+  // end of prototype
 
   // merge them for future use..
   cls.baseFeatures = jT.$.extend({}, baseFeatures, defaultSettings.configuration.baseFeatures);

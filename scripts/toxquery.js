@@ -45,45 +45,44 @@ var jToxQuery = (function () {
       self.initialQueryTimer = setTimeout(function () { self.query(); }, 200);
   };
 
-  cls.prototype = {
-    widget: function (name) {
-      return this.settings.dom.widgets[name];
-    },
+  cls.prototype.widget = function (name) {
+    return this.settings.dom.widgets[name];
+  };
 
-    kit: function () {
-      if (!this.mainKit)
-        this.mainKit = jT.kit(this.settings.dom.kit);
+  cls.prototype.kit = function () {
+    if (!this.mainKit)
+      this.mainKit = jT.kit(this.settings.dom.kit);
 
-      return this.mainKit;
-    },
+    return this.mainKit;
+  };
 
-    setWidget: function (id, dom) {
-      this.settings.dom.widgets[id] = dom;
-    },
+  cls.prototype.setWidget = function (id, dom) {
+    this.settings.dom.widgets[id] = dom;
+  };
 
-    cancelInitialQuery: function () {
-      if (!!this.initialQueryTimer)
-        clearTimeout(this.initialQueryTimer);
-    },
+  cls.prototype.cancelInitialQuery = function () {
+    if (!!this.initialQueryTimer)
+      clearTimeout(this.initialQueryTimer);
+  };
 
-    /* Perform the actual query, traversing all the widgets and asking them to
-    alter the given URL, then - makes the call */
-    query: function () {
-      var uri = this.settings.service || '';
-      for (var w in this.settings.dom.widgets) {
-        var widget = jT.kit(this.settings.dom.widgets[w]);
-        if (!widget)
-          console.log("jToxError: the widget [" + w + "] is not recognized: ignored");
-        else if (!widget['modifyUri'])
-          console.log("jToxError: the widget [" + w + "] doesn't have 'modifyUri' method: ignored");
-        else
-          uri = widget.modifyUri(uri);
-      }
-
-      if (!!uri)
-        this.kit().query(uri);
+  /* Perform the actual query, traversing all the widgets and asking them to
+  alter the given URL, then - makes the call */
+  cls.prototype.query = function () {
+    var uri = this.settings.service || '';
+    for (var w in this.settings.dom.widgets) {
+      var widget = jT.kit(this.settings.dom.widgets[w]);
+      if (!widget)
+        console.log("jToxError: the widget [" + w + "] is not recognized: ignored");
+      else if (!widget['modifyUri'])
+        console.log("jToxError: the widget [" + w + "] doesn't have 'modifyUri' method: ignored");
+      else
+        uri = widget.modifyUri(uri);
     }
-  }; // end of prototype
+
+    if (!!uri)
+      this.kit().query(uri);
+  }; 
+  // end of prototype
 
   return cls;
 })();
@@ -309,80 +308,79 @@ var jToxSearch = (function () {
     // and very finally - install the handlers...
   };
 
-  cls.prototype = {
-    // required from jToxQuery - this is how we add what we've collected
-    modifyUri: function (uri) {
-      var form = jT.$('form', this.rootElement)[0];
-      var params = { type: this.search.type };
-      var type = this.search.queryType;
+  // required from jToxQuery - this is how we add what we've collected
+  cls.prototype.modifyUri = function (uri) {
+    var form = jT.$('form', this.rootElement)[0];
+    var params = { type: this.search.type };
+    var type = this.search.queryType;
 
-      if (type == "auto" && params.type == 'auto' && form.searchbox.value.indexOf('http') == 0)
-        type = "uri";
+    if (type == "auto" && params.type == 'auto' && form.searchbox.value.indexOf('http') == 0)
+      type = "uri";
 
-      var res = queries[type] + (uri.indexOf('?') > -1 ? '' : '?') + uri;
+    var res = queries[type] + (uri.indexOf('?') > -1 ? '' : '?') + uri;
 
-      if (!!this.search.mol) {
-        params.b64search = $.base64.encode(this.search.mol);
-      }
-      else {
-        params.search = form.searchbox.value;
-        if (!params.search)
-          params.search = this.settings.defaultNeedle;
-          this.setAuto(params.search);
-      }
+    if (!!this.search.mol) {
+      params.b64search = $.base64.encode(this.search.mol);
+    }
+    else {
+      params.search = form.searchbox.value;
+      if (!params.search)
+        params.search = this.settings.defaultNeedle;
+        this.setAuto(params.search);
+    }
 
-      if (type == "auto" && form.regexp.checked) {
-        params['condition'] = "regexp";
-      }
-      if (type == 'similarity') {
-        params.threshold = form.threshold.value;
-      }
+    if (type == "auto" && form.regexp.checked) {
+      params['condition'] = "regexp";
+    }
+    if (type == 'similarity') {
+      params.threshold = form.threshold.value;
+    }
 
-      if (type == 'similarity') {
-        params.filterBySubstance = form.similaritybysubstance.checked;
-      }
-      if (type == 'smarts') {
-        params.filterBySubstance = form.smartsbysubstance.checked;
-      }
+    if (type == 'similarity') {
+      params.filterBySubstance = form.similaritybysubstance.checked;
+    }
+    if (type == 'smarts') {
+      params.filterBySubstance = form.smartsbysubstance.checked;
+    }
 
-      if (!!this.settings.contextUri)
-        params['dataset_uri'] = this.settings.contextUri;
+    if (!!this.settings.contextUri)
+      params['dataset_uri'] = this.settings.contextUri;
 
-      return ccLib.addParameter(res, $.param(params));
-    },
+    return ccLib.addParameter(res, $.param(params));
+  };
 
-    // some shortcuts for outer world.
-    makeQuery: function (needle) {
-      if (!!needle)
-        this.setAuto(needle);
-      this.queryKit.query();
-    },
+  // some shortcuts for outer world.
+  cls.prototype.makeQuery = function (needle) {
+    if (!!needle)
+      this.setAuto(needle);
+    this.queryKit.query();
+  },
 
-    getNeedle: function () {
-      return this.search.type == 'mol' ? this.search.mol : jT.$('form', this.rootElement)[0].searchbox.value;
-    },
+  cls.prototype.getNeedle = function () {
+    return this.search.type == 'mol' ? this.search.mol : jT.$('form', this.rootElement)[0].searchbox.value;
+  };
 
-    setAuto: function (needle) {
-      this.search.mol = null;
-      this.search.type = 'auto';
+  cls.prototype.setAuto = function (needle) {
+    this.search.mol = null;
+    this.search.type = 'auto';
 
-      var box = jT.$('form', this.rootElement)[0].searchbox;
-      if (!!this.search.oldplace)
-        box.placeholder = this.search.oldplace;
-      if (needle != null)
-        box.value = needle;
-    },
+    var box = jT.$('form', this.rootElement)[0].searchbox;
+    if (!!this.search.oldplace)
+      box.placeholder = this.search.oldplace;
+    if (needle != null)
+      box.value = needle;
+  };
 
-    setMol: function (mol) {
-      var box = jT.$('form', this.rootElement)[0].searchbox;
-      this.search.mol = mol;
-      this.search.type = 'mol';
-      this.search.oldplace = box.placeholder;
+  cls.prototype.setMol = function (mol) {
+    var box = jT.$('form', this.rootElement)[0].searchbox;
+    this.search.mol = mol;
+    this.search.type = 'mol';
+    this.search.oldplace = box.placeholder;
 
-      box.placeholder = "MOL formula saved_";
-      box.value = '';
-    },
-  }; // end of prototype
+    box.placeholder = "MOL formula saved_";
+    box.value = '';
+  }; 
+  // end of prototype
 
   return cls;
 })();

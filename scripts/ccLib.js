@@ -94,10 +94,6 @@ var ccLib = {
       return obj.innerHTML;
   },
 
-  isNull: function(obj) {
-    return obj === undefined || obj == null;
-  },
-
   isEmpty: function(obj) {
     var empty = true;
     if (obj !== undefined || obj != null) {
