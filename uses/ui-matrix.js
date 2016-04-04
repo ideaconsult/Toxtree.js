@@ -180,7 +180,7 @@ var jToxBundle = {
       //       Forms can be submitted in a number of other ways.
       self.createForm.onsubmit = function (e) {
         if (ccLib.validateForm(self.createForm, checkForm)) {
-          jT.service(self, '/bundle', { method: 'POST', data: ccLib.serializeForm(self.createForm)}, function (bundleUri, jhr) {
+          jT.service(self, self.settings.baseUrl + '/bundle', { method: 'POST', data: ccLib.serializeForm(self.createForm)}, function (bundleUri, jhr) {
             if (!!bundleUri)
               self.load(bundleUri);
             else
