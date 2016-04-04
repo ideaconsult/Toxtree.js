@@ -179,7 +179,7 @@ var jToxBundle = {
       self.createForm.onsubmit = function (e) {
         if (ccLib.validateForm(self.createForm, checkForm)) {
           jT.service(self, self.settings.baseUrl + '/bundle', { method: 'POST', data: ccLib.serializeForm(self.createForm)}, function (bundleUri, jhr) {
-            if (!!bundleUri)
+            if (!!bundleUri) {
               self.load(bundleUri);
               var url = ccLib.parseURL( window.location.href );
               if (url.query != '' ) {
