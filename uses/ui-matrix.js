@@ -176,16 +176,30 @@ var jToxBundle = {
 
       self.createForm = $('form', panel)[0];
 
-      // TODO: assign this on form submit, not on button click.
-      //       Forms can be submitted in a number of other ways.
       self.createForm.onsubmit = function (e) {
         if (ccLib.validateForm(self.createForm, checkForm)) {
           jT.service(self, '/bundle', { method: 'POST', data: ccLib.serializeForm(self.createForm)}, function (bundleUri, jhr) {
-            if (!!bundleUri)
+            if (!!bundleUri) {
               self.load(bundleUri);
-            else
+              var url = ccLib.parseURL( window.location.href );
+              if (url.query != '' ) {
+                url.query += '&bundleUri=' + bundleUri;
+              }
+              else {
+                url.query = '?bundleUri=' + bundleUri;
+              }
+              var href = url.protocol + '://' + url.host + ( (url.port != '') ? ':' + url.port : '' ) + url.path + url.query + ( (url.hash != '') ? '#' + url.hash : '' );
+              if ( 'pushState' in window.history ) {
+                window.history.pushState(null, '', href );
+              }
+              else {
+                document.location = href;
+              }
+            }
+            else {
               // TODO: report an error
-              console.log("Error on creating bundle [" + jhr.status + ": " + jhr.statusText);
+              console.log("Error on creating bundle [" + jhr.status + "]: " + jhr.statusText);
+            }
           });
         }
         e.preventDefault();
