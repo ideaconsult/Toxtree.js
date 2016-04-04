@@ -178,8 +178,8 @@ var jToxBundle = {
 
       self.createForm.onsubmit = function (e) {
         if (ccLib.validateForm(self.createForm, checkForm)) {
-          jT.service(self, '/bundle', { method: 'POST', data: ccLib.serializeForm(self.createForm)}, function (bundleUri, jhr) {
-            if (!!bundleUri) {
+          jT.service(self, self.settings.baseUrl + '/bundle', { method: 'POST', data: ccLib.serializeForm(self.createForm)}, function (bundleUri, jhr) {
+            if (!!bundleUri)
               self.load(bundleUri);
               var url = ccLib.parseURL( window.location.href );
               if (url.query != '' ) {
@@ -752,7 +752,7 @@ var jToxBundle = {
           }
         });
         $(checkAll).on('change', function (e) {
-          var qUri = "/query/study?mergeDatasets=true&bundle_uri=" + bUri;
+          var qUri = self.settings.baseUrl + "/query/study?mergeDatasets=true&bundle_uri=" + bUri;
           if (!this.checked)
             qUri += "&selected=substances&filterbybundle=" + bUri;
           self.endpointKit.loadEndpoints(qUri);
