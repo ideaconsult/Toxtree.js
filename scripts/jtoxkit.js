@@ -36,7 +36,9 @@ window.jT = window.jToxKit = {
 
 	// form the "default" baseUrl if no other is supplied
 	formBaseUrl: function(url) {
-    return !!url.host ? url.protocol + "://" + url.host + (url.port.length > 0 ? ":" + url.port : '') + '/' + url.segments[0] : null;
+  	var burl = !!url.host ? url.protocol + "://" + url.host + (url.port.length > 0 ? ":" + url.port : '') + '/' + url.segments[0] : null;
+  	console.log("Deduced base URL: " + burl + " (from: " + url.source + ")");
+    return burl;
 	},
 
   // initializes one kit, based on the kit name passed, either as params, or found within data-XXX parameters of the element
