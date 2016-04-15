@@ -4649,8 +4649,15 @@ var jToxEndpoint = (function () {
           settings.onchange.call(this, e, field, parseValue(this.value));
         },
         source: function( request, response ) {
-          // delegate back to autocomplete, but extract the last term
-          response( jT.$.ui.autocomplete.filter( allTags, extractLast(request.term)));
+          // extract the last term
+          var result = jT.$.ui.autocomplete.filter( allTags, extractLast(request.term));
+          if ( request.term == '') {
+            // if term is empty don't show results
+            // avoids IE opening all results after initialization.
+            result = '';
+          }
+          // delegate back to autocomplete
+          response( result );
         },
         focus: function() { // prevent value inserted on focus
           return false;
