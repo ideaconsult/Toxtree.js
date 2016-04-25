@@ -1049,9 +1049,10 @@ Usage: build.sh [options]
 Options can be one or more from the following:
 
     [--min | -m]           : run minification of the output js, producing additional .min.js file.
+		[--clean | -c]         : clean all pre-existing files in the output folder.
     [--html <html dir>]    : the directory where html files live. Default is [..].
     [--out <output dir>]   : the directory where output files should be put. Default is [../www].
-    [-css <styles dir>]    : the directory where styling files live. Default is [../styles].
+    [--css <styles dir>]   : the directory where styling files live. Default is [../styles].
     [--js <js dir>]        : the directory where script files live. Default is [../scripts].
     [--target <kit list>]  : list of kits to be included. Omit jtoxkit. Default [toxstudy].
     [--lib | -l <filename>]: html file name, referring to some external library (tool).

@@ -1,10 +1,11 @@
 /* jtoxkit.js - The main jToxKit service routines
  *
- * Copyright 2012-2014, IDEAconsult Ltd. http://www.ideaconsult.net/
+ * Copyright 2012-2016, IDEAconsult Ltd. http://www.ideaconsult.net/
  * Created by Ivan Georgiev
 **/
 
 window.jT = window.jToxKit = {
+  version: "1.0.0", // jToxKit version. The file suffix/git tag will be extracted from here!
 	templateRoot: null,
 
 	callId: 0,
