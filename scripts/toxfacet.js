@@ -238,22 +238,26 @@ var jToxFacet = (function () {
     // now launch the transition to...
     t.each(function () {
       // ... transform the root...
-      context.rootRegion.transition("zoom")
-        .attr("transform", "translate(" + ctm.e + "," + ctm.f + ") scale(" + scale + ")");
+      context.rootRegion
+        .transition("zoom")
+          .attr("transform", "translate(" + ctm.e + "," + ctm.f + ") scale(" + scale + ")");
       
       // ... scale the path's strokes, not to become so thick, while zoomed...
-      d3.select(visual.element).selectAll("path").transition("zoom")
-        .style("stroke-width", function (d, i) { 
-          return polyStroke(d, i) / Math.sqrt(scale);
-        });
+      d3.select(visual.element).selectAll("path")
+        .transition("zoom")
+          .style("stroke-width", function (d, i) { 
+            return polyStroke(d, i) / Math.sqrt(scale);
+          });
       
       // ... make sure former invisibles are back visible
-      d3.selectAll(ressurects).transition("zoom")
-        .style("opacity", 1.0);
+      d3.selectAll(ressurects)
+        .transition("zoom")
+          .style("opacity", 1.0);
       
       // .. and dismiss all invisibles
-      d3.selectAll(victims).transition("zoom")
-        .style("opacity", 0.1);
+      d3.selectAll(victims)
+        .transition("zoom")
+          .style("opacity", 0.1);
     });
     
     return selection;
@@ -441,11 +445,11 @@ var jToxFacet = (function () {
         
     var width = this.rootElement.clientWidth,
         height = this.rootElement.clientHeight,
-        boundaries = [[0, 0], [width, 0], [width, height], [0, height], [0, 0]],
+        boundaries = [[0, 0], [0, height], [width, height], [width, 0]],
         fValue = function(d) { return Math.sqrt(d.size); };
         
     self.voronoi = d3.geom.voronoi()
-      .clipExtent([boundaries[0], boundaries[2]])
+      .clipPoly(boundaries)
       .x(function (d) { return d.x; })
       .y(function (d) { return d.y; })
       .value (function (d) { return d.value; });
@@ -491,6 +495,8 @@ var jToxFacet = (function () {
           vertices = nodes
       	  	.map(function (e, i) {  return e.children == null ? { x: e.x + e.dx / 2, y: e.y + e.dy / 2, value: e.value, index: i} : null; })
       	  	.filter(function (e) { return e != null; });
+
+//       var cells = self.voronoi(vertices);
         
       self.voronoi.centroidal(vertices, 2).forEach(function (p) { 
         var i = p.point.index;
@@ -499,7 +505,7 @@ var jToxFacet = (function () {
         
         nodes[i].polygon = p;
         nodes[i].centroid = p.centroid;
-      });
+      });      
     
       // ensure everybody has polygon and centroid members    
       nodes.forEach(function (node) {
@@ -514,8 +520,27 @@ var jToxFacet = (function () {
       
       self.rootRegion = self.rootSVG
         .append("g")
-        .attr("class", "cluster-root");
+        .attr("class", "cluster cluster-root");
       self.dataTree.element = self.rootRegion.node();
+      
+/*
+      self.rootRegion
+        .selectAll("g")
+        .data(cells)
+        .enter()
+          .append("path")
+      		.attr("fill", function (d, i) { 
+        		var cc = [155, 155, 155];
+        		cc[1] += parseInt(d.point.value);
+        		cc[2] += parseInt(i * 100 / cells.length);
+        		return "rgb(" + cc + ")"; 
+          })
+      		.attr("stroke-width", function (d, i) { 
+        		return Math.sqrt(d.point.value);
+          })
+      		.attr("d", function (d, i) { return "M" + d.join("L") + "Z"; });
+*/
+      
         
       self.rootRegion
         .selectAll("g")
@@ -528,73 +553,3 @@ var jToxFacet = (function () {
   
   return cls;
 })();
-
-/*
-  html += '<switch>' +
-  '    <g requiredFeatures="http://www.w3.org/Graphics/SVG/feature/1.2/#TextFlow">' +
-  '      <textArea width="' + d.dx + '" height="auto">' + d.name + '</textArea>' +
-  '    </g>' +
-  '    <foreignObject width="' + d.dx + '" height="' + d.dy + '" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">' +
-  '      <body xmlns="http://www.w3.org/1999/xhtml">' +
-  '        <p>Here is a paragraph that requires word wrap</p>' +
-  '      </body>' +
-  '    </foreignObject>' +
-  '    <text>' + d.name + '</text>' +
-  ' </switch>';
-*/
-    	
-/*
-  g.append("foreignObject")
-  	.attr({ 'width': d.dx, 'height': d.dy})
-  	.append("xhtml:body")
-  	.append("xhtml:div")
-  	.style({width: d.dx + 'px', 
-          height: d.dy + 'px', 
-          "font-size": "20px", 
-          "background-color": "white"
-      })
-    .html(d.name);
-    
-d3_svg_transformRect = function (rect, matrix, svg) {
-  var ptFromRect = function (rect, size) {
-    var pt = svg.createSVGPoint();
-    pt.x = rect.x + (size ? rect.width : 0);
-    pt.y = rect.y + (size ? rect.height : 0);
-    return pt;
-  }
-  
-  var ptPos = ptFromRect(rect, false).matrixTransform(matrix),
-      ptOther = ptFromRect(rect, true).matrixTransform(matrix),
-      resRect = svg.createSVGRect();
-  
-  resRect.x = ptPos.x;
-  resRect.y = ptPos.y;
-  resRect.width = ptOther.x - ptPos.x;
-  resRect.height = ptOther.y - ptPos.y;
-
-  return resRect;
-};
-
-function isElementWithin (el, within) {
-  //special bonus for those using jQuery
-  if (typeof jQuery === "function") {
-    if (el instanceof jQuery)
-      el = el[0];
-    if (within instanceof jQuery)
-      within = within[0];
-  }
-
-
-  var rect = ((typeof el.getBoundingClientRect) === "function")  ? el.getBoundingClientRect() : el;
-      outrect = !!within ? (!within.getBoundingClientRect ? within : within.getBoundingClientRect()) : 
-        { top: 0, left: 0, bottom: (window.innerHeight || document.documentElement.clientHeight), right: (window.innerWidth || document.documentElement.clientWidth) };
-
-  return (
-      rect.top >= outrect.top &&
-      rect.left >= outrect.left &&
-      rect.bottom <=  outrect.bottom &&
-      rect.right <=  outrect.right
-  );
-}    
-    
-*/  
