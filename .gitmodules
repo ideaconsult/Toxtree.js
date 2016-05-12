@@ -4,3 +4,6 @@
 [submodule "libs/d3js"]
 	path = libs/d3js
 	url = https://github.com/thejonan/d3.git
+[submodule "libs/d3plus"]
+	path = libs/d3plus
+	url = git@github.com:thejonan/d3plus.git
