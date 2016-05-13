@@ -5,20 +5,15 @@
 **/
 
 var jToxFacet = (function () {
-  var colorThemes = {
-        "dark": {
-          "parentFill": "rgba(240, 240, 240, 0.66)"
-        },
-        
-        "light": {
-        }
-      },
-      defaultSettings = {
+  var defaultSettings = {
         "viewStep": 2,
         "loadStep": Infinity,
-        "colorTheme": "dark",
         "minFontSize": 11.0,
-        "maxFontSize": 64.0
+        "maxFontSize": 64.0,
+        "showTooltips": false,
+        
+        // colors
+        "parentFill": "rgba(240, 240, 240, 0.66)"
       },
       instanceCount = 0;
   
@@ -28,11 +23,6 @@ var jToxFacet = (function () {
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even in manual initialization.
 
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
-    
-    var theme = self.settings.colorTheme;
-    if (typeof theme === "string" && colorThemes[theme] != null)
-      self.settings.colorTheme = colorThemes[theme];
-
     self.instanceNo = instanceCount++;
 
     // finally make the query, if Uri is provided
@@ -44,7 +34,7 @@ var jToxFacet = (function () {
   /***** Now follow the helper functions ****/    
   function polyFill(d) {
   	if (!!d.children && d.children.length > 0)
-  	  return d.context.settings.colorTheme.parentFill;
+  	  return d.context.settings.parentFill;
   		
   	var v = d.value / d.parent.value;
   	var v = Math.round(220 - 220 * v );
@@ -305,7 +295,8 @@ var jToxFacet = (function () {
   		.attr("stroke-width", polyStroke(d, i))
   		.attr("d", !!d.polygon ? "M" + d.polygon.join("L") + "Z" : null);
   		
-  	g.append("text")
+    var svgt = g.append("text")
+      .attr("x", -d.dx * .25)
   	  .attr("font-size", Math.max(d.context.settings.maxFontSize * Math.sqrt(d.value / d.context.dataTree.value), d.context.settings.minFontSize))
   	  .style("opacity", textOpacity(d, i))
   	  .text(d.name)
@@ -314,6 +305,20 @@ var jToxFacet = (function () {
   	    .attr("dy", "1.1em")
   	    .attr("x", "0")
         .text(d.size != null ? "(" + d.size + ")" : null)
+  
+/*
+    d3plus.textwrap()
+      .container(svgt)
+      .align("center")
+      .shape("square")
+      .width(d.dx * 0.5)
+      .draw();
+    
+    svgt.append("tspan")
+  	    .attr("dy", "1.1em")
+  	    .attr("x", "0")
+        .text(d.size != null ? "(" + d.size + ")" : null)
+*/
   }
   
   function mergePolygons(poly) {
@@ -496,8 +501,6 @@ var jToxFacet = (function () {
       	  	.map(function (e, i) {  return e.children == null ? { x: e.x + e.dx / 2, y: e.y + e.dy / 2, value: e.value, index: i} : null; })
       	  	.filter(function (e) { return e != null; });
 
-//       var cells = self.voronoi(vertices);
-        
       self.voronoi.centroidal(vertices, 2).forEach(function (p) { 
         var i = p.point.index;
         p.edges = p.cell.edges;
@@ -522,26 +525,7 @@ var jToxFacet = (function () {
         .append("g")
         .attr("class", "cluster cluster-root");
       self.dataTree.element = self.rootRegion.node();
-      
-/*
-      self.rootRegion
-        .selectAll("g")
-        .data(cells)
-        .enter()
-          .append("path")
-      		.attr("fill", function (d, i) { 
-        		var cc = [155, 155, 155];
-        		cc[1] += parseInt(d.point.value);
-        		cc[2] += parseInt(i * 100 / cells.length);
-        		return "rgb(" + cc + ")"; 
-          })
-      		.attr("stroke-width", function (d, i) { 
-        		return Math.sqrt(d.point.value);
-          })
-      		.attr("d", function (d, i) { return "M" + d.join("L") + "Z"; });
-*/
-      
-        
+              
       self.rootRegion
         .selectAll("g")
         .data(self.dataTree.children)
