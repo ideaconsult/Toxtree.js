@@ -279,6 +279,8 @@ var jToxFacet = (function () {
     	.on("mouseover", function () { this.classList.add("selected"); })
     	.on("click", function (d) {
         d3.event.stopPropagation();
+        d.context.currentSelection = clusterZoom(d);
+        return;
 
         var nodes = populateRect(d, d.polygon, d.context.settings);
                 
