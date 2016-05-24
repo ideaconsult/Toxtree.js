@@ -6,14 +6,16 @@
 
 var jToxFacet = (function () {
   var defaultSettings = {
-        "viewStep": 2,
+        "viewStep": 4,
         "loadStep": Infinity,
         "minFontSize": 11.0,
         "maxFontSize": 64.0,
         "showTooltips": false,
         
         // colors
-        "parentFill": "rgba(240, 240, 240, 0.66)"
+        "parentFill": "rgba(240, 240, 240, 0.5)", // Color for transparent parent fills. The provided object's toString() method will be invoked.
+        "colorScale": null,                       // This will inforce defaulting to: d3.scale.category10(). Otherwise - an array of colors is expected.
+        "fValue": function(d) { return Math.sqrt(d.size); }
       },
       instanceCount = 0;
   
@@ -24,6 +26,14 @@ var jToxFacet = (function () {
 
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
     self.instanceNo = instanceCount++;
+    if (!self.settings.depthRange)
+      self.settings.depthRange = [0, self.settings.viewStep];
+    
+    // some color scale setup
+    self.settings.colorScale = !!self.settings.colorScale ? d3.scale.ordinal().range(self.settings.colorScale) : d3.scale.category10();
+    var dom = new Array(self.settings.colorScale.range().length);
+    for (var i = 0;i < dom.length; ++i) dom[i] = i;
+    self.settings.colorScale.domain(dom);
 
     // finally make the query, if Uri is provided
     if (self.settings['facetUri'] != null){
@@ -34,13 +44,13 @@ var jToxFacet = (function () {
   /***** Now follow the helper functions ****/    
   function polyFill(d) {
   	if (!!d.children && d.children.length > 0)
-  	  return d.context.settings.parentFill;
+  	  return d.context.settings.parentFill.toString();
   		
-  	var v = d.value / d.parent.value;
-  	var v = Math.round(220 - 220 * v );
-  	var carr = [v, v, v];
-  	carr[d.parent.id % 3] = 255;
-  	return "rgb(" + carr.join(",") + ")";
+  	var v = d.value / d.parent.value,
+  	    c = d3.hsl(d.context.settings.colorScale(d.master));
+  	
+    c.l = Math.max(1 - v, 0.1);
+  	return c.toString();
   }
   
   function polyStroke(d) {
@@ -139,7 +149,7 @@ var jToxFacet = (function () {
             'width': box.width, 'height': box.height };
       	}
       	
-    if (d == context.currentSelection)
+    if (selection == context.currentSelection)
       return context.currentSelection;
         
     if (el != context.rootRegion.node()) {
@@ -222,9 +232,6 @@ var jToxFacet = (function () {
       return true;
     });
       
-    console.log("Current common visual: " + visual.name);
-
-
     // now launch the transition to...
     t.each(function () {
       // ... transform the root...
@@ -271,14 +278,16 @@ var jToxFacet = (function () {
     	.on("mouseout", function () { this.classList.remove("selected"); } )
     	.on("mouseover", function () { this.classList.add("selected"); })
     	.on("click", function (d) {
-        var nm = "";
-        for (var e = d; !e.root; e = e.parent)
-          nm = e.name + ((nm.length > 0) ? " <- " : "") + nm;
-          
-        console.log("Selected: " + nm);
         d3.event.stopPropagation();
-        
-        d.context.currentSelection = clusterZoom(d);
+
+        var nodes = populateRect(d, d.polygon, d.context.settings);
+                
+        g
+          .selectAll("g")
+          .data(d.children)
+          .enter()
+            .append("g")
+            .each(clusterDOM);
     	});
     
     if (!!d.children) {
@@ -299,7 +308,7 @@ var jToxFacet = (function () {
       .attr("x", -d.dx * .25)
   	  .attr("font-size", Math.max(d.context.settings.maxFontSize * Math.sqrt(d.value / d.context.dataTree.value), d.context.settings.minFontSize))
   	  .style("opacity", textOpacity(d, i))
-  	  .text(d.name)
+  	  .text(d.name.join("/"))
   	  .call(textWrap, d.dx * 0.5)
   	    .append("tspan")
   	    .attr("dy", "1.1em")
@@ -319,6 +328,55 @@ var jToxFacet = (function () {
   	    .attr("x", "0")
         .text(d.size != null ? "(" + d.size + ")" : null)
 */
+  }
+  
+  function populateRect(tree, boundaries, settings, width, height) {
+
+    if (!width || !height) {
+        var r = d3plus.geom.largestRect(boundaries, { 'angle': 0, 'maxAspectRatio': 7})[0];
+        width = r.width;
+        height = r.height;
+    }
+    
+    var fValue = function(d) { return Math.sqrt(d.size); },
+        treemap = d3.layout.treemap()
+          .size([width, height])
+          .sticky(true)
+          .value(settings.fValue);
+    
+    var nodes = treemap.nodes(tree).reverse(),
+        vertices = nodes
+    	  	.map(function (e, i) {  return !e.children ?  { x: e.x + e.dx / 2, y: e.y + e.dy / 2, value: e.value, index: i } : null; })
+    	  	.filter(function (e) { return e != null; });
+
+    var voronoi = d3.geom.voronoi()
+      .clipPoly(boundaries)
+      .x(function (d) { return d.x; })
+      .y(function (d) { return d.y; })
+      .value (function (d) { return d.value; });
+
+    voronoi.centroidal(vertices, 2).forEach(function (p) { 
+      var i = p.point.index;
+      p.edges = p.cell.edges;
+      delete p.cell;
+      
+      nodes[i].polygon = p;
+      nodes[i].centroid = p.site;
+    });      
+  
+    // ensure everybody has polygon and centroid members. NOTE: We're traversing in reverse
+    // which implies that children are traversed before their parents.
+    nodes.forEach(function (node) {
+      if (node.root)
+        node.centroid = { x: 0, y: 0 };
+      else if (!node.centroid) {
+        node.polygon = mergePolygons(node.children.map(function(n) { return n.polygon; }))
+        var carr = d3.geom.polygon(node.polygon).centroid();
+        node.centroid = { x: carr[0], y: carr[1] };
+      }
+    });
+    
+    return nodes;
   }
   
   function mergePolygons(poly) {
@@ -377,8 +435,8 @@ var jToxFacet = (function () {
   	return merged;
   }
   
-  function treeFromFacets(facets, context) {
-    var root = { 'name': "", 'children': [], 'context': context },
+  function treeFromFacets(facets, range, context) {
+    var root = { 'name': [""], 'children': [], 'context': context },
         groups = { };
   	
   	var addChild = function (p, e) {
@@ -394,11 +452,11 @@ var jToxFacet = (function () {
   		var parent = groups[f.subcategory];
   		
   		if (parent === undefined) {
-  			groups[f.subcategory] = parent = { 'name': f.subcategory, 'size': 0, 'children': [], 'id': root.children.length, 'maxdepth': 1 };
+  			groups[f.subcategory] = parent = { 'name': [f.subcategory], 'size': 0, 'children': [], 'id': root.children.length, 'maxdepth': 1 };
   			addChild(root, parent);
   		}
   			
-  		el = { 'name': f.value, 'size': f.count, 'maxdepth': 0 };
+  		el = { 'name': [f.value], 'size': f.count, 'maxdepth': 0 };
   		addChild(parent, el);
   	}
   	
@@ -409,26 +467,33 @@ var jToxFacet = (function () {
   	return root;
   }
   
-  function prepareTree(tree, context) {
+  function extractTree(data, range, context, depth, master) {
     
-    if (!tree.children || tree.children.length < 1) {
-      tree.maxdepth = 0;
-      tree.count = 1;
-      tree.context = context;
+    if (depth == null)
+      depth = 0;
+      
+    var tree = { 'name': [data.name], 'size': data.size || 1, 'depth': depth, 'context': context, 'maxdepth': 0, 'count': 1 };
+
+    if (master != null)
+      tree.master = master;
+    
+    if (!data.children || data.children.length < 1)
+      ;
+    else if (data.children.length == 1) {
+      var nm = tree.name;
+      tree = extractTree(data.children[0], range, context, depth, master);
+      tree.name.push(nm);
+      tree.name.reverse();
     }
     else {
       var sz = 0,
           dep = 0,
-          cnt = 0;
-      
-      for (var i = 0;i < tree.children.length; ++i) {
-        var child = tree.children[i];
-        if (tree.id !== undefined)
-          child.id = tree.id;
-        else
-          child.id = i;
+          cnt = 0,
+          child,
+          arr = new Array(data.children.length);
         
-        prepareTree(child, context);
+      for (var i = 0;i < data.children.length; ++i) {
+        arr[i] = child = extractTree(data.children[i], range, context, depth + 1, master != null ? master : i);
         
         child.parent = tree;
         sz += child.size;
@@ -439,7 +504,11 @@ var jToxFacet = (function () {
       tree.size = sz;
       tree.count = cnt;
       tree.maxdepth = dep + 1;
-      tree.context = context;
+      
+      if (depth < range[1])
+        tree.children = arr;
+      else
+        tree.unloaded = arr;
     }
   
     return tree;
@@ -448,26 +517,10 @@ var jToxFacet = (function () {
   cls.prototype.init = function () {
     var self = this;
         
-    var width = this.rootElement.clientWidth,
-        height = this.rootElement.clientHeight,
-        boundaries = [[0, 0], [0, height], [width, height], [width, 0]],
-        fValue = function(d) { return Math.sqrt(d.size); };
-        
-    self.voronoi = d3.geom.voronoi()
-      .clipPoly(boundaries)
-      .x(function (d) { return d.x; })
-      .y(function (d) { return d.y; })
-      .value (function (d) { return d.value; });
-
     self.rootSVG = d3.select(this.rootElement).append("svg")
-      .attr("width", width)
-      .attr("height", height);
-            
-    self.treemap = d3.layout.treemap()
-      .size([width, height])
-      .sticky(true)
-      .value(fValue);
-    
+      .attr("width", this.rootElement.clientWidth)
+      .attr("height", this.rootElement.clientHeight);
+                
     $(document).on("keydown", function (e) {
       var key = e.key || e.keyCode;
       if (key != 27) // i.e. ESC
@@ -481,51 +534,37 @@ var jToxFacet = (function () {
     self.initialized = true;
   };
   	
-  cls.prototype.queryFacets = function (facetUri) {
+  cls.prototype.queryRange = function (facetUri, range) {
     var self = this;
-    
-    if (!self.initialized)
-      self.init();
     
     d3.json(window.location.search.substring(1) || facetUri, function(error, data) {
       if (error) throw error;
     
-      if (data.facet !== undefined) 
-        self.dataTree = treeFromFacets(data, self);
-     else
-        self.dataTree = prepareTree(data, self);
-      
-      self.dataTree.root = true;
-      var nodes = self.treemap.nodes(self.dataTree).reverse(),
-          vertices = nodes
-      	  	.map(function (e, i) {  return e.children == null ? { x: e.x + e.dx / 2, y: e.y + e.dy / 2, value: e.value, index: i} : null; })
-      	  	.filter(function (e) { return e != null; });
+      var width, height,
+          boundaries,
+          nodes, tree;
 
-      self.voronoi.centroidal(vertices, 2).forEach(function (p) { 
-        var i = p.point.index;
-        p.edges = p.cell.edges;
-        delete p.cell;
+      if (data.facet !== undefined) 
+        tree = treeFromFacets(data, range, self);
+      else
+        tree = extractTree(data, range, self);
+
+      if (range[0] === 0) {
+        self.rootRegion = self.rootSVG
+          .append("g")
+          .attr("class", "cluster cluster-root");
+          
+        self.dataTree = tree;
+        self.dataTree.root = true;
+        self.dataTree.element = self.rootRegion.node();
         
-        nodes[i].polygon = p;
-        nodes[i].centroid = p.centroid;
-      });      
-    
-      // ensure everybody has polygon and centroid members    
-      nodes.forEach(function (node) {
-        if (node.root)
-          node.centroid = { x: 0, y: 0 };
-        else if (!node.centroid) {
-          node.polygon = mergePolygons(node.children.map(function(n) { return n.polygon; }))
-          var carr = d3.geom.polygon(node.polygon).centroid();
-          node.centroid = { x: carr[0], y: carr[1] };
-        }
-      });
+        width = self.rootElement.clientWidth;
+        height = self.rootElement.clientHeight;
+        boundaries = [[0, 0], [0, height], [width, height], [width, 0]];
+      }
       
-      self.rootRegion = self.rootSVG
-        .append("g")
-        .attr("class", "cluster cluster-root");
-      self.dataTree.element = self.rootRegion.node();
-              
+      nodes = populateRect(tree, boundaries, self.settings, width, height);
+          
       self.rootRegion
         .selectAll("g")
         .data(self.dataTree.children)
@@ -533,6 +572,15 @@ var jToxFacet = (function () {
           .append("g")
           .each(clusterDOM);
     });
+  }
+  
+  cls.prototype.queryFacets = function (facetUri) {
+    var self = this;
+    
+    if (!self.initialized)
+      self.init();
+      
+    self.queryRange(facetUri, self.settings.depthRange)
   };
   
   return cls;
