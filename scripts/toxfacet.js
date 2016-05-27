@@ -26,9 +26,13 @@ var jToxFacet = (function () {
 
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
     self.instanceNo = instanceCount++;
-    if (!self.settings.depthRange)
-      self.settings.depthRange = [0, self.settings.viewStep];
-    
+
+    if (!self.settings.viewRange)
+      self.settings.viewRange = [0, self.settings.viewStep];
+      
+    if (self.settings.loadStep < self.settings.viewStep)
+      self.settings.loadStep = self.settings.viewStep;
+          
     // some color scale setup
     self.settings.colorScale = !!self.settings.colorScale ? d3.scale.ordinal().range(self.settings.colorScale) : d3.scale.category10();
     var dom = new Array(self.settings.colorScale.range().length);
@@ -49,7 +53,7 @@ var jToxFacet = (function () {
   	var v = d.value / d.parent.value,
   	    c = d3.hsl(d.context.settings.colorScale(d.master));
   	
-    c.l = Math.max(1 - v, 0.1);
+    c.l = Math.max(0.9 - v, 0.1);
   	return c.toString();
   }
   
@@ -61,16 +65,25 @@ var jToxFacet = (function () {
     return d.depth / (d.context.dataTree.maxdepth * 2) + 0.5; 
   }
   
-  function traverseTree(tree, fn) {
-    if (!fn) return false;
-    
-    var r = fn(tree);
-    if (r && tree.children != null) {
-      for (var i = 0;i < tree.children.length; ++i)
-        traverseTree(tree.children[i], fn);
+  function traverseTree(tree, hidden, pre, post) {
+    if (typeof hidden !== "boolean") {
+      post = pre;
+      pre = hidden;
+      hidden = false;
     }
     
-    return r;
+    var r = !!pre ? pre(tree) : true,
+        arr = tree.children;
+
+    if (!arr && hidden)
+      arr = tree.hidden;
+      
+    if (r !== false && arr != null)
+      for (var i = 0;i < arr.length; ++i)
+        traverseTree(arr[i], hidden, pre, post);
+    
+    if (!!post) 
+      post(tree);
   }
   
   function textWrap(text, width) {
@@ -132,8 +145,56 @@ var jToxFacet = (function () {
     };
   }
         
+  function showHideOnZoom(tree, context, selection, isVisible) {
+    var victims = [],
+        ressurects = [],
+        visual = selection;
+
+    traverseTree(tree, false, function (d) {
+      var el = d.element;
+      
+      if (!isVisible(el)) {
+        d.hidden = d.children;
+        delete d.children;
+        victims.push(el);
+        return false;
+
+      } else {
+        if (d.hidden !== undefined) {
+          for (var e = d; !!e && e.depth > selection.depth; e = e.parent);
+          if (e == selection) {
+            d.children = d.hidden;
+            delete d.hidden;
+            e.element.classList.remove("leaf");
+            e.element.classList.add("parent");
+            populateRect(d, d.polygon, context.settings);
+            presentPoly(d, d3.select(d.element));
+            ressurects.push(d.element);
+          }
+        }
+        
+        // equalize depths
+        while (d.depth > visual.depth) d = d.parent;
+        while (d.depth < visual.depth) visual = visual.parent;
+          
+        // now make sure the visual is the first common parent of d (which is visible) 
+        // and visual, which was known to be visible too.
+        while (d != visual) {
+          d = d.parent;
+          visual = visual.parent;
+        }
+      }
+      
+      return true;
+    });
+    
+    return { "shown": ressurects, "hidden": victims, "active": visual };
+  }
+  
   function clusterZoom(d) {
-    do { d = d.parent; } while (d.children.length == 1 && !d.root);      
+    // if we have hidden children, we'd like to zoom directly to them.
+    if (!d.hidden)
+      d = d.parent;
       
     var context = d.context,
         selection = d,
@@ -189,48 +250,15 @@ var jToxFacet = (function () {
     
     // Ok, we now prepare for the zoom - counting the outsiders and the returnings
     var t = d3.transition("zoom").duration(500),
-        victims = [],
-        ressurects = [],
-        visual = selection;
-        isVisible = function (bbox) {
-          var l = Math.max(bbox.left, 0),
+        isVisible = function (el) {
+          var bbox = polyTransform(normalizeBox(el.getBoundingClientRect()), backCTM),
+              l = Math.max(bbox.left, 0),
               t = Math.max(bbox.top, 0),
               r = Math.min(bbox.right, rootBBox.width),
               b = Math.min(bbox.bottom, rootBBox.height);
           return l < r && t < b;
-        };
-
-    traverseTree(context.dataTree, function (d) {
-      var el = d.element,
-          bbox = polyTransform(normalizeBox(el.getBoundingClientRect()), backCTM);
-      
-      if (!isVisible(bbox)) {
-//           delete d.children;
-        d.unloaded = true;
-        victims.push(el);
-
-        return false;
-
-      } else {
-        if (d.unloaded !== undefined) {
-          ressurects.push(d.element);
-          delete d.unloaded;
-        }
-        
-        // equalize depths
-        while (d.depth > visual.depth) d = d.parent;
-        while (d.depth < visual.depth) visual = visual.parent;
-          
-        // now make sure the visual is the first common parent of d (which is visible) 
-        // and visual, which was known to be visible too.
-        while (d != visual) {
-          d = d.parent;
-          visual = visual.parent;
-        }
-      }
-      
-      return true;
-    });
+        },
+        delta = showHideOnZoom(context.dataTree, context, selection, isVisible);
       
     // now launch the transition to...
     t.each(function () {
@@ -240,19 +268,19 @@ var jToxFacet = (function () {
           .attr("transform", "translate(" + ctm.e + "," + ctm.f + ") scale(" + scale + ")");
       
       // ... scale the path's strokes, not to become so thick, while zoomed...
-      d3.select(visual.element).selectAll("path")
+      d3.select(delta.active.element).selectAll("path")
         .transition("zoom")
           .style("stroke-width", function (d, i) { 
             return polyStroke(d, i) / Math.sqrt(scale);
           });
       
       // ... make sure former invisibles are back visible
-      d3.selectAll(ressurects)
+      d3.selectAll(delta.shown)
         .transition("zoom")
           .style("opacity", 1.0);
       
       // .. and dismiss all invisibles
-      d3.selectAll(victims)
+      d3.selectAll(delta.hidden)
         .transition("zoom")
           .style("opacity", 0.1);
     });
@@ -263,43 +291,25 @@ var jToxFacet = (function () {
   function clusterDOM(d, i) {
   	d.element = this;
   	
-  	// offset the whole geometry of the node
+  	// offset the whole geometry of the node  	
     d.polygon.forEach(function (pt) { pt[0] -= d.centroid.x; pt[1] -= d.centroid.y; });
-  
-  	for (var n = d.parent; !!n; n = n.parent) {
-      d.centroid.x -= n.centroid.x;
-      d.centroid.y -= n.centroid.y;
-  	}
-  	  
+    if (!!d.parent) {
+      d.centroid.x -= d.parent.offset.x;
+      d.centroid.y -= d.parent.offset.y;
+    }
+    	  
     // now proceed with drawing  	
   	var g = d3.select(this)
   		.attr("class", "cluster " + (!!d.children ? "parent" : "leaf"))
-  		.attr("transform", 'translate(' + d.centroid.x + ',' + d.centroid.y  + ')')
+  		.attr("transform", d.centroid.x || d.centroid.y ? 'translate(' + d.centroid.x + ',' + d.centroid.y  + ')' : null)
     	.on("mouseout", function () { this.classList.remove("selected"); } )
     	.on("mouseover", function () { this.classList.add("selected"); })
     	.on("click", function (d) {
         d3.event.stopPropagation();
         d.context.currentSelection = clusterZoom(d);
-        return;
-
-        var nodes = populateRect(d, d.polygon, d.context.settings);
-                
-        g
-          .selectAll("g")
-          .data(d.children)
-          .enter()
-            .append("g")
-            .each(clusterDOM);
     	});
-    
-    if (!!d.children) {
-      g
-        .selectAll("g")
-        .data(d.children)
-        .enter()
-          .append("g")
-          .each(clusterDOM);
-    }
+
+    presentPoly(d, g);
   	  	  
     g.append("path")
   		.attr("fill", polyFill(d, i))
@@ -332,7 +342,9 @@ var jToxFacet = (function () {
 */
   }
   
+  // Runs treemap and voronoi, to fill the tree with additional, polygon information
   function populateRect(tree, boundaries, settings, width, height) {
+	  console.log("Populate for: " + tree.name);
 
     if (!width || !height) {
         var r = d3plus.geom.largestRect(boundaries, { 'angle': 0, 'maxAspectRatio': 7})[0];
@@ -340,15 +352,15 @@ var jToxFacet = (function () {
         height = r.height;
     }
     
-    var fValue = function(d) { return Math.sqrt(d.size); },
-        treemap = d3.layout.treemap()
+    var treemap = d3.layout.treemap()
           .size([width, height])
           .sticky(true)
-          .value(settings.fValue);
+          .value(settings.fValue),
+        originalDepth = tree.depth || 0;
     
     var nodes = treemap.nodes(tree).reverse(),
         vertices = nodes
-    	  	.map(function (e, i) {  return !e.children ?  { x: e.x + e.dx / 2, y: e.y + e.dy / 2, value: e.value, index: i } : null; })
+    	  	.map(function (e, i) {  e.depth += originalDepth; return !e.children ?  { x: e.x + e.dx / 2, y: e.y + e.dy / 2, value: e.value, index: i } : null; })
     	  	.filter(function (e) { return e != null; });
 
     var voronoi = d3.geom.voronoi()
@@ -366,21 +378,38 @@ var jToxFacet = (function () {
       nodes[i].centroid = p.site;
     });      
   
+  
     // ensure everybody has polygon and centroid members. NOTE: We're traversing in reverse
     // which implies that children are traversed before their parents.
     nodes.forEach(function (node) {
-      if (node.root)
-        node.centroid = { x: 0, y: 0 };
-      else if (!node.centroid) {
+      if (!node.centroid) {
         node.polygon = mergePolygons(node.children.map(function(n) { return n.polygon; }))
         var carr = d3.geom.polygon(node.polygon).centroid();
         node.centroid = { x: carr[0], y: carr[1] };
       }
     });
     
-    return nodes;
+    tree.offset = { x: 0, y: 0 };
+    tree.offsetRoot = tree;
+    nodes.reverse().forEach(function (node) {
+      if (node != tree) {
+        node.offset = { x: node.parent.offset.x + node.centroid.x, y: node.parent.offset.y + node.centroid.y };
+        node.offsetRoot = tree;
+      }
+    });
   }
   
+  function presentPoly(tree, root) {
+    if (!!tree.children && tree.children.length > 0 )
+      root
+        .selectAll("g")
+        .data(tree.children)
+        .enter()
+          .insert("g", ":first-child")
+          .each(clusterDOM);
+  }
+  
+  // Merges several adjacent polygon to find the outlining one, which is returned.
   function mergePolygons(poly) {
   	var merged = [],
   	    edges = [];
@@ -437,7 +466,7 @@ var jToxFacet = (function () {
   	return merged;
   }
   
-  function treeFromFacets(facets, range, context) {
+  function treeFromFacets(facets, context) {
     var root = { 'name': [""], 'children': [], 'context': context },
         groups = { };
   	
@@ -469,7 +498,7 @@ var jToxFacet = (function () {
   	return root;
   }
   
-  function extractTree(data, range, context, depth, master) {
+  function extractTree(data, context, depth, master) {
     
     if (depth == null)
       depth = 0;
@@ -482,12 +511,10 @@ var jToxFacet = (function () {
     if (!data.children || data.children.length < 1)
       ;
     else if (data.children.length == 1) {
-      var nm = tree.name;
-      tree = extractTree(data.children[0], range, context, depth, master);
-      tree.name.push(nm);
-      tree.name.reverse();
+      tree = extractTree(data.children[0], context, depth, master);
+      tree.name.splice(0, 0, data.name);
     }
-    else {
+    else if (depth < context.settings.loadDepth) {
       var sz = 0,
           dep = 0,
           cnt = 0,
@@ -495,7 +522,7 @@ var jToxFacet = (function () {
           arr = new Array(data.children.length);
         
       for (var i = 0;i < data.children.length; ++i) {
-        arr[i] = child = extractTree(data.children[i], range, context, depth + 1, master != null ? master : i);
+        arr[i] = child = extractTree(data.children[i], context, depth + 1, master != null ? master : i);
         
         child.parent = tree;
         sz += child.size;
@@ -507,10 +534,10 @@ var jToxFacet = (function () {
       tree.count = cnt;
       tree.maxdepth = dep + 1;
       
-      if (depth < range[1])
+      if (depth < context.settings.viewRange[1])
         tree.children = arr;
       else
-        tree.unloaded = arr;
+        tree.hidden = arr;
     }
   
     return tree;
@@ -536,9 +563,11 @@ var jToxFacet = (function () {
     self.initialized = true;
   };
   	
-  cls.prototype.queryRange = function (facetUri, range) {
-    var self = this;
-    
+  cls.prototype.queryRange = function (facetUri, dataRoot) {
+    var self = this,
+        dataDepth = (!!dataRoot ? dataRoot.depth : 0);
+
+    // TODO: Form the proper URL for loading from a specific node, downwards    
     d3.json(window.location.search.substring(1) || facetUri, function(error, data) {
       if (error) throw error;
     
@@ -546,18 +575,20 @@ var jToxFacet = (function () {
           boundaries,
           nodes, tree;
 
+      self.settings.loadDepth = dataDepth + self.settings.loadStep;
+      
       if (data.facet !== undefined) 
-        tree = treeFromFacets(data, range, self);
+        tree = treeFromFacets(data, self);
       else
-        tree = extractTree(data, range, self);
+        tree = extractTree(data, self, dataDepth);
 
-      if (range[0] === 0) {
+      if (dataDepth === 0) {
         self.rootRegion = self.rootSVG
           .append("g")
           .attr("class", "cluster cluster-root");
           
         self.dataTree = tree;
-        self.dataTree.root = true;
+        self.dataTree.centroid = { x: 0, y: 0};
         self.dataTree.element = self.rootRegion.node();
         
         width = self.rootElement.clientWidth;
@@ -565,14 +596,8 @@ var jToxFacet = (function () {
         boundaries = [[0, 0], [0, height], [width, height], [width, 0]];
       }
       
-      nodes = populateRect(tree, boundaries, self.settings, width, height);
-          
-      self.rootRegion
-        .selectAll("g")
-        .data(self.dataTree.children)
-        .enter()
-          .append("g")
-          .each(clusterDOM);
+      populateRect(tree, boundaries, self.settings, width, height);
+      presentPoly(tree, self.rootRegion);
     });
   }
   
@@ -582,7 +607,7 @@ var jToxFacet = (function () {
     if (!self.initialized)
       self.init();
       
-    self.queryRange(facetUri, self.settings.depthRange)
+    self.queryRange(facetUri)
   };
   
   return cls;
