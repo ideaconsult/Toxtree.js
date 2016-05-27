@@ -11,6 +11,7 @@ var jToxFacet = (function () {
         "minFontSize": 11.0,
         "maxFontSize": 64.0,
         "showTooltips": false,
+        "numberFormat": null,   // which defaults to jToxKit's number formatter. If non-function d3js's d3.format is used with that given value
         
         // colors
         "parentFill": "rgba(240, 240, 240, 0.5)", // Color for transparent parent fills. The provided object's toString() method will be invoked.
@@ -32,6 +33,11 @@ var jToxFacet = (function () {
       
     if (self.settings.loadStep < self.settings.viewStep)
       self.settings.loadStep = self.settings.viewStep;
+      
+    if (!self.settings.numberFormat)
+      self.settings.numberFormat = jT.ui.formatCounter;
+    else if (typeof self.settings.numberFormat !== "function")
+      self.settings.numberFormat = d3.format(self.settings.numberFormat);
           
     // some color scale setup
     self.settings.colorScale = !!self.settings.colorScale ? d3.scale.ordinal().range(self.settings.colorScale) : d3.scale.category10();
@@ -325,7 +331,7 @@ var jToxFacet = (function () {
   	    .append("tspan")
   	    .attr("dy", "1.1em")
   	    .attr("x", "0")
-        .text(d.size != null ? "(" + d.size + ")" : null)
+        .text(d.size != null ? "(" + d.context.settings.numberFormat(d.size) + ")" : null)
   
 /*
     d3plus.textwrap()

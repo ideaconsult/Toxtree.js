@@ -808,6 +808,24 @@ window.jT.ui = {
 
     return str;
   },
+  
+  formatCounter: function (num, prec) {
+    var suf = "",
+        prec = 10;;
+    
+    if (num > 1000000)
+      num /= 1000000, suf = "m";
+    else if (num > 1000)
+      num /= 1000, suf = "k";
+    else
+      prec = 0;
+      
+    if (prec <= 0)
+      return num;
+      
+    num = Math.round(num * prec) / prec;
+    return "" + num + suf;
+  },
 
   bindControls: function (kit, handlers) {
     var pane = jT.$('.jtox-controls', kit.rootElement)[0];
