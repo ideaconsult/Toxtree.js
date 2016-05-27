@@ -155,6 +155,26 @@ var ccLib = {
     }
     return value;
   },
+  
+  // traverse any given tree, calling `pre` function before diggin in and `post` - after.
+  // the output of pre determines how the digging is going to happen, if
+  //  - is false - the digging further is interrupted;
+  //  - is true or null/undefined - it uses node's `children` property for digging in
+  //  - is something something - that value is used as a children array for digging in.
+  traverseTree: function (tree, pre, post) {
+    var arr = !!pre ? pre(tree) : true;
+  
+    if (arr === false) return;
+    else if (arr === true || !arr) arr = tree.children;
+      
+    if (!arr || !arr.length) return;
+    
+    for (var i = 0;i < arr.length; ++i)
+      this.traverseTree(arr[i], pre, post);
+    
+    if (!!post) 
+      post(tree);
+  },
 
   // given a root DOM element and an JSON object it fills all (sub)element of the tree
   // which has class 'data-field' and their name corresponds to a property in json object.
@@ -290,6 +310,25 @@ var ccLib = {
     for (var i in pars)
       format = format.replace('{' + i + '}', pars[i]);
     return format;
+  },
+
+  // Present a number in a brief format, adding 'k' or 'm', if needed.
+  briefNumber: function (num, prec) {
+    var suf = "",
+        prec = prec || 10;
+    
+    if (num >= 900000)
+      num /= 1000000, suf = "m";
+    else if (num >= 900)
+      num /= 1000, suf = "k";
+    else
+      prec = 0;
+      
+    if (prec <= 0)
+      return num;
+      
+    num = Math.round(num * prec) / prec;
+    return "" + num + suf;
   },
 
   trim: function(obj) {

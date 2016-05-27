@@ -7,7 +7,7 @@ g.cluster path {
 
 g.cluster.selected.parent>path { fill: none; }
 g.cluster.selected.leaf>path { fill: #fff; }
-g.cluster.selected.parent>text { opacity: 0.33; }
+g.cluster.selected.parent>text { opacity: 0.13; }
 g.cluster.selected.leaf>text { opacity: 1.0; }
 
 g.cluster.hidden>path,
@@ -15,16 +15,16 @@ g.cluster.hidden>text {
   visibility: hidden;
 }
 
-g.cluster text {
+g.cluster>text {
   text-anchor: middle;
   alignment-baseline: middle;
   fill: #555;
-
-  transition: opacity 0.3s;
+  transition: opacity 0.2s;
 }
 
-g.cluster.parent text {
+g.cluster.parent>text {
   pointer-events: none;
+  opacity: 0.8;
 }
 
 g.cluster text tspan:last-child {
