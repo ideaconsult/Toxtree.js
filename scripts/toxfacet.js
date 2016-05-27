@@ -6,23 +6,23 @@
 
 var jToxFacet = (function () {
   var defaultSettings = {
-        "viewStep": 4,
-        "loadStep": Infinity,
-        "minFontSize": 10.0,
-        "maxFontSize": 64.0,
-        "showTooltips": false,
-        
-        // colors
-        "parentFill": "rgba(240, 240, 240, 0.5)", // Color for transparent parent fills. The provided object's toString() method will be invoked.
-        "colorScale": null,                       // This will inforce defaulting to: d3.scale.category10(). Otherwise - an array of colors is expected.
-        
-        "onHover": null,
-        "onHoverOut": null,
-        "onSelect": null,
-        "fValue": function(d) { return Math.sqrt(d.size); },
-        "fLabel": function(d) { return { "label": d.name.join("/"), "size" : d.size > 200 ? "(" + ccLib.briefNumber(d.size) + ")" : null }; },
-      },
-      instanceCount = 0;
+      "viewStep": 4,
+      "loadStep": Infinity,
+      "minFontSize": 10.0,
+      "maxFontSize": 64.0,
+      "showTooltips": false,
+      
+      // colors
+      "parentFill": "rgba(240, 240, 240, 0.5)", // Color for transparent parent fills. The provided object's toString() method will be invoked.
+      "colorScale": d3.scale.category10(),                       
+      
+      "onHover": null,
+      "onHoverOut": null,
+      "onSelect": null,
+      "fValue": function(d) { return Math.sqrt(d.size); },
+      "fLabel": function(d) { return { "label": d.name.join("/"), "size" : d.size > 200 ? "(" + ccLib.briefNumber(d.size) + ")" : null }; },
+    },
+    instanceCount = 0;
   
   var cls = function (root, settings) {
     var self = this;
@@ -39,7 +39,6 @@ var jToxFacet = (function () {
       self.settings.loadStep = self.settings.viewStep;
                 
     // some color scale setup
-    self.settings.colorScale = !!self.settings.colorScale ? d3.scale.ordinal().range(self.settings.colorScale) : d3.scale.category10();
     var dom = new Array(self.settings.colorScale.range().length);
     for (var i = 0;i < dom.length; ++i) dom[i] = i;
     self.settings.colorScale.domain(dom);
@@ -153,7 +152,7 @@ var jToxFacet = (function () {
             var g = d3.select(d.element);
             g.select("path").attr("fill", polyFill(d));
             g.append("rect")
-            presentPoly(d, g);
+            presentTree(d, g);
             ressurects.push(d.element);
           }
         }
@@ -304,7 +303,7 @@ var jToxFacet = (function () {
         d.context.currentSelection = clusterZoom(d);
     	});
 
-    presentPoly(d, g);
+    presentTree(d, g);
   	  	  
     g.append("path")
   		.attr("fill", polyFill(d))
@@ -402,7 +401,7 @@ var jToxFacet = (function () {
     return { w: width, h: height };
   }
   
-  function presentPoly(tree, root) {
+  function presentTree(tree, root) {
     if (!!tree.children && tree.children.length > 0 )
       root
         .selectAll("g")
@@ -600,7 +599,7 @@ var jToxFacet = (function () {
       }
       
       populateRect(tree, boundaries, self.settings, width, height);
-      presentPoly(tree, self.rootRegion);
+        presentTree(tree, self.rootRegion);
     });
   }
   
