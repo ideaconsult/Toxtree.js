@@ -2,7 +2,7 @@ g.cluster path {
   stroke: #555;
   stroke-linejoin: round;
   stroke-linecap: round;
-  transition: fill 0.3s;
+  transition: fill 0.25s;
 }
 
 g.cluster.selected.parent>path { fill: none; }
@@ -16,14 +16,14 @@ g.cluster.hidden>text {
 }
 
 g.cluster>text {
+  pointer-events: none;
   text-anchor: middle;
   alignment-baseline: middle;
   fill: #555;
-  transition: opacity 0.2s;
+  transition: opacity 0.25s;
 }
 
 g.cluster.parent>text {
-  pointer-events: none;
   opacity: 0.8;
 }
 

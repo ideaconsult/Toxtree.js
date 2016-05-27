@@ -8,7 +8,7 @@ var jToxFacet = (function () {
   var defaultSettings = {
         "viewStep": 4,
         "loadStep": Infinity,
-        "minFontSize": 11.0,
+        "minFontSize": 10.0,
         "maxFontSize": 64.0,
         "showTooltips": false,
         
@@ -16,8 +16,11 @@ var jToxFacet = (function () {
         "parentFill": "rgba(240, 240, 240, 0.5)", // Color for transparent parent fills. The provided object's toString() method will be invoked.
         "colorScale": null,                       // This will inforce defaulting to: d3.scale.category10(). Otherwise - an array of colors is expected.
         
-        "sizeFormat": ccLib.briefNumber,      // if you pass somethig other than function here, it'll be passed to d3.format() routine.
-        "fValue": function(d) { return Math.sqrt(d.size); }
+        "onHover": null,
+        "onHoverOut": null,
+        "onSelect": null,
+        "fValue": function(d) { return Math.sqrt(d.size); },
+        "fLabel": function(d) { return { "label": d.name.join("/"), "size" : d.size > 200 ? "(" + ccLib.briefNumber(d.size) + ")" : null }; },
       },
       instanceCount = 0;
   
@@ -34,10 +37,7 @@ var jToxFacet = (function () {
       
     if (self.settings.loadStep < self.settings.viewStep)
       self.settings.loadStep = self.settings.viewStep;
-      
-      if (typeof self.settings.sizeFormat !== "function")
-      self.settings.sizeFormat = d3.format(self.settings.sizeFormat);
-          
+                
     // some color scale setup
     self.settings.colorScale = !!self.settings.colorScale ? d3.scale.ordinal().range(self.settings.colorScale) : d3.scale.category10();
     var dom = new Array(self.settings.colorScale.range().length);
@@ -282,13 +282,25 @@ var jToxFacet = (function () {
     }
     	  
     // now proceed with drawing  	
-  	var g = d3.select(this)
+  	var settings = d.context.settings, 
+  	    g, t, fontSz, svgt;
+  	    
+  	g = d3.select(this)
   		.attr("class", "cluster " + (!!d.children ? "parent" : "leaf"))
   		.attr("transform", d.centroid.x || d.centroid.y ? 'translate(' + d.centroid.x + ',' + d.centroid.y  + ')' : null)
-    	.on("mouseout", function () { this.classList.remove("selected"); } )
-    	.on("mouseover", function () { this.classList.add("selected"); })
+    	.on("mouseout", function (d) { 
+      	this.classList.remove("selected"); 
+      	if (this.classList.contains("leaf"))
+      	  ccLib.fireCallback(settings.onHoverOut, this, d);
+      })
+    	.on("mouseover", function (d) { 
+      	this.classList.add("selected"); 
+      	if (this.classList.contains("leaf"))
+      	  ccLib.fireCallback(settings.onHover, this, d);
+      })
     	.on("click", function (d) {
         d3.event.stopPropagation();
+        ccLib.fireCallback(settings.onSelect, this, d);
         d.context.currentSelection = clusterZoom(d);
     	});
 
@@ -299,13 +311,16 @@ var jToxFacet = (function () {
   		.attr("stroke-width", polyStroke(d))
   		.attr("d", !!d.polygon ? "M" + d.polygon.join("L") + "Z" : null);
   		
-    var sizeStr = d.size != null ? "(" + d.context.settings.sizeFormat(d.size) + ")" : null,
-        fontSz = Math.max(d.context.settings.maxFontSize * Math.sqrt(d.value / d.context.dataTree.value), d.context.settings.minFontSize),
-        svgt = g.append("text")
-          .attr("x", -d.dx * .25)
-          .attr("y", -fontSz)
-      	  .attr("font-size", fontSz)
-      	  .text(d.name.join("/"));	  
+    t = settings.fLabel(d);
+    
+    if (!t) return;
+    
+    fontSz = Math.max(settings.maxFontSize * Math.sqrt(d.value / d.context.dataTree.value), settings.minFontSize),
+    svgt = g.append("text")
+      .attr("x", -d.dx * .25)
+      .attr("y", -fontSz)
+  	  .attr("font-size", fontSz)
+  	  .text(t.label);	  
   
     d3plus.textwrap()
       .container(svgt)
@@ -313,11 +328,12 @@ var jToxFacet = (function () {
       .shape("square")
       .width(d.dx * 0.5)
       .draw();
-    
-    svgt.append("tspan")
+
+    if (!!t.size)
+      svgt.append("tspan")
   	    .attr("dy", "1.1em")
   	    .attr("x", "0")
-        .text(sizeStr);
+        .text(t.size);
   }
   
   // Runs treemap and voronoi, to fill the tree with additional, polygon information
