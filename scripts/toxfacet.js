@@ -6,11 +6,13 @@
 
 var jToxFacet = (function () {
   var defaultSettings = {
-      "viewStep": 4,
+      "viewStep": 3,
       "loadStep": Infinity,
       "minFontSize": 10.0,
       "maxFontSize": 64.0,
       "showTooltips": false,
+      "parentZoom": true,     // zoom to the parent of the selected item. On false - go one level deeper - directly to the selection.
+      "unloadDelay": 3000,    // unload the invisible items after that many milliseconds.
       
       // colors
       "parentFill": "rgba(240, 240, 240, 0.5)", // Color for transparent parent fills. The provided object's toString() method will be invoked.
@@ -21,8 +23,7 @@ var jToxFacet = (function () {
       "onSelect": null,
       "fValue": function(d) { return Math.sqrt(d.size); },
       "fLabel": function(d) { return { "label": d.name.join("/"), "size" : d.size > 200 ? "(" + ccLib.briefNumber(d.size) + ")" : null }; },
-    },
-    instanceCount = 0;
+    };
   
   var cls = function (root, settings) {
     var self = this;
@@ -30,7 +31,6 @@ var jToxFacet = (function () {
     jT.$(root).addClass('jtox-toolkit'); // to make sure it is there even in manual initialization.
 
     self.settings = jT.$.extend(true, {}, defaultSettings, jT.settings, settings);
-    self.instanceNo = instanceCount++;
 
     if (!self.settings.viewRange)
       self.settings.viewRange = [0, self.settings.viewStep];
@@ -42,7 +42,7 @@ var jToxFacet = (function () {
     var dom = new Array(self.settings.colorScale.range().length);
     for (var i = 0;i < dom.length; ++i) dom[i] = i;
     self.settings.colorScale.domain(dom);
-
+    
     // finally make the query, if Uri is provided
     if (self.settings['facetUri'] != null){
       self.queryFacets(self.settings['facetUri']);
@@ -61,42 +61,16 @@ var jToxFacet = (function () {
   	return c.toString();
   }
   
-  function polyStroke(d) {
-  	return 6.5 - 6 * d.depth / d.context.dataTree.maxdepth;
-  }
-      
-  function textWrap(text, width) {
-    text.each(function(i) {      
-      var text = d3.select(this),
-          words = text.text().split(/\s+/).reverse(),
-          word,
-          line = [],
-          lineNumber = .25,
-          lineHeight = 1.1, // ems
-          y = text.attr("y"),
-          dy = 0,
-          tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
-          
-      if (typeof width === 'function') {
-        width = width(text.datum(), i);
-      }
-          
-      while (word = words.pop()) {
-        line.push(word);
-        tspan.text(line.join(" "));
-        if (tspan.node().getComputedTextLength() > width) {
-          line.pop();
-          tspan.text(line.join(" "));
-          line = [word];
-          tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", lineHeight + "em").text(word);
-          ++lineNumber;
-        }
-      }
-      
-      text.attr("y", (-lineNumber * lineHeight / 2) + "em");
-    });
+  function polyStroke(d) { 
+    return (4.5 - 4 * d.depth / (d.context.settings.viewRange[1] + 1)) / Math.sqrt(d.context.currentScale); 
   }
   
+  function textFontSize(d) { 
+    return Math.max(
+      d.context.settings.maxFontSize * Math.sqrt(d.value / d.context.dataTree.value), 
+      d.context.settings.minFontSize) / Math.sqrt(d.context.currentScale); 
+  }
+        
   function polyTransform(poly, ctm) {
     var  box = false;
         
@@ -133,11 +107,12 @@ var jToxFacet = (function () {
       var el = d.element;
       
       if (!isVisible(el)) {
+        console.log ("Go invisible: " + d.name.join("/"));
         d.hidden = d.children;
         delete d.children;
         victims.push(el);
-        return false;
 
+        return false;
       } else {
         if (d.hidden !== undefined) {
           for (var e = d; !!e && e.depth > selection.depth; e = e.parent);
@@ -147,11 +122,11 @@ var jToxFacet = (function () {
             d.element.classList.remove("leaf");
             d.element.classList.add("parent");
             
-            var r = populateRect(d, d.polygon, context.settings);
+            populateRect(d, d.polygon);
             
             var g = d3.select(d.element);
             g.select("path").attr("fill", polyFill(d));
-            g.append("rect")
+
             presentTree(d, g);
             ressurects.push(d.element);
           }
@@ -175,13 +150,15 @@ var jToxFacet = (function () {
   
   function clusterZoom(d) {
     // if we have hidden children, we'd like to zoom directly to them.
-    if (!d.hidden)
+    if (d.context.settings.parentZoom)
       d = d.parent;
+
+    if (d == d.context.currentSelection)
+      return d;
       
     var context = d.context,
         selection = d,
         el = d.element,
-        scale = 1,
         backCTM = context.rootRegion.node().getCTM().inverse(),
       	rootBBox = el.ownerSVGElement.getBoundingClientRect(),
       	ctm = el.ownerSVGElement.createSVGMatrix(),
@@ -190,15 +167,11 @@ var jToxFacet = (function () {
             'left': box.left - rootBBox.left, 'top': box.top - rootBBox.top, 
             'right': box.right - rootBBox.left, 'bottom': box.bottom - rootBBox.top, 
             'width': box.width, 'height': box.height };
-      	}
-      	
-    if (selection == context.currentSelection)
-      return context.currentSelection;
+      	};
         
     if (el != context.rootRegion.node()) {
-      var bbox = polyTransform(normalizeBox(el.getBoundingClientRect()), backCTM);
-
-      scale = Math.min(rootBBox.width / bbox.width, rootBBox.height / bbox.height) * 0.8;
+      var bbox = polyTransform(normalizeBox(el.getBoundingClientRect()), backCTM),
+          scale = Math.min(rootBBox.width / bbox.width, rootBBox.height / bbox.height) * 0.8;
       
       if (scale > 1.0) {
         ctm = ctm
@@ -223,39 +196,41 @@ var jToxFacet = (function () {
         // since the scale is already applied on the transformation - we need to scale down the values.
         ctm = ctm.translate(offX / scale, offY / scale);
       }
-      else
-        scale = 1;
     }
     
     // backCTM becomes the transformation from the current to the new state
     backCTM = backCTM.multiply(ctm);
+    context.currentScale = ctm.a;
     
     // Ok, we now prepare for the zoom - counting the outsiders and the returnings
     var t = d3.transition("zoom").duration(500),
-        isVisible = function (el) {
+        delta = showHideOnZoom(context.dataTree, context, selection, function (el) {
           var bbox = polyTransform(normalizeBox(el.getBoundingClientRect()), backCTM),
               l = Math.max(bbox.left, 0),
               t = Math.max(bbox.top, 0),
               r = Math.min(bbox.right, rootBBox.width),
               b = Math.min(bbox.bottom, rootBBox.height);
           return l < r && t < b;
-        },
-        delta = showHideOnZoom(context.dataTree, context, selection, isVisible);
+        });
       
     // now launch the transition to...
     t.each(function () {
       // ... transform the root...
       context.rootRegion
         .transition("zoom")
-          .attr("transform", "translate(" + ctm.e + "," + ctm.f + ") scale(" + scale + ")");
+          .attr("transform", "translate(" + ctm.e + "," + ctm.f + ") scale(" + ctm.a + ")");
       
       // ... scale the path's strokes, not to become so thick, while zoomed...
-      d3.select(delta.active.element).selectAll("path")
-        .transition("zoom")
-          .style("stroke-width", function (d, i) { 
-            return polyStroke(d, i) / Math.sqrt(scale);
-          });
+      var active = d3.select(delta.active.element);
       
+      active.selectAll("path")
+        .transition("zoom")
+          .style("stroke-width", polyStroke);
+      
+      active.selectAll("text")
+        .transition("zoom")
+          .style("font-size", textFontSize);
+          
       // ... make sure former invisibles are back visible
       d3.selectAll(delta.shown)
         .transition("zoom")
@@ -264,7 +239,7 @@ var jToxFacet = (function () {
       // .. and dismiss all invisibles
       d3.selectAll(delta.hidden)
         .transition("zoom")
-          .style("opacity", 0.1);
+          .style("opacity", 0.0);
     });
     
     return selection;
@@ -273,20 +248,20 @@ var jToxFacet = (function () {
   function clusterDOM(d, i) {
   	d.element = this;
   	
-  	// offset the whole geometry of the node  	
-    d.polygon.forEach(function (pt) { pt[0] -= d.centroid.x; pt[1] -= d.centroid.y; });
-    if (!!d.parent) {
-      d.centroid.x -= d.parent.offset.x;
-      d.centroid.y -= d.parent.offset.y;
-    }
-    	  
     // now proceed with drawing  	
   	var settings = d.context.settings, 
-  	    g, t, fontSz, svgt;
+  	    g, t, fontSz, svgt,
+  	    offset = [0, 0];
+
+  	// offset the whole geometry of the node  	
+    d.polygon.forEach(function (pt) { pt[0] -= d.centroid.x; pt[1] -= d.centroid.y; });
+    
+    if (!!d.parent)
+      offset = [ d.centroid.x - d.parent.centroid.x, d.centroid.y - d.parent.centroid.y ];
   	    
   	g = d3.select(this)
   		.attr("class", "cluster " + (!!d.children ? "parent" : "leaf"))
-  		.attr("transform", d.centroid.x || d.centroid.y ? 'translate(' + d.centroid.x + ',' + d.centroid.y  + ')' : null)
+  		.attr("transform", offset[0] || offset[1] ? 'translate(' + offset[0]  + ',' + offset[1]  + ')' : null)
     	.on("mouseout", function (d) { 
       	this.classList.remove("selected"); 
       	if (this.classList.contains("leaf"))
@@ -314,7 +289,7 @@ var jToxFacet = (function () {
     
     if (!t) return;
     
-    fontSz = Math.max(settings.maxFontSize * Math.sqrt(d.value / d.context.dataTree.value), settings.minFontSize),
+    fontSz = textFontSize(d),
     svgt = g.append("text")
       .attr("x", -d.dx * .25)
       .attr("y", -fontSz)
@@ -336,19 +311,24 @@ var jToxFacet = (function () {
   }
   
   // Runs treemap and voronoi, to fill the tree with additional, polygon information
-  function populateRect(tree, boundaries, settings, width, height) {
-	  console.log("Populate for: " + tree.name);
-
+  function populateRect(tree, boundaries, width, height) {
     var r,
+        settings = tree.context.settings,
         originalDepth = tree.depth || 0;
         
     if (!width || !height) {
-      r = d3plus.geom.largestRect(boundaries, { 'angle': 0, 'maxAspectRatio': 7})[0];
+      r = d3plus.geom.largestRect(boundaries, { 'angle': 0, 'maxAspectRatio': 7 })[0];
       r.cx -= r.width / 2;
       r.cy -= r.height / 2;
     }
     else
       r = { cx: 0, cy: 0, width: width, height: height };
+      
+    if (tree.centroid != null) {
+      r.cx += tree.centroid.x;
+      r.cy += tree.centroid.y;
+      boundaries = polyTransform(boundaries, { a: 1, b: 0, c: 0, d: 1, e: tree.centroid.x, f: tree.centroid.y });
+    }
     
     var treemap = d3.layout.treemap()
           .size([r.width, r.height])
@@ -359,7 +339,7 @@ var jToxFacet = (function () {
         vertices = nodes
     	  	.map(function (e, i) {  
       	  	e.depth += originalDepth; 
-      	  	return !e.children ?  { x: e.x + r.cx + e.dx  / 2, y: e.y + r.cy + e.dy / 2, value: e.value, index: i } : null; 
+      	  	return !e.children ?  { x: r.cx + e.x + e.dx  / 2, y: r.cy + e.y + e.dy / 2, value: e.value, index: i } : null; 
       	  })
     	  	.filter(function (e) { return e != null; });
 
@@ -387,17 +367,10 @@ var jToxFacet = (function () {
         var carr = d3.geom.polygon(node.polygon).centroid();
         node.centroid = { x: carr[0], y: carr[1] };
       }
+      
+      node.offsetRoot = tree;
     });
-    
-    tree.offset = { x: 0, y: 0 };
-    tree.offsetRoot = tree;
-    nodes.reverse().forEach(function (node) {
-      if (node != tree) {
-        node.offset = { x: node.parent.offset.x + node.centroid.x, y: node.parent.offset.y + node.centroid.y };
-        node.offsetRoot = tree;
-      }
-    });
-    
+        
     return { w: width, h: height };
   }
   
@@ -485,18 +458,17 @@ var jToxFacet = (function () {
   		var parent = groups[f.subcategory];
   		
   		if (parent === undefined) {
-  			groups[f.subcategory] = parent = { 'name': [f.subcategory], 'size': 0, 'children': [], 'id': root.children.length, 'maxdepth': 1 };
+  			groups[f.subcategory] = parent = { 'name': [f.subcategory], 'size': 0, 'children': [], 'id': root.children.length };
   			addChild(root, parent);
   		}
   			
-  		el = { 'name': [f.value], 'size': f.count, 'maxdepth': 0 };
+  		el = { 'name': [f.value], 'size': f.count };
   		addChild(parent, el);
   	}
   	
   	while (root.children.length == 1)
   		root = root.children[0];
   	
-  	root.maxdepth = 2;
   	return root;
   }
   
@@ -505,7 +477,7 @@ var jToxFacet = (function () {
     if (depth == null)
       depth = 0;
       
-    var tree = { 'name': [data.name], 'size': data.size || 1, 'depth': depth, 'context': context, 'maxdepth': 0, 'count': 1 };
+    var tree = { 'name': [data.name], 'size': data.size || 1, 'depth': depth, 'context': context, 'count': 1 };
 
     if (master != null)
       tree.master = master;
@@ -518,7 +490,6 @@ var jToxFacet = (function () {
     }
     else if (depth < context.settings.loadDepth) {
       var sz = 0,
-          dep = 0,
           cnt = 0,
           child,
           arr = new Array(data.children.length);
@@ -529,12 +500,10 @@ var jToxFacet = (function () {
         child.parent = tree;
         sz += child.size;
         cnt += child.count;
-        dep = Math.max(child.maxdepth, dep);
       }
       
       tree.size = sz;
       tree.count = cnt;
-      tree.maxdepth = dep + 1;
       
       if (depth < context.settings.viewRange[1])
         tree.children = arr;
@@ -561,6 +530,7 @@ var jToxFacet = (function () {
         self.currentSelection = clusterZoom(self.currentSelection);
     });
     
+    self.currentScale = 1;
     self.currentSelection = null;
     self.initialized = true;
   };
@@ -598,8 +568,8 @@ var jToxFacet = (function () {
         boundaries = [[0, 0], [0, height], [width, height], [width, 0]];
       }
       
-      populateRect(tree, boundaries, self.settings, width, height);
-        presentTree(tree, self.rootRegion);
+      populateRect(tree, boundaries, width, height);
+      presentTree(tree, self.rootRegion);
     });
   }
   
