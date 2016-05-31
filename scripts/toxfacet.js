@@ -106,7 +106,7 @@ var jToxFacet = (function () {
     ccLib.traverseTree(tree, function (d) {
       var el = d.element;
       
-      if (!isVisible(el)) {
+      if (!isVisible(d)) {
         console.log ("Go invisible: " + d.name.join("/"));
         d.hidden = d.children;
         delete d.children;
@@ -150,27 +150,20 @@ var jToxFacet = (function () {
   
   function clusterZoom(d) {
     // if we have hidden children, we'd like to zoom directly to them.
-    if (d.context.settings.parentZoom)
-      d = d.parent;
-
-    if (d == d.context.currentSelection)
-      return d;
+    if (d.context.settings.parentZoom) d = d.parent;
+    
+    // or, if we're not actually making change...
+    if (d == d.context.currentSelection) return d;
       
     var context = d.context,
-        selection = d,
         el = d.element,
         backCTM = context.rootRegion.node().getCTM().inverse(),
       	rootBBox = el.ownerSVGElement.getBoundingClientRect(),
       	ctm = el.ownerSVGElement.createSVGMatrix(),
-      	normalizeBox = function (box) {
-        	return { 
-            'left': box.left - rootBBox.left, 'top': box.top - rootBBox.top, 
-            'right': box.right - rootBBox.left, 'bottom': box.bottom - rootBBox.top, 
-            'width': box.width, 'height': box.height };
-      	};
-        
+      	normalizeCTM = el.ownerSVGElement.createSVGMatrix().translate(-rootBBox.left, -rootBBox.top);
+      	        
     if (el != context.rootRegion.node()) {
-      var bbox = polyTransform(normalizeBox(el.getBoundingClientRect()), backCTM),
+      var bbox = polyTransform(el.getBoundingClientRect(), normalizeCTM.multiply(backCTM)),
           scale = Math.min(rootBBox.width / bbox.width, rootBBox.height / bbox.height) * 0.8;
       
       if (scale > 1.0) {
@@ -179,7 +172,7 @@ var jToxFacet = (function () {
           .translate((rootBBox.width / scale - bbox.right - bbox.left) / 2, (rootBBox.height / scale - bbox.bottom - bbox.top) / 2);
         
         // now check if the transformation won't put the edges of the whole picture inside it.
-        var newRootBBox = polyTransform(normalizeBox(rootBBox), ctm),
+        var newRootBBox = polyTransform(rootBBox, normalizeCTM.multiply(ctm)),
             offX = 0,
             offY = 0;
             
@@ -204,8 +197,8 @@ var jToxFacet = (function () {
     
     // Ok, we now prepare for the zoom - counting the outsiders and the returnings
     var t = d3.transition("zoom").duration(500),
-        delta = showHideOnZoom(context.dataTree, context, selection, function (el) {
-          var bbox = polyTransform(normalizeBox(el.getBoundingClientRect()), backCTM),
+        delta = showHideOnZoom(context.dataTree, context, d, function (d) {
+          var bbox = polyTransform(d.element.getBoundingClientRect(), normalizeCTM.multiply(backCTM)),
               l = Math.max(bbox.left, 0),
               t = Math.max(bbox.top, 0),
               r = Math.min(bbox.right, rootBBox.width),
@@ -242,7 +235,7 @@ var jToxFacet = (function () {
           .style("opacity", 0.0);
     });
     
-    return selection;
+    return d;
   }
     
   function clusterDOM(d, i) {
@@ -558,14 +551,15 @@ var jToxFacet = (function () {
         self.rootRegion = self.rootSVG
           .append("g")
           .attr("class", "cluster cluster-root");
-          
-        self.dataTree = tree;
-        self.dataTree.centroid = { x: 0, y: 0};
-        self.dataTree.element = self.rootRegion.node();
-        
+                  
         width = self.rootElement.clientWidth;
         height = self.rootElement.clientHeight;
         boundaries = [[0, 0], [0, height], [width, height], [width, 0]];
+        
+        self.dataTree = tree;
+        self.dataTree.centroid = { x: 0, y: 0};
+        self.dataTree.element = self.rootRegion.node();
+        self.dataTree.polygon = boundaries;
       }
       
       populateRect(tree, boundaries, width, height);
