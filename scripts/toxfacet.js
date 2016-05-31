@@ -71,33 +71,6 @@ var jToxFacet = (function () {
       d.context.settings.minFontSize) / Math.sqrt(d.context.currentScale); 
   }
         
-  function polyTransform(poly, ctm) {
-    var  box = false;
-        
-    if (poly.left !== undefined) {
-      poly = [[poly.left, poly.top], [poly.right, poly.bottom]];
-      box = true;
-    }
-    
-    var out = new Array(poly.length);
-    
-    for (var i = 0;i < poly.length; ++i) {
-      var x = poly[i].x === undefined ? poly[i][0] : poly[i].x,
-          y = poly[i].y === undefined ? poly[i][1] : poly[i].y;
-          
-      out[i] = [ ctm.a * x + ctm.c * y + ctm.e, ctm.b * x + ctm.d * y + ctm.f ];
-    }
-    
-    return !box ? out : { 
-      'left': out[0][0], 
-      'top': out[0][1], 
-      'right': out[1][0], 
-      'bottom': out[1][1], 
-      'width': out[1][0] - out[0][0], 
-      'height': out[1][1] - out[0][1] 
-    };
-  }
-        
   function showHideOnZoom(tree, context, selection, isVisible) {
     var victims = [],
         ressurects = [],
@@ -157,34 +130,35 @@ var jToxFacet = (function () {
       
     var context = d.context,
         el = d.element,
-        backCTM = context.rootRegion.node().getCTM().inverse(),
-      	rootBBox = el.ownerSVGElement.getBoundingClientRect(),
-      	ctm = el.ownerSVGElement.createSVGMatrix(),
-      	normalizeCTM = el.ownerSVGElement.createSVGMatrix().translate(-rootBBox.left, -rootBBox.top);
-      	        
+        dextent = d.polygon.extent().transform({ a: 1, b: 0, c: 0, d: 1, e: d.offset.x, f: d.offset.y }),
+        width = context.rootElement.clientWidth,
+        height = context.rootElement.clientHeight,
+        ctm = el.ownerSVGElement.createSVGMatrix();
+      	              	        
     if (el != context.rootRegion.node()) {
-      var bbox = polyTransform(el.getBoundingClientRect(), normalizeCTM.multiply(backCTM)),
-          scale = Math.min(rootBBox.width / bbox.width, rootBBox.height / bbox.height) * 0.8;
+      dextent.width = dextent[1][0] - dextent[0][0];
+      dextent.height = dextent[1][1] - dextent[0][1];
+      var scale = Math.min(width / dextent.width, height / dextent.height) * 0.8;
       
       if (scale > 1.0) {
         ctm = ctm
           .scale(scale)
-          .translate((rootBBox.width / scale - bbox.right - bbox.left) / 2, (rootBBox.height / scale - bbox.bottom - bbox.top) / 2);
+          .translate((width / scale - dextent[1][0] - dextent[0][0]) / 2, (height / scale - dextent[1][1] - dextent[0][1]) / 2);
         
         // now check if the transformation won't put the edges of the whole picture inside it.
-        var newRootBBox = polyTransform(rootBBox, normalizeCTM.multiply(ctm)),
+        var rb = d3.geom.polygon([[0, 0], [width, height]]).transform(ctm),
             offX = 0,
             offY = 0;
             
-        if (newRootBBox.left > 0)
-          offX = -newRootBBox.left;
-        else if (newRootBBox.right < rootBBox.width)
-          offX = rootBBox.width - newRootBBox.right;
+        if (rb[0][0] > 0)
+          offX = -rb[0][0];
+        else if (rb[1][0] < width)
+          offX = width - rb[1][0];
           
-        if (newRootBBox.top > 0)
-          offY = -newRootBBox.top;
-        else if (newRootBBox.bottom < rootBBox.height)
-          offY = rootBBox.height - newRootBBox.bottom;
+        if (rb[0][1] > 0)
+          offY = -rb[0][1];
+        else if (rb[1][1] < height)
+          offY = height - rb[1][1];
         
         // since the scale is already applied on the transformation - we need to scale down the values.
         ctm = ctm.translate(offX / scale, offY / scale);
@@ -192,17 +166,16 @@ var jToxFacet = (function () {
     }
     
     // backCTM becomes the transformation from the current to the new state
-    backCTM = backCTM.multiply(ctm);
     context.currentScale = ctm.a;
     
     // Ok, we now prepare for the zoom - counting the outsiders and the returnings
     var t = d3.transition("zoom").duration(500),
-        delta = showHideOnZoom(context.dataTree, context, d, function (d) {
-          var bbox = polyTransform(d.element.getBoundingClientRect(), normalizeCTM.multiply(backCTM)),
-              l = Math.max(bbox.left, 0),
-              t = Math.max(bbox.top, 0),
-              r = Math.min(bbox.right, rootBBox.width),
-              b = Math.min(bbox.bottom, rootBBox.height);
+        delta = showHideOnZoom(context.dataTree, context, d, function (e) {
+          var bbox = e.polygon.extent().transform(ctm.translate(e.offset.x, e.offset.y)),
+              l = Math.max(bbox[0][0], 0),
+              t = Math.max(bbox[0][1], 0),
+              r = Math.min(bbox[1][0], width),
+              b = Math.min(bbox[1][1], height);
           return l < r && t < b;
         });
       
@@ -232,7 +205,7 @@ var jToxFacet = (function () {
       // .. and dismiss all invisibles
       d3.selectAll(delta.hidden)
         .transition("zoom")
-          .style("opacity", 0.0);
+          .style("opacity", 0.1);
     });
     
     return d;
@@ -247,10 +220,10 @@ var jToxFacet = (function () {
   	    offset = [0, 0];
 
   	// offset the whole geometry of the node  	
-    d.polygon.forEach(function (pt) { pt[0] -= d.centroid.x; pt[1] -= d.centroid.y; });
+    d.polygon.forEach(function (pt) { pt[0] -= d.offset.x; pt[1] -= d.offset.y; });
     
     if (!!d.parent)
-      offset = [ d.centroid.x - d.parent.centroid.x, d.centroid.y - d.parent.centroid.y ];
+      offset = [ d.offset.x - d.parent.offset.x, d.offset.y - d.parent.offset.y ];
   	    
   	g = d3.select(this)
   		.attr("class", "cluster " + (!!d.children ? "parent" : "leaf"))
@@ -317,10 +290,10 @@ var jToxFacet = (function () {
     else
       r = { cx: 0, cy: 0, width: width, height: height };
       
-    if (tree.centroid != null) {
-      r.cx += tree.centroid.x;
-      r.cy += tree.centroid.y;
-      boundaries = polyTransform(boundaries, { a: 1, b: 0, c: 0, d: 1, e: tree.centroid.x, f: tree.centroid.y });
+    if (tree.offset != null) {
+      r.cx += tree.offset.x;
+      r.cy += tree.offset.y;
+      boundaries = boundaries.transform({ a: 1, b: 0, c: 0, d: 1, e: tree.offset.x, f: tree.offset.y });
     }
     
     var treemap = d3.layout.treemap()
@@ -348,17 +321,17 @@ var jToxFacet = (function () {
       delete p.cell;
       
       nodes[i].polygon = p;
-      nodes[i].centroid = p.site;
+      nodes[i].offset = p.site;
     });      
   
   
     // ensure everybody has polygon and centroid members. NOTE: We're traversing in reverse
     // which implies that children are traversed before their parents.
     nodes.forEach(function (node) {
-      if (!node.centroid) {
+      if (!node.offset) {
         node.polygon = mergePolygons(node.children.map(function(n) { return n.polygon; }))
         var carr = d3.geom.polygon(node.polygon).centroid();
-        node.centroid = { x: carr[0], y: carr[1] };
+        node.offset = { x: carr[0], y: carr[1] };
       }
       
       node.offsetRoot = tree;
@@ -557,7 +530,7 @@ var jToxFacet = (function () {
         boundaries = [[0, 0], [0, height], [width, height], [width, 0]];
         
         self.dataTree = tree;
-        self.dataTree.centroid = { x: 0, y: 0};
+        self.dataTree.offset = { x: 0, y: 0};
         self.dataTree.element = self.rootRegion.node();
         self.dataTree.polygon = boundaries;
       }
