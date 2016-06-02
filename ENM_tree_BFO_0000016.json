@@ -1,0 +1,2673 @@
+{
+"name":"disposition",
+"id":"BFO_0000016",
+"size":1,
+"children": [
+{
+"name":"amphiphilic",
+"id":"NPO_732",
+"size":1
+},{
+"name":"bioavailability",
+"id":"NPO_1529",
+"size":1
+},{
+"name":"electronegativity",
+"id":"NPO_421",
+"size":1
+},{
+"name":"function",
+"id":"BFO_0000034",
+"size":1,
+"children": [
+{
+"name":"DNA intercalation",
+"id":"NPO_1628",
+"size":1
+}
+]
+},{
+"name":"electric potential",
+"id":"PATO_0001464",
+"size":1,
+"children": [
+{
+"name":"zeta potential",
+"id":"NPO_1302",
+"size":1
+}
+]
+},{
+"name":"biodegradable",
+"id":"NPO_191",
+"size":1
+},{
+"name":"biocompatible",
+"id":"NPO_938",
+"size":1
+},{
+"name":"application",
+"id":"CHEBI_33232",
+"size":1,
+"children": [
+{
+"name":"neoglycolipid probe",
+"id":"CHEBI_74886",
+"size":1
+},{
+"name":"probe",
+"id":"CHEBI_50406",
+"size":1,
+"children": [
+{
+"name":"spin probe",
+"id":"CHEBI_35226",
+"size":1
+},{
+"name":"fluorescent probe",
+"id":"CHEBI_39442",
+"size":1
+}
+]
+},{
+"name":"flame retardant",
+"id":"CHEBI_79314",
+"size":1
+},{
+"name":"anti-anaemic agent",
+"id":"CHEBI_75835",
+"size":1
+},{
+"name":"fluorescence quencher",
+"id":"CHEBI_76648",
+"size":1
+},{
+"name":"fragrance",
+"id":"CHEBI_48318",
+"size":1
+},{
+"name":"reagent",
+"id":"CHEBI_33893",
+"size":1,
+"children": [
+{
+"name":"peptide coupling reagent",
+"id":"CHEBI_73668",
+"size":1
+},{
+"name":"chiral reagent",
+"id":"CHEBI_60646",
+"size":1
+},{
+"name":"nucleophilic reagent",
+"id":"CHEBI_59740",
+"size":1
+},{
+"name":"spectrophotometric reagent",
+"id":"CHEBI_73618",
+"size":1
+},{
+"name":"gelator",
+"id":"CHEBI_51266",
+"size":1
+},{
+"name":"swelling agent",
+"id":"CHEBI_51267",
+"size":1
+},{
+"name":"Grignard reagent",
+"id":"CHEBI_51237",
+"size":1
+},{
+"name":"Wittig reagent",
+"id":"CHEBI_51166",
+"size":1
+},{
+"name":"electrophilic reagent",
+"id":"CHEBI_59739",
+"size":1
+},{
+"name":"cross-linking reagent",
+"id":"CHEBI_50684",
+"size":1
+},{
+"name":"chromatographic reagent",
+"id":"CHEBI_59745",
+"size":1
+},{
+"name":"microarray analysis reagent",
+"id":"CHEBI_74914",
+"size":1
+},{
+"name":"colorimetric reagent",
+"id":"CHEBI_67126",
+"size":1
+},{
+"name":"NMR shift reagent",
+"id":"CHEBI_67137",
+"size":1
+}
+]
+},{
+"name":"MALDI matrix material",
+"id":"CHEBI_64345",
+"size":1
+},{
+"name":"catalyst",
+"id":"CHEBI_35223",
+"size":1
+},{
+"name":"anti-asthmatic agent",
+"id":"CHEBI_65023",
+"size":1,
+"children": [
+{
+"name":"anti-asthmatic drug",
+"id":"CHEBI_49167",
+"size":1
+}
+]
+},{
+"name":"cosmetic",
+"id":"CHEBI_64857",
+"size":1,
+"children": [
+{
+"name":"skin lightening agent",
+"id":"CHEBI_85046",
+"size":1,
+"children": [
+{
+"name":"vitamin C",
+"id":"CHEBI_21241",
+"size":1
+}
+]
+}
+]
+},{
+"name":"mordant",
+"id":"CHEBI_74152",
+"size":1
+},{
+"name":"antifoaming agent",
+"id":"CHEBI_77973",
+"size":1,
+"children": [
+{
+"name":"food antifoaming agent",
+"id":"CHEBI_78058",
+"size":1
+}
+]
+},{
+"name":"environmental contaminant",
+"id":"CHEBI_78298",
+"size":1
+},{
+"name":"humectant",
+"id":"CHEBI_77968",
+"size":1,
+"children": [
+{
+"name":"food humectant",
+"id":"CHEBI_77969",
+"size":1
+}
+]
+},{
+"name":"solvent",
+"id":"CHEBI_46787",
+"size":1,
+"children": [
+{
+"name":"non-polar solvent",
+"id":"CHEBI_48355",
+"size":1
+},{
+"name":"polar solvent",
+"id":"CHEBI_48354",
+"size":1,
+"children": [
+{
+"name":"polar aprotic solvent",
+"id":"CHEBI_48358",
+"size":1
+},{
+"name":"protophilic solvent",
+"id":"CHEBI_48359",
+"size":1,
+"children": [
+{
+"name":"amphiprotic solvent",
+"id":"CHEBI_48360",
+"size":1
+}
+]
+},{
+"name":"protic solvent",
+"id":"CHEBI_48356",
+"size":1,
+"children": [
+{
+"name":"amphiprotic solvent",
+"id":"CHEBI_48360",
+"size":1
+}
+]
+}
+]
+},{
+"name":"aprotic solvent",
+"id":"CHEBI_48357",
+"size":1,
+"children": [
+{
+"name":"polar aprotic solvent",
+"id":"CHEBI_48358",
+"size":1
+}
+]
+},{
+"name":"drying control chemical additive",
+"id":"CHEBI_51268",
+"size":1
+}
+]
+},{
+"name":"protein-sequencing agent",
+"id":"CHEBI_73352",
+"size":1
+},{
+"name":"curing agent",
+"id":"CHEBI_75358",
+"size":1
+},{
+"name":"tracer",
+"id":"CHEBI_35204",
+"size":1,
+"children": [
+{
+"name":"isotopic tracer",
+"id":"CHEBI_35206",
+"size":1
+},{
+"name":"radioactive tracer",
+"id":"CHEBI_35207",
+"size":1
+},{
+"name":"physical tracer",
+"id":"CHEBI_35208",
+"size":1
+},{
+"name":"chemical tracer",
+"id":"CHEBI_35205",
+"size":1
+}
+]
+},{
+"name":"pharmaceutical",
+"id":"CHEBI_52217",
+"size":1,
+"children": [
+{
+"name":"radiopharmaceutical",
+"id":"CHEBI_35232",
+"size":1
+},{
+"name":"adjuvant",
+"id":"CHEBI_60809",
+"size":1,
+"children": [
+{
+"name":"immunological adjuvant",
+"id":"CHEBI_50847",
+"size":1
+},{
+"name":"anaesthesia adjuvant",
+"id":"CHEBI_60807",
+"size":1
+}
+]
+},{
+"name":"diagnostic agent",
+"id":"CHEBI_33295",
+"size":1,
+"children": [
+{
+"name":"diagnostic imaging agent",
+"id":"CHEBI_37334",
+"size":1,
+"children": [
+{
+"name":"radioactive imaging agent",
+"id":"CHEBI_37336",
+"size":1
+},{
+"name":"MRI contrast agent",
+"id":"CHEBI_37335",
+"size":1
+},{
+"name":"ultrasound contrast agent",
+"id":"CHEBI_37337",
+"size":1
+},{
+"name":"radioopaque medium",
+"id":"CHEBI_37338",
+"size":1
+}
+]
+}
+]
+},{
+"name":"blood substitute",
+"id":"CHEBI_38849",
+"size":1
+},{
+"name":"drug",
+"id":"CHEBI_23888",
+"size":1,
+"children": [
+{
+"name":"hyperglycemic agent",
+"id":"CHEBI_76916",
+"size":1
+},{
+"name":"bile therapy drug",
+"id":"CHEBI_61026",
+"size":1
+},{
+"name":"photosensitizing agent",
+"id":"CHEBI_47868",
+"size":1
+},{
+"name":"bronchoconstrictor agent",
+"id":"CHEBI_50141",
+"size":1
+},{
+"name":"depigmentation drug",
+"id":"CHEBI_59864",
+"size":1,
+"children": [
+{
+"name":"melanin synthesis inhibitor",
+"id":"CHEBI_64933",
+"size":1
+}
+]
+},{
+"name":"gastrointestinal drug",
+"id":"CHEBI_55324",
+"size":1,
+"children": [
+{
+"name":"antidiarrhoeal drug",
+"id":"CHEBI_55323",
+"size":1
+}
+]
+},{
+"name":"antifungal drug",
+"id":"CHEBI_86327",
+"size":1
+},{
+"name":"cardiovascular drug",
+"id":"CHEBI_35554",
+"size":1,
+"children": [
+{
+"name":"cardiotonic drug",
+"id":"CHEBI_38147",
+"size":1
+},{
+"name":"anti-arrhythmia drug",
+"id":"CHEBI_38070",
+"size":1
+},{
+"name":"vasodilator agent",
+"id":"CHEBI_35620",
+"size":1,
+"children": [
+{
+"name":"partial prostacyclin agonist",
+"id":"CHEBI_51577",
+"size":1
+}
+]
+},{
+"name":"vasoconstrictor agent",
+"id":"CHEBI_50514",
+"size":1
+},{
+"name":"antihypertensive agent",
+"id":"CHEBI_35674",
+"size":1,
+"children": [
+{
+"name":"EC 3.4.15.1 (peptidyl-dipeptidase A) inhibitor",
+"id":"CHEBI_35457",
+"size":1
+}
+]
+},{
+"name":"antiatherogenic agent",
+"id":"CHEBI_50855",
+"size":1
+}
+]
+},{
+"name":"ophthalmology drug",
+"id":"CHEBI_66981",
+"size":1,
+"children": [
+{
+"name":"antiglaucoma drug",
+"id":"CHEBI_39456",
+"size":1
+}
+]
+},{
+"name":"astringent",
+"id":"CHEBI_74783",
+"size":1
+},{
+"name":"fibrin modulating drug",
+"id":"CHEBI_48676",
+"size":1,
+"children": [
+{
+"name":"antifibrinolytic drug",
+"id":"CHEBI_48675",
+"size":1
+}
+]
+},{
+"name":"neuromuscular agent",
+"id":"CHEBI_51372",
+"size":1,
+"children": [
+{
+"name":"muscle relaxant",
+"id":"CHEBI_51371",
+"size":1,
+"children": [
+{
+"name":"antispasmodic drug",
+"id":"CHEBI_53784",
+"size":1
+}
+]
+}
+]
+},{
+"name":"anti-allergic agent",
+"id":"CHEBI_50857",
+"size":1
+},{
+"name":"anaesthetic",
+"id":"CHEBI_38867",
+"size":1,
+"children": [
+{
+"name":"general anaesthetic",
+"id":"CHEBI_38869",
+"size":1,
+"children": [
+{
+"name":"intravenous anaesthetic",
+"id":"CHEBI_38877",
+"size":1
+},{
+"name":"inhalation anaesthetic",
+"id":"CHEBI_38870",
+"size":1
+}
+]
+},{
+"name":"local anaesthetic",
+"id":"CHEBI_36333",
+"size":1,
+"children": [
+{
+"name":"topical anaesthetic",
+"id":"CHEBI_48425",
+"size":1
+}
+]
+}
+]
+},{
+"name":"antihyperplasia drug",
+"id":"CHEBI_59844",
+"size":1
+},{
+"name":"proteasome inhibitor",
+"id":"CHEBI_52726",
+"size":1
+},{
+"name":"drug allergen",
+"id":"CHEBI_88188",
+"size":1
+},{
+"name":"hematologic agent",
+"id":"CHEBI_50248",
+"size":1,
+"children": [
+{
+"name":"platelet aggregation inhibitor",
+"id":"CHEBI_50427",
+"size":1,
+"children": [
+{
+"name":"partial prostacyclin agonist",
+"id":"CHEBI_51577",
+"size":1
+},{
+"name":"platelet glycoprotein-IIb/IIIa receptor antagonist",
+"id":"CHEBI_50433",
+"size":1
+}
+]
+},{
+"name":"anticoagulant",
+"id":"CHEBI_50249",
+"size":1
+}
+]
+},{
+"name":"antipyretic",
+"id":"CHEBI_35493",
+"size":1
+},{
+"name":"receptor modulator",
+"id":"CHEBI_90710",
+"size":1,
+"children": [
+{
+"name":"nuclear receptor modulator",
+"id":"CHEBI_90709",
+"size":1,
+"children": [
+{
+"name":"retinoic acid receptor modulator",
+"id":"CHEBI_90708",
+"size":1,
+"children": [
+{
+"name":"retinoic acid receptor agonist",
+"id":"CHEBI_67198",
+"size":1,
+"children": [
+{
+"name":"retinoic acid receptor alpha/beta agonist",
+"id":"CHEBI_50741",
+"size":1
+},{
+"name":"retinoic acid receptor beta agonist",
+"id":"CHEBI_90742",
+"size":1
+},{
+"name":"retinoic acid receptor gamma agonist",
+"id":"CHEBI_88336",
+"size":1
+}
+]
+},{
+"name":"retinoic acid receptor antagonist",
+"id":"CHEBI_90714",
+"size":1,
+"children": [
+{
+"name":"retinoic acid receptor gamma antagonist",
+"id":"CHEBI_90744",
+"size":1
+},{
+"name":"retinoic acid receptor alpha antagonist",
+"id":"CHEBI_90713",
+"size":1
+}
+]
+}
+]
+}
+]
+},{
+"name":"hormone receptor modulator",
+"id":"CHEBI_51061",
+"size":1,
+"children": [
+{
+"name":"hormone agonist",
+"id":"CHEBI_51060",
+"size":1,
+"children": [
+{
+"name":"gonadotropin releasing hormone agonist",
+"id":"CHEBI_63533",
+"size":1
+},{
+"name":"progesterone receptor agonist",
+"id":"CHEBI_70709",
+"size":1
+},{
+"name":"thyroid hormone agonist",
+"id":"CHEBI_73334",
+"size":1
+},{
+"name":"vasopressin receptor agonist",
+"id":"CHEBI_59727",
+"size":1
+}
+]
+},{
+"name":"progesterone receptor modulator",
+"id":"CHEBI_71027",
+"size":1
+},{
+"name":"hormone antagonist",
+"id":"CHEBI_49020",
+"size":1,
+"children": [
+{
+"name":"endothelin receptor antagonist",
+"id":"CHEBI_51451",
+"size":1,
+"children": [
+{
+"name":"endothelin A receptor antagonist",
+"id":"CHEBI_51452",
+"size":1
+}
+]
+},{
+"name":"antimineralocorticoid",
+"id":"CHEBI_50843",
+"size":1,
+"children": [
+{
+"name":"aldosterone antagonist",
+"id":"CHEBI_50844",
+"size":1
+}
+]
+},{
+"name":"GnRH antagonist",
+"id":"CHEBI_59229",
+"size":1
+},{
+"name":"corticotropin-releasing factor receptor antagonist",
+"id":"CHEBI_76977",
+"size":1
+},{
+"name":"glucagon receptor antagonist",
+"id":"CHEBI_60649",
+"size":1
+},{
+"name":"antithyroid drug",
+"id":"CHEBI_50671",
+"size":1
+},{
+"name":"estrogen antagonist",
+"id":"CHEBI_50837",
+"size":1
+},{
+"name":"prostaglandin antagonist",
+"id":"CHEBI_49023",
+"size":1
+},{
+"name":"cholecystokinin antagonist",
+"id":"CHEBI_73296",
+"size":1
+},{
+"name":"antiparathyroid drug",
+"id":"CHEBI_50827",
+"size":1
+},{
+"name":"vasopressin  receptor antagonist",
+"id":"CHEBI_59680",
+"size":1
+},{
+"name":"androgen antagonist",
+"id":"CHEBI_35497",
+"size":1
+},{
+"name":"leukotriene antagonist",
+"id":"CHEBI_49159",
+"size":1
+},{
+"name":"angiotensin receptor antagonist",
+"id":"CHEBI_61016",
+"size":1
+}
+]
+}
+]
+}
+]
+},{
+"name":"dermatologic drug",
+"id":"CHEBI_50177",
+"size":1,
+"children": [
+{
+"name":"antipsoriatic",
+"id":"CHEBI_50748",
+"size":1
+},{
+"name":"antipruritic drug",
+"id":"CHEBI_59683",
+"size":1
+},{
+"name":"antiseborrheic",
+"id":"CHEBI_59010",
+"size":1
+},{
+"name":"keratolytic drug",
+"id":"CHEBI_50176",
+"size":1
+}
+]
+},{
+"name":"nutraceutical",
+"id":"CHEBI_50733",
+"size":1,
+"children": [
+{
+"name":"B vitamin",
+"id":"CHEBI_75769",
+"size":1
+}
+]
+},{
+"name":"anti-asthmatic drug",
+"id":"CHEBI_49167",
+"size":1
+},{
+"name":"nootropic agent",
+"id":"CHEBI_66980",
+"size":1
+},{
+"name":"anti-inflammatory drug",
+"id":"CHEBI_35472",
+"size":1,
+"children": [
+{
+"name":"non-steroidal anti-inflammatory drug",
+"id":"CHEBI_35475",
+"size":1
+}
+]
+},{
+"name":"immunomodulator",
+"id":"CHEBI_50846",
+"size":1,
+"children": [
+{
+"name":"immunosuppressive agent",
+"id":"CHEBI_35705",
+"size":1
+},{
+"name":"immunological adjuvant",
+"id":"CHEBI_50847",
+"size":1
+}
+]
+},{
+"name":"antacid",
+"id":"CHEBI_65265",
+"size":1
+},{
+"name":"hypoglycemic agent",
+"id":"CHEBI_35526",
+"size":1,
+"children": [
+{
+"name":"insulin-sensitizing drug",
+"id":"CHEBI_50864",
+"size":1
+}
+]
+},{
+"name":"anti-ulcer drug",
+"id":"CHEBI_49201",
+"size":1
+},{
+"name":"hormone receptor modulator",
+"id":"CHEBI_51061",
+"size":1,
+"children": [
+{
+"name":"hormone agonist",
+"id":"CHEBI_51060",
+"size":1,
+"children": [
+{
+"name":"gonadotropin releasing hormone agonist",
+"id":"CHEBI_63533",
+"size":1
+},{
+"name":"progesterone receptor agonist",
+"id":"CHEBI_70709",
+"size":1
+},{
+"name":"thyroid hormone agonist",
+"id":"CHEBI_73334",
+"size":1
+},{
+"name":"vasopressin receptor agonist",
+"id":"CHEBI_59727",
+"size":1
+}
+]
+},{
+"name":"progesterone receptor modulator",
+"id":"CHEBI_71027",
+"size":1
+},{
+"name":"hormone antagonist",
+"id":"CHEBI_49020",
+"size":1,
+"children": [
+{
+"name":"endothelin receptor antagonist",
+"id":"CHEBI_51451",
+"size":1,
+"children": [
+{
+"name":"endothelin A receptor antagonist",
+"id":"CHEBI_51452",
+"size":1
+}
+]
+},{
+"name":"antimineralocorticoid",
+"id":"CHEBI_50843",
+"size":1,
+"children": [
+{
+"name":"aldosterone antagonist",
+"id":"CHEBI_50844",
+"size":1
+}
+]
+},{
+"name":"GnRH antagonist",
+"id":"CHEBI_59229",
+"size":1
+},{
+"name":"corticotropin-releasing factor receptor antagonist",
+"id":"CHEBI_76977",
+"size":1
+},{
+"name":"glucagon receptor antagonist",
+"id":"CHEBI_60649",
+"size":1
+},{
+"name":"antithyroid drug",
+"id":"CHEBI_50671",
+"size":1
+},{
+"name":"estrogen antagonist",
+"id":"CHEBI_50837",
+"size":1
+},{
+"name":"prostaglandin antagonist",
+"id":"CHEBI_49023",
+"size":1
+},{
+"name":"cholecystokinin antagonist",
+"id":"CHEBI_73296",
+"size":1
+},{
+"name":"antiparathyroid drug",
+"id":"CHEBI_50827",
+"size":1
+},{
+"name":"vasopressin  receptor antagonist",
+"id":"CHEBI_59680",
+"size":1
+},{
+"name":"androgen antagonist",
+"id":"CHEBI_35497",
+"size":1
+},{
+"name":"leukotriene antagonist",
+"id":"CHEBI_49159",
+"size":1
+},{
+"name":"angiotensin receptor antagonist",
+"id":"CHEBI_61016",
+"size":1
+}
+]
+}
+]
+},{
+"name":"laxative",
+"id":"CHEBI_50503",
+"size":1
+},{
+"name":"neurotransmitter agent",
+"id":"CHEBI_35942",
+"size":1,
+"children": [
+{
+"name":"nerve growth factor stimulator",
+"id":"CHEBI_72294",
+"size":1
+},{
+"name":"excitatory amino acid agonist",
+"id":"CHEBI_50103",
+"size":1,
+"children": [
+{
+"name":"NMDA receptor agonist",
+"id":"CHEBI_64571",
+"size":1
+}
+]
+},{
+"name":"GHB receptor agonist",
+"id":"CHEBI_53353",
+"size":1
+},{
+"name":"GABA reuptake inhibitor",
+"id":"CHEBI_85384",
+"size":1
+},{
+"name":"GABA agent",
+"id":"CHEBI_51374",
+"size":1,
+"children": [
+{
+"name":"GABA agonist",
+"id":"CHEBI_51373",
+"size":1,
+"children": [
+{
+"name":"GABAA receptor agonist",
+"id":"CHEBI_91016",
+"size":1
+}
+]
+},{
+"name":"GABA antagonist",
+"id":"CHEBI_65259",
+"size":1
+},{
+"name":"GABA modulator",
+"id":"CHEBI_50268",
+"size":1
+}
+]
+},{
+"name":"adrenergic agent",
+"id":"CHEBI_37962",
+"size":1,
+"children": [
+{
+"name":"alpha-adrenergic drug",
+"id":"CHEBI_48539",
+"size":1,
+"children": [
+{
+"name":"alpha-adrenergic agonist",
+"id":"CHEBI_35569",
+"size":1
+},{
+"name":"alpha-adrenergic antagonist",
+"id":"CHEBI_37890",
+"size":1
+}
+]
+},{
+"name":"sympatholytic agent",
+"id":"CHEBI_66991",
+"size":1
+},{
+"name":"beta-adrenergic drug",
+"id":"CHEBI_48540",
+"size":1,
+"children": [
+{
+"name":"beta-adrenergic antagonist",
+"id":"CHEBI_35530",
+"size":1
+},{
+"name":"beta-adrenergic agonist",
+"id":"CHEBI_35522",
+"size":1
+}
+]
+},{
+"name":"adrenergic antagonist",
+"id":"CHEBI_37887",
+"size":1,
+"children": [
+{
+"name":"beta-adrenergic antagonist",
+"id":"CHEBI_35530",
+"size":1
+},{
+"name":"alpha-adrenergic antagonist",
+"id":"CHEBI_37890",
+"size":1
+}
+]
+},{
+"name":"adrenergic agonist",
+"id":"CHEBI_37886",
+"size":1,
+"children": [
+{
+"name":"alpha-adrenergic agonist",
+"id":"CHEBI_35569",
+"size":1
+},{
+"name":"beta-adrenergic agonist",
+"id":"CHEBI_35522",
+"size":1
+}
+]
+},{
+"name":"adrenergic uptake inhibitor",
+"id":"CHEBI_35640",
+"size":1
+},{
+"name":"sympathomimetic agent",
+"id":"CHEBI_35524",
+"size":1
+}
+]
+},{
+"name":"neurotransmitter transporter modulator",
+"id":"CHEBI_64371",
+"size":1,
+"children": [
+{
+"name":"glutamate transporter activator",
+"id":"CHEBI_64370",
+"size":1
+}
+]
+},{
+"name":"cholinergic drug",
+"id":"CHEBI_38323",
+"size":1,
+"children": [
+{
+"name":"cholinergic agonist",
+"id":"CHEBI_38324",
+"size":1,
+"children": [
+{
+"name":"nicotinic acetylcholine receptor agonist",
+"id":"CHEBI_47958",
+"size":1,
+"children": [
+{
+"name":"neonicotinoid insectide",
+"id":"CHEBI_25540",
+"size":1
+}
+]
+},{
+"name":"muscarinic agonist",
+"id":"CHEBI_38325",
+"size":1
+}
+]
+},{
+"name":"cholinergic antagonist",
+"id":"CHEBI_48873",
+"size":1,
+"children": [
+{
+"name":"muscarinic antagonist",
+"id":"CHEBI_48876",
+"size":1
+},{
+"name":"nicotinic antagonist",
+"id":"CHEBI_48878",
+"size":1
+},{
+"name":"parasympatholytic",
+"id":"CHEBI_50370",
+"size":1
+}
+]
+}
+]
+},{
+"name":"histaminergic drug",
+"id":"CHEBI_37957",
+"size":1,
+"children": [
+{
+"name":"histamine agonist",
+"id":"CHEBI_35678",
+"size":1,
+"children": [
+{
+"name":"H4-receptor agonist",
+"id":"CHEBI_64155",
+"size":1
+},{
+"name":"H3-receptor agonist",
+"id":"CHEBI_64154",
+"size":1
+},{
+"name":"H1-receptor agonist",
+"id":"CHEBI_71173",
+"size":1
+}
+]
+},{
+"name":"histamine antagonist",
+"id":"CHEBI_37956",
+"size":1,
+"children": [
+{
+"name":"H3-receptor antagonist",
+"id":"CHEBI_64176",
+"size":1
+},{
+"name":"H2-receptor antagonist",
+"id":"CHEBI_37961",
+"size":1
+},{
+"name":"H1-receptor antagonist",
+"id":"CHEBI_37955",
+"size":1
+}
+]
+}
+]
+},{
+"name":"miotic",
+"id":"CHEBI_51068",
+"size":1
+},{
+"name":"opioid agent",
+"id":"CHEBI_60598",
+"size":1,
+"children": [
+{
+"name":"kappa-opioid agent",
+"id":"CHEBI_60603",
+"size":1,
+"children": [
+{
+"name":"kappa-opioid receptor agonist",
+"id":"CHEBI_59282",
+"size":1
+}
+]
+},{
+"name":"mu-opioid agent",
+"id":"CHEBI_60599",
+"size":1,
+"children": [
+{
+"name":"mu-opioid receptor antagonist",
+"id":"CHEBI_50137",
+"size":1
+},{
+"name":"mu-opioid receptor agonist",
+"id":"CHEBI_55322",
+"size":1
+}
+]
+},{
+"name":"delta-opioid agent",
+"id":"CHEBI_60601",
+"size":1,
+"children": [
+{
+"name":"delta-opioid receptor agonist",
+"id":"CHEBI_64054",
+"size":1
+},{
+"name":"delta-opioid receptor antagonist",
+"id":"CHEBI_59283",
+"size":1
+}
+]
+},{
+"name":"opioid receptor antagonist",
+"id":"CHEBI_60605",
+"size":1,
+"children": [
+{
+"name":"mu-opioid receptor antagonist",
+"id":"CHEBI_50137",
+"size":1
+},{
+"name":"delta-opioid receptor antagonist",
+"id":"CHEBI_59283",
+"size":1
+}
+]
+},{
+"name":"opioid receptor agonist",
+"id":"CHEBI_60606",
+"size":1,
+"children": [
+{
+"name":"delta-opioid receptor agonist",
+"id":"CHEBI_64054",
+"size":1
+},{
+"name":"mu-opioid receptor agonist",
+"id":"CHEBI_55322",
+"size":1
+},{
+"name":"kappa-opioid receptor agonist",
+"id":"CHEBI_59282",
+"size":1
+}
+]
+}
+]
+},{
+"name":"serotonergic drug",
+"id":"CHEBI_48278",
+"size":1,
+"children": [
+{
+"name":"serotonin uptake inhibitor",
+"id":"CHEBI_50949",
+"size":1
+},{
+"name":"serotonergic agonist",
+"id":"CHEBI_35941",
+"size":1
+},{
+"name":"serotonergic antagonist",
+"id":"CHEBI_48279",
+"size":1
+}
+]
+},{
+"name":"dopaminergic agent",
+"id":"CHEBI_48560",
+"size":1,
+"children": [
+{
+"name":"dopamine uptake inhibitor",
+"id":"CHEBI_51039",
+"size":1
+},{
+"name":"dopamine agonist",
+"id":"CHEBI_51065",
+"size":1
+},{
+"name":"dopaminergic antagonist",
+"id":"CHEBI_48561",
+"size":1
+}
+]
+}
+]
+},{
+"name":"nasal decongestant",
+"id":"CHEBI_77715",
+"size":1
+},{
+"name":"bone density conservation agent",
+"id":"CHEBI_50646",
+"size":1
+},{
+"name":"bronchodilator agent",
+"id":"CHEBI_35523",
+"size":1
+},{
+"name":"reproductive control drug",
+"id":"CHEBI_50689",
+"size":1,
+"children": [
+{
+"name":"contraceptive drug",
+"id":"CHEBI_49323",
+"size":1,
+"children": [
+{
+"name":"female contraceptive drug",
+"id":"CHEBI_49324",
+"size":1,
+"children": [
+{
+"name":"oral contraceptive",
+"id":"CHEBI_49325",
+"size":1,
+"children": [
+{
+"name":"synthetic oral contraceptive",
+"id":"CHEBI_49326",
+"size":1
+}
+]
+}
+]
+}
+]
+},{
+"name":"tocolytic agent",
+"id":"CHEBI_66993",
+"size":1
+},{
+"name":"abortifacient",
+"id":"CHEBI_50691",
+"size":1
+}
+]
+},{
+"name":"anti-estrogen",
+"id":"CHEBI_50751",
+"size":1
+},{
+"name":"antidyskinesia agent",
+"id":"CHEBI_66956",
+"size":1,
+"children": [
+{
+"name":"antiparkinson drug",
+"id":"CHEBI_48407",
+"size":1
+}
+]
+},{
+"name":"renal agent",
+"id":"CHEBI_35846",
+"size":1,
+"children": [
+{
+"name":"uricosuric drug",
+"id":"CHEBI_35841",
+"size":1
+}
+]
+},{
+"name":"antilipemic drug",
+"id":"CHEBI_35679",
+"size":1,
+"children": [
+{
+"name":"anticholesteremic drug",
+"id":"CHEBI_35821",
+"size":1
+}
+]
+},{
+"name":"expectorant",
+"id":"CHEBI_77035",
+"size":1
+},{
+"name":"antirheumatic drug",
+"id":"CHEBI_35842",
+"size":1,
+"children": [
+{
+"name":"gout suppressant",
+"id":"CHEBI_35845",
+"size":1,
+"children": [
+{
+"name":"uricosuric drug",
+"id":"CHEBI_35841",
+"size":1
+}
+]
+},{
+"name":"non-steroidal anti-inflammatory drug",
+"id":"CHEBI_35475",
+"size":1
+}
+]
+},{
+"name":"mydriatic agent",
+"id":"CHEBI_50513",
+"size":1
+},{
+"name":"appetite regulator",
+"id":"CHEBI_50780",
+"size":1,
+"children": [
+{
+"name":"appetite depressant",
+"id":"CHEBI_50507",
+"size":1
+},{
+"name":"appetite enhancer",
+"id":"CHEBI_50779",
+"size":1
+}
+]
+},{
+"name":"central nervous system drug",
+"id":"CHEBI_35470",
+"size":1,
+"children": [
+{
+"name":"central nervous system depressant",
+"id":"CHEBI_35488",
+"size":1,
+"children": [
+{
+"name":"sedative",
+"id":"CHEBI_35717",
+"size":1
+},{
+"name":"tranquilizing drug",
+"id":"CHEBI_35473",
+"size":1,
+"children": [
+{
+"name":"antipsychotic agent",
+"id":"CHEBI_35476",
+"size":1,
+"children": [
+{
+"name":"second generation antipsychotic",
+"id":"CHEBI_65191",
+"size":1
+},{
+"name":"first generation antipsychotic",
+"id":"CHEBI_65190",
+"size":1,
+"children": [
+{
+"name":"phenothiazine antipsychotic drug",
+"id":"CHEBI_37930",
+"size":1
+}
+]
+}
+]
+},{
+"name":"anxiolytic drug",
+"id":"CHEBI_35474",
+"size":1
+},{
+"name":"antimanic drug",
+"id":"CHEBI_35477",
+"size":1
+}
+]
+},{
+"name":"anticonvulsant",
+"id":"CHEBI_35623",
+"size":1
+}
+]
+},{
+"name":"psychotropic drug",
+"id":"CHEBI_35471",
+"size":1,
+"children": [
+{
+"name":"hallucinogen",
+"id":"CHEBI_35499",
+"size":1
+},{
+"name":"antidepressant",
+"id":"CHEBI_35469",
+"size":1
+},{
+"name":"eugeroic",
+"id":"CHEBI_77567",
+"size":1
+},{
+"name":"tranquilizing drug",
+"id":"CHEBI_35473",
+"size":1,
+"children": [
+{
+"name":"antipsychotic agent",
+"id":"CHEBI_35476",
+"size":1,
+"children": [
+{
+"name":"second generation antipsychotic",
+"id":"CHEBI_65191",
+"size":1
+},{
+"name":"first generation antipsychotic",
+"id":"CHEBI_65190",
+"size":1,
+"children": [
+{
+"name":"phenothiazine antipsychotic drug",
+"id":"CHEBI_37930",
+"size":1
+}
+]
+}
+]
+},{
+"name":"anxiolytic drug",
+"id":"CHEBI_35474",
+"size":1
+},{
+"name":"antimanic drug",
+"id":"CHEBI_35477",
+"size":1
+}
+]
+}
+]
+},{
+"name":"central nervous system stimulant",
+"id":"CHEBI_35337",
+"size":1
+}
+]
+},{
+"name":"angiogenesis inhibitor",
+"id":"CHEBI_48422",
+"size":1
+},{
+"name":"protective agent",
+"id":"CHEBI_50267",
+"size":1,
+"children": [
+{
+"name":"nephroprotective agent",
+"id":"CHEBI_76595",
+"size":1
+},{
+"name":"antidote",
+"id":"CHEBI_50247",
+"size":1,
+"children": [
+{
+"name":"antidote to organophosphate poisoning",
+"id":"CHEBI_90753",
+"size":1
+},{
+"name":"antidote to paracetamol poisoning",
+"id":"CHEBI_74529",
+"size":1
+},{
+"name":"antidote to cyanide poisoning",
+"id":"CHEBI_90749",
+"size":1
+},{
+"name":"antidote to benzodiazepine poisoning",
+"id":"CHEBI_90757",
+"size":1
+},{
+"name":"antidote to opioid poisoning",
+"id":"CHEBI_90755",
+"size":1
+},{
+"name":"antidote to curare poisoning",
+"id":"CHEBI_74530",
+"size":1
+}
+]
+},{
+"name":"cardioprotective agent",
+"id":"CHEBI_77307",
+"size":1
+},{
+"name":"hepatoprotective agent",
+"id":"CHEBI_62868",
+"size":1
+},{
+"name":"neuroprotective agent",
+"id":"CHEBI_63726",
+"size":1
+},{
+"name":"radiation protective agent",
+"id":"CHEBI_66987",
+"size":1
+}
+]
+},{
+"name":"calcimimetic",
+"id":"CHEBI_48525",
+"size":1
+},{
+"name":"interferon inducer",
+"id":"CHEBI_36710",
+"size":1
+},{
+"name":"orphan drug",
+"id":"CHEBI_71031",
+"size":1
+},{
+"name":"antiemetic",
+"id":"CHEBI_50919",
+"size":1
+},{
+"name":"analgesic",
+"id":"CHEBI_35480",
+"size":1,
+"children": [
+{
+"name":"opioid analgesic",
+"id":"CHEBI_35482",
+"size":1
+},{
+"name":"non-narcotic analgesic",
+"id":"CHEBI_35481",
+"size":1
+}
+]
+},{
+"name":"antineoplastic agent",
+"id":"CHEBI_35610",
+"size":1
+},{
+"name":"antiinfective agent",
+"id":"CHEBI_35441",
+"size":1,
+"children": [
+{
+"name":"antimicrobial drug",
+"id":"CHEBI_36043",
+"size":1,
+"children": [
+{
+"name":"antiprotozoal drug",
+"id":"CHEBI_35820",
+"size":1,
+"children": [
+{
+"name":"trypanocidal drug",
+"id":"CHEBI_36335",
+"size":1
+},{
+"name":"coccidiostat",
+"id":"CHEBI_35818",
+"size":1
+},{
+"name":"antiplasmodial drug",
+"id":"CHEBI_64915",
+"size":1,
+"children": [
+{
+"name":"antimalarial",
+"id":"CHEBI_38068",
+"size":1
+}
+]
+},{
+"name":"antileishmanial agent",
+"id":"CHEBI_70868",
+"size":1
+},{
+"name":"antitrichomonal drug",
+"id":"CHEBI_50685",
+"size":1
+}
+]
+},{
+"name":"antibacterial drug",
+"id":"CHEBI_36047",
+"size":1,
+"children": [
+{
+"name":"antimycobacterial drug",
+"id":"CHEBI_64912",
+"size":1,
+"children": [
+{
+"name":"antitubercular agent",
+"id":"CHEBI_33231",
+"size":1
+},{
+"name":"leprostatic drug",
+"id":"CHEBI_35816",
+"size":1
+}
+]
+},{
+"name":"antitreponemal drug",
+"id":"CHEBI_36050",
+"size":1,
+"children": [
+{
+"name":"antisyphilitic drug",
+"id":"CHEBI_36051",
+"size":1
+}
+]
+}
+]
+},{
+"name":"antiviral drug",
+"id":"CHEBI_36044",
+"size":1,
+"children": [
+{
+"name":"HIV fusion inhibitor",
+"id":"CHEBI_59886",
+"size":1
+},{
+"name":"EC 3.2.1.18 (exo-alpha-sialidase) inhibitor",
+"id":"CHEBI_52425",
+"size":1
+}
+]
+}
+]
+},{
+"name":"antifungal drug",
+"id":"CHEBI_86327",
+"size":1
+},{
+"name":"antiseptic drug",
+"id":"CHEBI_48218",
+"size":1
+},{
+"name":"antiparasitic agent",
+"id":"CHEBI_35442",
+"size":1,
+"children": [
+{
+"name":"anthelminthic drug",
+"id":"CHEBI_35443",
+"size":1,
+"children": [
+{
+"name":"antiplatyhelmintic drug",
+"id":"CHEBI_35684",
+"size":1,
+"children": [
+{
+"name":"schistosomicide drug",
+"id":"CHEBI_38941",
+"size":1
+}
+]
+},{
+"name":"antinematodal drug",
+"id":"CHEBI_35444",
+"size":1
+}
+]
+},{
+"name":"antiprotozoal drug",
+"id":"CHEBI_35820",
+"size":1,
+"children": [
+{
+"name":"trypanocidal drug",
+"id":"CHEBI_36335",
+"size":1
+},{
+"name":"coccidiostat",
+"id":"CHEBI_35818",
+"size":1
+},{
+"name":"antiplasmodial drug",
+"id":"CHEBI_64915",
+"size":1,
+"children": [
+{
+"name":"antimalarial",
+"id":"CHEBI_38068",
+"size":1
+}
+]
+},{
+"name":"antileishmanial agent",
+"id":"CHEBI_70868",
+"size":1
+},{
+"name":"antitrichomonal drug",
+"id":"CHEBI_50685",
+"size":1
+}
+]
+},{
+"name":"antiplasmodial drug",
+"id":"CHEBI_64915",
+"size":1,
+"children": [
+{
+"name":"antimalarial",
+"id":"CHEBI_38068",
+"size":1
+}
+]
+},{
+"name":"acaricide drug",
+"id":"CHEBI_36053",
+"size":1
+},{
+"name":"ectoparasiticide",
+"id":"CHEBI_38956",
+"size":1
+}
+]
+}
+]
+},{
+"name":"vulnerary",
+"id":"CHEBI_73336",
+"size":1
+},{
+"name":"mucolytic",
+"id":"CHEBI_77034",
+"size":1
+},{
+"name":"oxytocic",
+"id":"CHEBI_36063",
+"size":1
+},{
+"name":"estrogen receptor antagonist",
+"id":"CHEBI_50792",
+"size":1
+},{
+"name":"antitussive",
+"id":"CHEBI_51177",
+"size":1
+},{
+"name":"estrogen receptor modulator",
+"id":"CHEBI_50739",
+"size":1
+},{
+"name":"angiogenesis modulating agent",
+"id":"CHEBI_50926",
+"size":1,
+"children": [
+{
+"name":"pro-angiogenic agent",
+"id":"CHEBI_72571",
+"size":1
+},{
+"name":"anti-angiogenic agent",
+"id":"CHEBI_67170",
+"size":1
+},{
+"name":"angiogenesis inducing agent",
+"id":"CHEBI_50927",
+"size":1
+}
+]
+},{
+"name":"diuretic",
+"id":"CHEBI_35498",
+"size":1,
+"children": [
+{
+"name":"osmotic diuretic",
+"id":"CHEBI_50504",
+"size":1
+},{
+"name":"loop diuretic",
+"id":"CHEBI_77608",
+"size":1
+}
+]
+},{
+"name":"peripheral nervous system drug",
+"id":"CHEBI_49110",
+"size":1
+},{
+"name":"prodrug",
+"id":"CHEBI_50266",
+"size":1
+}
+]
+}
+]
+},{
+"name":"reactive oxygen species generator",
+"id":"CHEBI_70982",
+"size":1
+},{
+"name":"antimicrobial agent",
+"id":"CHEBI_33281",
+"size":1,
+"children": [
+{
+"name":"antimicrobial food preservative",
+"id":"CHEBI_65256",
+"size":1
+},{
+"name":"antimicrobial drug",
+"id":"CHEBI_36043",
+"size":1,
+"children": [
+{
+"name":"antiprotozoal drug",
+"id":"CHEBI_35820",
+"size":1,
+"children": [
+{
+"name":"trypanocidal drug",
+"id":"CHEBI_36335",
+"size":1
+},{
+"name":"coccidiostat",
+"id":"CHEBI_35818",
+"size":1
+},{
+"name":"antiplasmodial drug",
+"id":"CHEBI_64915",
+"size":1,
+"children": [
+{
+"name":"antimalarial",
+"id":"CHEBI_38068",
+"size":1
+}
+]
+},{
+"name":"antileishmanial agent",
+"id":"CHEBI_70868",
+"size":1
+},{
+"name":"antitrichomonal drug",
+"id":"CHEBI_50685",
+"size":1
+}
+]
+},{
+"name":"antibacterial drug",
+"id":"CHEBI_36047",
+"size":1,
+"children": [
+{
+"name":"antimycobacterial drug",
+"id":"CHEBI_64912",
+"size":1,
+"children": [
+{
+"name":"antitubercular agent",
+"id":"CHEBI_33231",
+"size":1
+},{
+"name":"leprostatic drug",
+"id":"CHEBI_35816",
+"size":1
+}
+]
+},{
+"name":"antitreponemal drug",
+"id":"CHEBI_36050",
+"size":1,
+"children": [
+{
+"name":"antisyphilitic drug",
+"id":"CHEBI_36051",
+"size":1
+}
+]
+}
+]
+},{
+"name":"antiviral drug",
+"id":"CHEBI_36044",
+"size":1,
+"children": [
+{
+"name":"HIV fusion inhibitor",
+"id":"CHEBI_59886",
+"size":1
+},{
+"name":"EC 3.2.1.18 (exo-alpha-sialidase) inhibitor",
+"id":"CHEBI_52425",
+"size":1
+}
+]
+}
+]
+},{
+"name":"antibiotic pesticide",
+"id":"CHEBI_39215",
+"size":1,
+"children": [
+{
+"name":"antibiotic nematicide",
+"id":"CHEBI_39217",
+"size":1
+},{
+"name":"antibiotic insecticide",
+"id":"CHEBI_39208",
+"size":1
+},{
+"name":"antibiotic acaricide",
+"id":"CHEBI_39216",
+"size":1
+}
+]
+}
+]
+},{
+"name":"indicator",
+"id":"CHEBI_47867",
+"size":1,
+"children": [
+{
+"name":"visual indicator",
+"id":"CHEBI_50408",
+"size":1,
+"children": [
+{
+"name":"adsorption indicator",
+"id":"CHEBI_50409",
+"size":1
+},{
+"name":"colour indicator",
+"id":"CHEBI_50410",
+"size":1,
+"children": [
+{
+"name":"one-colour indicator",
+"id":"CHEBI_50411",
+"size":1,
+"children": [
+{
+"name":"chromogenic compound",
+"id":"CHEBI_75050",
+"size":1
+}
+]
+},{
+"name":"acid-base indicator",
+"id":"CHEBI_50407",
+"size":1
+},{
+"name":"two-colour indicator",
+"id":"CHEBI_50412",
+"size":1
+}
+]
+}
+]
+},{
+"name":"biomarker",
+"id":"CHEBI_59163",
+"size":1
+}
+]
+},{
+"name":"photochemical role",
+"id":"CHEBI_52215",
+"size":1
+},{
+"name":"protecting group",
+"id":"CHEBI_51087",
+"size":1,
+"children": [
+{
+"name":"carboxylic acid protecting group",
+"id":"CHEBI_52943",
+"size":1
+},{
+"name":"phosphate protecting group",
+"id":"CHEBI_52941",
+"size":1
+}
+]
+},{
+"name":"pesticide",
+"id":"CHEBI_25944",
+"size":1,
+"children": [
+{
+"name":"pesticide synergist",
+"id":"CHEBI_25943",
+"size":1
+},{
+"name":"antibiotic pesticide",
+"id":"CHEBI_39215",
+"size":1,
+"children": [
+{
+"name":"antibiotic nematicide",
+"id":"CHEBI_39217",
+"size":1
+},{
+"name":"antibiotic insecticide",
+"id":"CHEBI_39208",
+"size":1
+},{
+"name":"antibiotic acaricide",
+"id":"CHEBI_39216",
+"size":1
+}
+]
+},{
+"name":"insecticide",
+"id":"CHEBI_24852",
+"size":1,
+"children": [
+{
+"name":"pyrethroid insecticide",
+"id":"CHEBI_26413",
+"size":1,
+"children": [
+{
+"name":"pyrethroid ester insecticide",
+"id":"CHEBI_39116",
+"size":1
+},{
+"name":"pyrethroid ether insecticide",
+"id":"CHEBI_39351",
+"size":1
+}
+]
+},{
+"name":"antibiotic insecticide",
+"id":"CHEBI_39208",
+"size":1
+},{
+"name":"carbamate insecticide",
+"id":"CHEBI_38461",
+"size":1
+},{
+"name":"insect repellent",
+"id":"CHEBI_71692",
+"size":1
+},{
+"name":"dinitrophenol insecticide",
+"id":"CHEBI_39415",
+"size":1
+},{
+"name":"phytogenic insecticide",
+"id":"CHEBI_22917",
+"size":1
+},{
+"name":"triazine insecticide",
+"id":"CHEBI_38060",
+"size":1
+},{
+"name":"neonicotinoid insectide",
+"id":"CHEBI_25540",
+"size":1
+},{
+"name":"insect growth regulator",
+"id":"CHEBI_24851",
+"size":1,
+"children": [
+{
+"name":"chitin synthesis inhibitor",
+"id":"CHEBI_23100",
+"size":1,
+"children": [
+{
+"name":"lepidopteran inhibitor of chitin biosynthesis",
+"id":"CHEBI_39379",
+"size":1
+},{
+"name":"homopteran inhibitor of chitin biosynthesis",
+"id":"CHEBI_39378",
+"size":1
+}
+]
+},{
+"name":"ecdysone antagonists",
+"id":"CHEBI_23891",
+"size":1
+},{
+"name":"juvenile hormone antagonists",
+"id":"CHEBI_24941",
+"size":1,
+"children": [
+{
+"name":"precocenes",
+"id":"CHEBI_26220",
+"size":1
+}
+]
+},{
+"name":"ecdysone agonist",
+"id":"CHEBI_38456",
+"size":1
+},{
+"name":"juvenile hormone mimic",
+"id":"CHEBI_24942",
+"size":1
+}
+]
+},{
+"name":"insect sterilant",
+"id":"CHEBI_67105",
+"size":1
+},{
+"name":"pediculicide",
+"id":"CHEBI_38706",
+"size":1
+},{
+"name":"fumigant insecticide",
+"id":"CHEBI_39277",
+"size":1
+}
+]
+},{
+"name":"nematicide",
+"id":"CHEBI_25491",
+"size":1,
+"children": [
+{
+"name":"antibiotic nematicide",
+"id":"CHEBI_39217",
+"size":1
+},{
+"name":"antinematodal drug",
+"id":"CHEBI_35444",
+"size":1
+}
+]
+},{
+"name":"fumigant",
+"id":"CHEBI_39276",
+"size":1,
+"children": [
+{
+"name":"fumigant insecticide",
+"id":"CHEBI_39277",
+"size":1
+}
+]
+},{
+"name":"insect attractant",
+"id":"CHEBI_24850",
+"size":1
+},{
+"name":"antifeedant",
+"id":"CHEBI_22583",
+"size":1
+},{
+"name":"antifungal agrochemical",
+"id":"CHEBI_86328",
+"size":1
+},{
+"name":"chemosterilant",
+"id":"CHEBI_23092",
+"size":1,
+"children": [
+{
+"name":"insect sterilant",
+"id":"CHEBI_67105",
+"size":1
+}
+]
+},{
+"name":"herbicide",
+"id":"CHEBI_24527",
+"size":1,
+"children": [
+{
+"name":"photosynthetic electron-transport chain inhibitor",
+"id":"CHEBI_26087",
+"size":1,
+"children": [
+{
+"name":"photosystem-II inhibitor",
+"id":"CHEBI_26089",
+"size":1
+},{
+"name":"cytochrome-b6f complex inhibitor",
+"id":"CHEBI_23529",
+"size":1
+},{
+"name":"photosystem-I inhibitor",
+"id":"CHEBI_26088",
+"size":1
+}
+]
+},{
+"name":"EC 2.2.1.6 (acetolactate synthase) inhibitor",
+"id":"CHEBI_22180",
+"size":1
+},{
+"name":"defoliant",
+"id":"CHEBI_23582",
+"size":1
+}
+]
+},{
+"name":"molluscicide",
+"id":"CHEBI_33904",
+"size":1
+},{
+"name":"antifouling biocide",
+"id":"CHEBI_51076",
+"size":1
+},{
+"name":"acaricide",
+"id":"CHEBI_22153",
+"size":1,
+"children": [
+{
+"name":"pyrethroid ester acaricide",
+"id":"CHEBI_39259",
+"size":1
+},{
+"name":"antibiotic acaricide",
+"id":"CHEBI_39216",
+"size":1
+},{
+"name":"sulfite ester acaricide",
+"id":"CHEBI_39301",
+"size":1
+},{
+"name":"tetrazine acaricide",
+"id":"CHEBI_39318",
+"size":1
+},{
+"name":"scabicide",
+"id":"CHEBI_73333",
+"size":1
+},{
+"name":"bridged diphenyl acaricide",
+"id":"CHEBI_39412",
+"size":1
+},{
+"name":"acaricide drug",
+"id":"CHEBI_36053",
+"size":1
+},{
+"name":"mite growth regulator",
+"id":"CHEBI_39316",
+"size":1
+},{
+"name":"pyrethroid ether acaricide",
+"id":"CHEBI_39369",
+"size":1
+}
+]
+},{
+"name":"fungicide",
+"id":"CHEBI_24127",
+"size":1,
+"children": [
+{
+"name":"antifungal agrochemical",
+"id":"CHEBI_86328",
+"size":1
+}
+]
+},{
+"name":"avicide",
+"id":"CHEBI_33289",
+"size":1
+},{
+"name":"rodenticide",
+"id":"CHEBI_33288",
+"size":1
+}
+]
+},{
+"name":"plasticiser",
+"id":"CHEBI_79056",
+"size":1
+},{
+"name":"label",
+"id":"CHEBI_35209",
+"size":1,
+"children": [
+{
+"name":"spin label",
+"id":"CHEBI_35210",
+"size":1
+},{
+"name":"radioactive label",
+"id":"CHEBI_35211",
+"size":1
+}
+]
+},{
+"name":"propellant",
+"id":"CHEBI_76414",
+"size":1,
+"children": [
+{
+"name":"food propellant",
+"id":"CHEBI_78017",
+"size":1
+}
+]
+},{
+"name":"refrigerant",
+"id":"CHEBI_78433",
+"size":1
+},{
+"name":"anticaking agent",
+"id":"CHEBI_77964",
+"size":1,
+"children": [
+{
+"name":"food anticaking agent",
+"id":"CHEBI_77965",
+"size":1
+}
+]
+},{
+"name":"enzyme mimic",
+"id":"CHEBI_78152",
+"size":1
+},{
+"name":"detergent",
+"id":"CHEBI_27780",
+"size":1
+},{
+"name":"agrochemical",
+"id":"CHEBI_33286",
+"size":1,
+"children": [
+{
+"name":"animal growth promotant",
+"id":"CHEBI_82655",
+"size":1
+},{
+"name":"fertilizer",
+"id":"CHEBI_33287",
+"size":1
+},{
+"name":"plant activator",
+"id":"CHEBI_73182",
+"size":1
+},{
+"name":"antifungal agrochemical",
+"id":"CHEBI_86328",
+"size":1
+}
+]
+},{
+"name":"protein denaturant",
+"id":"CHEBI_50533",
+"size":1
+},{
+"name":"dye",
+"id":"CHEBI_37958",
+"size":1,
+"children": [
+{
+"name":"fluorescent dye",
+"id":"CHEBI_51121",
+"size":1,
+"children": [
+{
+"name":"squaraine dye",
+"id":"CHEBI_52271",
+"size":1
+},{
+"name":"fluorochrome",
+"id":"CHEBI_51217",
+"size":1
+}
+]
+},{
+"name":"histological dye",
+"id":"CHEBI_77178",
+"size":1
+}
+]
+},{
+"name":"fuel",
+"id":"CHEBI_33292",
+"size":1,
+"children": [
+{
+"name":"nuclear fuel",
+"id":"CHEBI_35231",
+"size":1
+},{
+"name":"fossil fuel",
+"id":"CHEBI_35230",
+"size":1
+}
+]
+},{
+"name":"anti-inflammatory agent",
+"id":"CHEBI_67079",
+"size":1,
+"children": [
+{
+"name":"anti-inflammatory drug",
+"id":"CHEBI_35472",
+"size":1,
+"children": [
+{
+"name":"non-steroidal anti-inflammatory drug",
+"id":"CHEBI_35475",
+"size":1
+}
+]
+}
+]
+},{
+"name":"food additive",
+"id":"CHEBI_64047",
+"size":1,
+"children": [
+{
+"name":"food thickening agent",
+"id":"CHEBI_77970",
+"size":1
+},{
+"name":"food additive carrier",
+"id":"CHEBI_78059",
+"size":1
+},{
+"name":"food antifoaming agent",
+"id":"CHEBI_78058",
+"size":1
+},{
+"name":"raising agent",
+"id":"CHEBI_77971",
+"size":1
+},{
+"name":"food bleaching agent",
+"id":"CHEBI_78003",
+"size":1
+},{
+"name":"food glazing agent",
+"id":"CHEBI_77972",
+"size":1
+},{
+"name":"food bulking agent",
+"id":"CHEBI_78004",
+"size":1
+},{
+"name":"foaming agent",
+"id":"CHEBI_78007",
+"size":1
+},{
+"name":"food colour retention agent",
+"id":"CHEBI_78006",
+"size":1
+},{
+"name":"food anticaking agent",
+"id":"CHEBI_77965",
+"size":1
+},{
+"name":"food emulsifier",
+"id":"CHEBI_63047",
+"size":1
+},{
+"name":"food packaging gas",
+"id":"CHEBI_77974",
+"size":1
+},{
+"name":"food acidity regulator",
+"id":"CHEBI_64049",
+"size":1
+},{
+"name":"food propellant",
+"id":"CHEBI_78017",
+"size":1
+},{
+"name":"flour treatment agent",
+"id":"CHEBI_64577",
+"size":1
+},{
+"name":"food gelling agent",
+"id":"CHEBI_78016",
+"size":1
+},{
+"name":"food stabiliser",
+"id":"CHEBI_77966",
+"size":1
+},{
+"name":"food preservative",
+"id":"CHEBI_65255",
+"size":1,
+"children": [
+{
+"name":"sequestrant",
+"id":"CHEBI_77963",
+"size":1
+},{
+"name":"antimicrobial food preservative",
+"id":"CHEBI_65256",
+"size":1
+},{
+"name":"food antioxidant",
+"id":"CHEBI_77962",
+"size":1
+}
+]
+},{
+"name":"flavouring agent",
+"id":"CHEBI_35617",
+"size":1,
+"children": [
+{
+"name":"sweetening agent",
+"id":"CHEBI_50505",
+"size":1
+}
+]
+},{
+"name":"food firming agent",
+"id":"CHEBI_77960",
+"size":1
+},{
+"name":"food colouring",
+"id":"CHEBI_77182",
+"size":1
+},{
+"name":"food humectant",
+"id":"CHEBI_77969",
+"size":1
+}
+]
+},{
+"name":"excipient",
+"id":"CHEBI_75324",
+"size":1
+}
+]
+},{
+"name":"surface property",
+"id":"NPO_1364",
+"size":1,
+"children": [
+{
+"name":"surface area",
+"id":"NPO_1235",
+"size":1
+}
+]
+}
+]
+}
