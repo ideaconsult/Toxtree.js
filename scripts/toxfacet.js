@@ -10,11 +10,12 @@ var jToxFacet = (function () {
       "loadStep": Infinity,
       "minFontSize": 10.0,
       "maxFontSize": 64.0,
+      "lightnessScale": 0.9,
       "parentZoom": true,     // zoom to the parent of the selected item. On false - go one level deeper - directly to the selection.
       "unloadDelay": 3000,    // unload the invisible items after that many milliseconds.
       
       // colors
-      "parentFill": "rgba(240, 240, 240, 0.5)", // Color for transparent parent fills. The provided object's toString() method will be invoked.
+      "parentFill": "rgb(240, 240, 240)", // Color for parent fills. Alpha component is added automatically.
       "colorScale": d3.scale.category10(),                       
       
       "onHover": null,
@@ -42,6 +43,9 @@ var jToxFacet = (function () {
     for (var i = 0;i < dom.length; ++i) dom[i] = i;
     self.settings.colorScale.domain(dom);
     
+    var fill = d3.rgb(self.settings.parentFill);
+    self.settings.parentFill = "rgba(" + fill.r + "," + fill.g + "," + fill.b + "," + (1.0 / (self.settings.viewStep) + 0.15) + ")";
+    
     // finally make the query, if Uri is provided
     if (self.settings['facetUri'] != null){
       self.queryFacets(self.settings['facetUri']);
@@ -50,13 +54,15 @@ var jToxFacet = (function () {
   
   /***** Now follow the helper functions ****/    
   function polyFill(d) {
+    var settings = d.context.settings;
+    
   	if (!!d.children && d.children.length > 0)
-  	  return d.context.settings.parentFill.toString();
+  	  return settings.parentFill.toString();
   		
-  	var v = d.value / d.parent.value,
-  	    c = d3.hsl(d.context.settings.colorScale(d.master));
+  	var v = settings.fValue(d) * settings.lightnessScale / settings.fValue(d.parent),
+  	    c = d3.hsl(settings.colorScale(d.master));
   	
-    c.l = Math.max(0.9 - v, 0.1);
+    c.l = 1.0 - v;
   	return c.toString();
   }
   
@@ -65,9 +71,8 @@ var jToxFacet = (function () {
   }
   
   function textFontSize(d) { 
-    return Math.max(
-      d.context.settings.maxFontSize * Math.sqrt(d.value / d.context.dataTree.value), 
-      d.context.settings.minFontSize) / Math.sqrt(d.context.currentScale); 
+    var settings = d.context.settings;
+    return Math.max(settings.maxFontSize * settings.fValue(d) / settings.fValue(d.context.dataTree), settings.minFontSize) / Math.sqrt(d.context.currentScale); 
   }
         
   function showHideOnZoom(tree, context, selection, isVisible) {
@@ -173,9 +178,6 @@ var jToxFacet = (function () {
   }
   
   function clusterZoom(d) {
-    // if we have hidden children, we'd like to zoom directly to them.
-    if (d.context.settings.parentZoom) d = d.parent;
-    
     // or, if we're not actually making change...
     if (d == d.context.currentSelection) return d;
     
@@ -186,8 +188,7 @@ var jToxFacet = (function () {
         height = context.rootElement.clientHeight,
         ctm = el.ownerSVGElement.createSVGMatrix();
 
-    
-    context.settings.viewRange[0] = d.depthRoot.depth + (d.depth > d.depthRoot.depth) * context.settings.viewStep;
+    context.settings.viewRange[0] = d.depthRoot.depth + (d.depth > d.depthRoot.depth + context.settings.viewStep - 1) * context.settings.viewStep;
     context.settings.viewRange[1] = context.settings.viewRange[0] + context.settings.viewStep;
     
     console.log("Current range: " + context.settings.viewRange);
@@ -297,6 +298,10 @@ var jToxFacet = (function () {
     	.on("click", function (d) {
         d3.event.stopPropagation();
         ccLib.fireCallback(settings.onSelect, this, d);
+
+        // if we have hidden children, we'd like to zoom directly to them.
+        if (d.context.settings.parentZoom) d = d.parent;
+        
         d.context.currentSelection = clusterZoom(d);
     	});
 
@@ -361,7 +366,7 @@ var jToxFacet = (function () {
         vertices = nodes
     	  	.map(function (e, i) {  
       	  	e.depth += originalDepth; 
-      	  	return !e.children ?  { x: r.cx + e.x + e.dx  / 2, y: r.cy + e.y + e.dy / 2, value: e.value, index: i } : null; 
+      	  	return !e.children ?  { x: r.cx + e.x + e.dx  / 2, y: r.cy + e.y + e.dy / 2, value: settings.fValue(e), index: i } : null; 
       	  })
     	  	.filter(function (e) { return e != null; });
 
@@ -546,7 +551,7 @@ var jToxFacet = (function () {
         return;
         
       if (self.currentSelection != null && self.currentSelection.depth > 0)
-        self.currentSelection = clusterZoom(self.currentSelection);
+        self.currentSelection = clusterZoom(self.currentSelection.parent);
 
     });
     
