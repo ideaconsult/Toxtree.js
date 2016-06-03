@@ -24,10 +24,10 @@ var jToxFacet = (function () {
       "onDeHover": null,
       "onSelect": null,
       "fnCollate": null,
-      "fnValue": function(d) { return Math.sqrt(d.size); },
-      "fnLabel": function(d) { 
-        return {  "label": d.entries.length > 1 ? "..." : d.entries.map(function (e) { return e.name; }).join("/"), 
-                  "size" : d.size > 200 ? "(" + ccLib.briefNumber(d.size) + ")" : null 
+      "fnValue": function(entries) { return Math.sqrt(Math.sqrt(entries[0].size)); },
+      "fnLabel": function(entries) { 
+        return {  "label": entries.length > 1 ? "..." : entries.map(function (e) { return e.name; }).join("/"), 
+                  "size" : entries[0].size > 200 ? "(" + ccLib.briefNumber(entries[0].size) + ")" : null 
               }; 
       }
     };
@@ -66,10 +66,10 @@ var jToxFacet = (function () {
   	if (!!d.children && d.children.length > 0)
   	  return settings.parentFill.toString();
   		
-  	var v = settings.fnValue(d) * settings.lightnessScale / settings.fnValue(d.parent),
+  	var v = d.value * settings.lightnessScale / d.parent.value,
   	    c = d3.hsl(settings.colorScale(d.master));
   	
-    c.l = 1.0 - v;
+    c.l = Math.max(1.0 - v, 0.2);
   	return c.toString();
   }
   
@@ -79,7 +79,7 @@ var jToxFacet = (function () {
   
   function textFontSize(d) { 
     var settings = d.context.settings;
-    return Math.max(settings.maxFontSize * settings.fnValue(d) / settings.fnValue(d.context.dataTree), settings.minFontSize) / Math.sqrt(d.context.currentScale * 1.1 - 0.3);
+    return Math.max(settings.maxFontSize * d.value / d.context.dataTree.value, settings.minFontSize) / Math.sqrt(d.context.currentScale * 1.1 - 0.3);
   }
         
   function showHideOnZoom(tree, context, selection, isVisible) {
@@ -102,7 +102,6 @@ var jToxFacet = (function () {
             delete node.z;
             delete node.dx;
             delete node.dy;
-            delete node.value;
           }
           
           // TODO: Check if this needs to be unloaded and add it to `unloaders`
@@ -324,7 +323,7 @@ var jToxFacet = (function () {
   		.attr("stroke-width", polyStroke(d))
   		.attr("d", !!d.polygon ? "M" + d.polygon.join("L") + "Z" : null);
   		
-    t = settings.fnLabel(d);
+    t = settings.fnLabel(d.entries);
     
     if (!t) return g;
     
@@ -343,8 +342,8 @@ var jToxFacet = (function () {
       .draw();
 
     if (!!t.size)
-      svgt.append("tspan")
-  	    .attr("dy", "1.1em")
+      svgt.attr("class", "sized").append("tspan")
+  	    .attr("dy", "1.2em")
   	    .attr("x", "0")
         .text(t.size);
         
@@ -374,13 +373,13 @@ var jToxFacet = (function () {
     var treemap = d3.layout.treemap()
           .size([r.width, r.height])
           .sticky(true)
-          .value(settings.fnValue);
+          .value(function (d) { return Math.sqrt(d.value); });
     
     var nodes = treemap.nodes(tree).reverse(),
         vertices = nodes
     	  	.map(function (e, i) {  
       	  	e.depth += originalDepth; 
-      	  	return !e.children ?  { x: r.cx + e.x + e.dx  / 2, y: r.cy + e.y + e.dy / 2, value: settings.fnValue(e), index: i } : null; 
+      	  	return !e.children ?  { x: r.cx + e.x + e.dx  / 2, y: r.cy + e.y + e.dy / 2, value: e.value, index: i } : null; 
       	  })
     	  	.filter(function (e) { return e != null; });
 
@@ -513,7 +512,7 @@ var jToxFacet = (function () {
     if (depth == null)
       depth = 0;
       
-    var tree = { 'entries': [data], 'size': data.size || 1, 'depth': depth, 'context': context, 'count': 1 };
+    var tree = { 'entries': [data], 'value': context.settings.fnValue([data]) || 1, 'depth': depth, 'context': context, 'count': 1 };
 
     if (master != null)
       tree.master = master;
@@ -535,11 +534,11 @@ var jToxFacet = (function () {
         child = arr[i] = extractTree(data.children[i], context, depth + 1, master != null ? master : i);
         
         child.parent = tree;
-        sz += child.size;
+        sz += child.value;
         cnt += child.count;
       }
 
-      tree.size = sz;
+      tree.value = sz;
       tree.count = cnt;
       tree.children = arr;
       
@@ -551,7 +550,7 @@ var jToxFacet = (function () {
             collated = child;
           else {
             collated.entries = collated.entries.concat(child.entries);
-            collated.size += child.size;
+            collated.value += child.value;
             collated.count += child.count;
           }
           

@@ -27,7 +27,7 @@ g.cluster.parent>text {
   opacity: 0.8;
 }
 
-g.cluster text tspan:last-child {
+g.cluster text.sized tspan:last-child {
   font-style: italic;
   font-weight: bold;
   font-size: 0.7em;
