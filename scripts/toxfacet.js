@@ -23,8 +23,13 @@ var jToxFacet = (function () {
       "onHover": null,
       "onDeHover": null,
       "onSelect": null,
-      "fValue": function(d) { return Math.sqrt(d.size); },
-      "fLabel": function(d) { return { "label": d.name.join("/"), "size" : d.size > 200 ? "(" + ccLib.briefNumber(d.size) + ")" : null }; },
+      "fnCollate": null,
+      "fnValue": function(d) { return Math.sqrt(d.size); },
+      "fnLabel": function(d) { 
+        return {  "label": d.entries.length > 1 ? "..." : d.entries.map(function (e) { return e.name; }).join("/"), 
+                  "size" : d.size > 200 ? "(" + ccLib.briefNumber(d.size) + ")" : null 
+              }; 
+      }
     };
     
   var cls = function (root, settings) {
@@ -61,7 +66,7 @@ var jToxFacet = (function () {
   	if (!!d.children && d.children.length > 0)
   	  return settings.parentFill.toString();
   		
-  	var v = settings.fValue(d) * settings.lightnessScale / settings.fValue(d.parent),
+  	var v = settings.fnValue(d) * settings.lightnessScale / settings.fnValue(d.parent),
   	    c = d3.hsl(settings.colorScale(d.master));
   	
     c.l = 1.0 - v;
@@ -74,7 +79,7 @@ var jToxFacet = (function () {
   
   function textFontSize(d) { 
     var settings = d.context.settings;
-    return Math.max(settings.maxFontSize * settings.fValue(d) / settings.fValue(d.context.dataTree), settings.minFontSize) / Math.sqrt(d.context.currentScale); 
+    return Math.max(settings.maxFontSize * settings.fnValue(d) / settings.fnValue(d.context.dataTree), settings.minFontSize) / Math.sqrt(d.context.currentScale * 1.1 - 0.3);
   }
         
   function showHideOnZoom(tree, context, selection, isVisible) {
@@ -83,7 +88,7 @@ var jToxFacet = (function () {
         unloaders = [],
         settings = tree.context.settings,
         shrinkNode = function (node) {
-          console.log ("Removing: " + node.name.join("/"));
+          console.log ("Removing: " + node.entries[0].name);
           node.hidden = node.children;
           delete node.children;
           
@@ -159,7 +164,7 @@ var jToxFacet = (function () {
               // TODO: Make the new depths loading HERE.
             });
 
-            console.log ("Creating: " + d.name.join("/"));
+            console.log ("Creating: " + d.entries[0].name);
             var gEl = d.element || d3.select(d.parent.element).insert("g", ":first-child").datum(d).node();
 
             populateRect(d, d.polygon);
@@ -167,10 +172,9 @@ var jToxFacet = (function () {
             switchNode(d, "parent", "leaf");
             
             ressurects.push(d.element);
+            
+            return false;
           }
-
-          // No need to traverse down there - we've either just did, or there's no need to.  
-          return false;
         }
         
         if (d.element === undefined) {
@@ -320,7 +324,7 @@ var jToxFacet = (function () {
   		.attr("stroke-width", polyStroke(d))
   		.attr("d", !!d.polygon ? "M" + d.polygon.join("L") + "Z" : null);
   		
-    t = settings.fLabel(d);
+    t = settings.fnLabel(d);
     
     if (!t) return g;
     
@@ -354,7 +358,7 @@ var jToxFacet = (function () {
         originalDepth = tree.depth || 0;
         
     if (!width || !height) {
-      r = d3plus.geom.largestRect(boundaries, { 'angle': 0, 'maxAspectRatio': 7 })[0];
+      r = d3plus.geom.largestRect(boundaries, { 'angle': 0, 'maxAspectRatio': 11 })[0];
       r.cx -= r.width / 2;
       r.cy -= r.height / 2;
     }
@@ -370,13 +374,13 @@ var jToxFacet = (function () {
     var treemap = d3.layout.treemap()
           .size([r.width, r.height])
           .sticky(true)
-          .value(settings.fValue);
+          .value(settings.fnValue);
     
     var nodes = treemap.nodes(tree).reverse(),
         vertices = nodes
     	  	.map(function (e, i) {  
       	  	e.depth += originalDepth; 
-      	  	return !e.children ?  { x: r.cx + e.x + e.dx  / 2, y: r.cy + e.y + e.dy / 2, value: settings.fValue(e), index: i } : null; 
+      	  	return !e.children ?  { x: r.cx + e.x + e.dx  / 2, y: r.cy + e.y + e.dy / 2, value: settings.fnValue(e), index: i } : null; 
       	  })
     	  	.filter(function (e) { return e != null; });
 
@@ -386,11 +390,9 @@ var jToxFacet = (function () {
       .y(function (d) { return d.y; })
       .value (function (d) { return d.value; });
 
-    voronoi.centroidal(vertices, 2).forEach(function (p) { 
+    voronoi.edges(vertices).forEach(function (p) { 
       var i = p.point.index;
-      p.edges = p.cell.edges;
-      delete p.cell;
-      
+
       nodes[i].polygon = p;
       nodes[i].origin = p.site;
     });      
@@ -511,7 +513,7 @@ var jToxFacet = (function () {
     if (depth == null)
       depth = 0;
       
-    var tree = { 'name': [data.name], 'size': data.size || 1, 'depth': depth, 'context': context, 'count': 1 };
+    var tree = { 'entries': [data], 'size': data.size || 1, 'depth': depth, 'context': context, 'count': 1 };
 
     if (master != null)
       tree.master = master;
@@ -520,29 +522,51 @@ var jToxFacet = (function () {
       ;
     else if (data.children.length == 1 && context.settings.collapseSingles) {
       tree = extractTree(data.children[0], context, depth, master);
-      tree.name.splice(0, 0, data.name);
+      tree.entries.splice(0, 0, data);
     }
     else if (depth < context.settings.loadDepth) {
       var sz = 0,
           cnt = 0,
-          child,
+          child, i,
+          collated = null,
           arr = new Array(data.children.length);
-        
-      for (var i = 0;i < data.children.length; ++i) {
-        arr[i] = child = extractTree(data.children[i], context, depth + 1, master != null ? master : i);
+          
+      for (i = 0;i < data.children.length; ++i) {
+        child = arr[i] = extractTree(data.children[i], context, depth + 1, master != null ? master : i);
         
         child.parent = tree;
         sz += child.size;
         cnt += child.count;
       }
-      
+
       tree.size = sz;
       tree.count = cnt;
+      tree.children = arr;
       
-      if (depth < context.settings.viewRange[1])
-        tree.children = arr;
-      else
+      // strange enough... we need to do the collating stuff _now
+      for (i = 0;i < arr.length; ++i) {
+        child = arr[i];
+        if (ccLib.fireCallback(context.settings.fnCollate, data, child) === true) {
+          if (!collated)
+            collated = child;
+          else {
+            collated.entries = collated.entries.concat(child.entries);
+            collated.size += child.size;
+            collated.count += child.count;
+          }
+          
+          arr.splice(i--, 1);
+        }
+      }      
+      
+      if (!!collated)
+        arr.push(collated)
+
+      // and fix the children vs. hidden stuff        
+      if (depth >= context.settings.viewRange[1]) {
         tree.hidden = arr;
+        delete tree.children;
+      }
     }
   
     return tree;
