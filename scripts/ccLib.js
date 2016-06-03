@@ -167,10 +167,9 @@ var ccLib = {
     if (arr === false) return;
     else if (arr === true || !arr) arr = tree.children;
       
-    if (!arr || !arr.length) return;
-    
-    for (var i = 0;i < arr.length; ++i)
-      this.traverseTree(arr[i], pre, post);
+    if (!!arr && !!arr.length)
+      for (var i = 0;i < arr.length; ++i)
+        this.traverseTree(arr[i], pre, post);
     
     if (!!post) 
       post(tree);

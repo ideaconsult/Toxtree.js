@@ -11,6 +11,7 @@ var jToxFacet = (function () {
       "minFontSize": 10.0,
       "maxFontSize": 64.0,
       "lightnessScale": 0.9,
+      "collapseSingles": false,
       "parentZoom": true,     // zoom to the parent of the selected item. On false - go one level deeper - directly to the selection.
       "unloadDelay": 3000,    // unload the invisible items after that many milliseconds.
       
@@ -18,8 +19,9 @@ var jToxFacet = (function () {
       "parentFill": "rgb(240, 240, 240)", // Color for parent fills. Alpha component is added automatically.
       "colorScale": d3.scale.category10(),                       
       
+      "onPrepared": null,       // invoked when the initial call for determining the tabs/columns is ready
       "onHover": null,
-      "onHoverOut": null,
+      "onDeHover": null,
       "onSelect": null,
       "fValue": function(d) { return Math.sqrt(d.size); },
       "fLabel": function(d) { return { "label": d.name.join("/"), "size" : d.size > 200 ? "(" + ccLib.briefNumber(d.size) + ")" : null }; },
@@ -90,7 +92,15 @@ var jToxFacet = (function () {
             delete node.polygon;
             delete node.depthRoot;
             delete node.element;
+            
+            // and some treemap stuff
+            delete node.z;
+            delete node.dx;
+            delete node.dy;
+            delete node.value;
           }
+          
+          // TODO: Check if this needs to be unloaded and add it to `unloaders`
         },
         switchNode = function (node, on, off) {
           node.element.classList.remove(off);
@@ -116,9 +126,9 @@ var jToxFacet = (function () {
                   
           // .. and even clear the polygon-related inforomation for those that
           // are under the nested level.
-          if (node.depthRoot == d) {
+          if (node.depthRoot != tree.depthRoot) {
             shrinkNode(node);
-            // TODO: Check if this needs to be unloaded and add it to `unloaders`
+            return node.hidden;
           }
         });
                 
@@ -127,13 +137,13 @@ var jToxFacet = (function () {
 
       } else {
         if (d.element != null && d.children != null && d.depth >= settings.viewRange[1]) {
-          shrinkNode(d);
-          if (d.depth == settings.viewRange[1]) {
-            d.hidden.forEach(function (n) { victims.push(n.element); });
-            switchNode(d, "leaf", "parent");
-          }
+          d.children.forEach(function (n) { victims.push(n.element); });
 
-          return d.hidden;
+          ccLib.traverseTree(d, null, shrinkNode);
+
+          switchNode(d, "leaf", "parent");
+
+          return false;
         }
         else if (d.hidden !== undefined && d.depth < settings.viewRange[1]) {
           
@@ -141,11 +151,11 @@ var jToxFacet = (function () {
           for (var e = d; !!e && e.depth > selection.depth; e = e.parent);
           if (e == selection) {
             ccLib.traverseTree(d, function (node) {
-              if (node.depth < settings.viewRange[1]) {
-                node.children = node.hidden;
-                delete node.hidden;
-              }
-              
+              if (node.depth >= settings.viewRange[1]) return false;
+
+              node.children = node.hidden;
+              delete node.hidden;
+
               // TODO: Make the new depths loading HERE.
             });
 
@@ -168,7 +178,6 @@ var jToxFacet = (function () {
           clusterDOM.call(g.node(), d);
           ressurects.push(d.element);
         }
-        
       }
     });
     
@@ -285,11 +294,11 @@ var jToxFacet = (function () {
     g
   		.attr("class", "cluster " + (!!d.children ? "parent" : "leaf"))
   		.attr("transform", offset[0] || offset[1] ? 'translate(' + offset[0]  + ',' + offset[1]  + ')' : null)
-    	.on("mouseout", function (d) { 
+    	.on("mouseout", function (d) {
       	this.classList.remove("selected"); 
       	if (this.classList.contains("leaf"))
-      	  ccLib.fireCallback(settings.onHoverOut, this, d);
-      })
+      	  ccLib.fireCallback(settings.onDeHover, this, d);
+    	})
     	.on("mouseover", function (d) { 
       	this.classList.add("selected"); 
       	if (this.classList.contains("leaf"))
@@ -297,6 +306,7 @@ var jToxFacet = (function () {
       })
     	.on("click", function (d) {
         d3.event.stopPropagation();
+        
         ccLib.fireCallback(settings.onSelect, this, d);
 
         // if we have hidden children, we'd like to zoom directly to them.
@@ -508,7 +518,7 @@ var jToxFacet = (function () {
     
     if (!data.children || data.children.length < 1)
       ;
-    else if (data.children.length == 1) {
+    else if (data.children.length == 1 && context.settings.collapseSingles) {
       tree = extractTree(data.children[0], context, depth, master);
       tree.name.splice(0, 0, data.name);
     }
@@ -578,6 +588,8 @@ var jToxFacet = (function () {
         tree = treeFromFacets(data, self);
       else
         tree = extractTree(data, self, dataDepth);
+        
+      ccLib.fireCallback(self.settings.onPrepared, self);
 
       if (dataDepth === 0) {
         self.rootRegion = self.rootSVG
@@ -607,6 +619,9 @@ var jToxFacet = (function () {
       
     self.queryRange(facetUri)
   };
+  
+  cls.prototype.updateColors = function (callback) {
+  }
   
   return cls;
 })();
