@@ -26,12 +26,7 @@ var jToxFacet = (function () {
       "onSelect": null,
       "fnCollate": null,
       "fnChildren": null,
-      "fnName": null,
-      "fnSize": function(entries) { 
-        var sz = 0;
-        entries.forEach(function (e) { sz += e.size; });
-        return sz; 
-      },
+      "fnSize": function(entry) {  return entry.size },
       "fnLabel": function(entries) { 
         return {  "label": entries.length > 1 ? "..." : entries.map(function (e) { return e.name; }).join("/"), 
                   "size" : entries[0].size > 200 ? "(" + ccLib.briefNumber(entries[0].size) + ")" : null 
@@ -94,25 +89,6 @@ var jToxFacet = (function () {
         ressurects = [],
         unloaders = [],
         settings = tree.context.settings,
-        shrinkNode = function (node) {
-          console.log ("Removing: " + node.entries[0].name);
-          node.hidden = node.children;
-          delete node.children;
-          
-          if (node.depth > settings.viewRange[1]) {
-            delete node.origin;
-            delete node.polygon;
-            delete node.depthRoot;
-            delete node.element;
-            
-            // and some treemap stuff
-            delete node.z;
-            delete node.dx;
-            delete node.dy;
-          }
-          
-          // TODO: Check if this needs to be unloaded and add it to `unloaders`
-        },
         switchNode = function (node, on, off) {
           node.element.classList.remove(off);
           node.element.classList.add(on);
@@ -125,6 +101,11 @@ var jToxFacet = (function () {
               break;
             }
           };
+        },
+        unloadSubtree = function (node) {
+          console.log("Unloading: " + node.entries[0].name);          
+          delete node.children;
+          // TODO: utilize unloadDelay
         };
 
     ccLib.traverseTree(tree, function (d) {
@@ -135,41 +116,35 @@ var jToxFacet = (function () {
           // we MUST delete the elements that go out...
           delete node.element;
                   
-          // .. and even clear the polygon-related inforomation for those that
-          // are under the nested level.
-          if (node.depthRoot != tree.depthRoot) {
-            shrinkNode(node);
-            return node.hidden;
-          }
+          if (node.depth >= settings.viewRange[1])
+            unloadSubtree(node);
         });
                 
-        // no need to traverse further down - we've already did it.
+        // no need to traverse further down - they are all invisible and cleared.
         return false;
 
-      } else {
-        if (d.element != null && d.children != null && d.depth >= settings.viewRange[1]) {
+      } else { // i.e. IS visible...
+        if (d.element != null && d.children != null && d.depth >= settings.viewRange[1]) { // ... but too deep.
           d.children.forEach(function (n) { victims.push(n.element); });
-
-          ccLib.traverseTree(d, null, shrinkNode);
-
+          unloadSubtree(d);
           switchNode(d, "leaf", "parent");
-
           return false;
         }
-        else if (d.hidden !== undefined && d.depth < settings.viewRange[1]) {
+        else if (d.children === undefined && d.depth == settings.viewRange[0]) {
           
           // i.e. show only hidden units that are under our selection
           for (var e = d; !!e && e.depth > selection.depth; e = e.parent);
           if (e == selection) {
-            ccLib.traverseTree(d, function (node) {
-              if (node.depth >= settings.viewRange[1]) return false;
-
-              node.children = node.hidden;
-              delete node.hidden;
-
+            d.children = [];
+            d.entries.forEach(function (e) {
               // TODO: Make the new depths loading HERE.
+              
+              var t = extractTree(e, d.context, d.depth, d.master);
+              d.children = d.children.concat(t.children);
+              
+              ccLib.fireCallback(d.context.settings.onPrepared, self, t);              
             });
-
+            
             console.log ("Creating: " + d.entries[0].name);
             var gEl = d.element || d3.select(d.parent.element).insert("g", ":first-child").datum(d).node();
 
@@ -519,7 +494,7 @@ var jToxFacet = (function () {
     if (depth == null)
       depth = context.settings.viewRange[0];
       
-    var tree = { 'entries': [data], 'size': context.settings.fnSize([data]) || 1, 'depth': depth, 'context': context, 'count': 1 };
+    var tree = { 'entries': [data], 'size': context.settings.fnSize(data) || 1, 'depth': depth, 'context': context, 'count': 1 };
 
     if (master != null)
       tree.master = master;
@@ -547,31 +522,29 @@ var jToxFacet = (function () {
 
       tree.size = sz;
       tree.count = cnt;
-      tree.children = arr;
       
-      // strange enough... we need to do the collating stuff _now_
-      for (i = 0;i < arr.length; ++i) {
-        child = arr[i];
-        if (ccLib.fireCallback(context.settings.fnCollate, data, child) === true) {
-          if (!collated)
-            collated = child;
-          else {
-            collated.entries = collated.entries.concat(child.entries);
-            collated.size += child.size;
-            collated.count += child.count;
-          }
-          
-          arr.splice(i--, 1);
-        }
-      }      
-      
-      if (!!collated)
-        arr.push(collated)
+      if (depth < context.settings.viewRange[1]) {
 
-      // and fix the children vs. hidden stuff        
-      if (depth >= context.settings.viewRange[1]) {
-        tree.hidden = arr;
-        delete tree.children;
+        tree.children = arr;
+        
+        // strange enough... we need to do the collating stuff _now_
+        for (i = 0;i < arr.length; ++i) {
+          child = arr[i];
+          if (ccLib.fireCallback(context.settings.fnCollate, data, child) === true) {
+            if (!collated)
+              collated = child;
+            else {
+              collated.entries = collated.entries.concat(child.entries);
+              collated.size += child.size;
+              collated.count += child.count;
+            }
+            
+            arr.splice(i--, 1);
+          }
+        }      
+        
+        if (!!collated)
+          arr.push(collated)
       }
     }
   
