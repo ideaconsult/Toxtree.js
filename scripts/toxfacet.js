@@ -55,6 +55,8 @@ var jToxFacet = (function () {
     var fill = d3.rgb(self.settings.parentFill);
     self.settings.parentFill = "rgba(" + fill.r + "," + fill.g + "," + fill.b + "," + (1.0 / (self.settings.viewStep) + 0.15) + ")";
     
+    self.unloaders = [];
+    
     // finally make the query, if Uri is provided
     if (self.settings['facetUri'] != null){
       self.queryFacets(self.settings['facetUri']);
@@ -87,8 +89,8 @@ var jToxFacet = (function () {
   function showHideOnZoom(tree, context, selection, isVisible) {
     var victims = [],
         ressurects = [],
-        unloaders = [],
         settings = tree.context.settings,
+        unloadSubtree = function (node) { tree.context.unloaders.push(node); },
         switchNode = function (node, on, off) {
           node.element.classList.remove(off);
           node.element.classList.add(on);
@@ -101,11 +103,6 @@ var jToxFacet = (function () {
               break;
             }
           };
-        },
-        unloadSubtree = function (node) {
-          console.log("Unloading: " + node.entries[0].name);          
-          delete node.children;
-          // TODO: utilize unloadDelay
         };
 
     ccLib.traverseTree(tree, function (d) {
@@ -124,6 +121,11 @@ var jToxFacet = (function () {
         return false;
 
       } else { // i.e. IS visible...
+        var pi = tree.context.unloaders.indexOf(d.parent);
+        if (pi > -1) // we need to remove ourselves from unloaders
+          tree.context.unloaders.splice(pi, 1);
+        
+        // now start the unloading / loading stuff
         if (d.element != null && d.children != null && d.depth >= settings.viewRange[1]) { // ... but too deep.
           d.children.forEach(function (n) { victims.push(n.element); });
           unloadSubtree(d);
@@ -140,9 +142,12 @@ var jToxFacet = (function () {
               // TODO: Make the new depths loading HERE.
               
               var t = extractTree(e, d.context, d.depth, d.master);
-              d.children = d.children.concat(t.children);
+              if (t.children !== undefined)
+                d.children = d.children.concat(t.children);
+              else
+                d.children.push(t);
               
-              ccLib.fireCallback(d.context.settings.onPrepared, self, t);              
+              ccLib.fireCallback(d.context.settings.onPrepared, self, t);
             });
             
             console.log ("Creating: " + d.entries[0].name);
@@ -166,7 +171,15 @@ var jToxFacet = (function () {
       }
     });
     
-    // TODO: Now remove all that are marked for unloading in `unloaders`.
+    // Now is time to invoke the actual unloading
+    setTimeout(function () {
+      tree.context.unloaders.forEach(function (node) {
+        console.log("Unloading: " + node.entries[0].name);
+        delete node.children;
+      });
+      
+      tree.context.unloaders = [];
+    }, parseInt(settings.unloadDelay));
     
     return { "shown": ressurects, "hidden": victims };
   }
@@ -441,7 +454,7 @@ var jToxFacet = (function () {
     	    started = [pi, ei];
       }
       else if (started !== null) {
-        var ni = edge.edge.use.poly.findIndex(function (p) { return p != pi; });
+        var ni = ccLib.findIndex(edge.edge.use.poly, function (p) { return p != pi; });
         pi = edge.edge.use.poly[ni];
         ei = edge.edge.use.index[ni];
       }

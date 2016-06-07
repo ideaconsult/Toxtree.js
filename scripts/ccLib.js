@@ -143,7 +143,7 @@ var ccLib = {
     }
   },
 
-  getJsonValue: function (json, field){
+  getJsonValue: function (json, field) {
     var value = json[field];
     if (value === undefined && field != null) {
       try {
@@ -156,6 +156,19 @@ var ccLib = {
     return value;
   },
   
+  findIndex: function (arr, obj) {
+    if (arr.findIndex !== undefined)
+      return arr.findIndex(obj);
+    else if (typeof obj !== "function")
+      return arr.indexOf(obj);
+      
+    for (var i = 0;i < arr.length; ++i)
+      if (!!obj.call(arr[i], arr[i], i))
+        return i;
+      
+    return -1;
+  },
+   
   // traverse any given tree, calling `pre` function before diggin in and `post` - after.
   // the output of pre determines how the digging is going to happen, if
   //  - is false - the digging further is interrupted;
