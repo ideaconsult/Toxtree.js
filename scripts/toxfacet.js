@@ -14,6 +14,7 @@ var jToxFacet = (function () {
       "collapseSingles": false,
       "parentZoom": true,     // zoom to the parent of the selected item. On false - go one level deeper - directly to the selection.
       "unloadDelay": 3000,    // unload the invisible items after that many milliseconds.
+      "recalcSize": false,    // force the initial processing to reach the bottom of the tree, outside visible range to recalc the size.
       
       // colors
       "parentFill": "rgb(240, 240, 240)", // Color for parent fills. Alpha component is added automatically.
@@ -24,7 +25,13 @@ var jToxFacet = (function () {
       "onDeHover": null,
       "onSelect": null,
       "fnCollate": null,
-      "fnValue": function(entries) { return Math.sqrt(Math.sqrt(entries[0].size)); },
+      "fnChildren": null,
+      "fnName": null,
+      "fnSize": function(entries) { 
+        var sz = 0;
+        entries.forEach(function (e) { sz += e.size; });
+        return sz; 
+      },
       "fnLabel": function(entries) { 
         return {  "label": entries.length > 1 ? "..." : entries.map(function (e) { return e.name; }).join("/"), 
                   "size" : entries[0].size > 200 ? "(" + ccLib.briefNumber(entries[0].size) + ")" : null 
@@ -66,7 +73,7 @@ var jToxFacet = (function () {
   	if (!!d.children && d.children.length > 0)
   	  return settings.parentFill.toString();
   		
-  	var v = d.value * settings.lightnessScale / d.parent.value,
+  	var v = d.size * settings.lightnessScale / d.parent.size,
   	    c = d3.hsl(settings.colorScale(d.master));
   	
     c.l = Math.max(1.0 - v, 0.2);
@@ -79,7 +86,7 @@ var jToxFacet = (function () {
   
   function textFontSize(d) { 
     var settings = d.context.settings;
-    return Math.max(settings.maxFontSize * d.value / d.context.dataTree.value, settings.minFontSize) / Math.sqrt(d.context.currentScale * 1.1 - 0.3);
+    return Math.max(settings.maxFontSize * d.size / d.context.dataTree.size, settings.minFontSize) / Math.sqrt(d.context.currentScale * 1.1 - 0.3);
   }
         
   function showHideOnZoom(tree, context, selection, isVisible) {
@@ -373,13 +380,13 @@ var jToxFacet = (function () {
     var treemap = d3.layout.treemap()
           .size([r.width, r.height])
           .sticky(true)
-          .value(function (d) { return Math.sqrt(d.value); });
+          .value(function (d) { return Math.sqrt(d.size); });
     
     var nodes = treemap.nodes(tree).reverse(),
         vertices = nodes
     	  	.map(function (e, i) {  
       	  	e.depth += originalDepth; 
-      	  	return !e.children ?  { x: r.cx + e.x + e.dx  / 2, y: r.cy + e.y + e.dy / 2, value: e.value, index: i } : null; 
+      	  	return !e.children ?  { x: r.cx + e.x + e.dx  / 2, y: r.cy + e.y + e.dy / 2, size: e.size, index: i } : null; 
       	  })
     	  	.filter(function (e) { return e != null; });
 
@@ -387,7 +394,7 @@ var jToxFacet = (function () {
       .clipPoly(boundaries)
       .x(function (d) { return d.x; })
       .y(function (d) { return d.y; })
-      .value (function (d) { return d.value; });
+      .value (function (d) { return d.size; });
 
     voronoi.edges(vertices).forEach(function (p) { 
       var i = p.point.index;
@@ -510,9 +517,9 @@ var jToxFacet = (function () {
   function extractTree(data, context, depth, master) {
     
     if (depth == null)
-      depth = 0;
+      depth = context.settings.viewRange[0];
       
-    var tree = { 'entries': [data], 'value': context.settings.fnValue([data]) || 1, 'depth': depth, 'context': context, 'count': 1 };
+    var tree = { 'entries': [data], 'size': context.settings.fnSize([data]) || 1, 'depth': depth, 'context': context, 'count': 1 };
 
     if (master != null)
       tree.master = master;
@@ -523,7 +530,7 @@ var jToxFacet = (function () {
       tree = extractTree(data.children[0], context, depth, master);
       tree.entries.splice(0, 0, data);
     }
-    else if (depth < context.settings.loadDepth) {
+    else if (depth < context.settings.loadDepth && (!!context.settings.recalcSize || depth < context.settings.viewRange[1])) {
       var sz = 0,
           cnt = 0,
           child, i,
@@ -534,15 +541,15 @@ var jToxFacet = (function () {
         child = arr[i] = extractTree(data.children[i], context, depth + 1, master != null ? master : i);
         
         child.parent = tree;
-        sz += child.value;
+        sz += child.size;
         cnt += child.count;
       }
 
-      tree.value = sz;
+      tree.size = sz;
       tree.count = cnt;
       tree.children = arr;
       
-      // strange enough... we need to do the collating stuff _now
+      // strange enough... we need to do the collating stuff _now_
       for (i = 0;i < arr.length; ++i) {
         child = arr[i];
         if (ccLib.fireCallback(context.settings.fnCollate, data, child) === true) {
@@ -550,7 +557,7 @@ var jToxFacet = (function () {
             collated = child;
           else {
             collated.entries = collated.entries.concat(child.entries);
-            collated.value += child.value;
+            collated.size += child.size;
             collated.count += child.count;
           }
           
@@ -607,13 +614,13 @@ var jToxFacet = (function () {
 
       self.settings.loadDepth = dataDepth + self.settings.loadStep;
       
-      if (data.facet !== undefined) 
+      if (data.children !== undefined) 
+        tree = extractTree(data, self);
+      else if (data.facet !== undefined)
         tree = treeFromFacets(data, self);
       else
-        tree = extractTree(data, self, dataDepth);
+        throw new Error('Unrecognized data type!');
         
-      ccLib.fireCallback(self.settings.onPrepared, self);
-
       if (dataDepth === 0) {
         self.rootRegion = self.rootSVG
           .append("g")
@@ -623,14 +630,18 @@ var jToxFacet = (function () {
         height = self.rootElement.clientHeight;
         boundaries = [[0, 0], [0, height], [width, height], [width, 0]];
         
-        self.dataTree = tree;
+        self.dataTree = dataRoot = tree;
         self.dataTree.origin = { x: 0, y: 0};
         self.dataTree.element = self.rootRegion.node();
         self.dataTree.polygon = boundaries;
+      } else {
+        jT.$.extend(dataRoot, tree)
       }
+
+      ccLib.fireCallback(self.settings.onPrepared, self, dataRoot);
       
-      populateRect(tree, boundaries, width, height);
-      clusterDOM.call(self.rootRegion.node(), tree);
+      populateRect(dataRoot, boundaries, width, height);
+      clusterDOM.call(self.rootRegion.node(), dataRoot);
     });
   }
   
