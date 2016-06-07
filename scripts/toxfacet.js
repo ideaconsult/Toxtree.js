@@ -234,8 +234,7 @@ var jToxFacet = (function () {
     context.currentScale = ctm.a;
     
     // Ok, we now prepare for the zoom - counting the outsiders and the returnings
-    var t = d3.transition("zoom").duration(500),
-        delta = showHideOnZoom(context.dataTree, context, d, function (e) {
+    var delta = showHideOnZoom(context.dataTree, context, d, function (e) {
           var bbox = e.polygon.extent().transform(ctm.translate(e.origin.x, e.origin.y)),
               l = Math.max(bbox[0][0], 0),
               t = Math.max(bbox[0][1], 0),
@@ -243,30 +242,21 @@ var jToxFacet = (function () {
               b = Math.min(bbox[1][1], height);
           return l < r && t < b;
         });
-      
-    // now launch the transition to...
-    t.each(function () {
-      // ... transform the root...
-      context.rootRegion
-        .transition("zoom")
-          .attr("transform", "translate(" + ctm.e + "," + ctm.f + ") scale(" + ctm.a + ")");
+
+    d3.transition("zoom").duration(500).each(function () {
+      // First, make the actual zoom ...
+      context.rootRegion.transition("zoom").attr("transform", "translate(" + ctm.e + "," + ctm.f + ") scale(" + ctm.a + ")");
       
       // ... scale the path's strokes, not to become so thick, while zoomed...
-      context.rootRegion.selectAll("path")
-        .transition("zoom")
-          .style("stroke-width", polyStroke);
+      context.rootRegion.selectAll("path").transition("zoom").style("stroke-width", polyStroke);
       
-      context.rootRegion.selectAll("text")
-        .transition("zoom")
-          .style("font-size", textFontSize);
+      // ... change the text's font size, so it doesn't become too big too.
+      context.rootRegion.selectAll("text").transition("zoom").style("font-size", textFontSize);
           
       // .. and fade and dismiss all invisibles.
-      d3.selectAll(delta.hidden)
-        .transition("zoom")
-          .style("opacity", 0.1)
-          .remove();
+      d3.selectAll(delta.hidden).transition("zoom").style("opacity", 0.1).remove();
     });
-    
+        
     return d;
   }
     
@@ -570,7 +560,7 @@ var jToxFacet = (function () {
     self.rootSVG = d3.select(this.rootElement).append("svg")
       .attr("width", this.rootElement.clientWidth)
       .attr("height", this.rootElement.clientHeight);
-                
+      
     $(document).on("keydown", function (e) {
       var key = e.key || e.keyCode;
       if (key != 27) // i.e. ESC
