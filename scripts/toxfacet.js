@@ -70,10 +70,10 @@ var jToxFacet = (function () {
   	if (!!d.children && d.children.length > 0)
   	  return settings.parentFill.toString();
   		
-  	var v = d.size * settings.lightnessScale / d.parent.size,
-  	    c = d3.hsl(settings.colorScale(d.master));
+  	var v = d.size * settings.lightnessScale / d.master.size,
+  	    c = d3.hsl(settings.colorScale(d.master.masterIndex));
   	
-    c.l = Math.max(1.0 - v, 0.2);
+    c.l = Math.max(0.95 - v, 0.20);
   	return c.toString();
   }
   
@@ -499,8 +499,9 @@ var jToxFacet = (function () {
       
     var tree = { 'entries': [data], 'size': context.settings.fnSize(data) || 1, 'depth': depth, 'context': context, 'count': 1 };
 
-    if (master != null)
-      tree.master = master;
+    if (depth == 1) master = tree;
+
+    tree.master = master;
     
     if (!data.children || data.children.length < 1)
       ;
@@ -516,7 +517,9 @@ var jToxFacet = (function () {
           arr = new Array(data.children.length);
           
       for (i = 0;i < data.children.length; ++i) {
-        child = arr[i] = extractTree(data.children[i], context, depth + 1, master != null ? master : i);
+        child = arr[i] = extractTree(data.children[i], context, depth + 1, master );
+        
+        if (depth == 1) tree.masterIndex = i;
         
         child.parent = tree;
         sz += child.size;
