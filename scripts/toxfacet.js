@@ -519,7 +519,7 @@ var jToxFacet = (function () {
       for (i = 0;i < data.children.length; ++i) {
         child = arr[i] = extractTree(data.children[i], context, depth + 1, master );
         
-        if (depth == 1) tree.masterIndex = i;
+        if (depth == 0) child.masterIndex = i;
         
         child.parent = tree;
         sz += child.size;
