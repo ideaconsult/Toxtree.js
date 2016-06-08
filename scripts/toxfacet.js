@@ -67,7 +67,7 @@ var jToxFacet = (function () {
   function polyFill(d) {
     var settings = d.context.settings;
     
-  	if (!!d.children && d.children.length > 0)
+  	if (d.element.classList.contains("parent"))
   	  return settings.parentFill.toString();
   		
   	var v = d.size * settings.lightnessScale / d.master.size,
