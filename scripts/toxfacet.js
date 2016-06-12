@@ -565,7 +565,7 @@ var jToxFacet = (function () {
       .attr("height", this.rootElement.clientHeight);
       
     $(document).on("keydown", function (e) {
-      var key = e.key || e.keyCode;
+      var key = e.keyCode || e.key;
       if (key != 27) // i.e. ESC
         return;
         
