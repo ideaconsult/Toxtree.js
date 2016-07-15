@@ -808,7 +808,7 @@ window.jT.ui = {
 
     return str;
   },
-
+  
   bindControls: function (kit, handlers) {
     var pane = jT.$('.jtox-controls', kit.rootElement)[0];
     if (kit.settings.showControls) {

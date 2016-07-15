@@ -1,0 +1,107 @@
+{"facet": [
+	{
+	"value":"4.27. Nanomaterial aspect ratio/shape",	"endpoint":"ASPECT_RATIO_SHAPE_SECTION",
+	"count":585,
+	"substancescount":-1,
+	"uri":"https://apps.ideaconsult.net/enanomapper/substance?type=endpointcategory&search=ASPECT_RATIO_SHAPE_SECTION",
+	"subcategory":"P-CHEM",	"subcategoryuri":"https://apps.ideaconsult.net/enanomapper/substance?type=topcategory&search=P-CHEM",
+	"bundles":{}
+	},
+	{
+	"value":"4.26. Nanomaterial crystallite and grain size",	"endpoint":"CRYSTALLITE_AND_GRAIN_SIZE_SECTION",
+	"count":105,
+	"substancescount":-1,
+	"uri":"https://apps.ideaconsult.net/enanomapper/substance?type=endpointcategory&search=CRYSTALLITE_AND_GRAIN_SIZE_SECTION",
+	"subcategory":"P-CHEM",	"subcategoryuri":"https://apps.ideaconsult.net/enanomapper/substance?type=topcategory&search=P-CHEM",
+	"bundles":{}
+	},
+	{
+	"value":"4.31. Nanomaterial dustiness",	"endpoint":"DUSTINESS_SECTION",
+	"count":1,
+	"substancescount":-1,
+	"uri":"https://apps.ideaconsult.net/enanomapper/substance?type=endpointcategory&search=DUSTINESS_SECTION",
+	"subcategory":"P-CHEM",	"subcategoryuri":"https://apps.ideaconsult.net/enanomapper/substance?type=topcategory&search=P-CHEM",
+	"bundles":{}
+	},
+	{
+	"value":"4.1. Appearance",	"endpoint":"GI_GENERAL_INFORM_SECTION",
+	"count":1,
+	"substancescount":-1,
+	"uri":"https://apps.ideaconsult.net/enanomapper/substance?type=endpointcategory&search=GI_GENERAL_INFORM_SECTION",
+	"subcategory":"P-CHEM",	"subcategoryuri":"https://apps.ideaconsult.net/enanomapper/substance?type=topcategory&search=P-CHEM",
+	"bundles":{}
+	},
+	{
+	"value":"4.5. Particle size distribution (Granulometry)",	"endpoint":"PC_GRANULOMETRY_SECTION",
+	"count":1089,
+	"substancescount":-1,
+	"uri":"https://apps.ideaconsult.net/enanomapper/substance?type=endpointcategory&search=PC_GRANULOMETRY_SECTION",
+	"subcategory":"P-CHEM",	"subcategoryuri":"https://apps.ideaconsult.net/enanomapper/substance?type=topcategory&search=P-CHEM",
+	"bundles":{}
+	},
+	{
+	"value":"4.28. Nanomaterial specific surface area",	"endpoint":"SPECIFIC_SURFACE_AREA_SECTION",
+	"count":611,
+	"substancescount":-1,
+	"uri":"https://apps.ideaconsult.net/enanomapper/substance?type=endpointcategory&search=SPECIFIC_SURFACE_AREA_SECTION",
+	"subcategory":"P-CHEM",	"subcategoryuri":"https://apps.ideaconsult.net/enanomapper/substance?type=topcategory&search=P-CHEM",
+	"bundles":{}
+	},
+	{
+	"value":"4.30. Nanomaterial surface chemistry",	"endpoint":"SURFACE_CHEMISTRY_SECTION",
+	"count":368,
+	"substancescount":-1,
+	"uri":"https://apps.ideaconsult.net/enanomapper/substance?type=endpointcategory&search=SURFACE_CHEMISTRY_SECTION",
+	"subcategory":"P-CHEM",	"subcategoryuri":"https://apps.ideaconsult.net/enanomapper/substance?type=topcategory&search=P-CHEM",
+	"bundles":{}
+	},
+	{
+	"value":"4.29. Nanomaterial zeta potential",	"endpoint":"ZETA_POTENTIAL_SECTION",
+	"count":825,
+	"substancescount":-1,
+	"uri":"https://apps.ideaconsult.net/enanomapper/substance?type=endpointcategory&search=ZETA_POTENTIAL_SECTION",
+	"subcategory":"P-CHEM",	"subcategoryuri":"https://apps.ideaconsult.net/enanomapper/substance?type=topcategory&search=P-CHEM",
+	"bundles":{}
+	},
+	{
+	"value":"8.100. Proteomics",	"endpoint":"PROTEOMICS_SECTION",
+	"count":121,
+	"substancescount":-1,
+	"uri":"https://apps.ideaconsult.net/enanomapper/substance?type=endpointcategory&search=PROTEOMICS_SECTION",
+	"subcategory":"TOX",	"subcategoryuri":"https://apps.ideaconsult.net/enanomapper/substance?type=topcategory&search=TOX",
+	"bundles":{}
+	},
+	{
+	"value":"7.2.1. Acute toxicity - oral",	"endpoint":"TO_ACUTE_ORAL_SECTION",
+	"count":1,
+	"substancescount":-1,
+	"uri":"https://apps.ideaconsult.net/enanomapper/substance?type=endpointcategory&search=TO_ACUTE_ORAL_SECTION",
+	"subcategory":"TOX",	"subcategoryuri":"https://apps.ideaconsult.net/enanomapper/substance?type=topcategory&search=TOX",
+	"bundles":{}
+	},
+	{
+	"value":"7.7. Carcinogenicity",	"endpoint":"TO_CARCINOGENICITY_SECTION",
+	"count":1,
+	"substancescount":-1,
+	"uri":"https://apps.ideaconsult.net/enanomapper/substance?type=endpointcategory&search=TO_CARCINOGENICITY_SECTION",
+	"subcategory":"TOX",	"subcategoryuri":"https://apps.ideaconsult.net/enanomapper/substance?type=topcategory&search=TOX",
+	"bundles":{}
+	},
+	{
+	"value":"7.6.1. Genetic toxicity in vitro",	"endpoint":"TO_GENETIC_IN_VITRO_SECTION",
+	"count":1,
+	"substancescount":-1,
+	"uri":"https://apps.ideaconsult.net/enanomapper/substance?type=endpointcategory&search=TO_GENETIC_IN_VITRO_SECTION",
+	"subcategory":"TOX",	"subcategoryuri":"https://apps.ideaconsult.net/enanomapper/substance?type=topcategory&search=TOX",
+	"bundles":{}
+	},
+	{
+	"value":"7.99. Toxicity (other)",	"endpoint":"UNKNOWN_TOXICITY_SECTION",
+	"count":471,
+	"substancescount":-1,
+	"uri":"https://apps.ideaconsult.net/enanomapper/substance?type=endpointcategory&search=UNKNOWN_TOXICITY_SECTION",
+	"subcategory":"TOX",	"subcategoryuri":"https://apps.ideaconsult.net/enanomapper/substance?type=topcategory&search=TOX",
+	"bundles":{}
+	}
+]
+}
