@@ -1,0 +1,1282 @@
+{
+"name":"quality",
+"id":"BFO_0000019",
+"size":1,
+"children": [
+{
+"name":"dustiness",
+"id":"ENM_9000003",
+"size":1
+},{
+"name":"qualitative",
+"id":"PATO_0000068",
+"size":1,
+"children": [
+{
+"name":"intensity",
+"id":"PATO_0000049",
+"size":1
+}
+]
+},{
+"name":"mass density",
+"id":"PATO_0001019",
+"size":1,
+"children": [
+{
+"name":"volumetric density",
+"id":"PATO_0001353",
+"size":1
+},{
+"name":"irregular density",
+"id":"PATO_0002141",
+"size":1
+},{
+"name":"linear density",
+"id":"PATO_0001352",
+"size":1
+},{
+"name":"dense",
+"id":"PATO_0001164",
+"size":1,
+"children": [
+{
+"name":"decreased mass density",
+"id":"PATO_0001790",
+"size":1
+},{
+"name":"increased mass density",
+"id":"PATO_0001788",
+"size":1,
+"children": [
+{
+"name":"ivory",
+"id":"PATO_0002149",
+"size":1
+}
+]
+}
+]
+},{
+"name":"area density",
+"id":"PATO_0001351",
+"size":1
+}
+]
+},{
+"name":"hydrodynamic size",
+"id":"NPO_1914",
+"size":1,
+"children": [
+{
+"name":"hydrodynamic diameter",
+"id":"NPO_1915",
+"size":1
+}
+]
+},{
+"name":"concentration of",
+"id":"PATO_0000033",
+"size":1,
+"children": [
+{
+"name":"particle concentration",
+"id":"NPO_1830",
+"size":1
+},{
+"name":"cell concentration",
+"id":"NPO_1193",
+"size":1
+}
+]
+},{
+"name":"mass",
+"id":"PATO_0000125",
+"size":1
+},{
+"name":"particle size",
+"id":"NPO_1694",
+"size":1,
+"children": [
+{
+"name":"particle diameter",
+"id":"NPO_1539",
+"size":1
+}
+]
+},{
+"name":"pour density",
+"id":"ENM_9000004",
+"size":1
+},{
+"name":"polydispersity",
+"id":"NPO_821",
+"size":1,
+"children": [
+{
+"name":"size distribution",
+"id":"NPO_1697",
+"size":1,
+"children": [
+{
+"name":"particle size distribution",
+"id":"NPO_1699",
+"size":1
+}
+]
+},{
+"name":"molecular weight distribution",
+"id":"NPO_1698",
+"size":1
+},{
+"name":"polydisperse",
+"id":"NPO_867",
+"size":1
+},{
+"name":"monodisperse",
+"id":"NPO_892",
+"size":1
+}
+]
+},{
+"name":"solubility",
+"id":"PATO_0001536",
+"size":1,
+"children": [
+{
+"name":"insoluble in",
+"id":"PATO_0001538",
+"size":1
+},{
+"name":"soluble in",
+"id":"PATO_0001537",
+"size":1,
+"children": [
+{
+"name":"decreased solubility",
+"id":"PATO_0001664",
+"size":1
+},{
+"name":"increased solubility",
+"id":"PATO_0001663",
+"size":1
+}
+]
+},{
+"name":"dissolved",
+"id":"PATO_0001986",
+"size":1
+},{
+"name":"solubility in water",
+"id":"NPO_500",
+"size":1,
+"children": [
+{
+"name":"soluble in water",
+"id":"NPO_514",
+"size":1
+},{
+"name":"insoluble in water",
+"id":"NPO_598",
+"size":1
+}
+]
+}
+]
+},{
+"name":"physical state",
+"id":"NPO_888",
+"size":1,
+"children": [
+{
+"name":"state of mixture",
+"id":"NPO_1505",
+"size":1,
+"children": [
+{
+"name":"state of suspension",
+"id":"NPO_1506",
+"size":1,
+"children": [
+{
+"name":"colloidal state",
+"id":"NPO_1507",
+"size":1,
+"children": [
+{
+"name":"state of sol",
+"id":"NPO_1510",
+"size":1
+},{
+"name":"gel state",
+"id":"NPO_1509",
+"size":1
+},{
+"name":"state of emulsion",
+"id":"NPO_1508",
+"size":1
+}
+]
+}
+]
+}
+]
+},{
+"name":"solid state",
+"id":"NPO_1511",
+"size":1,
+"children": [
+{
+"name":"powdered state",
+"id":"NPO_1515",
+"size":1
+},{
+"name":"granular state",
+"id":"NPO_1514",
+"size":1
+},{
+"name":"crystalline state",
+"id":"NPO_1512",
+"size":1,
+"children": [
+{
+"name":"hexagonal-trigonal",
+"id":"ENM_9000033",
+"size":1,
+"children": [
+{
+"name":"ditrigonal-scalahedral",
+"id":"ENM_9000057",
+"size":1
+},{
+"name":"trigonal-trapezoidal",
+"id":"ENM_9000055",
+"size":1
+},{
+"name":"ditrigonal-pyramidal",
+"id":"ENM_9000056",
+"size":1
+},{
+"name":"rhombohedral",
+"id":"ENM_9000054",
+"size":1
+},{
+"name":"trigonal-pyramidal",
+"id":"ENM_9000053",
+"size":1
+}
+]
+},{
+"name":"cubic",
+"id":"ENM_9000035",
+"size":1,
+"children": [
+{
+"name":"hextetrahedral",
+"id":"ENM_9000066",
+"size":1
+},{
+"name":"tetrahedral",
+"id":"ENM_9000065",
+"size":1
+},{
+"name":"hexoctahedral",
+"id":"ENM_9000069",
+"size":1
+},{
+"name":"diploidal",
+"id":"ENM_9000067",
+"size":1
+},{
+"name":"gyroidal",
+"id":"ENM_9000068",
+"size":1
+}
+]
+},{
+"name":"tetragonal",
+"id":"ENM_9000032",
+"size":1,
+"children": [
+{
+"name":"tetragonal-trapezoidal",
+"id":"ENM_9000048",
+"size":1
+},{
+"name":"ditetragonal-pyramidal",
+"id":"ENM_9000050",
+"size":1
+},{
+"name":"tetragonal-pyramidal",
+"id":"ENM_9000045",
+"size":1
+},{
+"name":"tetragonal-scalenoidal",
+"id":"ENM_9000051",
+"size":1
+},{
+"name":"tetragonal-disphenoidal",
+"id":"ENM_9000046",
+"size":1
+},{
+"name":"tetragonal-dipyramidal",
+"id":"ENM_9000047",
+"size":1
+},{
+"name":"ditetragonal-dipyramidal",
+"id":"ENM_9000052",
+"size":1
+}
+]
+},{
+"name":"orthorhombic",
+"id":"ENM_9000031",
+"size":1,
+"children": [
+{
+"name":"orthorhombic-sphenoidal",
+"id":"ENM_9000042",
+"size":1
+},{
+"name":"orthorhombic-pyramidal",
+"id":"ENM_9000043",
+"size":1
+},{
+"name":"orthorhombic-bipyramidal",
+"id":"ENM_9000044",
+"size":1
+}
+]
+},{
+"name":"Bravais lattice",
+"id":"ENM_9000036",
+"size":1
+},{
+"name":"hexagonal-hexagonal",
+"id":"ENM_9000034",
+"size":1,
+"children": [
+{
+"name":"hexagonal-pyramidal",
+"id":"ENM_9000058",
+"size":1
+},{
+"name":"hexagonal-dipyramidal",
+"id":"ENM_9000060",
+"size":1
+},{
+"name":"dihexagonal-dipyramidal",
+"id":"ENM_9000064",
+"size":1
+},{
+"name":"ditrigonal-dipyramidal",
+"id":"ENM_9000063",
+"size":1
+},{
+"name":"hexagonal-trapezoidal",
+"id":"ENM_9000061",
+"size":1
+},{
+"name":"dihexagonal-pyramidal",
+"id":"ENM_9000062",
+"size":1
+},{
+"name":"trigonal-dipyramidal",
+"id":"ENM_9000059",
+"size":1
+}
+]
+},{
+"name":"Miller index",
+"id":"ENM_9000038",
+"size":1
+},{
+"name":"monoclinic",
+"id":"ENM_9000029",
+"size":1,
+"children": [
+{
+"name":"monoclinic-domatic",
+"id":"ENM_9000040",
+"size":1
+},{
+"name":"monoclinic-sphenoidal",
+"id":"ENM_9000039",
+"size":1
+},{
+"name":"monoclinic-prismatic",
+"id":"ENM_9000041",
+"size":1
+}
+]
+},{
+"name":"space group",
+"id":"ENM_9000037",
+"size":1
+},{
+"name":"triclinic",
+"id":"ENM_9000022",
+"size":1,
+"children": [
+{
+"name":"triclinic-pedial",
+"id":"ENM_9000012",
+"size":1
+},{
+"name":"triclinic-pinacoidal",
+"id":"ENM_9000030",
+"size":1
+}
+]
+}
+]
+},{
+"name":"glassy state",
+"id":"NPO_1513",
+"size":1
+}
+]
+},{
+"name":"fluid state",
+"id":"NPO_1501",
+"size":1,
+"children": [
+{
+"name":"gaseous state",
+"id":"NPO_1502",
+"size":1,
+"children": [
+{
+"name":"vapor state",
+"id":"NPO_1503",
+"size":1
+}
+]
+},{
+"name":"liquid state",
+"id":"NPO_1504",
+"size":1
+}
+]
+}
+]
+},{
+"name":"rate",
+"id":"PATO_0000161",
+"size":1,
+"children": [
+{
+"name":"frequency",
+"id":"PATO_0000044",
+"size":1,
+"children": [
+{
+"name":"increased frequency",
+"id":"PATO_0000380",
+"size":1
+},{
+"name":"decreased frequency",
+"id":"PATO_0000381",
+"size":1
+},{
+"name":"sound frequency",
+"id":"PATO_0001520",
+"size":1,
+"children": [
+{
+"name":"ultrasonic",
+"id":"PATO_0001526",
+"size":1
+},{
+"name":"sonic",
+"id":"PATO_0001525",
+"size":1
+},{
+"name":"intrasonic",
+"id":"PATO_0001524",
+"size":1
+}
+]
+}
+]
+},{
+"name":"growth rate",
+"id":"PATO_0001492",
+"size":1,
+"children": [
+{
+"name":"hypotrophic growth",
+"id":"PATO_0001494",
+"size":1
+},{
+"name":"hypertrophic growth",
+"id":"PATO_0001493",
+"size":1
+}
+]
+},{
+"name":"decreased rate",
+"id":"PATO_0000911",
+"size":1,
+"children": [
+{
+"name":"decreased frequency",
+"id":"PATO_0000381",
+"size":1
+}
+]
+},{
+"name":"increased rate",
+"id":"PATO_0000912",
+"size":1,
+"children": [
+{
+"name":"increased frequency",
+"id":"PATO_0000380",
+"size":1
+}
+]
+}
+]
+},{
+"name":"intensity",
+"id":"PATO_0000049",
+"size":1
+},{
+"name":"Stability",
+"id":"C54072",
+"size":1
+},{
+"name":"molecular entity quality",
+"id":"CHEMINF_000031",
+"size":1,
+"children": [
+{
+"name":"polarity",
+"id":"CHEMINF_000069",
+"size":1,
+"children": [
+{
+"name":"polar",
+"id":"CHEMINF_000070",
+"size":1
+},{
+"name":"nonpolar",
+"id":"CHEMINF_000071",
+"size":1
+}
+]
+},{
+"name":"atomic quality",
+"id":"CHEMINF_000108",
+"size":1
+},{
+"name":"cyclicity",
+"id":"CHEMINF_000067",
+"size":1,
+"children": [
+{
+"name":"acyclic",
+"id":"CHEMINF_000073",
+"size":1
+},{
+"name":"cyclic",
+"id":"CHEMINF_000072",
+"size":1
+}
+]
+},{
+"name":"chirality",
+"id":"CHEMINF_000013",
+"size":1,
+"children": [
+{
+"name":"achiral",
+"id":"CHEMINF_000075",
+"size":1
+},{
+"name":"chiral",
+"id":"CHEMINF_000074",
+"size":1
+}
+]
+},{
+"name":"aromaticity",
+"id":"CHEMINF_000115",
+"size":1,
+"children": [
+{
+"name":"aromatic",
+"id":"CHEMINF_000076",
+"size":1
+},{
+"name":"non-aromatic",
+"id":"CHEMINF_000077",
+"size":1
+}
+]
+},{
+"name":"valency",
+"id":"CHEMINF_000098",
+"size":1
+},{
+"name":"charge density",
+"id":"CHEMINF_000236",
+"size":1
+},{
+"name":"molecular structure",
+"id":"CHEMINF_000033",
+"size":1
+},{
+"name":"composition",
+"id":"CHEMINF_000230",
+"size":1
+},{
+"name":"bond multiplicity",
+"id":"CHEMINF_000129",
+"size":1
+},{
+"name":"molecular composition",
+"id":"CHEMINF_000054",
+"size":1
+},{
+"name":"hybridization",
+"id":"CHEMINF_000091",
+"size":1,
+"children": [
+{
+"name":"sp2 hybridized",
+"id":"CHEMINF_000134",
+"size":1
+},{
+"name":"sp3 hybridized",
+"id":"CHEMINF_000135",
+"size":1
+},{
+"name":"sp hybridized",
+"id":"CHEMINF_000133",
+"size":1
+}
+]
+},{
+"name":"charge",
+"id":"CHEMINF_000120",
+"size":1,
+"children": [
+{
+"name":"positive charge",
+"id":"CHEMINF_000402",
+"size":1
+},{
+"name":"neutral charge",
+"id":"CHEMINF_000401",
+"size":1
+},{
+"name":"negative charge",
+"id":"CHEMINF_000403",
+"size":1
+}
+]
+}
+]
+},{
+"name":"shape",
+"id":"NPO_274",
+"size":1,
+"children": [
+{
+"name":"conical shape",
+"id":"NPO_515",
+"size":1
+},{
+"name":"cylindrical shape",
+"id":"NPO_100",
+"size":1,
+"children": [
+{
+"name":"rod-shaped",
+"id":"NPO_461",
+"size":1,
+"children": [
+{
+"name":"needle shape",
+"id":"NPO_852",
+"size":1
+}
+]
+},{
+"name":"disc-shaped",
+"id":"NPO_307",
+"size":1
+}
+]
+},{
+"name":"polyhedral shape",
+"id":"NPO_858",
+"size":1,
+"children": [
+{
+"name":"hexahedral shape",
+"id":"NPO_666",
+"size":1,
+"children": [
+{
+"name":"cubical shape",
+"id":"NPO_861",
+"size":1
+}
+]
+}
+]
+},{
+"name":"elliptical shape",
+"id":"NPO_850",
+"size":1,
+"children": [
+{
+"name":"circular shape",
+"id":"NPO_342",
+"size":1
+}
+]
+},{
+"name":"ellipsoidal shape",
+"id":"NPO_156",
+"size":1,
+"children": [
+{
+"name":"spheroidal shape",
+"id":"NPO_320",
+"size":1,
+"children": [
+{
+"name":"oblate spheroidal shape",
+"id":"NPO_241",
+"size":1
+},{
+"name":"prolate spheroidal shape",
+"id":"NPO_102",
+"size":1
+}
+]
+},{
+"name":"spherical shape",
+"id":"NPO_286",
+"size":1
+}
+]
+}
+]
+},{
+"name":"surface area",
+"id":"CHEMINF_000247",
+"size":1
+},{
+"name":"chemical substance quality",
+"id":"CHEMINF_000101",
+"size":1,
+"children": [
+{
+"name":"specific surface area",
+"id":"CHEMINF_000515",
+"size":1
+},{
+"name":"crystal structure",
+"id":"CHEMINF_000102",
+"size":1
+}
+]
+},{
+"name":"size",
+"id":"PATO_0000117",
+"size":1,
+"children": [
+{
+"name":"decreased size",
+"id":"PATO_0000587",
+"size":1,
+"children": [
+{
+"name":"hypoplastic",
+"id":"PATO_0000645",
+"size":1
+},{
+"name":"decreased height",
+"id":"PATO_0000569",
+"size":1
+},{
+"name":"decreased volume",
+"id":"PATO_0000596",
+"size":1,
+"children": [
+{
+"name":"hypotrophic",
+"id":"PATO_0000585",
+"size":1
+}
+]
+},{
+"name":"decreased length",
+"id":"PATO_0000574",
+"size":1,
+"children": [
+{
+"name":"decreased diameter",
+"id":"PATO_0001715",
+"size":1,
+"children": [
+{
+"name":"decreased anterior-posterior diameter",
+"id":"PATO_0002042",
+"size":1
+}
+]
+},{
+"name":"decreased perimeter",
+"id":"PATO_0001713",
+"size":1,
+"children": [
+{
+"name":"decreased circumference",
+"id":"PATO_0001899",
+"size":1
+}
+]
+}
+]
+},{
+"name":"decreased area",
+"id":"PATO_0002058",
+"size":1
+},{
+"name":"dystrophic",
+"id":"PATO_0001780",
+"size":1
+},{
+"name":"decreased width",
+"id":"PATO_0000599",
+"size":1
+},{
+"name":"atrophied",
+"id":"PATO_0001623",
+"size":1
+},{
+"name":"decreased thickness",
+"id":"PATO_0000592",
+"size":1
+},{
+"name":"dwarf-like",
+"id":"PATO_0000969",
+"size":1
+},{
+"name":"decreased depth",
+"id":"PATO_0001472",
+"size":1
+}
+]
+},{
+"name":"tapered size",
+"id":"PATO_0005015",
+"size":1
+},{
+"name":"3-D extent",
+"id":"PATO_0001710",
+"size":1,
+"children": [
+{
+"name":"volume",
+"id":"PATO_0000918",
+"size":1,
+"children": [
+{
+"name":"increased volume",
+"id":"PATO_0000595",
+"size":1,
+"children": [
+{
+"name":"hypertrophic",
+"id":"PATO_0000584",
+"size":1
+},{
+"name":"ballooning",
+"id":"PATO_0002093",
+"size":1
+}
+]
+},{
+"name":"decreased volume",
+"id":"PATO_0000596",
+"size":1,
+"children": [
+{
+"name":"hypotrophic",
+"id":"PATO_0000585",
+"size":1
+}
+]
+},{
+"name":"molar volume",
+"id":"PATO_0001680",
+"size":1
+},{
+"name":"specific volume",
+"id":"PATO_0001679",
+"size":1
+}
+]
+}
+]
+},{
+"name":"increased size",
+"id":"PATO_0000586",
+"size":1,
+"children": [
+{
+"name":"increased volume",
+"id":"PATO_0000595",
+"size":1,
+"children": [
+{
+"name":"hypertrophic",
+"id":"PATO_0000584",
+"size":1
+},{
+"name":"ballooning",
+"id":"PATO_0002093",
+"size":1
+}
+]
+},{
+"name":"distended",
+"id":"PATO_0001602",
+"size":1
+},{
+"name":"increased length",
+"id":"PATO_0000573",
+"size":1,
+"children": [
+{
+"name":"increased perimeter",
+"id":"PATO_0001712",
+"size":1,
+"children": [
+{
+"name":"increased circumference",
+"id":"PATO_0001898",
+"size":1
+}
+]
+},{
+"name":"increased diameter",
+"id":"PATO_0001714",
+"size":1,
+"children": [
+{
+"name":"increased anterior-posterior diameter",
+"id":"PATO_0002043",
+"size":1
+}
+]
+}
+]
+},{
+"name":"hyperplastic",
+"id":"PATO_0000644",
+"size":1
+},{
+"name":"increased area",
+"id":"PATO_0002057",
+"size":1
+},{
+"name":"gigantic",
+"id":"PATO_0001940",
+"size":1
+},{
+"name":"increased width",
+"id":"PATO_0000600",
+"size":1
+},{
+"name":"dilated",
+"id":"PATO_0001571",
+"size":1
+},{
+"name":"increased thickness",
+"id":"PATO_0000591",
+"size":1
+},{
+"name":"increased depth",
+"id":"PATO_0001596",
+"size":1
+},{
+"name":"increased height",
+"id":"PATO_0000570",
+"size":1
+}
+]
+},{
+"name":"1-D extent",
+"id":"PATO_0001708",
+"size":1,
+"children": [
+{
+"name":"width",
+"id":"PATO_0000921",
+"size":1,
+"children": [
+{
+"name":"decreased width",
+"id":"PATO_0000599",
+"size":1
+},{
+"name":"increased width",
+"id":"PATO_0000600",
+"size":1
+}
+]
+},{
+"name":"height",
+"id":"PATO_0000119",
+"size":1,
+"children": [
+{
+"name":"decreased height",
+"id":"PATO_0000569",
+"size":1
+},{
+"name":"increased height",
+"id":"PATO_0000570",
+"size":1
+}
+]
+},{
+"name":"length",
+"id":"PATO_0000122",
+"size":1,
+"children": [
+{
+"name":"diameter",
+"id":"PATO_0001334",
+"size":1,
+"children": [
+{
+"name":"decreased diameter",
+"id":"PATO_0001715",
+"size":1,
+"children": [
+{
+"name":"decreased anterior-posterior diameter",
+"id":"PATO_0002042",
+"size":1
+}
+]
+},{
+"name":"anterior-posterior diameter",
+"id":"PATO_0002041",
+"size":1,
+"children": [
+{
+"name":"decreased anterior-posterior diameter",
+"id":"PATO_0002042",
+"size":1
+},{
+"name":"increased anterior-posterior diameter",
+"id":"PATO_0002043",
+"size":1
+}
+]
+},{
+"name":"uniform diameter",
+"id":"PATO_0005022",
+"size":1
+},{
+"name":"increased diameter",
+"id":"PATO_0001714",
+"size":1,
+"children": [
+{
+"name":"increased anterior-posterior diameter",
+"id":"PATO_0002043",
+"size":1
+}
+]
+}
+]
+},{
+"name":"increased length",
+"id":"PATO_0000573",
+"size":1,
+"children": [
+{
+"name":"increased perimeter",
+"id":"PATO_0001712",
+"size":1,
+"children": [
+{
+"name":"increased circumference",
+"id":"PATO_0001898",
+"size":1
+}
+]
+},{
+"name":"increased diameter",
+"id":"PATO_0001714",
+"size":1,
+"children": [
+{
+"name":"increased anterior-posterior diameter",
+"id":"PATO_0002043",
+"size":1
+}
+]
+}
+]
+},{
+"name":"decreased length",
+"id":"PATO_0000574",
+"size":1,
+"children": [
+{
+"name":"decreased diameter",
+"id":"PATO_0001715",
+"size":1,
+"children": [
+{
+"name":"decreased anterior-posterior diameter",
+"id":"PATO_0002042",
+"size":1
+}
+]
+},{
+"name":"decreased perimeter",
+"id":"PATO_0001713",
+"size":1,
+"children": [
+{
+"name":"decreased circumference",
+"id":"PATO_0001899",
+"size":1
+}
+]
+}
+]
+},{
+"name":"radius",
+"id":"PATO_0002390",
+"size":1
+},{
+"name":"perimeter",
+"id":"PATO_0001711",
+"size":1,
+"children": [
+{
+"name":"circumference",
+"id":"PATO_0001648",
+"size":1,
+"children": [
+{
+"name":"increased circumference",
+"id":"PATO_0001898",
+"size":1
+},{
+"name":"decreased circumference",
+"id":"PATO_0001899",
+"size":1
+}
+]
+},{
+"name":"decreased perimeter",
+"id":"PATO_0001713",
+"size":1,
+"children": [
+{
+"name":"decreased circumference",
+"id":"PATO_0001899",
+"size":1
+}
+]
+},{
+"name":"increased perimeter",
+"id":"PATO_0001712",
+"size":1,
+"children": [
+{
+"name":"increased circumference",
+"id":"PATO_0001898",
+"size":1
+}
+]
+}
+]
+}
+]
+},{
+"name":"depth",
+"id":"PATO_0001595",
+"size":1,
+"children": [
+{
+"name":"decreased depth",
+"id":"PATO_0001472",
+"size":1
+},{
+"name":"increased depth",
+"id":"PATO_0001596",
+"size":1
+}
+]
+},{
+"name":"thickness",
+"id":"PATO_0000915",
+"size":1,
+"children": [
+{
+"name":"irregular thickness",
+"id":"PATO_0001781",
+"size":1
+},{
+"name":"decreased thickness",
+"id":"PATO_0000592",
+"size":1
+},{
+"name":"increased thickness",
+"id":"PATO_0000591",
+"size":1
+}
+]
+}
+]
+},{
+"name":"2-D extent",
+"id":"PATO_0001709",
+"size":1,
+"children": [
+{
+"name":"area",
+"id":"PATO_0001323",
+"size":1,
+"children": [
+{
+"name":"increased area",
+"id":"PATO_0002057",
+"size":1
+},{
+"name":"decreased area",
+"id":"PATO_0002058",
+"size":1
+}
+]
+}
+]
+}
+]
+},{
+"name":"age",
+"id":"PATO_0000011",
+"size":1
+},{
+"name":"porosity",
+"id":"PATO_0000973",
+"size":1
+}
+]
+}

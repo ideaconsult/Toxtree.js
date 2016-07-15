@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+
+  <title>ToxFacet development page</title>
+  <link rel="stylesheet" href="tests/base.css"/>
+	<link rel="stylesheet" href="styles/jtoxkit.css"/>
+	<link rel="stylesheet" href="styles/toxfacet.css"/>
+    
+  <style>
+    body {
+      margin: 0px;
+    	margin-top: 100px;
+    	background: #555;
+    }
+    
+    svg {
+      background: #777;
+    }
+    
+    div.jtox-toolkit {
+      width: 100%;
+      height: 600px;
+    }
+    
+  </style>
+  
+  <script src="libs/d3js/d3.js"></script>
+  <script src="libs/d3plus/d3plus.js"></script>
+  <script src="tests/jquery.js"></script>
+
+  <script src="scripts/ccLib.js"></script>
+  <script src="scripts/jtoxkit.js"></script>
+  <script src="scripts/toxfacet.js"></script>
+  <script lang="JavaScript">
+    function collateNodes (node) { 
+      return !!node.parent && node.parent.children.length > 50 && node.size < 2; 
+    }
+  </script>
+    
+</head>
+<body>
+	<div class="jtox-toolkit" data-kit="facet" data-facet-uri="flare.json" data-view-step="2" data-parent-zoom="false" data-fn-collate="collateNodes" data-recalc-size="true"></div>
+</body>
+</html>
