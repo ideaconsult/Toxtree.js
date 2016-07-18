@@ -9,6 +9,7 @@ target='toxquery toxcompound toxdataset toxmodel toxsubstance toxcomposition tox
 libs=()
 tools=''
 append=0
+clean=0
 
 # test the parameters first
 while (( "$#" )); do
@@ -37,6 +38,9 @@ while (( "$#" )); do
 			append=0
 			minimize=1
 			;;
+		--clean|-c)
+			clean=1
+			;;
 		--target)
 			target=''
 			append=1
@@ -55,9 +59,10 @@ while (( "$#" )); do
 			echo "Options can be one or more from the following:"
 			echo
 			echo "    [--min | -m]            : run minification of the output js, producing additional .min.js file."
+			echo "    [--clean | -c]          : clean all pre-existing files in the output folder."
 			echo "    [--html <html dir>]     : the directory where html files live. Default is [..]."
 			echo "    [--out <output dir>]    : the directory where output files should be put. Default is [../www]."
-			echo "    [-css <styles dir>]     : the directory where styling files live. Default is [../styles]."
+			echo "    [--css <styles dir>]    : the directory where styling files live. Default is [../styles]."
 			echo "    [--js <js dir>]         : the directory where script files live. Default is [../scripts]."
 			echo "    [--target <kit list>]   : list of kits to be included. Omit jtoxkit. Default are all of them."
 			echo "    [--lib | -l <filename>] : html file name, referring to some external library (tool)."
@@ -76,14 +81,13 @@ while (( "$#" )); do
 	shift
 done
 
-echo "Clearing old files..."
 pushd $outdir > /dev/null
-rm -rf *
+if [ $clean -eq 1 ]; then
+	echo "Clearing old files..."
+	rm -rf *
+fi
 outdir=`pwd`
 popd > /dev/null
-
-outJS="$outdir/jtoxkit.js"
-outCSS="$outdir/jtoxkit.css"
 
 # First prepare the libraries, if any
 curdir=`pwd`
@@ -104,6 +108,15 @@ for l in "${libs[@]}"; do
 	"$curdir/html2js.pl" --trim --body-var "jT.tools['$name']" <$base >>"$outdir/$name.js"
 	popd > /dev/null
 done
+
+
+# Extract the version and prepare the outputs
+version=`sed -En -e 's/^[ \t]+version:[ \t]+"([0-9\.]+)",[ \t]+\/\/.+$/\1/p' $jsdir/jtoxkit.js`
+echo "Version: $version..."
+
+outJS="$outdir/jtoxkit-${version}.js"
+outCSS="$outdir/jtoxkit-${version}.css"
+
 # form the final target list
 target="ccLib jtoxkit $target"
 
@@ -125,7 +138,7 @@ done
 
 if [ $minimize -eq 1 ]; then
 	echo "Minification..."
-	./jsminify.pl $outJS > "$outdir/jtoxkit.min.js"
+	./jsminify.pl $outJS > "$outdir/jtoxkit-${version}.min.js"
 fi
 
 echo "Merging CSS files from [$cssdir] ..."
