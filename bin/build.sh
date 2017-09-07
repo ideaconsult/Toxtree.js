@@ -136,9 +136,12 @@ for t in ${target[@]}; do
 	fi
 done
 
+cp -f $outJS "$outdir/jtoxkit.js"
+
 if [ $minimize -eq 1 ]; then
 	echo "Minification..."
 	./jsminify.pl $outJS > "$outdir/jtoxkit-${version}.min.js"
+	cp -f "$outdir/jtoxkit-${version}.min.js" "$outdir/jtoxkit.min.js"
 fi
 
 echo "Merging CSS files from [$cssdir] ..."
@@ -147,5 +150,7 @@ for t in ${target[@]}; do
 		cat "$cssdir/$t.css" >> $outCSS
 	fi
 done
+
+cp -f $outCSS "$outdir/jtoxkit.css"
 
 echo "Done."
