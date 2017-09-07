@@ -1,0 +1,5052 @@
+{
+"name":"information content entity",
+"id":"IAO_0000030",
+"size":1,
+"children": [
+{
+"name":"endpointresult",
+"id":"BAO_0000179",
+"size":1,
+"children": [
+{
+"name":"protein substrate and ligand constant",
+"id":"BAO_0000016",
+"size":1,
+"children": [
+{
+"name":"binding constant",
+"id":"BAO_0000587",
+"size":1,
+"children": [
+{
+"name":"Ki",
+"id":"BAO_0000192",
+"size":1
+},{
+"name":"Kd",
+"id":"BAO_0000034",
+"size":1
+},{
+"name":"Ka",
+"id":"BAO_0002809",
+"size":1
+},{
+"name":"Bmax",
+"id":"BAO_0000033",
+"size":1
+}
+]
+},{
+"name":"enzyme kinetic constant",
+"id":"BAO_0000487",
+"size":1,
+"children": [
+{
+"name":"vmax",
+"id":"BAO_0000586",
+"size":1
+},{
+"name":"km",
+"id":"BAO_0000477",
+"size":1
+},{
+"name":"kcat",
+"id":"BAO_0000481",
+"size":1
+},{
+"name":"kon",
+"id":"BAO_0000480",
+"size":1
+},{
+"name":"koff",
+"id":"BAO_0000479",
+"size":1
+}
+]
+}
+]
+},{
+"name":"time endpoint",
+"id":"BAO_0002114",
+"size":1,
+"children": [
+{
+"name":"T1/2",
+"id":"BAO_0002115",
+"size":1,
+"children": [
+{
+"name":"T1/2(in vivo)",
+"id":"BAO_0002766",
+"size":1
+},{
+"name":"T1/2(in vitro)",
+"id":"BAO_0002768",
+"size":1
+}
+]
+},{
+"name":"Tmax",
+"id":"BAO_0003037",
+"size":1
+}
+]
+},{
+"name":"volume endpoint",
+"id":"BAO_0002758",
+"size":1,
+"children": [
+{
+"name":"Vdss",
+"id":"BAO_0003041",
+"size":1
+},{
+"name":"Vd",
+"id":"BAO_0003040",
+"size":1
+},{
+"name":"CL",
+"id":"BAO_0002759",
+"size":1,
+"children": [
+{
+"name":"CL(hepatic)",
+"id":"BAO_0002774",
+"size":1
+},{
+"name":"CL(renal)",
+"id":"BAO_0002773",
+"size":1
+}
+]
+}
+]
+},{
+"name":"physical property endpoint",
+"id":"BAO_0002128",
+"size":1,
+"children": [
+{
+"name":"pKa",
+"id":"BAO_0002131",
+"size":1
+},{
+"name":"logP",
+"id":"BAO_0002130",
+"size":1
+},{
+"name":"permeability",
+"id":"BAO_0002808",
+"size":1,
+"children": [
+{
+"name":"permeability B-A",
+"id":"BAO_0002134",
+"size":1
+},{
+"name":"permeability A-B",
+"id":"BAO_0002133",
+"size":1
+}
+]
+},{
+"name":"percent purity",
+"id":"BAO_0002132",
+"size":1
+},{
+"name":"logD",
+"id":"BAO_0002129",
+"size":1
+}
+]
+},{
+"name":"graphical calculation endpoint",
+"id":"BAO_0002118",
+"size":1,
+"children": [
+{
+"name":"slope",
+"id":"BAO_0002121",
+"size":1
+},{
+"name":"amplification curve calculated endpoint",
+"id":"BAO_0002122",
+"size":1,
+"children": [
+{
+"name":"Cp",
+"id":"BAO_0002123",
+"size":1
+},{
+"name":"Ct",
+"id":"BAO_0002125",
+"size":1
+},{
+"name":"Cq",
+"id":"BAO_0002124",
+"size":1
+}
+]
+},{
+"name":"IZ",
+"id":"BAO_0003039",
+"size":1
+},{
+"name":"AUC",
+"id":"BAO_0002120",
+"size":1,
+"children": [
+{
+"name":"AUC(oral)",
+"id":"BAO_0002771",
+"size":1
+},{
+"name":"AUC(iv)",
+"id":"BAO_0002772",
+"size":1
+}
+]
+},{
+"name":"Cmax",
+"id":"BAO_0002119",
+"size":1
+},{
+"name":"F",
+"id":"BAO_0003042",
+"size":1
+}
+]
+},{
+"name":"profile endpoint",
+"id":"BAO_0002136",
+"size":1,
+"children": [
+{
+"name":"computational profile endpoint",
+"id":"BAO_0002137",
+"size":1
+},{
+"name":"gene-expression profile endpoint",
+"id":"BAO_0002138",
+"size":1,
+"children": [
+{
+"name":"fragments per kilobase of exon per million mapped reads",
+"id":"BAO_0080011",
+"size":1
+}
+]
+},{
+"name":"panel-assay profile endpoint",
+"id":"BAO_0002139",
+"size":1
+}
+]
+},{
+"name":"concentration endpoint",
+"id":"BAO_0000180",
+"size":1,
+"children": [
+{
+"name":"measured concentration",
+"id":"BAO_0002752",
+"size":1
+},{
+"name":"concentration response endpoint",
+"id":"BAO_0002162",
+"size":1,
+"children": [
+{
+"name":"EC20",
+"id":"ENM_0000052",
+"size":1
+},{
+"name":"GI50",
+"id":"BAO_0000189",
+"size":1
+},{
+"name":"MIC",
+"id":"BAO_0002146",
+"size":1
+},{
+"name":"AC500 absolute",
+"id":"BAO_0002882",
+"size":1
+},{
+"name":"AC1000 absolute",
+"id":"BAO_0002877",
+"size":1
+},{
+"name":"IC90",
+"id":"BAO_0002144",
+"size":1
+},{
+"name":"AC35 absolute",
+"id":"BAO_0002880",
+"size":1
+},{
+"name":"AC26 absolute",
+"id":"BAO_0002879",
+"size":1
+},{
+"name":"pA2",
+"id":"BAO_0003038",
+"size":1
+},{
+"name":"EC30",
+"id":"BAO_0000599",
+"size":1
+},{
+"name":"CC50",
+"id":"BAO_0000187",
+"size":1
+},{
+"name":"EC90",
+"id":"ENM_0000054",
+"size":1
+},{
+"name":"IC25",
+"id":"BAO_0080002",
+"size":1
+},{
+"name":"NOEC",
+"id":"ENM_0000060",
+"size":1
+},{
+"name":"IC80",
+"id":"BAO_0000191",
+"size":1
+},{
+"name":"EC50",
+"id":"BAO_0000188",
+"size":1,
+"children": [
+{
+"name":"pEC50",
+"id":"BAO_0002583",
+"size":1
+}
+]
+},{
+"name":"AC10 absolute",
+"id":"BAO_0002878",
+"size":1
+},{
+"name":"LC50",
+"id":"BAO_0002145",
+"size":1
+},{
+"name":"AC40 absolute",
+"id":"BAO_0002881",
+"size":1
+},{
+"name":"ECMax",
+"id":"BAO_0002883",
+"size":1,
+"children": [
+{
+"name":"ECMax_fold increase",
+"id":"BAO_0002886",
+"size":1
+},{
+"name":"ECMax_percent inhibition",
+"id":"BAO_0002887",
+"size":1
+},{
+"name":"ECMax_Agonist",
+"id":"BAO_0002885",
+"size":1
+},{
+"name":"ECMax_Tm",
+"id":"BAO_0002884",
+"size":1
+}
+]
+},{
+"name":"RD50",
+"id":"ENM_0000055",
+"size":1
+},{
+"name":"MIC50",
+"id":"BAO_0003035",
+"size":1
+},{
+"name":"EC10",
+"id":"ENM_0000051",
+"size":1
+},{
+"name":"AC50",
+"id":"BAO_0000186",
+"size":1
+},{
+"name":"EC80",
+"id":"ENM_0000053",
+"size":1
+},{
+"name":"Ki",
+"id":"BAO_0000192",
+"size":1
+},{
+"name":"IC30",
+"id":"BAO_0080003",
+"size":1
+},{
+"name":"TGI",
+"id":"BAO_0000194",
+"size":1
+},{
+"name":"Ka",
+"id":"BAO_0002809",
+"size":1
+},{
+"name":"IC50",
+"id":"BAO_0000190",
+"size":1,
+"children": [
+{
+"name":"IC50 absolute",
+"id":"BAO_0000197",
+"size":1
+},{
+"name":"IC50 relative",
+"id":"BAO_0000198",
+"size":1
+},{
+"name":"pIC50",
+"id":"BAO_0000199",
+"size":1
+}
+]
+},{
+"name":"EC 5 hour",
+"id":"BAO_0002862",
+"size":1
+},{
+"name":"IC20",
+"id":"BAO_0080001",
+"size":1
+}
+]
+},{
+"name":"screening concentration",
+"id":"BAO_0000098",
+"size":1
+},{
+"name":"dosage endpoint",
+"id":"BAO_0002116",
+"size":1,
+"children": [
+{
+"name":"LD50",
+"id":"BAO_0002117",
+"size":1
+},{
+"name":"ED50",
+"id":"BAO_0003036",
+"size":1
+}
+]
+}
+]
+},{
+"name":"solubility endpoint",
+"id":"ENM_9000072",
+"size":1,
+"children": [
+{
+"name":"",
+"id":"BAO_0002775",
+"size":1
+}
+]
+},{
+"name":"percentage yield",
+"id":"CHMO_0002855",
+"size":1
+},{
+"name":"response endpoint",
+"id":"BAO_0000181",
+"size":1,
+"children": [
+{
+"name":"raw activity",
+"id":"BAO_0000583",
+"size":1
+},{
+"name":"statistical endpoint",
+"id":"BAO_0002126",
+"size":1,
+"children": [
+{
+"name":"Z-score",
+"id":"BAO_0000432",
+"size":1
+},{
+"name":"B-score",
+"id":"BAO_0000430",
+"size":1
+},{
+"name":"MAD score",
+"id":"BAO_0002127",
+"size":1
+}
+]
+},{
+"name":"percent response",
+"id":"BAO_0000082",
+"size":1,
+"children": [
+{
+"name":"percent bound",
+"id":"BAO_0002147",
+"size":1
+},{
+"name":"percent activation",
+"id":"BAO_0000200",
+"size":1,
+"children": [
+{
+"name":"50 percent activation",
+"id":"BAO_0000346",
+"size":1
+}
+]
+},{
+"name":"percent control",
+"id":"BAO_0000143",
+"size":1
+},{
+"name":"percent activity",
+"id":"BAO_0001103",
+"size":1,
+"children": [
+{
+"name":"percent mitotic cells",
+"id":"BAO_0002040",
+"size":1
+},{
+"name":"percent DNA replicated cells",
+"id":"BAO_0002044",
+"size":1
+},{
+"name":"percent mitotic arrested cells",
+"id":"BAO_0002807",
+"size":1
+},{
+"name":"percent cell viability",
+"id":"BAO_0000202",
+"size":1,
+"children": [
+{
+"name":"50 percent cell viability",
+"id":"BAO_0000349",
+"size":1
+}
+]
+},{
+"name":"percent neurite outgrowth",
+"id":"BAO_0080013",
+"size":1
+},{
+"name":"percent non-arrested cells",
+"id":"BAO_0002082",
+"size":1
+},{
+"name":"percent interphase cells",
+"id":"BAO_0002042",
+"size":1
+},{
+"name":"percent G2 arrested cells",
+"id":"BAO_0002081",
+"size":1
+},{
+"name":"percent neurite branch point",
+"id":"BAO_0080015",
+"size":1
+},{
+"name":"percent neurite count",
+"id":"BAO_0080014",
+"size":1
+}
+]
+},{
+"name":"percent inhibition",
+"id":"BAO_0000201",
+"size":1,
+"children": [
+{
+"name":"80 percent inhibition",
+"id":"BAO_0000348",
+"size":1
+},{
+"name":"90 percent inhibition",
+"id":"BAO_0002667",
+"size":1
+},{
+"name":"50 percent inhibition",
+"id":"BAO_0000347",
+"size":1
+},{
+"name":"percent cytotoxicity",
+"id":"BAO_0000006",
+"size":1,
+"children": [
+{
+"name":"percent apoptotic cells",
+"id":"BAO_0002006",
+"size":1
+},{
+"name":"percent dead cells",
+"id":"BAO_0002046",
+"size":1
+},{
+"name":"50 percent cytotoxicity",
+"id":"BAO_0000588",
+"size":1
+}
+]
+},{
+"name":"percent growth inhibition",
+"id":"BAO_0000096",
+"size":1,
+"children": [
+{
+"name":"100 percent growth inhibition",
+"id":"BAO_0001108",
+"size":1
+},{
+"name":"50 percent growth inhibition",
+"id":"BAO_0001106",
+"size":1
+}
+]
+}
+]
+},{
+"name":"efficacy",
+"id":"BAO_0000656",
+"size":1,
+"children": [
+{
+"name":"maximal activation",
+"id":"BAO_0000805",
+"size":1
+},{
+"name":"maximal inhibition",
+"id":"BAO_0000804",
+"size":1
+}
+]
+},{
+"name":"percent recovery",
+"id":"BAO_0002148",
+"size":1
+}
+]
+},{
+"name":"LOEL",
+"id":"ENM_0000059",
+"size":1
+},{
+"name":"NOEL",
+"id":"ENM_0000056",
+"size":1
+},{
+"name":"NOAEL",
+"id":"ENM_0000057",
+"size":1
+},{
+"name":"fold change",
+"id":"BAO_0000193",
+"size":1,
+"children": [
+{
+"name":"fold activation",
+"id":"BAO_0000375",
+"size":1
+},{
+"name":"fold decrease",
+"id":"BAO_0002802",
+"size":1
+},{
+"name":"fold increase",
+"id":"BAO_0002801",
+"size":1
+},{
+"name":"fold inhibition",
+"id":"BAO_0000376",
+"size":1
+}
+]
+},{
+"name":"LOAEL",
+"id":"ENM_0000058",
+"size":1
+}
+]
+},{
+"name":"temperature endpoint",
+"id":"BAO_0000585",
+"size":1,
+"children": [
+{
+"name":"Tm",
+"id":"BAO_0000581",
+"size":1
+}
+]
+},{
+"name":"toxicological endpoint",
+"id":"ENM_0000018",
+"size":1,
+"children": [
+{
+"name":"toxicity",
+"id":"NPO_1338",
+"size":1,
+"children": [
+{
+"name":"cytotoxicity",
+"id":"NPO_1340",
+"size":1
+},{
+"name":"dermal toxicity",
+"id":"ENM_0000025",
+"size":1,
+"children": [
+{
+"name":"acute dermal toxicity",
+"id":"ENM_0000026",
+"size":1
+},{
+"name":"repeated dose dermal toxicity",
+"id":"ENM_0000027",
+"size":1
+}
+]
+},{
+"name":"environmental toxicity",
+"id":"ENM_0000001",
+"size":1,
+"children": [
+{
+"name":"toxicity to birds",
+"id":"ENM_0000002",
+"size":1
+},{
+"name":"soil toxicity",
+"id":"ENM_0000012",
+"size":1,
+"children": [
+{
+"name":"toxicity to soil microorganisms",
+"id":"ENM_0000008",
+"size":1
+},{
+"name":"toxicity to soil macroorganisms",
+"id":"ENM_0000013",
+"size":1
+}
+]
+},{
+"name":"toxicity to earthworms",
+"id":"ENM_0000003",
+"size":1
+},{
+"name":"aquatic environmental toxicity",
+"id":"ENM_0000007",
+"size":1,
+"children": [
+{
+"name":"toxicity to aquatic invertebrates",
+"id":"ENM_0000006",
+"size":1
+},{
+"name":"toxicity to fish",
+"id":"ENM_0000004",
+"size":1,
+"children": [
+{
+"name":"long-term toxicity to fish",
+"id":"ENM_0000011",
+"size":1
+},{
+"name":"short-term toxicity to fish",
+"id":"ENM_0000010",
+"size":1
+}
+]
+},{
+"name":"toxicity to aquatic algae and cyanobacteria",
+"id":"ENM_0000005",
+"size":1
+}
+]
+},{
+"name":"sediment toxicity",
+"id":"ENM_0000009",
+"size":1
+},{
+"name":"toxicity to terrestrial organisms",
+"id":"ENM_0000014",
+"size":1,
+"children": [
+{
+"name":"toxicity to terrestrial plants",
+"id":"ENM_0000017",
+"size":1
+},{
+"name":"toxicity to terrestrial arthropods",
+"id":"ENM_0000016",
+"size":1
+}
+]
+},{
+"name":"toxicity to microorganisms",
+"id":"ENM_0000015",
+"size":1,
+"children": [
+{
+"name":"toxicity to soil microorganisms",
+"id":"ENM_0000008",
+"size":1
+}
+]
+}
+]
+},{
+"name":"drug toxicity",
+"id":"NPO_1341",
+"size":1
+},{
+"name":"reproductive toxicity",
+"id":"ENM_0000030",
+"size":1
+},{
+"name":"carcinogenicity",
+"id":"ENM_0000029",
+"size":1
+},{
+"name":"developmental toxicity",
+"id":"ENM_0000050",
+"size":1,
+"children": [
+{
+"name":"teratogenicity",
+"id":"ENM_0000031",
+"size":1
+}
+]
+},{
+"name":"genetic toxicity",
+"id":"ENM_0000028",
+"size":1
+},{
+"name":"immunotoxicity",
+"id":"NPO_1339",
+"size":1
+},{
+"name":"oral toxicity",
+"id":"ENM_0000019",
+"size":1,
+"children": [
+{
+"name":"repeated dose oral toxicity",
+"id":"ENM_0000021",
+"size":1
+},{
+"name":"acute oral toxicity",
+"id":"ENM_0000020",
+"size":1
+}
+]
+},{
+"name":"inhalation toxicity",
+"id":"ENM_0000022",
+"size":1,
+"children": [
+{
+"name":"repeated dose inhalation toxicity",
+"id":"ENM_0000024",
+"size":1
+},{
+"name":"acute inhalation toxicity",
+"id":"ENM_0000023",
+"size":1
+}
+]
+}
+]
+},{
+"name":"skin sensitization",
+"id":"ENM_0000034",
+"size":1
+},{
+"name":"skin irritation",
+"id":"ENM_0000032",
+"size":1
+},{
+"name":"eye irritation",
+"id":"ENM_0000033",
+"size":1
+},{
+"name":"RD50",
+"id":"ENM_0000055",
+"size":1
+}
+]
+}
+]
+},{
+"name":"chemical entity information format specification",
+"id":"CHEMINF_000014",
+"size":1,
+"children": [
+{
+"name":"molecular entity name format specification",
+"id":"CHEMINF_000039",
+"size":1,
+"children": [
+{
+"name":"Preferred IUPAC Name for Organic Compounds",
+"id":"CHEMINF_000040",
+"size":1
+},{
+"name":"Preferred IUPAC Name for Inorganic Compounds",
+"id":"CHEMINF_000045",
+"size":1
+}
+]
+},{
+"name":"molecular structure encoding format specification",
+"id":"CHEMINF_000022",
+"size":1,
+"children": [
+{
+"name":"molecular stereochemistry format specification",
+"id":"CHEMINF_000023",
+"size":1,
+"children": [
+{
+"name":"specification of stereochemistry by configuration",
+"id":"CHEMINF_000028",
+"size":1,
+"children": [
+{
+"name":"RS stereochemistry specification",
+"id":"CHEMINF_000024",
+"size":1
+},{
+"name":"cis-trans stereochemistry specification",
+"id":"CHEMINF_000220",
+"size":1
+},{
+"name":"DL stereochemistry specification",
+"id":"CHEMINF_000026",
+"size":1
+}
+]
+},{
+"name":"specification of stereochemistry by optical activity",
+"id":"CHEMINF_000029",
+"size":1,
+"children": [
+{
+"name":"+/- stereochemistry specification",
+"id":"CHEMINF_000030",
+"size":1
+}
+]
+}
+]
+},{
+"name":"atomic connectivity molecular structure encoding format specification",
+"id":"CHEMINF_000035",
+"size":1,
+"children": [
+{
+"name":"InChI format specification",
+"id":"CHEMINF_000038",
+"size":1
+},{
+"name":"MOLfile format specification",
+"id":"CHEMINF_000100",
+"size":1
+},{
+"name":"SMILES format specification",
+"id":"CHEMINF_000020",
+"size":1,
+"children": [
+{
+"name":"isomeric SMILES format specification",
+"id":"CHEMINF_000150",
+"size":1,
+"children": [
+{
+"name":"canonical SMILES format specification",
+"id":"CHEMINF_000151",
+"size":1
+}
+]
+}
+]
+},{
+"name":"SMARTS format specification",
+"id":"CHEMINF_000021",
+"size":1
+},{
+"name":"CML format specification",
+"id":"CHEMINF_000111",
+"size":1
+}
+]
+}
+]
+},{
+"name":"molecular composition format specification",
+"id":"CHEMINF_000036",
+"size":1,
+"children": [
+{
+"name":"IUPAC chemical formula",
+"id":"CHEMINF_000037",
+"size":1
+}
+]
+}
+]
+},{
+"name":"citation",
+"id":"IAO_0000301",
+"size":1
+},{
+"name":"Name",
+"id":"C42614",
+"size":1
+},{
+"name":"unit",
+"id":"UO_0000000",
+"size":1,
+"children": [
+{
+"name":"electric current unit",
+"id":"UO_0000004",
+"size":1,
+"children": [
+{
+"name":"ampere",
+"id":"UO_0000011",
+"size":1
+},{
+"name":"microampere",
+"id":"UO_0000038",
+"size":1
+},{
+"name":"milliampere",
+"id":"UO_0000037",
+"size":1
+}
+]
+},{
+"name":"momentum unit",
+"id":"UO_0000057",
+"size":1,
+"children": [
+{
+"name":"kilogram meter per second",
+"id":"UO_0000091",
+"size":1
+}
+]
+},{
+"name":"angular velocity unit",
+"id":"UO_0000049",
+"size":1,
+"children": [
+{
+"name":"radian per second",
+"id":"UO_0000079",
+"size":1
+}
+]
+},{
+"name":"mass unit",
+"id":"UO_0000002",
+"size":1,
+"children": [
+{
+"name":"kilodalton",
+"id":"UO_0000222",
+"size":1
+},{
+"name":"femtogram",
+"id":"UO_0000026",
+"size":1
+},{
+"name":"dalton",
+"id":"UO_0000221",
+"size":1
+},{
+"name":"picogram",
+"id":"UO_0000025",
+"size":1
+},{
+"name":"gram",
+"id":"UO_0000021",
+"size":1
+},{
+"name":"milligram",
+"id":"UO_0000022",
+"size":1
+},{
+"name":"kilogram",
+"id":"UO_0000009",
+"size":1
+},{
+"name":"nanogram",
+"id":"UO_0000024",
+"size":1
+},{
+"name":"molar mass unit",
+"id":"UO_0000055",
+"size":1,
+"children": [
+{
+"name":"gram per mole",
+"id":"UO_0000088",
+"size":1
+},{
+"name":"kilogram per mole",
+"id":"UO_0000087",
+"size":1
+}
+]
+},{
+"name":"microgram",
+"id":"UO_0000023",
+"size":1
+}
+]
+},{
+"name":"area unit",
+"id":"UO_0000047",
+"size":1,
+"children": [
+{
+"name":"square centimeter",
+"id":"UO_0000081",
+"size":1
+},{
+"name":"square millimeter",
+"id":"UO_0000082",
+"size":1
+},{
+"name":"square angstrom",
+"id":"UO_0000324",
+"size":1
+},{
+"name":"square meter",
+"id":"UO_0000080",
+"size":1
+}
+]
+},{
+"name":"volumetric flow rate unit",
+"id":"UO_0000270",
+"size":1,
+"children": [
+{
+"name":"microliters per minute",
+"id":"UO_0000271",
+"size":1
+}
+]
+},{
+"name":"Age Unit",
+"id":"C50400",
+"size":1
+},{
+"name":"volume unit",
+"id":"UO_0000095",
+"size":1,
+"children": [
+{
+"name":"microliter",
+"id":"UO_0000101",
+"size":1
+},{
+"name":"picoliter",
+"id":"UO_0000103",
+"size":1
+},{
+"name":"nanoliter",
+"id":"UO_0000102",
+"size":1
+},{
+"name":"specific volume unit",
+"id":"UO_0000059",
+"size":1,
+"children": [
+{
+"name":"microliter per kilogram",
+"id":"UO_0000199",
+"size":1
+},{
+"name":"milliliter per kilogram",
+"id":"UO_0000198",
+"size":1
+},{
+"name":"liter per kilogram",
+"id":"UO_0000197",
+"size":1
+},{
+"name":"cubic meter per kilogram",
+"id":"UO_0000093",
+"size":1
+}
+]
+},{
+"name":"femtoliter",
+"id":"UO_0000104",
+"size":1
+},{
+"name":"cubic decimeter",
+"id":"UO_0000100",
+"size":1
+},{
+"name":"deciliter",
+"id":"UO_0000209",
+"size":1
+},{
+"name":"liter",
+"id":"UO_0000099",
+"size":1
+},{
+"name":"cubic meter",
+"id":"UO_0000096",
+"size":1
+},{
+"name":"cubic centimeter",
+"id":"UO_0000097",
+"size":1
+},{
+"name":"molar volume unit",
+"id":"UO_0000056",
+"size":1,
+"children": [
+{
+"name":"cubic centimeter per mole",
+"id":"UO_0000090",
+"size":1
+},{
+"name":"cubic meter per mole",
+"id":"UO_0000089",
+"size":1
+}
+]
+},{
+"name":"milliliter",
+"id":"UO_0000098",
+"size":1
+}
+]
+},{
+"name":"base unit",
+"id":"UO_0000045",
+"size":1,
+"children": [
+{
+"name":"second",
+"id":"UO_0000010",
+"size":1
+},{
+"name":"kelvin",
+"id":"UO_0000012",
+"size":1
+},{
+"name":"ampere",
+"id":"UO_0000011",
+"size":1
+},{
+"name":"meter",
+"id":"UO_0000008",
+"size":1
+},{
+"name":"kilogram",
+"id":"UO_0000009",
+"size":1
+},{
+"name":"mole",
+"id":"UO_0000013",
+"size":1
+},{
+"name":"candela",
+"id":"UO_0000014",
+"size":1
+}
+]
+},{
+"name":"substance unit",
+"id":"UO_0000006",
+"size":1,
+"children": [
+{
+"name":"picomole",
+"id":"UO_0000042",
+"size":1
+},{
+"name":"micromole",
+"id":"UO_0000039",
+"size":1
+},{
+"name":"millimole",
+"id":"UO_0000040",
+"size":1
+},{
+"name":"attomole",
+"id":"UO_0000044",
+"size":1
+},{
+"name":"femtomole",
+"id":"UO_0000043",
+"size":1
+},{
+"name":"mole",
+"id":"UO_0000013",
+"size":1
+},{
+"name":"nanomole",
+"id":"UO_0000041",
+"size":1
+}
+]
+},{
+"name":"viscosity unit",
+"id":"UO_0000256",
+"size":1,
+"children": [
+{
+"name":"poise",
+"id":"UO_0000258",
+"size":1
+},{
+"name":"pascal second",
+"id":"UO_0000257",
+"size":1
+}
+]
+},{
+"name":"radiation unit",
+"id":"UO_0000127",
+"size":1,
+"children": [
+{
+"name":"dose equivalent unit",
+"id":"UO_0000130",
+"size":1,
+"children": [
+{
+"name":"millisievert",
+"id":"UO_0000138",
+"size":1
+},{
+"name":"microsievert",
+"id":"UO_0000139",
+"size":1
+},{
+"name":"sievert",
+"id":"UO_0000137",
+"size":1
+},{
+"name":"Roentgen equivalent man",
+"id":"UO_0000140",
+"size":1
+},{
+"name":"nanosievert",
+"id":"UO_0000144",
+"size":1
+}
+]
+},{
+"name":"exposure unit",
+"id":"UO_0000131",
+"size":1,
+"children": [
+{
+"name":"roentgen",
+"id":"UO_0000136",
+"size":1
+}
+]
+},{
+"name":"absorbed dose unit",
+"id":"UO_0000129",
+"size":1,
+"children": [
+{
+"name":"microgray",
+"id":"UO_0000141",
+"size":1
+},{
+"name":"nanogray",
+"id":"UO_0000143",
+"size":1
+},{
+"name":"milligray",
+"id":"UO_0000142",
+"size":1
+},{
+"name":"gray",
+"id":"UO_0000134",
+"size":1
+},{
+"name":"rad",
+"id":"UO_0000135",
+"size":1
+}
+]
+},{
+"name":"activity (of a radionuclide) unit",
+"id":"UO_0000128",
+"size":1,
+"children": [
+{
+"name":"counts per minute",
+"id":"UO_0000148",
+"size":1
+},{
+"name":"microcurie",
+"id":"UO_0000146",
+"size":1
+},{
+"name":"curie",
+"id":"UO_0000133",
+"size":1
+},{
+"name":"disintegrations per minute",
+"id":"UO_0000147",
+"size":1
+},{
+"name":"becquerel",
+"id":"UO_0000132",
+"size":1
+},{
+"name":"millicurie",
+"id":"UO_0000145",
+"size":1
+},{
+"name":"disintegrations per second",
+"id":"UO_0000216",
+"size":1
+}
+]
+},{
+"name":"effective dose unit",
+"id":"UO_0000260",
+"size":1
+}
+]
+},{
+"name":"temperature unit",
+"id":"UO_0000005",
+"size":1,
+"children": [
+{
+"name":"degree Fahrenheit",
+"id":"UO_0000195",
+"size":1
+},{
+"name":"degree Celsius",
+"id":"UO_0000027",
+"size":1
+},{
+"name":"kelvin",
+"id":"UO_0000012",
+"size":1
+}
+]
+},{
+"name":"dimensionless unit",
+"id":"UO_0000186",
+"size":1,
+"children": [
+{
+"name":"count unit",
+"id":"UO_0000189",
+"size":1,
+"children": [
+{
+"name":"base pair",
+"id":"UO_0000244",
+"size":1,
+"children": [
+{
+"name":"kilobasepair",
+"id":"UO_0000328",
+"size":1
+},{
+"name":"megabasepair",
+"id":"UO_0000329",
+"size":1
+},{
+"name":"gigabasepair",
+"id":"UO_0000330",
+"size":1
+}
+]
+},{
+"name":"plaque forming unit",
+"id":"UO_0000211",
+"size":1
+},{
+"name":"molecule count",
+"id":"UO_0000192",
+"size":1
+},{
+"name":"colony forming unit",
+"id":"UO_0000210",
+"size":1
+}
+]
+},{
+"name":"absorbance unit",
+"id":"UO_0000269",
+"size":1
+},{
+"name":"pi",
+"id":"UO_0000188",
+"size":1
+},{
+"name":"fold dilution",
+"id":"UO_0000322",
+"size":1
+},{
+"name":"ratio",
+"id":"UO_0000190",
+"size":1,
+"children": [
+{
+"name":"percent",
+"id":"UO_0000187",
+"size":1,
+"children": [
+{
+"name":"mass percentage",
+"id":"UO_0000163",
+"size":1
+},{
+"name":"confluence percentage",
+"id":"UO_0000194",
+"size":1
+},{
+"name":"volume percentage",
+"id":"UO_0000165",
+"size":1
+},{
+"name":"mass volume percentage",
+"id":"UO_0000164",
+"size":1
+},{
+"name":"purity percentage",
+"id":"UO_0000193",
+"size":1
+}
+]
+},{
+"name":"decibel",
+"id":"UO_0000259",
+"size":1
+},{
+"name":"fraction",
+"id":"UO_0000191",
+"size":1,
+"children": [
+{
+"name":"mole fraction",
+"id":"UO_0000076",
+"size":1
+}
+]
+}
+]
+},{
+"name":"pH",
+"id":"UO_0000196",
+"size":1
+},{
+"name":"parts per notation unit",
+"id":"UO_0000166",
+"size":1,
+"children": [
+{
+"name":"parts per thousand",
+"id":"UO_0000168",
+"size":1
+},{
+"name":"parts per million",
+"id":"UO_0000169",
+"size":1
+},{
+"name":"parts per quadrillion",
+"id":"UO_0000172",
+"size":1
+},{
+"name":"parts per trillion",
+"id":"UO_0000171",
+"size":1
+},{
+"name":"parts per hundred",
+"id":"UO_0000167",
+"size":1
+},{
+"name":"parts per billion",
+"id":"UO_0000170",
+"size":1
+}
+]
+},{
+"name":"aspect ratio",
+"id":"NPO_1365",
+"size":1
+}
+]
+},{
+"name":"force unit",
+"id":"UO_0000107",
+"size":1,
+"children": [
+{
+"name":"newton",
+"id":"UO_0000108",
+"size":1
+}
+]
+},{
+"name":"pressure unit",
+"id":"UO_0000109",
+"size":1,
+"children": [
+{
+"name":"millimetres of mercury",
+"id":"UO_0000272",
+"size":1
+},{
+"name":"pascal",
+"id":"UO_0000110",
+"size":1
+}
+]
+},{
+"name":"density unit",
+"id":"UO_0000182",
+"size":1,
+"children": [
+{
+"name":"linear density unit",
+"id":"UO_0000183",
+"size":1,
+"children": [
+{
+"name":"kilogram per meter",
+"id":"UO_0000184",
+"size":1
+}
+]
+},{
+"name":"area density unit",
+"id":"UO_0000054",
+"size":1,
+"children": [
+{
+"name":"ton per hectare",
+"id":"UO_0000323",
+"size":1
+},{
+"name":"kilogram per square meter",
+"id":"UO_0000086",
+"size":1
+},{
+"name":"kilogram per hectare",
+"id":"UO_0000283",
+"size":1
+}
+]
+},{
+"name":"mass density unit",
+"id":"UO_0000052",
+"size":1,
+"children": [
+{
+"name":"kilogram per cubic meter",
+"id":"UO_0000083",
+"size":1
+},{
+"name":"nanogram per milliliter",
+"id":"UO_0000275",
+"size":1
+},{
+"name":"gram per cubic centimeter",
+"id":"UO_0000084",
+"size":1
+},{
+"name":"microgram per liter",
+"id":"UO_0000301",
+"size":1
+},{
+"name":"gram per liter",
+"id":"UO_0000175",
+"size":1
+},{
+"name":"gram per milliliter",
+"id":"UO_0000173",
+"size":1
+},{
+"name":"kilogram per liter",
+"id":"UO_0000174",
+"size":1
+},{
+"name":"gram per deciliter",
+"id":"UO_0000208",
+"size":1
+},{
+"name":"milligram per milliliter",
+"id":"UO_0000176",
+"size":1
+},{
+"name":"microgram per milliliter",
+"id":"UO_0000274",
+"size":1
+},{
+"name":"milligram per liter",
+"id":"UO_0000273",
+"size":1
+}
+]
+}
+]
+},{
+"name":"energy unit",
+"id":"UO_0000111",
+"size":1,
+"children": [
+{
+"name":"kilowatt-hour",
+"id":"UO_0000224",
+"size":1
+},{
+"name":"watt-hour",
+"id":"UO_0000223",
+"size":1
+},{
+"name":"joule",
+"id":"UO_0000112",
+"size":1
+},{
+"name":"electronvolt",
+"id":"UO_0000266",
+"size":1
+}
+]
+},{
+"name":"turbidity unit",
+"id":"UO_0000315",
+"size":1,
+"children": [
+{
+"name":"formazin nephelometric unit",
+"id":"UO_0000318",
+"size":1
+}
+]
+},{
+"name":"concentration unit",
+"id":"UO_0000051",
+"size":1,
+"children": [
+{
+"name":"mass percentage",
+"id":"UO_0000163",
+"size":1
+},{
+"name":"unit of normality",
+"id":"UO_0000074",
+"size":1,
+"children": [
+{
+"name":"normal",
+"id":"UO_0000075",
+"size":1
+}
+]
+},{
+"name":"mass volume percentage",
+"id":"UO_0000164",
+"size":1
+},{
+"name":"radioactivity concentration",
+"id":"UO_0000319",
+"size":1,
+"children": [
+{
+"name":"microcurie per milliliter",
+"id":"UO_0000321",
+"size":1
+},{
+"name":"curie per liter",
+"id":"UO_0000320",
+"size":1
+}
+]
+},{
+"name":"volume per unit volume",
+"id":"UO_0000205",
+"size":1,
+"children": [
+{
+"name":"milliliter per liter",
+"id":"UO_0000207",
+"size":1
+},{
+"name":"milliliter per cubic meter",
+"id":"UO_0000206",
+"size":1
+},{
+"name":"volume percentage",
+"id":"UO_0000165",
+"size":1
+}
+]
+},{
+"name":"unit of molarity",
+"id":"UO_0000061",
+"size":1,
+"children": [
+{
+"name":"micromolar",
+"id":"UO_0000064",
+"size":1
+},{
+"name":"femtomolar",
+"id":"UO_0000073",
+"size":1
+},{
+"name":"molar",
+"id":"UO_0000062",
+"size":1
+},{
+"name":"nanomolar",
+"id":"UO_0000065",
+"size":1
+},{
+"name":"picomolar",
+"id":"UO_0000066",
+"size":1
+},{
+"name":"millimolar",
+"id":"UO_0000063",
+"size":1
+}
+]
+},{
+"name":"unit of molality",
+"id":"UO_0000067",
+"size":1,
+"children": [
+{
+"name":"millimolal",
+"id":"UO_0000069",
+"size":1
+},{
+"name":"picomolal",
+"id":"UO_0000072",
+"size":1
+},{
+"name":"micromolal",
+"id":"UO_0000070",
+"size":1
+},{
+"name":"nanomolal",
+"id":"UO_0000071",
+"size":1
+},{
+"name":"molal",
+"id":"UO_0000068",
+"size":1
+}
+]
+},{
+"name":"mass per unit volume",
+"id":"UO_0000180",
+"size":1
+},{
+"name":"mole fraction",
+"id":"UO_0000076",
+"size":1
+},{
+"name":"colony forming unit per volume",
+"id":"UO_0000212",
+"size":1,
+"children": [
+{
+"name":"colony forming unit per milliliter",
+"id":"UO_0000213",
+"size":1
+}
+]
+},{
+"name":"dosage unit",
+"id":"UO_0000310",
+"size":1,
+"children": [
+{
+"name":"milligram per kilogram per day",
+"id":"UO_0000311",
+"size":1
+}
+]
+},{
+"name":"plaque forming unit per volume",
+"id":"UO_0000214",
+"size":1,
+"children": [
+{
+"name":"plaque forming unit per milliliter",
+"id":"UO_0000215",
+"size":1
+}
+]
+},{
+"name":"dose unit",
+"id":"UO_0000307",
+"size":1,
+"children": [
+{
+"name":"milligram per square meter",
+"id":"UO_0000309",
+"size":1
+},{
+"name":"milligram per kilogram",
+"id":"UO_0000308",
+"size":1
+}
+]
+},{
+"name":"amount per container",
+"id":"UO_0000276",
+"size":1,
+"children": [
+{
+"name":"ug/disk",
+"id":"UO_0000277",
+"size":1
+},{
+"name":"nmole/disk",
+"id":"UO_0000278",
+"size":1
+}
+]
+},{
+"name":"cell concentration unit",
+"id":"UO_0000200",
+"size":1,
+"children": [
+{
+"name":"cells per milliliter",
+"id":"UO_0000201",
+"size":1
+},{
+"name":"cells per well",
+"id":"UO_0000317",
+"size":1
+},{
+"name":"cells per microliter",
+"id":"UO_0000316",
+"size":1
+}
+]
+},{
+"name":"catalytic (activity) concentration unit",
+"id":"UO_0000202",
+"size":1,
+"children": [
+{
+"name":"katal per liter",
+"id":"UO_0000204",
+"size":1
+},{
+"name":"katal per cubic meter",
+"id":"UO_0000203",
+"size":1
+}
+]
+},{
+"name":"pH",
+"id":"UO_0000196",
+"size":1
+},{
+"name":"unit per volume unit",
+"id":"UO_0000177",
+"size":1,
+"children": [
+{
+"name":"unit per milliliter",
+"id":"UO_0000178",
+"size":1
+},{
+"name":"unit per liter",
+"id":"UO_0000179",
+"size":1
+},{
+"name":"milliunits per milliliter",
+"id":"UO_0000279",
+"size":1
+}
+]
+}
+]
+},{
+"name":"information unit",
+"id":"UO_0000231",
+"size":1,
+"children": [
+{
+"name":"mebibyte",
+"id":"UO_0000246",
+"size":1
+},{
+"name":"kibibyte",
+"id":"UO_0000245",
+"size":1
+},{
+"name":"terabyte",
+"id":"UO_0000332",
+"size":1
+},{
+"name":"kilobyte",
+"id":"UO_0000234",
+"size":1
+},{
+"name":"megabyte",
+"id":"UO_0000235",
+"size":1
+},{
+"name":"image resolution unit",
+"id":"UO_0000236",
+"size":1,
+"children": [
+{
+"name":"spatial resolution unit",
+"id":"UO_0000239",
+"size":1,
+"children": [
+{
+"name":"pixels per millimeter",
+"id":"UO_0000243",
+"size":1
+},{
+"name":"dots per inch",
+"id":"UO_0000240",
+"size":1
+},{
+"name":"micron pixel",
+"id":"UO_0000241",
+"size":1
+},{
+"name":"pixels per inch",
+"id":"UO_0000242",
+"size":1
+}
+]
+},{
+"name":"dynamic range unit",
+"id":"UO_0000238",
+"size":1
+},{
+"name":"chroma sampling unit",
+"id":"UO_0000237",
+"size":1
+}
+]
+},{
+"name":"bit",
+"id":"UO_0000232",
+"size":1
+},{
+"name":"byte",
+"id":"UO_0000233",
+"size":1
+},{
+"name":"gigabyte",
+"id":"UO_0000331",
+"size":1
+}
+]
+},{
+"name":"magnetic flux density unit",
+"id":"UO_0000227",
+"size":1,
+"children": [
+{
+"name":"tesla",
+"id":"UO_0000228",
+"size":1
+}
+]
+},{
+"name":"power unit",
+"id":"UO_0000113",
+"size":1,
+"children": [
+{
+"name":"watt",
+"id":"UO_0000114",
+"size":1
+}
+]
+},{
+"name":"frequency unit",
+"id":"UO_0000105",
+"size":1,
+"children": [
+{
+"name":"rotational frequency unit",
+"id":"UO_0000058",
+"size":1,
+"children": [
+{
+"name":"turns per second",
+"id":"UO_0000092",
+"size":1
+}
+]
+},{
+"name":"hertz",
+"id":"UO_0000106",
+"size":1,
+"children": [
+{
+"name":"megaHertz",
+"id":"UO_0000325",
+"size":1
+}
+]
+}
+]
+},{
+"name":"electric potential difference unit",
+"id":"UO_0000217",
+"size":1,
+"children": [
+{
+"name":"millivolt",
+"id":"UO_0000247",
+"size":1
+},{
+"name":"picovolt",
+"id":"UO_0000251",
+"size":1
+},{
+"name":"megavolt",
+"id":"UO_0000252",
+"size":1
+},{
+"name":"nanovolt",
+"id":"UO_0000250",
+"size":1
+},{
+"name":"volt",
+"id":"UO_0000218",
+"size":1
+},{
+"name":"microvolt",
+"id":"UO_0000249",
+"size":1
+},{
+"name":"kilovolt",
+"id":"UO_0000248",
+"size":1
+}
+]
+},{
+"name":"angle unit",
+"id":"UO_0000121",
+"size":1,
+"children": [
+{
+"name":"solid angle unit",
+"id":"UO_0000124",
+"size":1,
+"children": [
+{
+"name":"steradian",
+"id":"UO_0000125",
+"size":1
+}
+]
+},{
+"name":"plane angle unit",
+"id":"UO_0000122",
+"size":1,
+"children": [
+{
+"name":"radian",
+"id":"UO_0000123",
+"size":1
+},{
+"name":"degree",
+"id":"UO_0000185",
+"size":1
+}
+]
+}
+]
+},{
+"name":"catalytic activity unit",
+"id":"UO_0000119",
+"size":1,
+"children": [
+{
+"name":"katal",
+"id":"UO_0000120",
+"size":1
+},{
+"name":"enzyme unit",
+"id":"UO_0000181",
+"size":1
+}
+]
+},{
+"name":"electric charge",
+"id":"UO_0000219",
+"size":1,
+"children": [
+{
+"name":"coulomb",
+"id":"UO_0000220",
+"size":1
+}
+]
+},{
+"name":"time unit",
+"id":"UO_0000003",
+"size":1,
+"children": [
+{
+"name":"week",
+"id":"UO_0000034",
+"size":1
+},{
+"name":"month",
+"id":"UO_0000035",
+"size":1
+},{
+"name":"year",
+"id":"UO_0000036",
+"size":1
+},{
+"name":"second",
+"id":"UO_0000010",
+"size":1
+},{
+"name":"day",
+"id":"UO_0000033",
+"size":1
+},{
+"name":"nanosecond",
+"id":"UO_0000150",
+"size":1
+},{
+"name":"century",
+"id":"UO_0000151",
+"size":1
+},{
+"name":"picosecond",
+"id":"UO_0000030",
+"size":1
+},{
+"name":"millisecond",
+"id":"UO_0000028",
+"size":1
+},{
+"name":"hour",
+"id":"UO_0000032",
+"size":1
+},{
+"name":"half life",
+"id":"UO_0000152",
+"size":1
+},{
+"name":"minute",
+"id":"UO_0000031",
+"size":1
+},{
+"name":"microsecond",
+"id":"UO_0000029",
+"size":1
+}
+]
+},{
+"name":"length unit",
+"id":"UO_0000001",
+"size":1,
+"children": [
+{
+"name":"centiRay",
+"id":"UO_0000327",
+"size":1
+},{
+"name":"picometer",
+"id":"UO_0000020",
+"size":1
+},{
+"name":"angstrom",
+"id":"UO_0000019",
+"size":1
+},{
+"name":"micrometer",
+"id":"UO_0000017",
+"size":1
+},{
+"name":"centiMorgan",
+"id":"UO_0000326",
+"size":1
+},{
+"name":"nanometer",
+"id":"UO_0000018",
+"size":1
+},{
+"name":"millimeter",
+"id":"UO_0000016",
+"size":1
+},{
+"name":"meter",
+"id":"UO_0000008",
+"size":1
+},{
+"name":"centimeter",
+"id":"UO_0000015",
+"size":1
+}
+]
+},{
+"name":"magnetic flux unit",
+"id":"UO_0000225",
+"size":1,
+"children": [
+{
+"name":"volt-hour",
+"id":"UO_0000229",
+"size":1
+},{
+"name":"kilovolt-hour",
+"id":"UO_0000230",
+"size":1
+},{
+"name":"weber",
+"id":"UO_0000226",
+"size":1
+}
+]
+},{
+"name":"surface tension unit",
+"id":"UO_0000253",
+"size":1,
+"children": [
+{
+"name":"newton per meter",
+"id":"UO_0000254",
+"size":1
+},{
+"name":"dyne per cm",
+"id":"UO_0000255",
+"size":1
+}
+]
+},{
+"name":"conduction unit",
+"id":"UO_0000261",
+"size":1,
+"children": [
+{
+"name":"electrical conduction unit",
+"id":"UO_0000262",
+"size":1,
+"children": [
+{
+"name":"siemens",
+"id":"UO_0000264",
+"size":1
+}
+]
+},{
+"name":"heat conduction unit",
+"id":"UO_0000263",
+"size":1,
+"children": [
+{
+"name":"watt per meter kelvin",
+"id":"UO_0000265",
+"size":1
+}
+]
+}
+]
+},{
+"name":"acceleration unit",
+"id":"UO_0000048",
+"size":1,
+"children": [
+{
+"name":"meter per second per second",
+"id":"UO_0000077",
+"size":1
+}
+]
+},{
+"name":"speed/velocity unit",
+"id":"UO_0000060",
+"size":1,
+"children": [
+{
+"name":"meter per second",
+"id":"UO_0000094",
+"size":1
+}
+]
+},{
+"name":"light unit",
+"id":"UO_0000157",
+"size":1,
+"children": [
+{
+"name":"luminous flux unit",
+"id":"UO_0000117",
+"size":1,
+"children": [
+{
+"name":"lumen",
+"id":"UO_0000118",
+"size":1
+}
+]
+},{
+"name":"relative light unit",
+"id":"UO_0000312",
+"size":1,
+"children": [
+{
+"name":"relative luminescence unit",
+"id":"UO_0000313",
+"size":1
+},{
+"name":"relative fluorescence unit",
+"id":"UO_0000314",
+"size":1
+}
+]
+},{
+"name":"irradiance unit",
+"id":"UO_0000154",
+"size":1,
+"children": [
+{
+"name":"watt per square meter",
+"id":"UO_0000155",
+"size":1
+},{
+"name":"einstein per square meter per second",
+"id":"UO_0000156",
+"size":1
+},{
+"name":"microeinstein per square meter per second",
+"id":"UO_0000160",
+"size":1
+}
+]
+},{
+"name":"radiance unit",
+"id":"UO_0000161",
+"size":1,
+"children": [
+{
+"name":"watt per steradian per square meter",
+"id":"UO_0000158",
+"size":1
+}
+]
+},{
+"name":"luminance unit",
+"id":"UO_0000053",
+"size":1,
+"children": [
+{
+"name":"candela per square meter",
+"id":"UO_0000085",
+"size":1
+}
+]
+},{
+"name":"illuminance unit",
+"id":"UO_0000115",
+"size":1,
+"children": [
+{
+"name":"lux",
+"id":"UO_0000116",
+"size":1
+},{
+"name":"foot candle",
+"id":"UO_0000153",
+"size":1
+}
+]
+},{
+"name":"luminous intensity unit",
+"id":"UO_0000007",
+"size":1,
+"children": [
+{
+"name":"candela",
+"id":"UO_0000014",
+"size":1
+}
+]
+},{
+"name":"radiant intensity unit",
+"id":"UO_0000159",
+"size":1,
+"children": [
+{
+"name":"watt per steradian",
+"id":"UO_0000162",
+"size":1
+}
+]
+}
+]
+},{
+"name":"rate unit",
+"id":"UO_0000280",
+"size":1,
+"children": [
+{
+"name":"count per nanomolar",
+"id":"UO_0000284",
+"size":1
+},{
+"name":"count per molar second",
+"id":"UO_0000282",
+"size":1
+},{
+"name":"count per nanomolar second",
+"id":"UO_0000281",
+"size":1
+},{
+"name":"count per molar",
+"id":"UO_0000285",
+"size":1
+}
+]
+},{
+"name":"electric field strength unit",
+"id":"UO_0000267",
+"size":1,
+"children": [
+{
+"name":"volt per meter",
+"id":"UO_0000268",
+"size":1
+}
+]
+},{
+"name":"angular acceleration unit",
+"id":"UO_0000050",
+"size":1,
+"children": [
+{
+"name":"radian per second per second",
+"id":"UO_0000078",
+"size":1
+}
+]
+}
+]
+},{
+"name":"Authority",
+"id":"C79889",
+"size":1
+},{
+"name":"assay description",
+"id":"BAO_0000520",
+"size":1,
+"children": [
+{
+"name":"assay comment",
+"id":"BAO_0000525",
+"size":1
+},{
+"name":"assay narrative",
+"id":"BAO_0000522",
+"size":1
+},{
+"name":"assay title",
+"id":"BAO_0000521",
+"size":1
+},{
+"name":"premises identifier",
+"id":"ENM_9000049",
+"size":1
+},{
+"name":"summary comment",
+"id":"BAO_0000384",
+"size":1
+},{
+"name":"assay protocol",
+"id":"BAO_0000523",
+"size":1,
+"children": [
+{
+"name":"Type",
+"id":"C25284",
+"size":1
+},{
+"name":"Exposure Route of Administration",
+"id":"C83121",
+"size":1,
+"children": [
+{
+"name":"Parent",
+"id":"C42709",
+"size":1
+}
+]
+},{
+"name":"Description",
+"id":"C25365",
+"size":1
+}
+]
+},{
+"name":"research institute",
+"id":"BAO_0000709",
+"size":1,
+"children": [
+{
+"name":"NIH chemical genomics center",
+"id":"BAO_0000973",
+"size":1
+},{
+"name":"MLSCN center at columbia university",
+"id":"BAO_0000813",
+"size":1
+},{
+"name":"the penn center for molecular discovery",
+"id":"BAO_0000989",
+"size":1
+},{
+"name":"HMS",
+"id":"BAO_0003110",
+"size":1
+},{
+"name":"new mexico molecular libraries screening center",
+"id":"BAO_0000977",
+"size":1
+},{
+"name":"the structural genomics consortium",
+"id":"BAO_0001015",
+"size":1
+},{
+"name":"broad institute",
+"id":"BAO_0000869",
+"size":1
+},{
+"name":"the scripps research institute molecular screening center",
+"id":"BAO_0001031",
+"size":1
+},{
+"name":"southern research institute",
+"id":"BAO_0000791",
+"size":1
+},{
+"name":"burnham center for chemical genomics",
+"id":"BAO_0000871",
+"size":1
+},{
+"name":"john hopkins ion channel center",
+"id":"BAO_0000951",
+"size":1
+},{
+"name":"vanderbilt screening center for gpcrs, ion channels and transporters",
+"id":"BAO_0000710",
+"size":1
+},{
+"name":"emory university molecular libraries screening center",
+"id":"BAO_0000899",
+"size":1
+},{
+"name":"university of pittsburgh molecular libraries screening center",
+"id":"BAO_0001043",
+"size":1
+}
+]
+},{
+"name":"sample identifier",
+"id":"ENM_9000071",
+"size":1
+},{
+"name":"PubChem endpoint name",
+"id":"BAO_0000610",
+"size":1
+},{
+"name":"measurement identifier",
+"id":"ENM_9000070",
+"size":1
+}
+]
+},{
+"name":"chemical descriptor",
+"id":"CHEMINF_000123",
+"size":1,
+"children": [
+{
+"name":"topological descriptor",
+"id":"CHEMINF_000092",
+"size":1,
+"children": [
+{
+"name":"valence connectivity index (order 0)",
+"id":"CHEMINF_001535",
+"size":1
+},{
+"name":"carbon connectivity index (order 1)",
+"id":"CHEMINF_001537",
+"size":1
+},{
+"name":"carbon types",
+"id":"CHEMINF_001533",
+"size":1
+},{
+"name":"Moreau-Broto autocorrelation (mass) descriptors",
+"id":"CHEMINF_001531",
+"size":1
+},{
+"name":"Moreau-Broto Autocorrelation (charge) descriptors",
+"id":"CHEMINF_001530",
+"size":1
+},{
+"name":"Wiener path number",
+"id":"CHEMINF_000117",
+"size":1
+},{
+"name":"valence carbon connectivity index (order 1)",
+"id":"CHEMINF_001539",
+"size":1
+},{
+"name":"Kier Hall SMARTS",
+"id":"CHEMINF_001519",
+"size":1
+},{
+"name":"Kier and Hall kappa molecular shape indices",
+"id":"CHEMINF_001543",
+"size":1
+},{
+"name":"Petitjean number",
+"id":"CHEMINF_000184",
+"size":1
+},{
+"name":"WHIM",
+"id":"CHEMINF_001529",
+"size":1
+},{
+"name":"chi path-cluster indices",
+"id":"CHEMINF_001509",
+"size":1
+},{
+"name":"chi cluster indices",
+"id":"CHEMINF_001507",
+"size":1
+},{
+"name":"eccentric connectivity index descriptor",
+"id":"CHEMINF_000192",
+"size":1
+},{
+"name":"bonds to Atom",
+"id":"CHEMINF_001505",
+"size":1
+},{
+"name":"molecular distance edge",
+"id":"CHEMINF_001520",
+"size":1
+},{
+"name":"BCUT",
+"id":"CHEMINF_001500",
+"size":1
+},{
+"name":"valence carbon connectivity index (order 0)",
+"id":"CHEMINF_001536",
+"size":1
+},{
+"name":"carbon connectivity index (order 0)",
+"id":"CHEMINF_001534",
+"size":1
+},{
+"name":"Moreau-Broto autocorrelation (polarizability) descriptors",
+"id":"CHEMINF_001532",
+"size":1
+},{
+"name":"Wiener polarity number descriptor",
+"id":"CHEMINF_000137",
+"size":1
+},{
+"name":"RDF proton descriptor",
+"id":"CHEMINF_001526",
+"size":1
+},{
+"name":"Petitjean Shape Index",
+"id":"CHEMINF_000185",
+"size":1,
+"children": [
+{
+"name":"Petitjean Geometric Shape Index",
+"id":"CHEMINF_000183",
+"size":1
+},{
+"name":"Petitjean Topological Shape Index",
+"id":"CHEMINF_000182",
+"size":1
+}
+]
+},{
+"name":"hybridization ratio",
+"id":"CHEMINF_001542",
+"size":1
+},{
+"name":"chi path indices",
+"id":"CHEMINF_001508",
+"size":1
+},{
+"name":"valence connectivity index (order 1)",
+"id":"CHEMINF_001538",
+"size":1
+},{
+"name":"weighted path",
+"id":"CHEMINF_001528",
+"size":1
+},{
+"name":"chi chain indices",
+"id":"CHEMINF_001506",
+"size":1
+}
+]
+},{
+"name":"positional descriptor",
+"id":"CHEMINF_000041",
+"size":1,
+"children": [
+{
+"name":"atomic order",
+"id":"CHEMINF_000010",
+"size":1
+}
+]
+},{
+"name":"constitutional descriptor",
+"id":"CHEMINF_000136",
+"size":1,
+"children": [
+{
+"name":"molecular formula",
+"id":"CHEMINF_000042",
+"size":1,
+"children": [
+{
+"name":"molecular formula calculated by the pubchem software library",
+"id":"CHEMINF_000335",
+"size":1
+},{
+"name":"molecular formula calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000490",
+"size":1
+}
+]
+},{
+"name":"count descriptor",
+"id":"CHEMINF_000209",
+"size":1,
+"children": [
+{
+"name":"acidic group count",
+"id":"CHEMINF_000293",
+"size":1
+},{
+"name":"zagreb index",
+"id":"CHEMINF_000046",
+"size":1
+},{
+"name":"proton count",
+"id":"CHEMINF_000079",
+"size":1
+},{
+"name":"structural alert count",
+"id":"CHEMINF_000430",
+"size":1
+},{
+"name":"histidine countcovalent unit count",
+"id":"CHEMINF_000280",
+"size":1,
+"children": [
+{
+"name":"covalent unit count generated by pubchem software library",
+"id":"CHEMINF_000369",
+"size":1
+}
+]
+},{
+"name":"hydrogen bond acceptor count",
+"id":"CHEMINF_000245",
+"size":1,
+"children": [
+{
+"name":"hydrogen bond acceptor count calculated by pipeline pilot",
+"id":"CHEMINF_000309",
+"size":1
+},{
+"name":"hydrogen bond acceptor count calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000345",
+"size":1
+},{
+"name":"hydrogen bond acceptor count calculated by cactvs",
+"id":"CHEMINF_000388",
+"size":1
+}
+]
+},{
+"name":"size of largest chain",
+"id":"CHEMINF_000246",
+"size":1,
+"children": [
+{
+"name":"size of largest aliphatic chain",
+"id":"CHEMINF_000240",
+"size":1
+}
+]
+},{
+"name":"pi-system size",
+"id":"CHEMINF_000223",
+"size":1
+},{
+"name":"atom count",
+"id":"CHEMINF_000263",
+"size":1,
+"children": [
+{
+"name":"oxygen atom count",
+"id":"CHEMINF_000449",
+"size":1
+},{
+"name":"heavy atom count",
+"id":"CHEMINF_000300",
+"size":1,
+"children": [
+{
+"name":"heavy atom count generated by pubchem software library",
+"id":"CHEMINF_000373",
+"size":1
+}
+]
+},{
+"name":"metal atom count",
+"id":"CHEMINF_000448",
+"size":1
+},{
+"name":"isotope atom count",
+"id":"CHEMINF_000301",
+"size":1,
+"children": [
+{
+"name":"isotope atom count generated by pubchem software library",
+"id":"CHEMINF_000372",
+"size":1
+}
+]
+},{
+"name":"aromatic atom count",
+"id":"CHEMINF_000232",
+"size":1
+}
+]
+},{
+"name":"basic group count",
+"id":"CHEMINF_000294",
+"size":1
+},{
+"name":"hydrogen bond donor count",
+"id":"CHEMINF_000244",
+"size":1,
+"children": [
+{
+"name":"hydrogen bond donor count calculated by cactvs",
+"id":"CHEMINF_000387",
+"size":1
+},{
+"name":"hydrogen bond donor count calculated by pipeline pilot",
+"id":"CHEMINF_000310",
+"size":1
+},{
+"name":"hydrogen bond donor count calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000346",
+"size":1
+}
+]
+},{
+"name":"bond count",
+"id":"CHEMINF_000233",
+"size":1,
+"children": [
+{
+"name":"aromatic bond count",
+"id":"CHEMINF_000243",
+"size":1
+},{
+"name":"rotatable bond count",
+"id":"CHEMINF_000254",
+"size":1,
+"children": [
+{
+"name":"number of freely rotating bonds calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000348",
+"size":1
+},{
+"name":"rotatable bond count calculated by pipeline pilot",
+"id":"CHEMINF_000311",
+"size":1
+},{
+"name":"rotatable bond count calculated by cactvs",
+"id":"CHEMINF_000389",
+"size":1
+}
+]
+}
+]
+},{
+"name":"stereocenter count",
+"id":"CHEMINF_000203",
+"size":1,
+"children": [
+{
+"name":"atom stereocenter count",
+"id":"CHEMINF_000205",
+"size":1,
+"children": [
+{
+"name":"undefined atom stereocenter count",
+"id":"CHEMINF_000212",
+"size":1,
+"children": [
+{
+"name":"undefined atom stereocenter count generated by the pubchem software library",
+"id":"CHEMINF_000374",
+"size":1
+}
+]
+},{
+"name":"defined atom stereocenter count",
+"id":"CHEMINF_000206",
+"size":1,
+"children": [
+{
+"name":"defined atom stereocenter count generated by the pubchem software library",
+"id":"CHEMINF_000370",
+"size":1
+}
+]
+}
+]
+},{
+"name":"bond stereocenter count",
+"id":"CHEMINF_000213",
+"size":1,
+"children": [
+{
+"name":"defined bond stereocenter count",
+"id":"CHEMINF_000214",
+"size":1,
+"children": [
+{
+"name":"defined bond stereocenter count generated by pubchem software library",
+"id":"CHEMINF_000371",
+"size":1
+}
+]
+},{
+"name":"undefined bond stereocenter count",
+"id":"CHEMINF_000215",
+"size":1,
+"children": [
+{
+"name":"undefined bond stereocenter count generated by the pubchem software library",
+"id":"CHEMINF_000375",
+"size":1
+}
+]
+}
+]
+}
+]
+},{
+"name":"cycle count",
+"id":"CHEMINF_000380",
+"size":1,
+"children": [
+{
+"name":"aromatic cycle count",
+"id":"CHEMINF_000381",
+"size":1
+}
+]
+},{
+"name":"neutron count",
+"id":"CHEMINF_000078",
+"size":1
+},{
+"name":"effective rotor count",
+"id":"CHEMINF_000267",
+"size":1
+},{
+"name":"atomic degree",
+"id":"CHEMINF_000090",
+"size":1
+},{
+"name":"tautomer count",
+"id":"CHEMINF_000202",
+"size":1,
+"children": [
+{
+"name":"tautomer count calculated by cactvs",
+"id":"CHEMINF_000391",
+"size":1
+}
+]
+},{
+"name":"amino acid count",
+"id":"CHEMINF_000270",
+"size":1,
+"children": [
+{
+"name":"aspartate count",
+"id":"CHEMINF_000274",
+"size":1
+},{
+"name":"cysteine count",
+"id":"CHEMINF_000275",
+"size":1
+},{
+"name":"valine count",
+"id":"CHEMINF_000289",
+"size":1
+},{
+"name":"leucine count",
+"id":"CHEMINF_000283",
+"size":1
+},{
+"name":"tyrosine count",
+"id":"CHEMINF_000288",
+"size":1
+},{
+"name":"lysine count",
+"id":"CHEMINF_000284",
+"size":1
+},{
+"name":"methionine count",
+"id":"CHEMINF_000285",
+"size":1
+},{
+"name":"phenylalanine count",
+"id":"CHEMINF_000276",
+"size":1
+},{
+"name":"proline count",
+"id":"CHEMINF_000282",
+"size":1
+},{
+"name":"histidine countcovalent unit count",
+"id":"CHEMINF_000280",
+"size":1,
+"children": [
+{
+"name":"covalent unit count generated by pubchem software library",
+"id":"CHEMINF_000369",
+"size":1
+}
+]
+},{
+"name":"isoleucine count",
+"id":"CHEMINF_000281",
+"size":1
+},{
+"name":"tryptophan count",
+"id":"CHEMINF_000290",
+"size":1
+},{
+"name":"glycine count",
+"id":"CHEMINF_000279",
+"size":1
+},{
+"name":"serine count",
+"id":"CHEMINF_000286",
+"size":1
+},{
+"name":"glutamate count",
+"id":"CHEMINF_000277",
+"size":1
+},{
+"name":"arginine count",
+"id":"CHEMINF_000272",
+"size":1
+},{
+"name":"glutamine count",
+"id":"CHEMINF_000278",
+"size":1
+},{
+"name":"threonine count",
+"id":"CHEMINF_000287",
+"size":1
+},{
+"name":"asparagine count",
+"id":"CHEMINF_000273",
+"size":1
+},{
+"name":"alanine count",
+"id":"CHEMINF_000271",
+"size":1
+}
+]
+}
+]
+},{
+"name":"proton belonging to a pi-system",
+"id":"CHEMINF_001518",
+"size":1
+},{
+"name":"proton belonging to an aromatic system",
+"id":"CHEMINF_001517",
+"size":1
+},{
+"name":"group of an atom",
+"id":"CHEMINF_000516",
+"size":1
+},{
+"name":"period of an atom",
+"id":"CHEMINF_001523",
+"size":1
+},{
+"name":"pi-contact of two atoms",
+"id":"CHEMINF_001524",
+"size":1
+}
+]
+},{
+"name":"energetic descriptor",
+"id":"CHEMINF_000016",
+"size":1,
+"children": [
+{
+"name":"solvation energy descriptor",
+"id":"CHEMINF_000208",
+"size":1,
+"children": [
+{
+"name":"solvation enthalpy descriptor",
+"id":"CHEMINF_000250",
+"size":1
+},{
+"name":"solvation entropy descriptor",
+"id":"CHEMINF_000249",
+"size":1
+},{
+"name":"solvation Gibbs energy descriptor",
+"id":"CHEMINF_000225",
+"size":1
+}
+]
+},{
+"name":"energy band gap",
+"id":"CHEMINF_000487",
+"size":1
+},{
+"name":"dissociation energy descriptor",
+"id":"CHEMINF_000210",
+"size":1,
+"children": [
+{
+"name":"bond dissociation enthalpy descriptor",
+"id":"CHEMINF_000252",
+"size":1
+},{
+"name":"bond dissociation Gibbs energy descriptor",
+"id":"CHEMINF_000224",
+"size":1
+},{
+"name":"bond dissociation entropy descriptor",
+"id":"CHEMINF_000265",
+"size":1
+}
+]
+},{
+"name":"formation energy descriptor",
+"id":"CHEMINF_000207",
+"size":1,
+"children": [
+{
+"name":"formation entropy descriptor",
+"id":"CHEMINF_000260",
+"size":1
+},{
+"name":"formation Gibbs energy descriptor",
+"id":"CHEMINF_000239",
+"size":1
+},{
+"name":"formation enthalpy descriptor",
+"id":"CHEMINF_000241",
+"size":1
+}
+]
+}
+]
+},{
+"name":"QSAR descriptor",
+"id":"CHEMINF_000064",
+"size":1,
+"children": [
+{
+"name":"atomic QSAR descriptor",
+"id":"CHEMINF_000112",
+"size":1
+},{
+"name":"molecular QSAR descriptor",
+"id":"CHEMINF_000104",
+"size":1
+}
+]
+},{
+"name":"physical descriptor",
+"id":"CHEMINF_000025",
+"size":1,
+"children": [
+{
+"name":"molecular species at pH 7.4 descriptor",
+"id":"CHEMINF_000326",
+"size":1,
+"children": [
+{
+"name":"molecular species at pH 7.4 calculated by ACD/Labs PhysChem software",
+"id":"CHEMINF_000327",
+"size":1
+}
+]
+},{
+"name":"boiling point descriptor",
+"id":"CHEMINF_000257",
+"size":1,
+"children": [
+{
+"name":"Boiling point at 760 mmHg pressure calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000347",
+"size":1
+}
+]
+},{
+"name":"surface tension descriptor",
+"id":"CHEMINF_000420",
+"size":1,
+"children": [
+{
+"name":"surface tension calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000368",
+"size":1
+}
+]
+},{
+"name":"rule of three passes descriptor",
+"id":"CHEMINF_000315",
+"size":1,
+"children": [
+{
+"name":"rule of three passes calculated by pipeline pilot",
+"id":"CHEMINF_000317",
+"size":1
+}
+]
+},{
+"name":"Partition Coefficient",
+"id":"C20610",
+"size":1
+},{
+"name":"odor detection threshold descriptor",
+"id":"CHEMINF_000441",
+"size":1
+},{
+"name":"specific gravity descriptor",
+"id":"CHEMINF_000438",
+"size":1
+},{
+"name":"logD descriptor",
+"id":"CHEMINF_000322",
+"size":1,
+"children": [
+{
+"name":"logD calculated at pH 5.5 by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000344",
+"size":1
+},{
+"name":"logD calculated at pH 7.4 by ACD/Labs PhysChem software",
+"id":"CHEMINF_000323",
+"size":1
+}
+]
+},{
+"name":"autoignition temperature descriptor",
+"id":"CHEMINF_000444",
+"size":1
+},{
+"name":"atmospheric OH rate constant",
+"id":"CHEMINF_000434",
+"size":1
+},{
+"name":"pH descriptor",
+"id":"CHEMINF_000442",
+"size":1,
+"children": [
+{
+"name":"isoelectric point",
+"id":"NPO_1204",
+"size":1
+}
+]
+},{
+"name":"lower explosive limit descriptor",
+"id":"CHEMINF_000436",
+"size":1
+},{
+"name":"bioconcentration factor descriptor",
+"id":"CHEMINF_000414",
+"size":1,
+"children": [
+{
+"name":"bioconcentration factor at pH 7.4 calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000366",
+"size":1
+},{
+"name":"bioconcentration factor at pH 5.5 calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000365",
+"size":1
+}
+]
+},{
+"name":"freezing point descriptor",
+"id":"CHEMINF_000432",
+"size":1
+},{
+"name":"enthalpy of vaporization descriptor",
+"id":"CHEMINF_000418",
+"size":1,
+"children": [
+{
+"name":"enthalpy of vaporization calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000361",
+"size":1
+}
+]
+},{
+"name":"density descriptor",
+"id":"CHEMINF_000416",
+"size":1,
+"children": [
+{
+"name":"density calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000359",
+"size":1
+}
+]
+},{
+"name":"relative density descriptor",
+"id":"CHEMINF_000439",
+"size":1
+},{
+"name":"melting point descriptor",
+"id":"CHEMINF_000256",
+"size":1
+},{
+"name":"rule of five violations descriptor",
+"id":"CHEMINF_000312",
+"size":1,
+"children": [
+{
+"name":"rule of five violations calculated by pipeline pilot",
+"id":"CHEMINF_000314",
+"size":1
+},{
+"name":"number of rule of five violations calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000367",
+"size":1
+}
+]
+},{
+"name":"minimum explosive concentration descriptor",
+"id":"CHEMINF_000437",
+"size":1
+},{
+"name":"vapor density descriptor",
+"id":"CHEMINF_000440",
+"size":1
+},{
+"name":"evaporation rate descriptor",
+"id":"CHEMINF_000443",
+"size":1
+},{
+"name":"mass descriptor",
+"id":"CHEMINF_000083",
+"size":1,
+"children": [
+{
+"name":"molecular mass descriptor",
+"id":"CHEMINF_000088",
+"size":1,
+"children": [
+{
+"name":"exact mass descriptor",
+"id":"CHEMINF_000217",
+"size":1,
+"children": [
+{
+"name":"exact mass calculated by pubchem software library",
+"id":"CHEMINF_000338",
+"size":1
+}
+]
+},{
+"name":"monoisotopic mass descriptor",
+"id":"CHEMINF_000218",
+"size":1,
+"children": [
+{
+"name":"monoisotopic molecular weight descriptor calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000485",
+"size":1
+},{
+"name":"monoisotopic mass calculated by the pubchem software library",
+"id":"CHEMINF_000337",
+"size":1
+}
+]
+},{
+"name":"average molecular weight descriptor",
+"id":"CHEMINF_000216",
+"size":1,
+"children": [
+{
+"name":"average molecular weight descriptor calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000484",
+"size":1
+},{
+"name":"molecular weight calculated by the pubchem software library",
+"id":"CHEMINF_000334",
+"size":1
+},{
+"name":"molecular weight of the corresponding free base",
+"id":"CHEMINF_000350",
+"size":1
+},{
+"name":"molecular weight calculated by pipeline pilot",
+"id":"CHEMINF_000198",
+"size":1
+}
+]
+}
+]
+},{
+"name":"atomic mass descriptor",
+"id":"CHEMINF_000084",
+"size":1
+},{
+"name":"metal element mass descriptor",
+"id":"CHEMINF_000488",
+"size":1
+}
+]
+},{
+"name":"medchem friendly descriptor",
+"id":"CHEMINF_000318",
+"size":1,
+"children": [
+{
+"name":"medchem friendly descriptor calculated by pipeline pilot",
+"id":"CHEMINF_000319",
+"size":1
+}
+]
+},{
+"name":"logP descriptor",
+"id":"CHEMINF_000251",
+"size":1,
+"children": [
+{
+"name":"XLogP descriptor",
+"id":"CHEMINF_000186",
+"size":1,
+"children": [
+{
+"name":"xlogp3 calculated by the xlogp3 software",
+"id":"CHEMINF_000395",
+"size":1
+}
+]
+},{
+"name":"MLogP descriptor",
+"id":"CHEMINF_000187",
+"size":1
+},{
+"name":"logP calculated by ACD/Labs PhysChem software",
+"id":"CHEMINF_000321",
+"size":1
+},{
+"name":"ALogP descriptor",
+"id":"CHEMINF_000295",
+"size":1,
+"children": [
+{
+"name":"ALogP calculated by Pipeline Pilot",
+"id":"CHEMINF_000305",
+"size":1
+}
+]
+}
+]
+},{
+"name":"upper explosive limit descriptor",
+"id":"CHEMINF_000435",
+"size":1
+},{
+"name":"refractive index descriptor",
+"id":"CHEMINF_000253",
+"size":1,
+"children": [
+{
+"name":"index of refraction calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000352",
+"size":1
+}
+]
+},{
+"name":"Henry's Law constant",
+"id":"CHEMINF_000433",
+"size":1
+},{
+"name":"vapour pressure descriptor",
+"id":"CHEMINF_000419",
+"size":1,
+"children": [
+{
+"name":"vapour pressure calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000362",
+"size":1
+}
+]
+},{
+"name":"weighted quantitative estimate of drug-likeness",
+"id":"CHEMINF_000431",
+"size":1
+},{
+"name":"partition coefficient",
+"id":"CHEMINF_000496",
+"size":1
+},{
+"name":"organic carbon adsorption descriptor",
+"id":"CHEMINF_000413",
+"size":1,
+"children": [
+{
+"name":"organic carbon adsorption coefficient at pH 7.4 calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000364",
+"size":1
+},{
+"name":"organic carbon adsorption coefficient at pH 5.5 calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000363",
+"size":1
+}
+]
+},{
+"name":"molar volume descriptor",
+"id":"CHEMINF_000415",
+"size":1,
+"children": [
+{
+"name":"molar volume calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000358",
+"size":1
+}
+]
+},{
+"name":"flash point descriptor",
+"id":"CHEMINF_000417",
+"size":1,
+"children": [
+{
+"name":"flash point calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000360",
+"size":1
+}
+]
+},{
+"name":"soil half-life descriptor",
+"id":"CHEMINF_000445",
+"size":1
+}
+]
+},{
+"name":"identifying descriptor",
+"id":"CHEMINF_000061",
+"size":1,
+"children": [
+{
+"name":"molecular entity name",
+"id":"CHEMINF_000043",
+"size":1,
+"children": [
+{
+"name":"systematic name",
+"id":"CHEMINF_000106",
+"size":1,
+"children": [
+{
+"name":"IUPAC name",
+"id":"CHEMINF_000107",
+"size":1,
+"children": [
+{
+"name":"IUPAC Name generated by LexiChem",
+"id":"CHEMINF_000382",
+"size":1
+}
+]
+}
+]
+},{
+"name":"International Non-proprietary Name",
+"id":"CHEMINF_000562",
+"size":1
+},{
+"name":"pubchem depositor-supplied molecular entity name",
+"id":"CHEMINF_000339",
+"size":1
+},{
+"name":"ChemSpider unvalidated synonym",
+"id":"CHEMINF_000466",
+"size":1
+},{
+"name":"drug trade name",
+"id":"CHEMINF_000561",
+"size":1
+},{
+"name":"trivial name",
+"id":"CHEMINF_000109",
+"size":1
+},{
+"name":"preferred name",
+"id":"CHEMINF_000044",
+"size":1,
+"children": [
+{
+"name":"ChEBI name",
+"id":"CHEMINF_000550",
+"size":1
+},{
+"name":"ChemSpider validated synonym",
+"id":"CHEMINF_000465",
+"size":1,
+"children": [
+{
+"name":"ChemSpider title",
+"id":"CHEMINF_000476",
+"size":1
+}
+]
+}
+]
+}
+]
+},{
+"name":"chemical database identifier",
+"id":"CHEMINF_000464",
+"size":1,
+"children": [
+{
+"name":"ChEMBL identifier",
+"id":"CHEMINF_000412",
+"size":1
+},{
+"name":"ChEBI identifier",
+"id":"CHEMINF_000407",
+"size":1
+},{
+"name":"Reactome identifier",
+"id":"CHEMINF_000411",
+"size":1
+},{
+"name":"HMDB identifier",
+"id":"CHEMINF_000408",
+"size":1
+},{
+"name":"DrugBank identifier",
+"id":"CHEMINF_000406",
+"size":1
+},{
+"name":"Wikipedia identifier",
+"id":"CHEMINF_000410",
+"size":1
+},{
+"name":"ChemSpider identifier",
+"id":"CHEMINF_000405",
+"size":1
+},{
+"name":"PubMed Identifier",
+"id":"CHEMINF_000302",
+"size":1,
+"children": [
+{
+"name":"PubChem compound identifier (CID)",
+"id":"CHEMINF_000140",
+"size":1,
+"children": [
+{
+"name":"PubChem conformer identifier",
+"id":"CHEMINF_000234",
+"size":1
+}
+]
+},{
+"name":"PubChem substance identifier (SID)",
+"id":"CHEMINF_000141",
+"size":1
+}
+]
+},{
+"name":"validated chemical database identifier",
+"id":"CHEMINF_000467",
+"size":1
+},{
+"name":"GenBank Protein Identifier",
+"id":"CHEMINF_000303",
+"size":1
+},{
+"name":"LipidMaps identifier",
+"id":"CHEMINF_000564",
+"size":1
+},{
+"name":"National Service Center number",
+"id":"CHEMINF_000565",
+"size":1
+},{
+"name":"GenBank Nucleotide Identifier",
+"id":"CHEMINF_000304",
+"size":1
+},{
+"name":"Unique Ingredient Identifier",
+"id":"CHEMINF_000563",
+"size":1
+},{
+"name":"CAS registry number",
+"id":"CHEMINF_000446",
+"size":1
+},{
+"name":"KEGG identifier",
+"id":"CHEMINF_000409",
+"size":1
+},{
+"name":"EC numberEuropean Community numberEINECS No",
+"id":"CHEMINF_000447",
+"size":1
+}
+]
+},{
+"name":"InChIKey",
+"id":"CHEMINF_000059",
+"size":1,
+"children": [
+{
+"name":"InChIKey generated by software version 1.0.4",
+"id":"CHEMINF_000399",
+"size":1
+}
+]
+}
+]
+},{
+"name":"electronic descriptor",
+"id":"CHEMINF_000087",
+"size":1,
+"children": [
+{
+"name":"bond partial pi charge",
+"id":"CHEMINF_001501",
+"size":1
+},{
+"name":"equilibrium constant",
+"id":"CHEMINF_000193",
+"size":1,
+"children": [
+{
+"name":"pKa",
+"id":"CHEMINF_000195",
+"size":1,
+"children": [
+{
+"name":"most acidic pKa calculated by ACD/Labs PhysChem software library",
+"id":"CHEMINF_000324",
+"size":1
+},{
+"name":"most basic pKa calculated by ACD/Labs PhysChem software library",
+"id":"CHEMINF_000325",
+"size":1
+}
+]
+},{
+"name":"acid dissociation constant",
+"id":"CHEMINF_000194",
+"size":1
+}
+]
+},{
+"name":"charge descriptor",
+"id":"CHEMINF_000131",
+"size":1,
+"children": [
+{
+"name":"formal charge descriptor",
+"id":"CHEMINF_000118",
+"size":1
+},{
+"name":"total formal charge descriptor",
+"id":"CHEMINF_000268",
+"size":1,
+"children": [
+{
+"name":"total formal charge calculated by the pubchem software library",
+"id":"CHEMINF_000336",
+"size":1
+}
+]
+},{
+"name":"partial charge descriptor",
+"id":"CHEMINF_000119",
+"size":1
+}
+]
+},{
+"name":"Highest Occupied Molecular Orbital Energy",
+"id":"CHEMINF_000291",
+"size":1
+},{
+"name":"Bond Polarizabilities",
+"id":"CHEMINF_001100",
+"size":1
+},{
+"name":"charge density descriptor",
+"id":"CHEMINF_000231",
+"size":1,
+"children": [
+{
+"name":"bond charge density descriptor",
+"id":"CHEMINF_000226",
+"size":1
+},{
+"name":"atomic charge density descriptor",
+"id":"CHEMINF_000264",
+"size":1
+}
+]
+},{
+"name":"inductive atomic hardness",
+"id":"CHEMINF_000297",
+"size":1
+},{
+"name":"proton total partial charge",
+"id":"CHEMINF_001525",
+"size":1
+},{
+"name":"hydrogen bond acceptors (Daylight)",
+"id":"CHEMINF_001513",
+"size":1
+},{
+"name":"partial sigma charge",
+"id":"CHEMINF_001545",
+"size":1
+},{
+"name":"donor field atoms (Boehm,Klebe)",
+"id":"CHEMINF_001515",
+"size":1
+},{
+"name":"TAE RECON descriptors for amino acid sequences",
+"id":"CHEMINF_001527",
+"size":1
+},{
+"name":"aromaticity descriptor",
+"id":"CHEMINF_000056",
+"size":1,
+"children": [
+{
+"name":"bond aromaticity descriptor",
+"id":"CHEMINF_000237",
+"size":1
+}
+]
+},{
+"name":"charge delocalization descriptor",
+"id":"CHEMINF_000094",
+"size":1,
+"children": [
+{
+"name":"ionization energy descriptor",
+"id":"CHEMINF_000191",
+"size":1
+},{
+"name":"atomic softness descriptor",
+"id":"CHEMINF_000099",
+"size":1
+},{
+"name":"atomic hardness descriptor",
+"id":"CHEMINF_000097",
+"size":1
+},{
+"name":"molar refractivity",
+"id":"CHEMINF_000001",
+"size":1,
+"children": [
+{
+"name":"molar refractivity calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000351",
+"size":1
+}
+]
+},{
+"name":"atomic polarizability sum",
+"id":"CHEMINF_000002",
+"size":1
+},{
+"name":"molecular polarizability",
+"id":"CHEMINF_000179",
+"size":1
+}
+]
+},{
+"name":"bond partial total charge",
+"id":"CHEMINF_001503",
+"size":1
+},{
+"name":"Lowest Unoccupied Molecular Orbital Energy",
+"id":"CHEMINF_000292",
+"size":1
+},{
+"name":"atomic valence",
+"id":"CHEMINF_000096",
+"size":1
+},{
+"name":"bond multiplicity descriptor",
+"id":"CHEMINF_000130",
+"size":1
+},{
+"name":"effective polarizability",
+"id":"CHEMINF_001541",
+"size":1
+},{
+"name":"acceptor field atoms (Boehm,Klebe)",
+"id":"CHEMINF_001512",
+"size":1
+},{
+"name":"partial total charge (MMFF94)",
+"id":"CHEMINF_001522",
+"size":1
+},{
+"name":"electronegativity descriptor",
+"id":"CHEMINF_000122",
+"size":1
+},{
+"name":"partial pi charge",
+"id":"CHEMINF_001544",
+"size":1
+},{
+"name":"relative permittivity descriptor",
+"id":"CHEMINF_000261",
+"size":1
+},{
+"name":"acceptors or donors field atoms (Boehm,Klebe)",
+"id":"CHEMINF_001514",
+"size":1
+},{
+"name":"hydrogen bond donors (Daylight)",
+"id":"CHEMINF_001516",
+"size":1
+},{
+"name":"pi electronegativity",
+"id":"CHEMINF_001546",
+"size":1
+},{
+"name":"hybridization descriptor",
+"id":"CHEMINF_000095",
+"size":1,
+"children": [
+{
+"name":"hybridization descriptor (VSEPR)",
+"id":"CHEMINF_000296",
+"size":1
+}
+]
+},{
+"name":"bond partial sigma charge",
+"id":"CHEMINF_001502",
+"size":1
+},{
+"name":"bond sigma electronegativity",
+"id":"CHEMINF_001504",
+"size":1
+}
+]
+},{
+"name":"structural descriptor",
+"id":"CHEMINF_000085",
+"size":1,
+"children": [
+{
+"name":"MOLfile descriptor",
+"id":"CHEMINF_000114",
+"size":1
+},{
+"name":"collection of 3D coordinates",
+"id":"CHEMINF_000177",
+"size":1,
+"children": [
+{
+"name":"collection of 3D atomic coordinates",
+"id":"CHEMINF_000178",
+"size":1
+}
+]
+},{
+"name":"SMILES descriptor",
+"id":"CHEMINF_000018",
+"size":1,
+"children": [
+{
+"name":"isomeric SMILES descriptor",
+"id":"CHEMINF_000032",
+"size":1,
+"children": [
+{
+"name":"isomeric SMILES generated by OEChem",
+"id":"CHEMINF_000379",
+"size":1
+},{
+"name":"absolute SMILES descriptor",
+"id":"CHEMINF_000199",
+"size":1
+}
+]
+},{
+"name":"canonical SMILES descriptor",
+"id":"CHEMINF_000007",
+"size":1,
+"children": [
+{
+"name":"canonical smiles generated by OEChem",
+"id":"CHEMINF_000376",
+"size":1
+}
+]
+},{
+"name":"generic SMILES descriptor",
+"id":"CHEMINF_000149",
+"size":1
+}
+]
+},{
+"name":"InChI descriptor",
+"id":"CHEMINF_000113",
+"size":1,
+"children": [
+{
+"name":"InChI calculated by library version 1.0.4",
+"id":"CHEMINF_000396",
+"size":1
+}
+]
+},{
+"name":"SMARTS descriptor",
+"id":"CHEMINF_000019",
+"size":1
+},{
+"name":"cycle basis",
+"id":"CHEMINF_000105",
+"size":1
+},{
+"name":"fused cycles",
+"id":"CHEMINF_000110",
+"size":1
+},{
+"name":"complexity descriptor",
+"id":"CHEMINF_000219",
+"size":1,
+"children": [
+{
+"name":"structure complexity calculated by cactvs",
+"id":"CHEMINF_000390",
+"size":1
+},{
+"name":"fragment complexity descriptor",
+"id":"CHEMINF_000180",
+"size":1
+}
+]
+},{
+"name":"chemical graph",
+"id":"CHEMINF_000400",
+"size":1
+},{
+"name":"chemical connectivity table",
+"id":"CHEMINF_000055",
+"size":1
+},{
+"name":"functional group descriptor",
+"id":"CHEMINF_000068",
+"size":1
+}
+]
+},{
+"name":"chemical substance descriptor",
+"id":"CHEMINF_000513",
+"size":1
+},{
+"name":"stereochemical descriptor",
+"id":"CHEMINF_000027",
+"size":1,
+"children": [
+{
+"name":"+/- stereochemical descriptor",
+"id":"CHEMINF_000048",
+"size":1,
+"children": [
+{
+"name":"- stereochemical descriptor",
+"id":"CHEMINF_000050",
+"size":1
+},{
+"name":"+ stereochemical descriptor",
+"id":"CHEMINF_000049",
+"size":1
+}
+]
+},{
+"name":"DL stereochemical descriptor",
+"id":"CHEMINF_000051",
+"size":1,
+"children": [
+{
+"name":"D stereochemical descriptor",
+"id":"CHEMINF_000052",
+"size":1
+},{
+"name":"L stereochemical descriptor",
+"id":"CHEMINF_000053",
+"size":1
+}
+]
+},{
+"name":"cis-trans stereochemical descriptor",
+"id":"CHEMINF_000080",
+"size":1,
+"children": [
+{
+"name":"trans stereochemical descriptor",
+"id":"CHEMINF_000082",
+"size":1
+},{
+"name":"cis stereochemical descriptor",
+"id":"CHEMINF_000081",
+"size":1
+}
+]
+},{
+"name":"RS stereochemical descriptor",
+"id":"CHEMINF_000005",
+"size":1,
+"children": [
+{
+"name":"S stereochemical descriptor",
+"id":"CHEMINF_000034",
+"size":1
+},{
+"name":"R stereochemical descriptor",
+"id":"CHEMINF_000006",
+"size":1
+}
+]
+}
+]
+},{
+"name":"textual chemical descriptor",
+"id":"CHEMINF_000512",
+"size":1
+},{
+"name":"numeric chemical descriptor",
+"id":"CHEMINF_000511",
+"size":1
+},{
+"name":"geometric descriptor",
+"id":"CHEMINF_000093",
+"size":1,
+"children": [
+{
+"name":"atomic connectivity index",
+"id":"CHEMINF_000116",
+"size":1
+},{
+"name":"moments of inertia",
+"id":"CHEMINF_001521",
+"size":1
+},{
+"name":"dimensional extent descriptor",
+"id":"CHEMINF_000060",
+"size":1,
+"children": [
+{
+"name":"surface area descriptor",
+"id":"CHEMINF_000229",
+"size":1,
+"children": [
+{
+"name":"relative positive charge",
+"id":"CHEMINF_000169",
+"size":1
+},{
+"name":"FNSA-3",
+"id":"CHEMINF_000162",
+"size":1
+},{
+"name":"WNSA-2",
+"id":"CHEMINF_000167",
+"size":1
+},{
+"name":"WPSA-2",
+"id":"CHEMINF_000164",
+"size":1
+},{
+"name":"FPSA-3",
+"id":"CHEMINF_000159",
+"size":1
+},{
+"name":"FPSA-1",
+"id":"CHEMINF_000157",
+"size":1
+},{
+"name":"FNSA-1",
+"id":"CHEMINF_000160",
+"size":1
+},{
+"name":"PPSA-2",
+"id":"CHEMINF_000004",
+"size":1
+},{
+"name":"relative negative charge surface area",
+"id":"CHEMINF_000172",
+"size":1
+},{
+"name":"DPSA-1",
+"id":"CHEMINF_000154",
+"size":1
+},{
+"name":"partial negative surface area",
+"id":"CHEMINF_000011",
+"size":1
+},{
+"name":"relative negative charge",
+"id":"CHEMINF_000170",
+"size":1
+},{
+"name":"polar surface area descriptor",
+"id":"CHEMINF_000307",
+"size":1,
+"children": [
+{
+"name":"polar surface area descriptor calculated by Pipeline Pilot",
+"id":"CHEMINF_000308",
+"size":1
+},{
+"name":"polar surface area calculated by ACD/Labs PhysChem software library version 12.01",
+"id":"CHEMINF_000349",
+"size":1
+}
+]
+},{
+"name":"WNSA-1",
+"id":"CHEMINF_000166",
+"size":1
+},{
+"name":"TPSA",
+"id":"CHEMINF_000174",
+"size":1,
+"children": [
+{
+"name":"TPSA calculated by cactvs",
+"id":"CHEMINF_000392",
+"size":1
+}
+]
+},{
+"name":"topological surface area descriptor",
+"id":"CHEMINF_000146",
+"size":1,
+"children": [
+{
+"name":"topological polar surface area descriptor",
+"id":"CHEMINF_000152",
+"size":1,
+"children": [
+{
+"name":"TPSA (fragments)",
+"id":"CHEMINF_000298",
+"size":1
+}
+]
+}
+]
+},{
+"name":"RPSA",
+"id":"CHEMINF_000176",
+"size":1
+},{
+"name":"WNSA-3",
+"id":"CHEMINF_000168",
+"size":1
+},{
+"name":"PNSA-2",
+"id":"CHEMINF_000015",
+"size":1
+},{
+"name":"FPSA-2",
+"id":"CHEMINF_000158",
+"size":1
+},{
+"name":"WPSA-1",
+"id":"CHEMINF_000163",
+"size":1
+},{
+"name":"FNSA-2",
+"id":"CHEMINF_000161",
+"size":1
+},{
+"name":"DPSA-3",
+"id":"CHEMINF_000156",
+"size":1
+},{
+"name":"partial positive surface area",
+"id":"CHEMINF_000003",
+"size":1
+},{
+"name":"relative positive charge surface area",
+"id":"CHEMINF_000171",
+"size":1
+},{
+"name":"charge weighted partial negative surface area",
+"id":"CHEMINF_000153",
+"size":1
+},{
+"name":"DPSA-2",
+"id":"CHEMINF_000155",
+"size":1
+},{
+"name":"WPSA-3",
+"id":"CHEMINF_000165",
+"size":1
+},{
+"name":"RHSA",
+"id":"CHEMINF_000175",
+"size":1
+},{
+"name":"charge weighted partial positive surface area",
+"id":"CHEMINF_000008",
+"size":1
+},{
+"name":"THSA",
+"id":"CHEMINF_000173",
+"size":1
+}
+]
+},{
+"name":"volume descriptor",
+"id":"CHEMINF_000242",
+"size":1,
+"children": [
+{
+"name":"conformer volume descriptor",
+"id":"CHEMINF_000269",
+"size":1
+},{
+"name":"VABC volume descriptor",
+"id":"CHEMINF_000299",
+"size":1
+}
+]
+},{
+"name":"bond length descriptor",
+"id":"CHEMINF_000132",
+"size":1
+}
+]
+},{
+"name":"ratio of length to breadth descriptor",
+"id":"CHEMINF_000189",
+"size":1,
+"children": [
+{
+"name":"maximal ratio of length to breadth descriptor",
+"id":"CHEMINF_000188",
+"size":1
+},{
+"name":"minimal ratio of length to breadth descriptor",
+"id":"CHEMINF_000190",
+"size":1
+}
+]
+},{
+"name":"distance to atom",
+"id":"CHEMINF_001540",
+"size":1
+},{
+"name":"bond order descriptor",
+"id":"CHEMINF_000062",
+"size":1
+},{
+"name":"vertex adjacency matrix descriptor",
+"id":"CHEMINF_000181",
+"size":1
+},{
+"name":"gravitational index",
+"id":"CHEMINF_001510",
+"size":1,
+"children": [
+{
+"name":"gravitational index (square and cube roots)",
+"id":"CHEMINF_001511",
+"size":1
+}
+]
+}
+]
+}
+]
+},{
+"name":"Version",
+"id":"C25714",
+"size":1,
+"children": [
+{
+"name":"Document Version",
+"id":"C93484",
+"size":1
+},{
+"name":"Expanded Access Study Protocol Version",
+"id":"C93485",
+"size":1
+},{
+"name":"Standard for the Exchange of Nonclinical Data Controlled Terminology Version",
+"id":"C96370",
+"size":1
+},{
+"name":"Study Protocol Document Version",
+"id":"C93489",
+"size":1
+},{
+"name":"Study Protocol Version",
+"id":"C93490",
+"size":1
+},{
+"name":"Observational Study Protocol Version",
+"id":"C93487",
+"size":1
+},{
+"name":"Software Version",
+"id":"C111093",
+"size":1
+},{
+"name":"Standard for the Exchange of Nonclinical Data Implementation Guide Version",
+"id":"C90458",
+"size":1,
+"children": [
+{
+"name":"SEND Version 3.0 Draft B",
+"id":"C90454",
+"size":1
+},{
+"name":"SEND Version 3.0 Draft A",
+"id":"C90453",
+"size":1
+},{
+"name":"Standard for the Exchange of Nonclinical Data Implementation Guide Version 3.1",
+"id":"C120925",
+"size":1
+},{
+"name":"Standard for the Exchange of Nonclinical Data Implementation Guide Version 3.0",
+"id":"C96371",
+"size":1
+}
+]
+},{
+"name":"Version of the Reference Terminology",
+"id":"C117376",
+"size":1,
+"children": [
+{
+"name":"Trial Summary Parameter Version of the Reference Terminology",
+"id":"C117461",
+"size":1
+}
+]
+},{
+"name":"Interventional Study Protocol Version",
+"id":"C93486",
+"size":1
+},{
+"name":"Build",
+"id":"C47904",
+"size":1
+},{
+"name":"Trial Inclusion Exclusion Criteria Version",
+"id":"C83444",
+"size":1
+}
+]
+},{
+"name":"parameter",
+"id":"NPO_1680",
+"size":1,
+"children": [
+{
+"name":"pharmacokinetic parameter",
+"id":"NPO_1530",
+"size":1,
+"children": [
+{
+"name":"Tmax",
+"id":"NPO_1528",
+"size":1
+},{
+"name":"drug clearance",
+"id":"NPO_1525",
+"size":1
+},{
+"name":"volume of distribution",
+"id":"NPO_1524",
+"size":1
+},{
+"name":"area under the plasma concentration time curve",
+"id":"NPO_1523",
+"size":1
+},{
+"name":"elimination rate constant",
+"id":"NPO_1526",
+"size":1
+},{
+"name":"Cmax",
+"id":"NPO_1527",
+"size":1
+}
+]
+},{
+"name":"experimental factor",
+"id":"EFO_0000001",
+"size":1
+},{
+"name":"polydispersity index",
+"id":"NPO_1155",
+"size":1
+},{
+"name":"wave parameter",
+"id":"NPO_1681",
+"size":1,
+"children": [
+{
+"name":"wave frequency",
+"id":"NPO_1683",
+"size":1,
+"children": [
+{
+"name":"frequency of sound wave",
+"id":"PATO_0001520",
+"size":1
+}
+]
+},{
+"name":"wave speed",
+"id":"NPO_1684",
+"size":1,
+"children": [
+{
+"name":"speed of sound wave",
+"id":"PATO_0001522",
+"size":1
+}
+]
+},{
+"name":"wave amplitude",
+"id":"NPO_1682",
+"size":1,
+"children": [
+{
+"name":"amplitude of sound wave",
+"id":"NPO_1351",
+"size":1
+}
+]
+},{
+"name":"wavelength",
+"id":"PATO_0001242",
+"size":1,
+"children": [
+{
+"name":"wavelength of sound",
+"id":"PATO_0001523",
+"size":1
+}
+]
+}
+]
+}
+]
+},{
+"name":"protocol",
+"id":"OBI_0000272",
+"size":1,
+"children": [
+{
+"name":"Modification",
+"id":"C25572",
+"size":1
+}
+]
+},{
+"name":"data item",
+"id":"IAO_0000027",
+"size":1,
+"children": [
+{
+"name":"Batch Number",
+"id":"C104504",
+"size":1
+},{
+"name":"measurement scale",
+"id":"OBCS_0000011",
+"size":1,
+"children": [
+{
+"name":"interval scale",
+"id":"OBCS_0000090",
+"size":1
+},{
+"name":"ordinal scale",
+"id":"OBCS_0000092",
+"size":1
+},{
+"name":"nominal scale",
+"id":"OBCS_0000091",
+"size":1
+},{
+"name":"ratio scale",
+"id":"OBCS_0000093",
+"size":1
+}
+]
+},{
+"name":"probability distribution",
+"id":"OBCS_0000010",
+"size":1,
+"children": [
+{
+"name":"frequency distribution",
+"id":"OBCS_0000068",
+"size":1
+},{
+"name":"Hotelling T2 distribution",
+"id":"STATO_0000132",
+"size":1
+},{
+"name":"discrete probability distribution",
+"id":"OBCS_0000067",
+"size":1,
+"children": [
+{
+"name":"negative binomial distribution",
+"id":"STATO_0000283",
+"size":1,
+"children": [
+{
+"name":"geometric distribution",
+"id":"STATO_0000145",
+"size":1
+}
+]
+},{
+"name":"Poisson distribution",
+"id":"OBCS_0000045",
+"size":1
+},{
+"name":"hypergeometric distribution",
+"id":"STATO_0000060",
+"size":1
+},{
+"name":"binomial distribution",
+"id":"OBCS_0000044",
+"size":1,
+"children": [
+{
+"name":"Bernoulli distribution",
+"id":"STATO_0000262",
+"size":1
+}
+]
+},{
+"name":"multinomial distribution",
+"id":"STATO_0000103",
+"size":1
+}
+]
+},{
+"name":"histogram distribution",
+"id":"OBCS_0000210",
+"size":1
+},{
+"name":"continuous probability distribution",
+"id":"OBCS_0000066",
+"size":1,
+"children": [
+{
+"name":"exponential distribution",
+"id":"OBCS_0000125",
+"size":1
+},{
+"name":"gamma distribution",
+"id":"OBCS_0000004",
+"size":1
+},{
+"name":"beta distribution",
+"id":"STATO_0000177",
+"size":1
+},{
+"name":"log-normal distribution",
+"id":"OBCS_0000008",
+"size":1
+},{
+"name":"bivariate normality",
+"id":"OBCS_0000007",
+"size":1
+},{
+"name":"Student's t distribution",
+"id":"OBCS_0000006",
+"size":1
+},{
+"name":"studentized range distribution",
+"id":"STATO_0000023",
+"size":1
+},{
+"name":"chi-square distribution",
+"id":"OBCS_0000119",
+"size":1
+},{
+"name":"normal distribution",
+"id":"OBCS_0000005",
+"size":1,
+"children": [
+{
+"name":"standard normal distribution",
+"id":"STATO_0000180",
+"size":1
+},{
+"name":"Box-Cox distribution",
+"id":"OBCS_0000211",
+"size":1
+}
+]
+},{
+"name":"F distribution",
+"id":"OBCS_0000003",
+"size":1
+}
+]
+},{
+"name":"Wilk's lambda distribution",
+"id":"STATO_0000017",
+"size":1
+}
+]
+}
+]
+},{
+"name":"datum value",
+"id":"NPO_1779",
+"size":1,
+"children": [
+{
+"name":"quantitative value",
+"id":"NPO_1793",
+"size":1,
+"children": [
+{
+"name":"time value",
+"id":"NPO_1817",
+"size":1,
+"children": [
+{
+"name":"expiry date",
+"id":"ENM_9000010",
+"size":1
+},{
+"name":"Manufacture Date",
+"id":"C93591",
+"size":1
+}
+]
+},{
+"name":"viscosity value",
+"id":"NPO_1857",
+"size":1
+},{
+"name":"zeta potential value",
+"id":"NPO_1815",
+"size":1
+},{
+"name":"refractive index value",
+"id":"NPO_1851",
+"size":1
+},{
+"name":"polydispersity index value",
+"id":"NPO_1849",
+"size":1
+},{
+"name":"percent cell viability",
+"id":"NPO_1816",
+"size":1
+},{
+"name":"size value",
+"id":"NPO_1807",
+"size":1,
+"children": [
+{
+"name":"mean particle size",
+"id":"NPO_1822",
+"size":1
+}
+]
+},{
+"name":"measured value",
+"id":"NPO_1805",
+"size":1
+},{
+"name":"computed value",
+"id":"NPO_1795",
+"size":1,
+"children": [
+{
+"name":"statistical measure",
+"id":"NPO_1797",
+"size":1,
+"children": [
+{
+"name":"measure of central tendency",
+"id":"NPO_1799",
+"size":1,
+"children": [
+{
+"name":"mode",
+"id":"NPO_1802",
+"size":1
+},{
+"name":"median",
+"id":"NPO_1801",
+"size":1
+},{
+"name":"mean",
+"id":"NPO_1800",
+"size":1,
+"children": [
+{
+"name":"mean particle size",
+"id":"NPO_1822",
+"size":1
+},{
+"name":"mean polydispersity index",
+"id":"NPO_1829",
+"size":1
+}
+]
+},{
+"name":"z-average",
+"id":"NPO_1916",
+"size":1
+}
+]
+},{
+"name":"measure of variability",
+"id":"NPO_1798",
+"size":1,
+"children": [
+{
+"name":"standard deviation",
+"id":"NPO_1804",
+"size":1
+},{
+"name":"variance",
+"id":"NPO_1803",
+"size":1
+}
+]
+}
+]
+}
+]
+},{
+"name":"pH value",
+"id":"NPO_1814",
+"size":1
+},{
+"name":"body weight value",
+"id":"NPO_1813",
+"size":1
+},{
+"name":"temperature value",
+"id":"NPO_1806",
+"size":1
+},{
+"name":"counted value",
+"id":"NPO_1796",
+"size":1
+}
+]
+},{
+"name":"qualitative value",
+"id":"NPO_1794",
+"size":1,
+"children": [
+{
+"name":"Significant",
+"id":"C41130",
+"size":1
+}
+]
+}
+]
+},{
+"name":"Supplier",
+"id":"C43530",
+"size":1
+}
+]
+}
