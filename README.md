@@ -1080,3 +1080,7 @@ jT.insertTool('ketcher', jT.$('#ketcher-test')[0]);
 ```
 
 Any additional initialization that the particular tool needs, has to be called separately.
+
+jToxKit new generation
+====
+https://github.com/ideaconsult/jToxKit
