@@ -143,7 +143,7 @@ var ccLib = {
     }
   },
 
-  getJsonValue: function (json, field){
+  getJsonValue: function (json, field) {
     var value = json[field];
     if (value === undefined && field != null) {
       try {
@@ -154,6 +154,38 @@ var ccLib = {
       }
     }
     return value;
+  },
+  
+  findIndex: function (arr, obj) {
+    if (arr.findIndex !== undefined)
+      return arr.findIndex(obj);
+    else if (typeof obj !== "function")
+      return arr.indexOf(obj);
+      
+    for (var i = 0;i < arr.length; ++i)
+      if (!!obj.call(arr[i], arr[i], i))
+        return i;
+      
+    return -1;
+  },
+   
+  // traverse any given tree, calling `pre` function before diggin in and `post` - after.
+  // the output of pre determines how the digging is going to happen, if
+  //  - is false - the digging further is interrupted;
+  //  - is true or null/undefined - it uses node's `children` property for digging in
+  //  - is something something - that value is used as a children array for digging in.
+  traverseTree: function (tree, pre, post) {
+    var arr = !!pre ? pre(tree) : true;
+  
+    if (arr === false) return;
+    else if (arr === true || !arr) arr = tree.children;
+      
+    if (!!arr && !!arr.length)
+      for (var i = 0;i < arr.length; ++i)
+        this.traverseTree(arr[i], pre, post);
+    
+    if (!!post) 
+      post(tree);
   },
 
   // given a root DOM element and an JSON object it fills all (sub)element of the tree
@@ -290,6 +322,25 @@ var ccLib = {
     for (var i in pars)
       format = format.replace('{' + i + '}', pars[i]);
     return format;
+  },
+
+  // Present a number in a brief format, adding 'k' or 'm', if needed.
+  briefNumber: function (num, prec) {
+    var suf = "",
+        prec = prec || 10;
+    
+    if (num >= 900000)
+      num /= 1000000, suf = "m";
+    else if (num >= 900)
+      num /= 1000, suf = "k";
+    else
+      prec = 0;
+      
+    if (prec <= 0)
+      return num;
+      
+    num = Math.round(num * prec) / prec;
+    return "" + num + suf;
   },
 
   trim: function(obj) {
@@ -1244,7 +1295,7 @@ window.jT.ui = {
 
     return str;
   },
-
+  
   bindControls: function (kit, handlers) {
     var pane = jT.$('.jtox-controls', kit.rootElement)[0];
     if (kit.settings.showControls) {
@@ -3285,7 +3336,12 @@ var jToxSubstance = (function () {
     for (var i = 0;i < data.length;++i) {
       if (i > 0)
         html += '<br/>';
-      html += data[i].type + '&nbsp;=&nbsp;' + data[i].id;
+      var id = data[i].id;
+      try {
+      if (id.startsWith("http")) id = "<a href='"+id+"' target=_blank class='qxternal'>"+id+"</a>";
+      } catch (err) {}  
+              
+      html += data[i].type + '&nbsp;=&nbsp;' + id;
     }
     return html;
   };
