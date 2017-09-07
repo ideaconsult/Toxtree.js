@@ -1,0 +1,841 @@
+/* jtoxkit.css - Styling for all jToxKit parts
+*/
+.jtox-panel,
+.jtox-foldable {
+	background: #eee; /* Old browsers */
+	background: -moz-linear-gradient(top, rgba(255,255,255,.5) 0%, rgba(200,200,200,.5) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,.5)), color-stop(100%,rgba(200,200,200,.5))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, rgba(255,255,255,.5) 0%,rgba(200,200,200,.5) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, rgba(255,255,255,.5) 0%,rgba(200,200,200,.5) 100%); /* Opera11.10+ */
+	background: -ms-linear-gradient(top, rgba(255,255,255,.5) 0%,rgba(200,200,200,.5) 100%); /* IE10+ */
+	background: linear-gradient(top, rgba(255,255,255,.5) 0%,rgba(200,200,200,.5) 100%); /* W3C */
+  border: 1px solid #aaa;
+  border-top: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  -moz-border-radius: 7px;
+  -webkit-border-radius: 7px;
+  border-radius: 7px;
+  padding-top: 7px;
+  padding-bottom: 3px;
+}
+
+.jtox-foldable:hover {
+	background: #ddd; /* Old browsers */
+	background: -moz-linear-gradient(top, rgba(255,255,255,.2) 0%, rgba(200,200,200,.2) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,.2)), color-stop(100%,rgba(200,200,200,.2))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, rgba(255,255,255,.2) 0%,rgba(200,200,200,.2) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, rgba(255,255,255,.2) 0%,rgba(200,200,200,.2) 100%); /* Opera11.10+ */
+	background: -ms-linear-gradient(top, rgba(255,255,255,.2) 0%,rgba(200,200,200,.2) 100%); /* IE10+ */
+	background: linear-gradient(top, rgba(255,255,255,.2) 0%,rgba(200,200,200,.2) 100%); /* W3C */
+}
+
+
+.jtox-foldable {
+  padding: 5px;
+}
+
+.jtox-foldable.folded>.content {
+  display: none;
+}
+
+.jtox-foldable.folded>.title {
+  background: url(../images/sort_desc.png) right top no-repeat;
+}
+
+.jtox-foldable>.title {
+  background: url(../images/sort_asc.png) right top no-repeat;
+  background-size: 19px 19px;
+}
+
+.jtox-fadable {
+  -moz-transition: opacity ease 300ms;
+  -ms-transition: opacity ease 300ms;
+  -o-transition: opacity ease 300ms;
+  -webkit-transition: opacity ease 300ms;
+  transition: opacity ease 300ms;
+}
+
+.jtox-toolkit {
+  clear: both;
+}
+
+.jtox-toolkit .jtox-details {
+  font-size: 80%;
+}
+
+.jtox-toolkit sup.helper {
+  opacity: 0.7;
+}
+
+.jtox-toolkit sup.helper span.ui-icon {
+  vertical-align: top !important;
+  display: inline-block;
+}
+
+.jtox-toolkit sup {
+  font-size: smaller;
+  vertical-align: super;
+}
+
+.jtox-toolkit sub {
+  font-size: smaller;
+  vertical-align: sub;
+}
+
+.jtox-toolkit sup a {
+  text-decoration: none;
+}
+
+.jtox-template {
+  display: none !important;
+}
+
+.jtox-toolkit .size-quarter {
+  width: 25%;
+}
+
+.jtox-toolkit .size-third {
+  width: 33%;
+}
+
+.jtox-toolkit .size-half {
+  width: 50%;
+}
+
+.jtox-toolkit .size-full {
+  width: 100%;
+}
+
+.jtox-toolkit .top {
+  vertical-align: top !important;
+}
+
+.jtox-toolkit .middle {
+  vertical-align: middle !important;
+}
+
+.jtox-toolkit .center {
+  text-align: center !important;
+}
+
+.jtox-toolkit .right {
+  text-align: right !important;
+}
+
+.jtox-toolkit .nomargin {
+	margin: 0px !important;
+}
+
+.jtox-toolkit .font-small {
+  font-size: small;
+}
+
+.jtox-toolkit .font-smaller {
+  font-size: smaller;
+}
+
+.jtox-toolkit .font-big {
+  font-size: large;
+}
+
+.jtox-toolkit .font-bigger {
+  font-size: larger;
+}
+
+.jtox-toolkit .font-heavy {
+  font-weight: bold;
+}
+
+.jtox-toolkit .transparent {
+  opacity: 0.3;
+}
+
+.jtox-toolkit .paddingless {
+  padding: 0px !important;
+}
+
+.jtox-toolkit .borderless {
+  border:0px !important;
+}
+
+.jtox-toolkit .borderless-top,
+.jtox-toolkit .borderless-top * {
+  border-top: 0px !important;
+}
+
+.jtox-toolkit .borderless-bottom,
+.jtox-toolkit .borderless-bottom * {
+  border-bottom: 0px !important;
+}
+
+.cc-flex, cc-fixed {
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* Make table helper elements, like paging, filter, etc. in one line...
+*/
+.jtox-toolkit .dataTables_filter label input,
+.jtox-toolkit .dataTables_length label select,
+.jtox-inline {
+  display: inline-block;
+}
+
+.jtox-toolkit table.dataTable td,
+.jtox-toolkit table.dataTable th {
+  border:1px solid #ccc;
+  overflow: hidden;
+}
+
+.jtox-toolkit .shortened {
+  max-height: 25px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jtox-toolkit .breakable {
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+.jtox-toolkit .word-break {
+  word-break: break-all;
+}
+
+.jtox-toolkit .non-breakable {
+  word-break:normal;
+  word-wrap: normal;
+  white-space: nowrap;
+}
+
+.jtox-hidden {
+  display: none !important;
+}
+
+.jtox-toolkit .float-right {
+	float: right !important;
+}
+
+.jtox-toolkit span.units {
+  font-size: 80%;
+}
+
+.jtox-diagram {
+  position: relative;
+}
+
+.jtox-diagram img {
+  border: 0px;
+}
+
+.jtox-toolkit a.select-all,
+.jtox-toolkit a.unselect-all {
+  text-decoration: underline;
+}
+
+.jtox-toolkit .loading {
+  background: url(../images/waiting_small.gif) right top no-repeat;
+  background-size: 16px 16px;
+  min-width: 16px;
+  min-height: 16px;
+}
+
+.jtox-toolkit button.loading,
+.jtox-toolkit span.loading {
+  background-position: center center;
+  text-fill-color: rgba(0, 0, 0, 0);
+  color: rgba(0, 0, 0, 0);
+}
+
+.jtox-toolkit input[type="password"],
+.jtox-toolkit input[type="search"],
+.jtox-toolkit input[type="text"],
+textarea,
+select {
+  margin-bottom: 10px;
+}
+
+.jtox-toolkit input[type="password"].jt-inlineaction,
+.jtox-toolkit input[type="search"].jt-inlineaction,
+.jtox-toolkit input[type="text"].jt-inlineaction,
+.jtox-toolkit select.jt-inlineaction {
+  margin: 1px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.jtox-toolkit input.jt-inlineaction {
+  border: 0px;
+  border-radius: 3px;
+  background-color: transparent;
+}
+
+.jtox-toolkit input.jt-inlineaction:focus,
+.jtox-toolkit input.jt-inlineaction:hover {
+  border: inherit;
+  margin: 0px;
+}
+
+.jtox-toolkit input.jt-inlineaction:focus {
+  background-color: #fefefe;
+}
+
+.jtox-diagram span.ui-icon {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  display: none;
+}
+
+.jtox-diagram:hover span.ui-icon {
+  display: block;
+}
+
+.jtox-toolkit a,
+.jtox-toolkit a:visited,
+.jtox-toolkit a:active {
+  color: inherit;
+}
+
+img.jtox-smalldiagram {
+  width: 125px;
+  height: 125px;
+}
+
+.jtox-medium-box {
+  margin: 2px;
+  padding-left: 2px;
+  padding-right: 2px;
+  display: inline-block;
+  min-width: 220px;
+  height: auto;
+  vertical-align: top;
+}
+
+.jtox-endpoint thead {
+  display: none;
+}
+
+.jtox-toolkit .jtox-border-box {
+  box-sizing: border-box;
+  border: 1px solid #666;
+  border-radius: 6px;
+  padding: 10px;
+  width: 100%;
+  height: 100%;
+}
+
+.jtox-toolkit li.tagit-choice a.tagit-close {
+  opacity: 0.4;
+}
+
+.jtox-toolkit li.tagit-choice.tag-value,
+.jtox-toolkit li.tagit-choice.tag-unit {
+  border: 0px;
+  background: inherit;
+  padding-right: 0px;
+}
+
+.jtox-toolkit li.tagit-choice.tag-value a.tagit-close,
+.jtox-toolkit li.tagit-choice.tag-unit a.tagit-close {
+  display: none;
+}
+
+.jtox-toolkit li.tagit-choice.tag-value {
+  font-weight: bold;
+}
+
+.jtox-toolkit li.tagit-choice.tag-unit {
+  font-size: 80%;
+  line-height: 1.2rem;
+}
+
+button.jt-alert {
+	display: inline-block;
+	background: #a41515;
+	color: #fff;
+	text-shadow: 0px 1px 0px #4d4d4d;
+}
+
+button.jt-toggle {
+  display: inline-block;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  background: #eee;
+  opacity: 0.7;
+  width: 24px;
+  text-align: center;
+  vertical-align: middle;
+  padding: 2px;
+  font-weight: bold;
+  margin: 0px;
+}
+
+button.jt-toggle:hover,
+button.jt-toggle.active {
+  background: #aaa;
+  opacity: 1.0;
+}
+
+/* Start of multi-row table-related classes */
+.jtox-toolkit table.dataTable td.jtox-multi {
+  padding: 0px;
+}
+
+td.jtox-multi table {
+  margin: 0px;
+}
+
+td.jtox-multi table td {
+  border-left: 0px !important;
+  border-right: 0px !important;
+  border-bottom: 0px !important;
+}
+
+td.jtox-multi table tr:first-child td {
+  border-top: 0px !important;
+}
+
+td.jtox-multi table {
+  height: 100%;
+  width: 100%;
+}
+
+.jtox-required:after {
+  content: ' *';
+}
+/* toxtstudy.css - Styling for toxstudy engine
+*/
+
+.jtox-search input[type="text"] {
+  min-width: 380px;
+  height: 20px;
+  -moz-transition: width 0.3s ease-out;
+  -webkit-transition: width 0.3s ease-out;
+  transition: width 0.3s ease-out;
+  margin-bottom: 0px;
+}
+
+.jtox-search label {
+  display: inline-block;
+  font-weight: normal;
+  font-size: 1rem;
+}
+
+#searchcontext input {
+  height: auto;
+  width: 99%;
+  box-sizing: border-box;
+}
+
+.jtox-search .search-pane .jtox-inline input,
+.jtox-search .search-pane .jtox-inline select {
+  font-size: 1.1em;
+  margin-top: 2px;
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+.jtox-search .search-pane .jtox-inline select {
+  margin: 6px;
+  height: 26px;
+}
+
+.jtox-search form {
+  margin: 0px;
+}
+
+.jtox-search form>div {
+  margin: 2px 4px 4px 4px;
+  box-sizing: border-box;
+}
+
+.jtox-search form div.jq-buttonset {
+  margin-top: 6px;
+}
+
+.jtox-search .search-pane button {
+  vertical-align: top;
+  margin-bottom: 0px;
+}
+
+.jtox-search .searchsimilarity select {
+  width: 5em;
+}
+
+.jtox-search .searchauto.dynamic>div {
+  white-space: nowrap;
+  padding-top: 10px;
+}
+
+.jtox-search .search-pane div.dynamic {
+  min-height: 40px;
+  float: left;
+}
+
+.jtox-search .search-pane .dynamic.hidden {
+  display: none;
+}
+
+.jtox-search .ketcher {
+  display: block;
+  height: auto;
+  position: relative;
+  left: 0px;
+  -moz-transition: all 0.5s ease, opacity 0.2s;
+  -webkit-transition: all 0.5s ease, opacity 0.2s;
+  transition: all 0.5s ease, opacity 0.2s;
+}
+
+.jtox-search .ketcher.shrinken {
+  left: 100%;
+/*   opacity: 0.0; */
+}
+
+.jtox-search .ketcher .toolEmptyCell {
+  vertical-align: middle;
+}
+
+.jtox-search .ketcher .toolEmptyCell button {
+  margin: 0px;
+  padding: 4px 8px;
+}
+
+.jtox-search .ketcher .toolEmptyCell button span {
+  display: inline-block;
+}
+/* toxtcompound.css - Styling for tox-compound engine
+*/
+
+.jtox-ds-fixed,
+.jtox-ds-variable {
+  border: 0px;
+  padding: 0px;
+  margin: 0px;
+  vertical-align: top;
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+
+.jtox-ds-fixed {
+  display: inline-block;
+  width: 450px;
+  float: left;
+  overflow-x: hidden;
+}
+
+.jtox-ds-feature {
+  display: inline-block;
+  width: 250px;
+  border: 0px;
+  padding: 0px;
+  margin: 2px 15px 2px 2px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.jtox-selection {
+  font-size: 80%;
+  float: right;
+  vertical-align: top;
+}
+
+.jtox-ds-tables {
+  position: relative;
+}
+
+.jtox-ds-tables .jt-processing,
+.jtox-ds-tables .jt-error {
+  text-align: center;
+  display: none;
+}
+
+.jtox-ds-tables .jt-processing .message {
+  background: url("../images/waiting_big.gif") left center no-repeat;
+  background-size: 30px 30px;
+  width: auto;
+  min-height: 30px;
+  padding-left: 35px;
+  padding-top: 8px;
+  overflow: visible;
+  display: inline-block;
+}
+
+.jtox-ds-tables .jt-error .message {
+  color: red;
+}
+
+.jtox-ds-tables .jtox-details-box {
+  position: absolute;
+  margin: 0px;
+  left: 0px;
+  top: 0px;
+  padding: 0px;
+  z-index: 10;
+  height: auto;
+}
+
+.jtox-ds-tables .jtox-inline,
+.jtox-ds-tables td {
+  vertical-align: top;
+}
+
+.jtox-ds-tables td .shortened {
+  max-width: 75px;
+}
+
+.jtox-ds-export {
+  float: right !important;
+}
+
+.jtox-ds-download {
+  padding:0px 5px 0px 5px;
+}
+
+.jtox-ds-details * {
+  font-size: small;
+}
+
+.jtox-ds-details .ui-tabs {
+  padding: 0px;
+  border: 0px;
+  margin: 0px;
+}
+
+div.jtox-details-table {
+  padding: 12px 0px 0px 0px !important;
+}
+
+.jtox-details-table table {
+  width: 100%;
+  height: auto;
+  vertical-align: baseline;
+}
+
+.jtox-controls {
+  padding: 10px;
+  vertical-align: baseline;
+}
+
+.jtox-controls .paginate_disabled_previous,
+.jtox-controls .paginate_enabled_previous,
+.jtox-controls .paginate_disabled_next,
+.jtox-controls .paginate_enabled_next {
+  float: none;
+}
+
+.jtox-controls select {
+  width: 75px;
+}
+
+.jtox-controls select,
+.jtox-controls input {
+  display: inline-block;
+  font-size: 1.1em;
+}
+
+.jtox-controls input {
+  position: absolute;
+  right:10px;
+  width: 25%;
+}
+
+.jtox-controls span.high {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+.jtox-substance table td div.shortened {
+  width: 120px;
+}
+.jtox-toolkit table.composition-info.dataTable td,
+.jtox-toolkit table.composition-info.dataTable th {
+  border: 0px;
+  padding-bottom: 0px;
+  padding-top: 0px;
+}
+
+.jtox-toolkit table.composition-info.dataTable th {
+  width: 20%;
+  text-align: right;
+}
+
+.jtox-toolkit table.composition-table td {
+  vertical-align: top;
+}
+/* toxtstudy.css - Styling for toxstudy engine
+*/
+
+div.jtox-study,
+div.jtox-compo-tab,
+div.jtox-substance {
+  display: block;
+  font-size: small;
+  border-radius: 5px;
+  padding: 5px 5px 35px 5px;
+}
+
+.jtox-compo-tab {
+  margin-top: 25px;
+  margin-bottom: 45px;  
+}
+
+div.jtox-study-tab.unloaded  {
+  background: url(../images/waiting_big.gif) center center no-repeat;
+  background-size: 30px 30px;
+}
+
+div.jtox-study-tab.unloaded div.jtox-study {
+  display: none;
+}
+
+div.jtox-study.folded {
+  padding-bottom: 5px;
+}
+
+div.jtox-study .title {
+  font-weight: bold;
+  clear: both;
+  padding: 0px;
+  margin: 0px;
+  border: 0px;
+  width: 100%;
+}
+
+div.jtox-foldable.jtox-study.unloaded>.title {
+  background: url(../images/waiting_small.png) right top no-repeat;
+  background-size: 16px 16px;
+}
+
+div.jtox-study-tab.ui-tabs-panel {
+  padding-left: 0px;
+  padding-bottom: 0px;
+  padding-right: 0px;
+  width: 100%;
+  height: 100%;
+}
+
+div.jtox-study-tab div button {
+	font-size: 80%;
+	padding:4px 8px 4px 8px;
+}
+
+div.jtox-study-tab .dataTables_wrapper {
+  overflow: hidden;  
+  width: 100%;
+}
+
+.jtox-toolkit .jtox-study table td {
+  word-wrap: break-word;
+}
+/* jToxLog styling
+*/
+
+.jtox-log {
+  position: fixed;
+	height: 144px;
+  width: 99%;
+  right: 0px;
+	bottom: 0px;
+	z-index: 100;
+	transition: bottom 0.5s ease;
+	-moz-transition: bottom 0.5s ease;
+	-webkit-transition: bottom 0.5s ease;
+	-o-transition: bottom 0.5s ease;
+	box-shadow: -3px 7px 7px #999; 
+}
+
+.jtox-log.right-side {
+  position: fixed;
+	height: 144px;
+  width: 95%;
+  right: 5px;
+	bottom: 0px;
+	z-index: 100;
+	transition: bottom 0.5s ease;
+	-moz-transition: bottom 0.5s ease;
+	-webkit-transition: bottom 0.5s ease;
+	-o-transition: bottom 0.5s ease;
+	box-shadow: 7px 7px 7px #999;  
+}
+
+.jtox-log.hidden {
+  bottom: -120px;
+}
+
+.jtox-log div.icon {
+  display: inline-block;
+  vertical-align: middle;
+  color: rgba(0, 0, 0, 0);
+  width: 16px;
+  height: 16px;
+}
+
+.jtox-log .status {
+  background: #fff;
+  position: absolute;
+  top: 1px;
+  width: 32px;
+  height: 24px;
+  text-align: center;
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  border-left: 1px solid black;
+  border-top: 1px solid black;
+  border-right: 1px solid black;
+  border-bottom: 0px;
+}
+
+.jtox-log .jt-faded {
+  opacity: 0.2;
+}
+
+.jtox-log .list-wrap {
+  background: #fff;
+  position: absolute;
+  box-sizing: border-box;
+  top: 0px;
+  width: 100%;
+  border: 1px solid black;
+  border-radius: 5px;
+  border-top-left-radius: 0px;
+  min-height: 50px;
+  height: 100%;
+  overflow: scroll;
+  margin-top: 25px;
+  padding-left: 8px;
+}
+
+.jtox-log.right-side .list-wrap {
+  border-top-right-radius: 0px;
+  border-top-left-radius: 5px;
+}
+
+.jtox-log .list-root {
+  margin-bottom: 24px;
+  margin-right: 8px;
+}
+
+.jtox-log .logline {
+  margin-top: 2px;
+  background: inherit;
+  border: 0px;
+  font-style: italic;
+  font-size: 90%;
+  overflow: hidden;
+
+  -moz-transition: height ease 300ms;
+  -ms-transition: height ease 300ms;
+  -o-transition: height ease 300ms;
+  -webkit-transition: height ease 300ms;
+  transition: height ease 300ms;
+}
+
+.jtox-log .logline .content {
+  vertical-align: middle;
+}
+
+.jtox-log .logline .details {
+  margin-left: 18px;
+  vertical-align: top;
+}
