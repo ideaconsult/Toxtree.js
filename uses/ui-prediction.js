@@ -20,7 +20,7 @@ var tt = {
   ]
 };
 
-var config_toxtree = {
+var config_model = {
   "baseFeatures": {}, // to be expanded upon algorithm loading
 	"handlers": {
   	"query": function (e, query) {
@@ -42,7 +42,7 @@ var config_toxtree = {
       "http://www.opentox.org/api/1.1#EINECS",
       "http://www.opentox.org/api/1.1#IUCLID5_UUID"
 	  ],
-  	"ToxTree": []   // to be expanded upon algorithm loading
+  	"Models": []   // to be expanded upon algorithm loading
 	}
 };
 
@@ -121,7 +121,7 @@ function runSelected() {
 }
 
 function formatAlgoName(val) {
-  return (val.indexOf('ToxTree: ') == 0) ? val = val.substr(9) : val;
+  return val.replace(/^\w+:\s+/, "");
 }
 
 function buildCategories(features, values) {
@@ -204,8 +204,8 @@ function onAlgoLoaded(result) {
       };
 
       $(this).data('algoId', data.id);
-      config_toxtree.groups.ToxTree.push(data.uri);
-      config_toxtree.baseFeatures[data.uri] = {
+      config_model.groups.Models.push(data.uri);
+      config_model.baseFeatures[data.uri] = {
     	  title: formatAlgoName(data.name),
     	  search: false,
     	  data: "index",
@@ -317,7 +317,7 @@ function showPrediction(algoId) {
   addFeatures(mapRes.data, algoId);
   var aEl = map.dom;
   if (mapRes.explanation != null)
-    $('.tt-explanation', aEl).html(mapRes.explanation.replace(/(Yes|No)/g, '<span class="answer $1">$1</span>'));
+    $('.tt-explanation', aEl).html(mapRes.explanation.replace(/\W(Yes|No)\W/g, '<span class="answer $1">$&</span>'));
   $('.tt-classification', aEl).empty();
 
 

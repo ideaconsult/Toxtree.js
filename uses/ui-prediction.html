@@ -8,7 +8,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
 
-  <title>ToxTree web interface</title>
+  <title>Model Prediction</title>
   <link rel="stylesheet" href="../tests/base.css"/>
 	<link rel="stylesheet" href="../tests/skeleton-fluid.css"/>
 	<link rel="stylesheet" href="../tests/layout.css"/>
@@ -18,7 +18,7 @@
 
 	<link rel="stylesheet" href="../www/jtoxkit.css"/>
 	<link rel="stylesheet" href="../www/ketcher.css"/>
-	<link rel="stylesheet" href="ui-toxtree.css"/>
+	<link rel="stylesheet" href="ui-prediction.css"/>
 
   <script src="oecdcategories.js"></script>
 
@@ -32,12 +32,12 @@
 
   <script src="../www/jtoxkit.js"></script>
   <script src="../www/ketcher.js"></script>
-  <script src="ui-toxtree.js"></script>
+  <script src="ui-prediction.js"></script>
 </head>
 <body>
   <div id="logger" class="jtox-toolkit jtox-widget hidden" data-kit="log" data-resend-events="false" data-right-side="true"></div>
 
-  <div class="jtox-toolkit" data-kit="query" data-configuration="config_toxtree" data-base-url="https://apps.ideaconsult.net/data">
+  <div class="jtox-toolkit" data-kit="query" data-configuration="config_model" data-base-url="https://apps.ideaconsult.net/data">
     <div class="jtox-toolkit jtox-widget cc-fixed" data-kit="search"></div>
     <div id="tt-bigpane" class="cc-flex">
       <div>
@@ -59,9 +59,9 @@
             <div class="title jtox-inline"><span class="counter-field">Toxicity prediction modules (0/0)</span></div>
             <div class="jtox-inline selections"><a href="#" class="select-unselect" title="(Un)select all algorithms" data-other="unselect">select</a>&nbsp;<a href="#" class="expand-collapse" title="Expand/collapse all algorithm panes" data-other="collapse">expand</a>&nbsp;<a href="#" class="run-selected" title="Run predictions for all selected algorithms">run</a>&nbsp;<a href="#" class="show-hide" data-other="show" title="Hide/show unselected algorithms">hide</a></div>
           </div>
-          <div class="jtox-toolkit jtox-widget cc-flex size-full" data-kit="model" data-algorithms="true" data-no-interface="true" data-on-loaded="onAlgoLoaded" data-algorithm-needle="ToxTree"></div>
+          <div class="jtox-toolkit jtox-widget cc-flex size-full" data-kit="model" data-algorithms="true" data-no-interface="true" data-on-loaded="onAlgoLoaded"></div>
         </div>
-        <div id="tt-table" class="jtox-toolkit jtox-panel" data-kit="compound" data-configuration="config_toxtree" data-manual-init="true" data-pre-details="onTableDetails" data-show-tabs="false" data-on-loaded="onDataLoaded" data-selection-handler="checked"></div>
+        <div id="tt-table" class="jtox-toolkit jtox-panel" data-kit="compound" data-configuration="config_model" data-manual-init="true" data-pre-details="onTableDetails" data-show-tabs="false" data-on-loaded="onDataLoaded" data-selection-handler="checked"></div>
       </div>
     </div>
     <div id="sidebar">
