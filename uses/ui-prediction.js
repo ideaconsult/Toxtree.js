@@ -124,47 +124,33 @@ function formatAlgoName(val) {
   return val.replace(/^\w+:\s+/, "");
 }
 
-function buildCategories(features, values) {
-	var cats = [];
-	var regex = /\^\^(\S+)Category/i;
-	var multi = false;
-
-	for (var fId in values) {
-	  if (features[fId].title.indexOf('#explanation') > -1 || features[fId].source.type.toLowerCase() != 'model')
-	    continue;
-  	var val = values[fId];
-  	var anot = features[fId].annotation;
-  	if (anot.length > 0) {
-  	  if (cats.length > 0)
-  	    multi = true;
-    	for (var i = 0;i < anot.length; ++i) {
-    	  cats.push({
-    	    name: features[fId].title.replace(/\s/g, '&nbsp;'),
-      	  title: anot[i].o.replace(/\s/g, '&nbsp;'),
-      	  toxicity: anot[i].type.replace(regex, '$1').toLowerCase(),
-      	  active: anot[i].o == val
-    	  });
-    	}
-    }
-    else
-      cats.push({
-        name: features[fId].title.replace(/\s/g, '&nbsp;'),
-        title: val,
-        toxicity: 'unknown',
-        active: true
-      });
-	};
-
-	if (multi) {
-	  var old = cats;
-	  cats = [];
-	  $.map(old, function (o) {
+function mergeCategories(features, indices) {
+  var cats = [];
+  for (var i = 0; i < indices.length; ++i) {
+    $.map(features[indices[i]].categories, function (o) {
   	  if (o.active) {
     	  o.title = o.name + ':&nbsp;' + o.title;
     	  cats.push(o);
   	  }
-	  });
+    });
+  }
+  
+  return cats;
+}
 
+function buildCategories(feature) {
+	anot = feature.annotation;
+	if (!anot || anot.length == 0)
+	  return null;
+	var cats = [],
+	    regex = /\^\^(\S+)Category/i;
+	for (var i = 0;i < anot.length; ++i) {
+	  cats.push({
+	    name: feature.title.replace(/\s/g, '&nbsp;'),
+  	  title: anot[i].o.replace(/\s/g, '&nbsp;'),
+  	  toxicity: anot[i].type.replace(regex, '$1').toLowerCase(),
+  	  active: anot[i].o == feature.value
+	  });
 	}
 
 	return cats;
@@ -244,7 +230,7 @@ function addFeatures(data, className) {
       enumFn = function () { $(this).addClass(className); };
       $('.' + className, tt.featuresList).remove();
     }
-    ccLib.populateData(tt.featuresList, '#tt-feature', data, enumFn);
+    ccLib.populateData(tt.featuresList, '#tt-feature', data.filter(function (e) { return e.explanation == null; }), enumFn);
     var sep = $('#tt-feature')[0].cloneNode(true);
     sep.removeAttribute('id');
     $(sep).addClass('separator').empty();
@@ -307,22 +293,76 @@ function showCompound() {
 }
 
 function showPrediction(algoId) {
-  var map = tt.algoMap[algoId];
-  var mapRes = map.results[tt.compoundIdx];
+  var map = tt.algoMap[algoId],
+      mapRes = map.results[tt.compoundIdx];
 
   // check if we have results for this guy at all...
   if (mapRes == null || mapRes.data == null)
     return;
 
-  addFeatures(mapRes.data, algoId);
-  var aEl = map.dom;
-  if (mapRes.explanation != null)
-    $('.tt-explanation', aEl).html(mapRes.explanation.replace(/\W(Yes|No)\W/g, '<span class="answer $1">$&</span>'));
+  var aEl = map.dom,
+      $expEl = $('.content', aEl).empty();
+    
+  if (mapRes.submodels && mapRes.submodels.length) {
+    mapRes.submodels.forEach(function (el, subIdx) {  
+      addFeatures(el.data, algoId + "-" + subIdx);
+      if (!el.explanation) {
+        el.explanation = "";
+        el.data.forEach(function (feature) {
+          if (!feature.annotation || !feature.annotation.length)
+            el.explanation += feature.title + "&nbsp;:&nbsp;<strong>" + jT.ui.valueWithUnits(feature.value, feature.units) + "</strong><br/>";
+        });
+      }
+      
+      if (!!el.explanation)
+        $expEl.append('<div class="tt-explanation">' + el.explanation + '</div>');
+    });
+  }
+  else { // Singe model mode
+    addFeatures(mapRes.data, algoId);
+    if (mapRes.explanation != null)
+      $expEl.append('<div class="tt-explanation">' + mapRes.explanation + '</div>');
+  }
+    
   $('.tt-classification', aEl).empty();
-
-
   fillClassification($('.tt-classification', aEl)[0], mapRes.categories);
   $(aEl).removeClass('folded');
+}
+
+function splitFeatures(features) {
+  var lastURI = features[0].source.URI,
+      subs = [],
+      catFeatures = [],
+      descIndex = null;
+  
+  for (var e, i = 0;; ++i) {
+    if (i >= features.length || features[i].source.URI != lastURI) {
+      e = { data: features.splice(0, i) };
+      if (catFeatures.length > 1) 
+        e.categories = mergeCategories(e.data, catFeatures);
+      else if (catFeatures.length == 1)
+        e.categories = e.data[catFeatures[0]].categories;
+        
+      if (descIndex != null)
+        e.explanation = e.data[descIndex].explanation;
+
+      subs.push(e);
+      
+      i = 0;
+      descIndex = null;
+      catFeatures = [];
+    }
+    
+    if (i >= features.length)
+      break;
+    else if (features[i].explanation != null)
+      descIndex = i;
+    else if (features[i].categories != null)
+      catFeatures.push(i);
+    lastURI = i < features.length ? features[i].source.URI : null;
+  }
+  
+  return subs;
 }
 
 function parsePrediction(result, algoId, index) {
@@ -330,28 +370,43 @@ function parsePrediction(result, algoId, index) {
 
   var cells = $('#tt-table table td.' + algoId);
   for (var i = 0, rl = result.dataEntry.length; i < rl; ++i) {
-    var idx = i + (index || 0);
-    var mapRes = map.results[idx];
-    if (mapRes == null){
+    var idx = i + (index || 0),
+        mapRes = map.results[idx],
+        catFeatures = [];
+        
+    if (mapRes == null)
       map.results[idx] = mapRes = {};
-    }
-    mapRes.explanation = '';
-    mapRes.data = jToxCompound.extractFeatures(result.dataEntry[i], result.feature, function (feature, fId) {
-      if (feature.title.indexOf("#explanation") > -1) {
-        mapRes.explanation = feature.value;
+    
+    mapRes.data = jToxCompound.extractFeatures(result.dataEntry[i], result.feature, function (feature, fId, fIdx) {
+      if (feature.source.type.toLowerCase() != 'model' || !feature.value)
         return false;
+        
+      if (feature.title.endsWith("#explanation"))
+        feature.explanation = feature.value.replace(/\W(Yes|No)\W/g, '<span class="answer $1">$&</span>');
+      else {
+        feature.categories = buildCategories(feature);
+        if (feature.categories != null)
+          catFeatures.push(fIdx)
       }
-      else if (feature.source.type.toLowerCase() == 'model' && !!feature.value)
-        return true;
-      else
-        return false;
+      return true;
     });
 
-    mapRes.categories = buildCategories(result.feature, result.dataEntry[i].values);
+    // Make the combined categories in any case for the table mode
+    if (catFeatures.length > 1) 
+      mapRes.categories = mergeCategories(mapRes.data, catFeatures);
+    else if (catFeatures.length == 1)
+      mapRes.categories = mapRes.data[catFeatures[0]].categories;
 
-    if (mapRes.categories.length == 0 && index == null){
-      runPredict ($('button', cells[idx]), algoId);
+    if (tt.modelKit.settings.multiModels && mapRes.data.length > 1) {
+      mapRes.data.sort(function (a, b) { return a.title < b.title ? -1 : (a.title > b.title ? 1 : 0); });
+      mapRes.submodels = splitFeatures(mapRes.data);
     }
+    else // !multiModels
+      mapRes.explanation = mapRes.data.find(function (e) { return e.explanation != null; }).explanation;
+
+    // Finally, fill the table cell.
+    if (mapRes.categories.length == 0 && index == null)
+      runPredict ($('button', cells[idx]), algoId);
     else {
       $('.tt-class', cells[idx]).remove();
       $(cells[idx]).addClass('calculated');
