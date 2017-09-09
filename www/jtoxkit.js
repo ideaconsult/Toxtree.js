@@ -2803,7 +2803,7 @@ cls.prototype.init = function () {
       var feat = jT.$.extend({}, features[fId]);
       feat.value = entry.values[fId];
       if (!!feat.title) {
-        if (ccLib.fireCallback(callback, null, feat, fId) !== false) {
+        if (ccLib.fireCallback(callback, null, feat, fId, data.length) !== false) {
           if (!feat.value)
             feat.value = '-';
           data.push(feat);
@@ -3024,7 +3024,7 @@ var jToxModel = (function () {
     sDom: "<Fif>rt",          // merged to dataTable's settings, when created
     loadOnInit: false,        // whether to make a (blank) request upon loading
     oLanguage: null,          // merged to dataTable's settings, when created
-    /* algorithmNeedle */
+    /* algorithmFilter */
     /* modelUri */
     configuration: {
       columns : {
@@ -3071,7 +3071,7 @@ var jToxModel = (function () {
     }
 
     // finally, wait a bit for everyone to get initialized and make a call, if asked to
-    if (self.settings.modelUri != null || self.settings.algorithmNeedle != null || self.settings.loadOnInit)
+    if (self.settings.modelUri != null || self.settings.algorithmFilter != null || self.settings.loadOnInit)
       self.query();
   };
 
@@ -3229,7 +3229,7 @@ var jToxModel = (function () {
 
   cls.prototype.query = function (uri) {
     if (this.settings.algorithms)
-      this.listAlgorithms(this.settings.algorithmNeedle = (uri || this.settings.algorithmNeedle));
+      this.listAlgorithms(this.settings.algorithmFilter = (uri || this.settings.algorithmFilter));
     else
       this.listModels(this.settings.modelUri = (uri || this.settings.modelUri));
   };

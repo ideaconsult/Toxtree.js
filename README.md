@@ -709,10 +709,10 @@ There are few things that can be setup from outside:
 - **`algorithms`** (attr. `data-algorithms`): Whether to list available algorithms, rather than available models. Default: _false_.
 - **`maxStars`** (attr. `data-max-stars`): How many stars are considered maximum, when building the long version of ratings. Default: _10_.
 - **`shortStars`** (attr. `data-short-stars`): Whether to show show star rating notation, i.e. - one star and the number of stars next to it, opposed to the long (default) version - always showing the maximum number of stars, with given number of them - highlighted. Default is _false_.
-- **`loadOnInit`** (attr. `data-load-on-init`): Whether to make an initial query even when _modelUri_ or _algorithmNeedle_ are not specified. Default is _false_.
+- **`loadOnInit`** (attr. `data-load-on-init`): Whether to make an initial query even when _modelUri_ or _algorithmFilter_ are not specified. Default is _false_.
 - **`sDom`** (attr. `data-s-dom`): The redefinition of _sDom_ attribute for the table. Default _"\<Fif\>rt"_.
 - **`modelUri`** (attr. `data-model-uri`): The address to query for list of models. If none is passed, the standard `<baseURL>/model` is used.
-- **`algorithmNeedle`** (attr. `data-algorithms-needle`): If algorithms listing mode is selected (`algorithms` = _true_) - this is the needle to be used when listing them. Default: _null_.
+- **`algorithmFilter`** (attr. `data-algorithm-filter`): If algorithms listing mode is selected (`algorithms` = _true_) - this is the needle to be used when listing them. Default: _null_.
 - **`forceCreate`** (attr. `data-force-create`): When creating a model from an algorithm, the kit usually tries to obtain one from the server, and only if that fails it makes a _create model_ query, unless this option is specified, which instructs the kit to directly try to create a new one. Default _false_.
 
 
