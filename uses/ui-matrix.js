@@ -627,8 +627,6 @@ var jToxBundle = {
 
       };
 
-
-
       $('.create-button', panel).on('click', function () {
         var el = this;
         $(el).addClass('loading');
@@ -646,33 +644,13 @@ var jToxBundle = {
         });
       });
 
-      $('.create-final-button', panel).on('click', function () {
-        var el = this;
-        $(el).addClass('loading');
-        jT.service(self, self.bundleUri + '/matrix/final', { method: 'POST', data: { deletematrix:  false } }, function (result, jhr) {
-          $(el).removeClass('loading');
-          if (!!result) {
-            $('.jtox-toolkit', panel).show();
-            $('.save-button', panel).show();
-            $('.create-final-button', panel).hide();
-            self.bundleSummary['matrix/final']++;
-            self.edit.matrixEditable = false;
-            self.matrixKit.query(self.bundleUri + '/matrix/final');
-            self.progressTabs();
-          }
-        });
-      });
-
-
       $(panel).addClass('initialized');
 
     }
 
-
-      // finally decide what query to make, depending on the
+    // finally decide what query to make, depending on the
     $('.save-button', panel).hide();
     $('.create-button', panel).hide();
-    $('.create-final-button', panel).hide();
     var queryUri = null;
     if (panId == 'xinitial') {
       $('.jtox-toolkit', panel).show();
@@ -680,28 +658,21 @@ var jToxBundle = {
       queryUri = self.bundleUri + '/dataset?mergeDatasets=true';
     }
     else {
-      var queryPath = (panId == 'xfinal') ? '/matrix/final' : '/matrix/working';
-      var m = (panId == 'xfinal') ? 'matrix/final' : 'matrix';
-      var editable = (panId == 'xfinal') ? false : true;
-      if (self.bundleSummary[m] > 0) {
+      var queryPath = (panId == 'xfinal') ? '/matrix/final' : '/matrix/working',
+          editable = (panId != 'xfinal');
+          
+      if (self.bundleSummary.matrix > 0) {
         $('.jtox-toolkit', panel).show();
         queryUri = self.bundleUri + queryPath;
         self.edit.matrixEditable = editable;
-        if (editable) {
+        if (editable)
           $('.save-button', panel).show();
-        }
-        else {
+        else
           $('.save-button', panel).hide();
-        }
       }
       else {
         $('.jtox-toolkit', panel).hide();
-        if (self.bundleSummary.matrix > 0) {
-          $('.create-final-button', panel).show();
-        }
-        else {
-          $('.create-button', panel).show();
-        }
+        $('.create-button', panel).show();
       }
     }
 
@@ -1783,7 +1754,7 @@ var jToxBundle = {
   progressTabs: function () {
     $(this.rootElement).tabs(this.bundleSummary.compound > 0 ? 'enable' : 'disable', 2);
     $(this.rootElement).tabs(this.bundleSummary.substance > 0  && this.bundleSummary.property > 0 ? 'enable' : 'disable', 3);
-    if (this.bundleSummary.matrix > 0 || this.bundleSummary['matrix/final'] > 0) {
+    if (this.bundleSummary.matrix > 0) {
       $('#xfinal').button('enable');
       $(this.rootElement).tabs('enable', 4);
     }
