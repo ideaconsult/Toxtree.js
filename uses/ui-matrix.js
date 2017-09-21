@@ -752,15 +752,16 @@ var jToxBundle = {
         var bundleInfo = data.bundles[self.bundleUri] || {};
         // we need to setup remarks field regardless of bundleInfo presence
         var noteEl = $('textarea.remark', row).on('change', function (e) {
-          var data = jT.ui.rowData(this);
-          var el = this;
+          var data = jT.ui.rowData(this),
+              el = this,
+              bInfo = data.bundles[self.bundleUri] || {};
           $(el).addClass('loading');
           jT.service(self, self.bundleUri + '/compound', {
             'method': 'PUT',
             'data': {
               compound_uri: data.compound.URI,
               command: 'add',
-              tag: data.bundles[self.bundleUri].tag,
+              tag: bInfo.tag,
               remarks: $(el).val()
             }
           }, function (result) {
