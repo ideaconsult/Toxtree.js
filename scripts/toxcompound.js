@@ -1034,7 +1034,7 @@ cls.prototype.init = function () {
       var feat = jT.$.extend({}, features[fId]);
       feat.value = entry.values[fId];
       if (!!feat.title) {
-        if (ccLib.fireCallback(callback, null, feat, fId) !== false) {
+        if (ccLib.fireCallback(callback, null, feat, fId, data.length) !== false) {
           if (!feat.value)
             feat.value = '-';
           data.push(feat);
