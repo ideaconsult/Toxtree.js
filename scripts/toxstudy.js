@@ -131,7 +131,7 @@ var jToxStudy = (function () {
       var defaultColumns = [
         { "sTitle": "Name", "sClass": "center middle", "sWidth": "15%", "mData": "protocol.endpoint" }, // The name (endpoint)
         { "sTitle": "Endpoint", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData": "effects", "mRender": function (data, type, full) { 
-          return jT.ui.renderMulti(data, type, full, function (data, type, full, idx) {
+          return jT.ui.renderMulti(data, type, full, function (data, type) {
             var endpointText = self.getFormatted(data, type, "endpoint");
             if (data.endpointtype != null)
               endpointText += " (" + data.endpointtype + ")";
@@ -144,26 +144,23 @@ var jToxStudy = (function () {
               resText += " (" + (data.result.errQualifier || "Err") + " " + data.result.errorValue + ")";
             return  resText }); } },
         { "sTitle": "Text", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { 
-          return jT.ui.renderMulti(data, type, full, function (data, type) { 
+          return jT.ui.renderMulti(data, type, full, function (data) { 
             return data.result.textValue ||  '-'; }); 
           } },
         { "sTitle": "Guideline", "sClass": "center middle", "sWidth": "15%", "mData": "protocol.guideline", "mRender" : "[,]", "sDefaultContent": "-"  },    // Protocol columns
         { "sTitle": "Owner", "sClass": "center middle", "sWidth": "10%", "mData": "citation.owner", "sDefaultContent": "-" },
-        { "sTitle": "Citation", "sClass": "center middle", "sWidth": "10%", "mData": "citation", "mRender": function (data, type, full) { 
+        { "sTitle": "Citation", "sClass": "center middle", "sWidth": "10%", "mData": "citation", "mRender": function (data) { 
           return (data.title || "") + ' ' + (!!data.year || ""); } 
         },
-        { "sTitle": "Reliability", "sClass": "center middle", "sWidth": "10%", "mData": "reliability", "mRender": function (data, type, full) { 
+        { "sTitle": "Reliability", "sClass": "center middle", "sWidth": "10%", "mData": "reliability", "mRender": function (data) { 
           return data.r_value; }  
         },
-        { "sTitle": "UUID", "sClass": "center middle", "sWidth": "15%", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { 
+        { "sTitle": "UUID", "sClass": "center middle", "sWidth": "15%", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type) { 
           return type != "display" ? '' + data : jT.ui.shortenedData(data, "Press to copy the UUID in the clipboard"); } 
         }
       ];
 
       var colDefs = [];
-
-      // start filling it
-      var parCount = 0;
 
       // this function takes care to add as columns all elements from given array
       var putAGroup = function(group, fProcess) {
@@ -263,7 +260,7 @@ var jToxStudy = (function () {
           el.innerHTML = jT.ui.updateCounter(el.innerHTML, iTotal);
           return sPre;
         },
-        "fnCreatedRow": function( nRow, aData, iDataIndex ) {
+        "fnCreatedRow": function( nRow ) {
           ccLib.equalizeHeights.apply(window, jT.$('td.jtox-multi table tbody', nRow).toArray());
         },
 
@@ -301,8 +298,8 @@ var jToxStudy = (function () {
 
     // create the groups on the corresponding tabs, first sorting them alphabetically
     summary.sort(function (a, b) {
-    	var valA = (a.category.order || a.category.description || a.category.title);
-    	var valB = (b.category.order || b.category.description || b.category.title);
+      var valA = (a.category.order || a.category.description || a.category.title),
+          valB = (b.category.order || b.category.description || b.category.title);
     	if (valA == null)
     		return -1;
     	if (valB == null)
@@ -312,14 +309,15 @@ var jToxStudy = (function () {
       return (valA < valB) ? -1 : 1;
     });
 
-    var tabRoot = $('ul', self.rootElement).parent()[0];
-    var added = 0;
-    var lastAdded = null;
-    var addStudyTab = function (top, sum) {
-      var tab = jT.getTemplate('#jtox-study-tab');
-      var link = jT.ui.addTab(tabRoot, (knownNames[top] || sum.topcategory.title) + " (0)", "jtox-" + top.toLowerCase() + '_' + self.instanceNo, tab).tab;
-      jT.$(link).data('type', top);
+    var tabRoot = $('ul', self.rootElement).parent()[0],
+        added = 0,
+        lastAdded = null;
 
+    function addStudyTab(top, sum) {
+      var tab = jT.getTemplate('#jtox-study-tab'),
+          link = jT.ui.addTab(tabRoot, (knownNames[top] || sum.topcategory.title) + " (0)", "jtox-" + top.toLowerCase() + '_' + self.instanceNo, tab).tab;
+
+      jT.$(link).data('type', top);
       jT.$(tab).addClass(top).data('jtox-uri', sum.topcategory.uri);
       ccLib.fillTree(tab, self.substance);
 
@@ -376,8 +374,8 @@ var jToxStudy = (function () {
       if (!!filterTimeout)
         clearTimeout(filterTimeout);
 
-      var field = ev.currentTarget;
-      var tab = jT.$(this).parents('.jtox-study-tab')[0];
+      var field = ev.currentTarget,
+          tab = jT.$(this).parents('.jtox-study-tab')[0];
 
       filterTimeout = setTimeout(function() {
         var tabList = jT.$('.jtox-study-table', tab);
@@ -388,15 +386,14 @@ var jToxStudy = (function () {
     };
 
     var tabList = jT.$('.jtox-study-tab');
-    for (var t = 0, tlen = tabList.length;t < tlen; t++){
-      var filterEl = jT.$('.jtox-study-filter', tabList[t])[0].onkeydown = fFilter;
-    }
+    for (var t = 0, tlen = tabList.length;t < tlen; t++)
+      jT.$('.jtox-study-filter', tabList[t])[0].onkeydown = fFilter;
   };
 
   cls.prototype.processStudies = function (tab, study, map) {
-    var self = this;
-    var cats = {};
-    var cntCats = 0;
+    var self = this,
+        cats = {},
+        cntCats = 0;
 
     // first swipe to map them to different categories...
     if (!map){
@@ -421,8 +418,8 @@ var jToxStudy = (function () {
 
     // now iterate within all categories (if many) and initialize the tables
     for (var c in cats) {
-      var onec = cats[c];
-      var aStudy = jT.$('.' + c + '.jtox-study', tab)[0];
+      var onec = cats[c],
+          aStudy = jT.$('.' + c + '.jtox-study', tab)[0];
       if (aStudy === undefined)
         continue;
 
@@ -436,14 +433,22 @@ var jToxStudy = (function () {
           break;
       }
 
-      var theTable = self.ensureTable(tab, study);
+      var theTable = self.ensureTable(tab, study),
+          fixMultiRows = function () {
+            jT.$(theTable.tBodies[0]).children().each(function() {
+              ccLib.equalizeHeights.apply(window, jT.$('td.jtox-multi table tbody', this).toArray());
+            });
+          };
+
       jT.$(theTable).dataTable().fnAddData(onec);
-      jT.$(theTable).colResizable({ minWidth: 30, liveDrag: true });
+      jT.$(theTable).colResizable({ minWidth: 30, liveDrag: true, onResize: fixMultiRows });
+
+      fixMultiRows();
       if (cntCats > 1)
         jT.$(theTable).parents('.jtox-study').addClass('folded');
 
       // we need to fix columns height's because of multi-cells
-      jT.$('#' + theTable.id + ' .jtox-multi').each(function(index){
+      jT.$('.jtox-multi', theTable[0]).each(function () {
         this.style.height = '' + this.offsetHeight + 'px';
       });
     }
