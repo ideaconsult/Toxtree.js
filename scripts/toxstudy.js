@@ -131,8 +131,11 @@ var jToxStudy = (function () {
       var defaultColumns = [
         { "sTitle": "Name", "sClass": "center middle", "sWidth": "15%", "mData": "protocol.endpoint" }, // The name (endpoint)
         { "sTitle": "Endpoint", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData": "effects", "mRender": function (data, type, full) { 
-          return jT.ui.renderMulti(data, type, full, function (data, type) { 
-            return self.getFormatted(data, type, "endpoint"); }); 
+          return jT.ui.renderMulti(data, type, full, function (data, type, full, idx) {
+            var endpointText = self.getFormatted(data, type, "endpoint");
+            if (data.endpointtype != null)
+              endpointText += " (" + data.endpointtype + ")";
+            return endpointText }); 
           } },   // Effects columns
         { "sTitle": "Result", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { 
           return jT.ui.renderMulti(data, type, full, function (data, type) {
