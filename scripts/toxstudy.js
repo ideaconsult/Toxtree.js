@@ -123,20 +123,38 @@ var jToxStudy = (function () {
 
   // modifies the column title, according to configuration and returns "null" if it is marked as "invisible".
   cls.prototype.ensureTable =function (tab, study) {
-    var self = this;
-    var category = study.protocol.category.code;
-    var theTable = jT.$('.' + category + ' .jtox-study-table', tab)[0];
+    var self = this,
+        category = study.protocol.category.code,
+        theTable = jT.$('.' + category + ' .jtox-study-table', tab)[0];
+
     if (!jT.$(theTable).hasClass('dataTable')) {
       var defaultColumns = [
         { "sTitle": "Name", "sClass": "center middle", "sWidth": "15%", "mData": "protocol.endpoint" }, // The name (endpoint)
-        { "sTitle": "Endpoint", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData": "effects", "mRender": function (data, type, full) { return jT.ui.renderMulti(data, type, full, function (data, type) { return self.getFormatted(data, type, "endpoint"); }); } },   // Effects columns
-        { "sTitle": "Result", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { return jT.ui.renderMulti(data, type, full, function (data, type) { return jT.ui.renderRange(data.result, null, type) }); } },
-        { "sTitle": "Text", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { return jT.ui.renderMulti(data, type, full, function (data, type) { return data.result.textValue ||  '-'; }); } },
+        { "sTitle": "Endpoint", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData": "effects", "mRender": function (data, type, full) { 
+          return jT.ui.renderMulti(data, type, full, function (data, type) { 
+            return self.getFormatted(data, type, "endpoint"); }); 
+          } },   // Effects columns
+        { "sTitle": "Result", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { 
+          return jT.ui.renderMulti(data, type, full, function (data, type) {
+            var resText = jT.ui.renderRange(data.result, null, type);
+            if (data.result.errorValue != null)
+              resText += " (" + (data.result.errQualifier || "Err") + " " + data.result.errorValue + ")";
+            return  resText }); } },
+        { "sTitle": "Text", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { 
+          return jT.ui.renderMulti(data, type, full, function (data, type) { 
+            return data.result.textValue ||  '-'; }); 
+          } },
         { "sTitle": "Guideline", "sClass": "center middle", "sWidth": "15%", "mData": "protocol.guideline", "mRender" : "[,]", "sDefaultContent": "-"  },    // Protocol columns
         { "sTitle": "Owner", "sClass": "center middle", "sWidth": "10%", "mData": "citation.owner", "sDefaultContent": "-" },
-        { "sTitle": "Citation", "sClass": "center middle", "sWidth": "10%", "mData": "citation", "mRender": function (data, type, full) { return (data.title || "") + ' ' + (!!data.year || ""); }  },
-        { "sTitle": "Reliability", "sClass": "center middle", "sWidth": "10%", "mData": "reliability", "mRender": function (data, type, full) { return data.r_value; }  },
-        { "sTitle": "UUID", "sClass": "center middle", "sWidth": "15%", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { return type != "display" ? '' + data : jT.ui.shortenedData(data, "Press to copy the UUID in the clipboard"); } }
+        { "sTitle": "Citation", "sClass": "center middle", "sWidth": "10%", "mData": "citation", "mRender": function (data, type, full) { 
+          return (data.title || "") + ' ' + (!!data.year || ""); } 
+        },
+        { "sTitle": "Reliability", "sClass": "center middle", "sWidth": "10%", "mData": "reliability", "mRender": function (data, type, full) { 
+          return data.r_value; }  
+        },
+        { "sTitle": "UUID", "sClass": "center middle", "sWidth": "15%", "mData": "uuid", "bSearchable": false, "mRender" : function(data, type, full) { 
+          return type != "display" ? '' + data : jT.ui.shortenedData(data, "Press to copy the UUID in the clipboard"); } 
+        }
       ];
 
       var colDefs = [];
