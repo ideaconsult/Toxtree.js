@@ -294,15 +294,14 @@ function showCompound() {
 
 function showPrediction(algoId) {
   var map = tt.algoMap[algoId],
-      mapRes = map.results[tt.compoundIdx];
+      mapRes = map.results[tt.compoundIdx],
+      aEl = map.dom,
+      $expEl = $('.content', aEl).empty();
 
   // check if we have results for this guy at all...
-  if (mapRes == null || mapRes.data == null)
+  if (mapRes == null || mapRes.data == null || mapRes.data.length == 0)
     return;
 
-  var aEl = map.dom,
-      $expEl = $('.content', aEl).empty();
-    
   if (mapRes.submodels && mapRes.submodels.length) {
     mapRes.submodels.forEach(function (el, subIdx) {  
       addFeatures(el.data, algoId + "-" + subIdx);
@@ -396,13 +395,18 @@ function parsePrediction(result, algoId, index) {
       mapRes.categories = mergeCategories(mapRes.data, catFeatures);
     else if (catFeatures.length == 1)
       mapRes.categories = mapRes.data[catFeatures[0]].categories;
+    else
+      return;
 
     if (tt.modelKit.settings.multiModels && mapRes.data.length > 1) {
       mapRes.data.sort(function (a, b) { return a.title < b.title ? -1 : (a.title > b.title ? 1 : 0); });
       mapRes.submodels = splitFeatures(mapRes.data);
     }
-    else // !multiModels
-      mapRes.explanation = mapRes.data.find(function (e) { return e.explanation != null; }).explanation;
+    else { // !multiModels
+      var explainedOne = mapRes.data.find(function (e) { return e.explanation != null; });
+      if (!!explainedOne)
+        mapRes.explanation = explainedOne.explanation;
+    } 
 
     // Finally, fill the table cell.
     if (mapRes.categories.length == 0 && index == null)
