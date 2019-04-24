@@ -9,6 +9,7 @@ var jToxStudy = (function () {
     tab: null,
     sDom: "rt<Fip>",
     oLanguage: null,
+    errorDefault: "Err", // Default text shown when errQualifier is missing
     // events
     onSummary: null,    // invoked when the summary is loaded
     onComposition: null, // invoked when the
@@ -141,7 +142,7 @@ var jToxStudy = (function () {
           return jT.ui.renderMulti(data, type, full, function (data, type) {
             var resText = jT.ui.renderRange(data.result, null, type);
             if (data.result.errorValue != null)
-              resText += " (" + (data.result.errQualifier || "Err") + " " + data.result.errorValue + ")";
+              resText += " (" + (data.result.errQualifier || self.settings.errorDefault) + " " + data.result.errorValue + ")";
             return  resText }); } },
         { "sTitle": "Text", "sClass": "center middle jtox-multi", "sWidth": "10%", "mData" : "effects", "mRender": function (data, type, full) { 
           return jT.ui.renderMulti(data, type, full, function (data) { 
