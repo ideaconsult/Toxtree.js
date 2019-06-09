@@ -325,7 +325,7 @@ var ccLib = {
   },
 
   // Present a number in a brief format, adding 'k' or 'm', if needed.
-  briefNumber: function (num, prec) {
+  formatNumber: function (num, prec) {
     var suf = "",
         prec = prec || 10;
     
