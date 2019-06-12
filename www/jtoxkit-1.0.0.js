@@ -325,7 +325,7 @@ var ccLib = {
   },
 
   // Present a number in a brief format, adding 'k' or 'm', if needed.
-  briefNumber: function (num, prec) {
+  formatNumber: function (num, prec) {
     var suf = "",
         prec = prec || 10;
     
@@ -3400,7 +3400,7 @@ var jToxSubstance = (function () {
     var qUri = ccLib.addParameter(self.substanceUri, "page=" + qStart + "&pagesize=" + size);
     jT.call(self, qUri, function (result, jhr) {
       if (!result && jhr.status != 200)
-        result = { substabce: [] }; // empty one
+        result = { substance: [] }; // empty one
       if (!!result) {
         self.pageSize = size;
         self.pageStart = from;
@@ -3876,9 +3876,6 @@ var jToxStudy = (function () {
           el.innerHTML = jT.ui.updateCounter(el.innerHTML, iTotal);
           return sPre;
         },
-        "fnCreatedRow": function( nRow ) {
-          ccLib.equalizeHeights.apply(window, jT.$('td.jtox-multi table tbody', nRow).toArray());
-        },
 
 				"oLanguage": jT.$.extend({
           "sProcessing": "<img src='" + (jT.settings.baseUrl || self.baseUrl) + "/images/24x24_ambit.gif' border='0'>",
@@ -4058,6 +4055,7 @@ var jToxStudy = (function () {
 
       jT.$(theTable).dataTable().fnAddData(onec);
       jT.$(theTable).colResizable({ minWidth: 30, liveDrag: true, onResize: fixMultiRows });
+      jT.$(window).resize(fixMultiRows);
 
       fixMultiRows();
       if (cntCats > 1)

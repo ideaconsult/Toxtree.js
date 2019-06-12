@@ -29,7 +29,7 @@ var jToxFacet = (function () {
       "fnSize": function(entry) {  return entry.size },
       "fnLabel": function(entries) { 
         return {  "label": entries.length > 1 ? "..." : entries.map(function (e) { return e.name; }).join("/"), 
-                  "size" : entries[0].size > 200 ? "(" + ccLib.briefNumber(entries[0].size) + ")" : null 
+                  "size" : entries[0].size > 200 ? "(" + ccLib.formatNumber(entries[0].size) + ")" : null 
               }; 
       }
     };
